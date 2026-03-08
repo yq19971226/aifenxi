@@ -139,7 +139,7 @@ export function AlertRuleForm({ mode, initialData, onSubmit, onCancel }: AlertRu
         </div>
       </div>
       <div className="flex items-center gap-3 pt-2">
-        <button type="submit" disabled={submitting} className="px-5 py-2 rounded-lg bg-[var(--color-accent)] text-white text-sm font-medium hover:bg-[var(--color-accent)]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? "提交中..." : mode === "create" ? "创建规则" : "保存修改"}</button>
+        <button type="submit" disabled={submitting} className="px-5 py-2 rounded-lg bg-white text-zinc-900 text-sm font-medium hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? "提交中..." : mode === "create" ? "创建规则" : "保存修改"}</button>
         {onCancel && <button type="button" onClick={onCancel} className="px-5 py-2 rounded-lg text-sm text-zinc-400 hover:text-zinc-200 transition-colors">取消</button>}
       </div>
     </motion.form>

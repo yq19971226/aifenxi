@@ -318,7 +318,7 @@ class DataSourceManager:
         try:
             combo = await self._registry.get_group("exchange_direct_combo")
             if combo is None:
-                return OperationResult(success=False, message="exchange_direct_combo group not found")
+                return OperationResult(success=False, message="交易所直连组合未注册")
 
             if enabled:
                 # 开启组合：启动所有交易所级开关为 enabled 的交易所
@@ -332,7 +332,7 @@ class DataSourceManager:
                 await self._update_status_snapshot()
                 return OperationResult(
                     success=True,
-                    message=f"Combo enabled, started: {started}",
+                    message=f"组合已开启，已启动: {started}",
                     completeness_score=score,
                 )
             else:
@@ -346,14 +346,14 @@ class DataSourceManager:
                 await self._update_status_snapshot()
                 return OperationResult(
                     success=True,
-                    message="Combo disabled, all exchanges stopped",
+                    message="组合已关闭，所有交易所已停止",
                     completeness_score=score,
                 )
         except Exception as exc:
             logger.error("set_combo_enabled_failed", enabled=enabled, error=str(exc))
             return OperationResult(
                 success=False,
-                message=f"Operation failed: {exc}",
+                message=f"操作失败: {exc}",
                 errors=[str(exc)],
             )
 
@@ -365,13 +365,13 @@ class DataSourceManager:
             # 检查组合级开关
             combo = await self._registry.get_group("exchange_direct_combo")
             if combo is None:
-                return OperationResult(success=False, message="exchange_direct_combo not found")
+                return OperationResult(success=False, message="交易所直连组合未注册")
 
             if not combo.enabled and enabled:
                 return OperationResult(
                     success=False,
                     source_id=source_id,
-                    message="Cannot enable exchange while combo is disabled",
+                    message="组合已关闭时无法启用交易所",
                 )
 
             src = await self._registry.get_source(source_id)
@@ -379,7 +379,7 @@ class DataSourceManager:
                 return OperationResult(
                     success=False,
                     source_id=source_id,
-                    message=f"Source {source_id} not found",
+                    message=f"数据源 {source_id} 未找到",
                 )
 
             await self._registry.set_source_enabled(source_id, enabled)
@@ -401,7 +401,7 @@ class DataSourceManager:
             return OperationResult(
                 success=True,
                 source_id=source_id,
-                message=f"{source_id} {'enabled' if enabled else 'disabled'}",
+                message=f"{source_id} 已{'开启' if enabled else '关闭'}",
                 completeness_score=score,
             )
         except Exception as exc:
@@ -415,7 +415,7 @@ class DataSourceManager:
             return OperationResult(
                 success=False,
                 source_id=source_id,
-                message=f"Failed to {'enable' if enabled else 'disable'} {source_id}: {exc}",
+                message=f"{'开启' if enabled else '关闭'} {source_id} 失败: {exc}",
                 errors=[str(exc)],
             )
 
@@ -436,14 +436,14 @@ class DataSourceManager:
             return OperationResult(
                 success=True,
                 source_id="coinglass",
-                message=f"CoinGlass {'enabled' if enabled else 'disabled'}",
+                message=f"CoinGlass 已{'开启' if enabled else '关闭'}",
             )
         except Exception as exc:
             logger.error("set_coinglass_enabled_failed", enabled=enabled, error=str(exc))
             return OperationResult(
                 success=False,
                 source_id="coinglass",
-                message=f"Operation failed: {exc}",
+                message=f"操作失败: {exc}",
                 errors=[str(exc)],
             )
 

@@ -278,7 +278,7 @@ async def get_datasource_detail(source_id: str) -> dict:
     manager = get_datasource_manager()
     src = await manager._registry.get_source(source_id)
     if src is None:
-        raise HTTPException(status_code=404, detail=f"Data source '{source_id}' not found")
+        raise HTTPException(status_code=404, detail=f"数据源 '{source_id}' 未找到")
 
     # 读取健康状态
     from app.core.redis import get_json
@@ -336,7 +336,7 @@ async def toggle_exchange(source_id: str, body: ToggleRequest) -> OperationResul
     if source_id not in valid_ids:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid source_id '{source_id}'. Valid: {sorted(valid_ids)}",
+            detail=f"无效的 source_id '{source_id}'，可选: {sorted(valid_ids)}",
         )
     manager = get_datasource_manager()
     result = await manager.set_exchange_enabled(source_id, body.enabled)
@@ -536,7 +536,7 @@ async def get_source_metrics(source_id: str) -> dict:
     manager = get_datasource_manager()
     src = await manager._registry.get_source(source_id)
     if src is None:
-        raise HTTPException(status_code=404, detail=f"Data source '{source_id}' not found")
+        raise HTTPException(status_code=404, detail=f"数据源 '{source_id}' 未找到")
 
     from app.core.redis import get_json
     health = await get_json(f"ds:health:{source_id}")
@@ -575,13 +575,13 @@ async def toggle_group(group_id: str, body: ToggleRequest) -> OperationResult:
     if group_id not in _VALID_GROUPS:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid group_id '{group_id}'. Valid: {sorted(_VALID_GROUPS)}",
+            detail=f"无效的 group_id '{group_id}'，可选: {sorted(_VALID_GROUPS)}",
         )
     manager = get_datasource_manager()
     registry = manager._registry
     group = await registry.get_group(group_id)
     if group is None:
-        raise HTTPException(status_code=404, detail=f"Group '{group_id}' not found")
+        raise HTTPException(status_code=404, detail=f"数据源组 '{group_id}' 未找到")
 
     await registry.set_group_enabled(group_id, body.enabled)
     logger.info("group_toggled", extra={"group_id": group_id, "enabled": body.enabled})
@@ -602,13 +602,13 @@ async def toggle_collector(group_id: str, source_id: str, body: ToggleRequest) -
     if group_id not in _VALID_GROUPS:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid group_id '{group_id}'. Valid: {sorted(_VALID_GROUPS)}",
+            detail=f"无效的 group_id '{group_id}'，可选: {sorted(_VALID_GROUPS)}",
         )
     manager = get_datasource_manager()
     registry = manager._registry
     group = await registry.get_group(group_id)
     if group is None:
-        raise HTTPException(status_code=404, detail=f"Group '{group_id}' not found")
+        raise HTTPException(status_code=404, detail=f"数据源组 '{group_id}' 未找到")
 
     # 组关闭时不允许开启子数据源
     if body.enabled and not group.enabled:
@@ -619,14 +619,14 @@ async def toggle_collector(group_id: str, source_id: str, body: ToggleRequest) -
 
     src = await registry.get_source(source_id)
     if src is None:
-        raise HTTPException(status_code=404, detail=f"Source '{source_id}' not found")
+        raise HTTPException(status_code=404, detail=f"数据源 '{source_id}' 未找到")
 
     # 验证 source_id 属于该组
     valid_ids = {s.source_id for s in group.sources}
     if source_id not in valid_ids:
         raise HTTPException(
             status_code=400,
-            detail=f"Source '{source_id}' does not belong to group '{group_id}'",
+            detail=f"数据源 '{source_id}' 不属于组 '{group_id}'",
         )
 
     await registry.set_collector_enabled(group_id, source_id, body.enabled)

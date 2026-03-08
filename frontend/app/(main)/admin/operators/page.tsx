@@ -154,7 +154,7 @@ export default function OperatorsPage() {
         <button
           type="submit"
           disabled={creating}
-          className="h-9 px-5 rounded-lg bg-[var(--color-accent)] text-sm font-medium text-white hover:bg-[var(--color-accent)]/80 disabled:opacity-50 transition-colors shrink-0"
+          className="h-9 px-5 rounded-lg bg-white text-sm font-medium text-zinc-900 hover:bg-zinc-200 disabled:opacity-50 transition-colors shrink-0"
         >
           {creating ? "创建中…" : "创建运营员"}
         </button>

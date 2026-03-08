@@ -494,17 +494,17 @@ function LoginPageInner() {
           <div className="flex items-center gap-6">
             <div className="flex flex-col">
               <span className="text-lg font-bold font-mono text-zinc-300">10</span>
-              <span className="text-xs text-zinc-600">AI Agents</span>
+              <span className="text-xs text-zinc-600">AI 智能体</span>
             </div>
             <div className="h-6 w-px bg-white/[0.06]" />
             <div className="flex flex-col">
               <span className="text-lg font-bold font-mono text-zinc-300">4</span>
-              <span className="text-xs text-zinc-600">Consensus Models</span>
+              <span className="text-xs text-zinc-600">共识模型</span>
             </div>
             <div className="h-6 w-px bg-white/[0.06]" />
             <div className="flex flex-col">
               <span className="text-lg font-bold font-mono text-zinc-300">6</span>
-              <span className="text-xs text-zinc-600">Timeframes</span>
+              <span className="text-xs text-zinc-600">时间周期</span>
             </div>
           </div>
           <span className="text-xs text-zinc-700">&copy; 2025 Axiom</span>

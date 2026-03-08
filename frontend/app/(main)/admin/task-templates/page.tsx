@@ -81,7 +81,7 @@ export default function TaskTemplatesPage() {
           <h1 className="text-2xl font-bold text-white">任务模板管理</h1>
           <button
             onClick={openCreate}
-            className="flex items-center gap-1.5 rounded-lg bg-[var(--color-accent)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-accent)]/80"
+            className="flex items-center gap-1.5 rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-200"
           >
             <Plus size={16} /> 新建模板
           </button>
@@ -190,7 +190,7 @@ export default function TaskTemplatesPage() {
               <button
                 onClick={handleSave}
                 disabled={!editing.title || createMutation.isPending || updateMutation.isPending}
-                className="rounded-lg bg-[var(--color-accent)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-accent)]/80 disabled:opacity-50"
+                className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-200 disabled:opacity-50"
               >
                 保存
               </button>

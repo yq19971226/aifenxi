@@ -222,7 +222,7 @@ export default function AdminUsersPage() {
 
         <button
           type="submit"
-          className="h-9 px-5 rounded-lg bg-[var(--color-accent)] text-sm font-medium text-white hover:bg-[var(--color-accent)]/80 transition-colors shrink-0"
+          className="h-9 px-5 rounded-lg bg-white text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors shrink-0"
         >
           搜索
         </button>

@@ -608,7 +608,7 @@ export default function MembershipPage() {
           type="button"
           onClick={handleCreatePayment}
           disabled={creating}
-          className="mt-6 w-full rounded-lg bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-[var(--color-accent)]/80 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-6 w-full rounded-lg bg-white px-6 py-3 text-sm font-semibold text-zinc-900 transition-all duration-200 hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {creating ? "创建中…" : `支付 $${selectedTotal}`}
         </button>

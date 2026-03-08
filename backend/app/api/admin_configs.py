@@ -317,7 +317,7 @@ async def switch_coinglass_channel(
     if body.channel not in ("proxy", "official"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="channel must be 'proxy' or 'official'",
+            detail="channel 必须为 'proxy' 或 'official'",
         )
 
     try:
