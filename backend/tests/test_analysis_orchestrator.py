@@ -113,7 +113,7 @@ async def test_run_analysis_retries_lock_and_executes_when_previous_executor_exi
     async def _sleep(_seconds: float) -> None:
         return None
 
-    monkeypatch.setattr(orchestrator, "_run_post_complete_tasks", _post_complete)
+    monkeypatch.setattr(orchestrator_module, "run_post_complete_tasks", _post_complete)
     monkeypatch.setattr(orchestrator_module.asyncio, "create_task", _create_task)
     monkeypatch.setattr(orchestrator_module.asyncio, "sleep", _sleep)
 
@@ -407,7 +407,7 @@ async def test_run_analysis_complete_event_includes_p2_fields(monkeypatch):
         coro.close()
         return None
 
-    monkeypatch.setattr(orchestrator, "_run_post_complete_tasks", _post_complete)
+    monkeypatch.setattr(orchestrator_module, "run_post_complete_tasks", _post_complete)
     monkeypatch.setattr(orchestrator_module.asyncio, "create_task", _create_task)
 
     events = await _collect_events(
@@ -456,7 +456,7 @@ async def test_run_analysis_timeout_early_reports_null_dqs(monkeypatch):
         coro.close()
         return None
 
-    monkeypatch.setattr(orchestrator, "_run_post_complete_tasks", _post_complete)
+    monkeypatch.setattr(orchestrator_module, "run_post_complete_tasks", _post_complete)
     monkeypatch.setattr(orchestrator_module.asyncio, "create_task", _create_task)
 
     events = await _collect_events(
@@ -521,7 +521,7 @@ async def test_run_analysis_timeout_includes_dqs_when_available(monkeypatch):
         coro.close()
         return None
 
-    monkeypatch.setattr(orchestrator, "_run_post_complete_tasks", _post_complete)
+    monkeypatch.setattr(orchestrator_module, "run_post_complete_tasks", _post_complete)
     monkeypatch.setattr(orchestrator_module.asyncio, "create_task", _create_task)
 
     events = await _collect_events(
