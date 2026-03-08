@@ -48,6 +48,7 @@ from app.api.tasks import user_router as tasks_user_router, admin_router as task
 from app.api.announcements import user_router as announcements_user_router, admin_router as announcements_admin_router
 from app.api.admin_system import router as admin_system_router
 from app.api.dashboard_overview import router as dashboard_overview_router
+from app.api.leaderboard import router as leaderboard_router
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.redis import init_redis, close_redis
@@ -262,6 +263,7 @@ app.include_router(announcements_user_router)
 app.include_router(announcements_admin_router)
 app.include_router(admin_system_router)
 app.include_router(dashboard_overview_router)
+app.include_router(leaderboard_router)
 
 
 @app.get("/health", tags=["system"])
