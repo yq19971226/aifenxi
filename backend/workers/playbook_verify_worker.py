@@ -19,6 +19,7 @@ import asyncio
 import json
 import logging
 import re
+import time
 from datetime import datetime, timezone
 
 from sqlalchemy import text
@@ -85,6 +86,7 @@ async def _get_current_price(symbol: str) -> float | None:
         raw = await redis.get(f"latest_price:{symbol}")
         return float(raw) if raw else None
     except Exception:
+        logger.exception("获取最新价格失败: symbol=%s", symbol)
         return None
 
 
@@ -121,6 +123,7 @@ def _check_hard_failure(
 
 async def _verify_all() -> dict[str, int]:
     """遍历所有活跃预测，验证阶段进展。"""
+    t0 = time.monotonic()
     await init_redis()
 
     verified = 0
@@ -179,11 +182,15 @@ async def _verify_all() -> dict[str, int]:
                     "验证失败: prediction=%s, error=%s", pred["id"], exc,
                 )
 
+    elapsed_sec = time.monotonic() - t0
     logger.info(
         "剧本验证完成: active=%d, verified=%d, completed=%d, "
-        "failed=%d, expired=%d, errors=%d",
+        "failed=%d, expired=%d, errors=%d, elapsed=%.1fs",
         len(predictions), verified, completed, failed, expired, errors,
+        elapsed_sec,
     )
+    if elapsed_sec > 300:
+        logger.warning("剧本验证耗时过长: %.1fs，可能影响下次调度", elapsed_sec)
     return {
         "active": len(predictions),
         "verified": verified,
@@ -214,6 +221,7 @@ async def _verify_one(
     try:
         stages = json.loads(pred["stages_json"]) if pred["stages_json"] else []
     except Exception:
+        logger.error("阶段数据损坏，无法解析 stages_json: prediction=%s", pred_id)
         stages = []
 
     if not stages:

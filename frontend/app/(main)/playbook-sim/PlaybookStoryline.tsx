@@ -31,9 +31,11 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
   completed:  { label: "验证完成", color: "text-zinc-300",     bg: "bg-white/[0.06]",   border: "border-white/[0.06]" },
   failed:     { label: "已失效",   color: "text-red-400",      bg: "bg-red-500/10",     border: "border-red-500/20" },
   expired:    { label: "已过期",   color: "text-zinc-500",     bg: "bg-white/[0.04]",   border: "border-white/[0.04]" },
+  untracked:  { label: "未跟踪",   color: "text-zinc-500",     bg: "bg-white/[0.04]",   border: "border-white/[0.04]" },
 };
 
 function resolveStatus(status?: string, riskFlag?: boolean): string {
+  if (!status) return "untracked";
   if (status === "failed") return "failed";
   if (status === "completed") return "completed";
   if (status === "expired") return "expired";
@@ -188,7 +190,7 @@ export default function PlaybookStoryline({
       </div>
 
       {/* Stage roadmap */}
-      <div className="flex items-start">
+      <div className="flex items-start overflow-x-auto pb-1">
         {match.stages.map((stage, i) => (
           <StageNode
             key={i}

@@ -562,7 +562,7 @@ export default function PlaybookSimPage() {
     staleTime: 30_000,
   });
 
-  const { data: plaza } = useQuery<PlazaFeed>({
+  const { data: plaza, isLoading: plazaLoading } = useQuery<PlazaFeed>({
     queryKey: ["plazaFeed", symbol, 1],
     queryFn: () => fetchPlazaFeed({ symbol, page: 1, page_size: 10 }),
     retry: false,
@@ -936,7 +936,11 @@ export default function PlaybookSimPage() {
                   {plaza?.total || 0} {"\u6761\u9884\u6D4B"}
                 </span>
               </div>
-              {!plaza || plaza.items.length === 0 ? (
+              {plazaLoading ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 size={18} className="animate-spin text-zinc-600" />
+                </div>
+              ) : !plaza || plaza.items.length === 0 ? (
                 <div className="flex items-center justify-center py-16">
                   <span className="text-sm text-zinc-500">{"\u6682\u65E0\u5267\u672C\u9884\u6D4B\u8BB0\u5F55"}</span>
                 </div>
