@@ -174,6 +174,13 @@ def interval_sub(column: str, value: int, unit: str = "hours") -> str:
     return f"{column} - INTERVAL '{value} {unit}'"
 
 
+def least_val(a: str, b: str) -> str:
+    """PostgreSQL ``LEAST(a, b)`` → SQLite ``MIN(a, b)`` (scalar min of two values)."""
+    if is_sqlite:
+        return f"MIN({a}, {b})"
+    return f"LEAST({a}, {b})"
+
+
 def now_func() -> str:
     """PostgreSQL ``NOW()`` → SQLite ``datetime('now')``."""
     if is_sqlite:

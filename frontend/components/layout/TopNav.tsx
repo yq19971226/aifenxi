@@ -26,6 +26,7 @@ import {
 import { useAuth } from "@/lib/auth-context";
 import { useAlertSocket } from "@/lib/ws/useAlertSocket";
 import { type UserRole, ROLE_LEVEL, isNavItemVisible } from "@/lib/route-permissions";
+import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -125,23 +126,7 @@ export function TopNav() {
   const { unreadCount: alertCount, clearUnread: clearAlertCount } = useAlertSocket();
 
   // Feature flags (tri-state: active / maintenance / hidden)
-  const [featureFlags, setFeatureFlags] = useState<Record<string, string>>({});
-  useEffect(() => {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
-    fetch(`${API_BASE}/api/feature-flags`)
-      .then((r) => (r.ok ? r.json() : {}))
-      .then((data: Record<string, string>) => {
-        const normalized: Record<string, string> = {};
-        for (const [k, v] of Object.entries(data)) {
-          const s = String(v).toLowerCase();
-          if (s === "true") normalized[k] = "active";
-          else if (s === "false") normalized[k] = "hidden";
-          else normalized[k] = s;
-        }
-        setFeatureFlags(normalized);
-      })
-      .catch(() => {});
-  }, []);
+  const { flags: featureFlags } = useFeatureFlags();
 
   // Filter nav items by shared route-permissions + feature flags
   const filteredItems = useMemo(
@@ -330,7 +315,7 @@ export function TopNav() {
                             >
                               {child.label}
                               {child.featureFlag && featureFlags[child.featureFlag] === "maintenance" && (
-                                <span className="ml-1.5 inline-block rounded bg-amber-500/15 px-1 py-px text-[10px] font-medium text-amber-400 leading-tight">
+                                <span className="ml-1.5 inline-block rounded bg-amber-500/15 px-1 py-px text-xs font-medium text-amber-400 leading-tight">
                                   维护
                                 </span>
                               )}
@@ -357,7 +342,7 @@ export function TopNav() {
               >
                 <span className="whitespace-nowrap">{item.label}</span>
                 {isMaintenance && (
-                  <span className="ml-1.5 inline-block rounded bg-amber-500/15 px-1 py-px text-[10px] font-medium text-amber-400 leading-tight">
+                  <span className="ml-1.5 inline-block rounded bg-amber-500/15 px-1 py-px text-xs font-medium text-amber-400 leading-tight">
                     维护
                   </span>
                 )}
@@ -398,6 +383,7 @@ export function TopNav() {
                           </div>
                           {item.children.map((child) => {
                             const childActive = pathname === child.href;
+                            const childMaint = child.featureFlag && featureFlags[child.featureFlag] === "maintenance";
                             return (
                               <Link
                                 key={child.href}
@@ -412,6 +398,11 @@ export function TopNav() {
                                   }`}
                                 >
                                   {child.label}
+                                  {childMaint && (
+                                    <span className="ml-1.5 inline-block rounded bg-amber-500/15 px-1 py-px text-xs font-medium text-amber-400 leading-tight">
+                                      维护
+                                    </span>
+                                  )}
                                 </div>
                               </Link>
                             );
@@ -420,6 +411,7 @@ export function TopNav() {
                       );
                     }
 
+                    const itemMaint = item.featureFlag && featureFlags[item.featureFlag] === "maintenance";
                     return (
                       <Link
                         key={item.href}
@@ -434,6 +426,11 @@ export function TopNav() {
                           }`}
                         >
                           {item.label}
+                          {itemMaint && (
+                            <span className="ml-1.5 inline-block rounded bg-amber-500/15 px-1 py-px text-xs font-medium text-amber-400 leading-tight">
+                              维护
+                            </span>
+                          )}
                         </div>
                       </Link>
                     );
@@ -545,6 +542,7 @@ export function TopNav() {
                       </div>
                       {item.children!.map((child) => {
                         const childActive = pathname === child.href;
+                        const childMaint = child.featureFlag && featureFlags[child.featureFlag] === "maintenance";
                         return (
                           <Link
                             key={child.href}
@@ -557,6 +555,11 @@ export function TopNav() {
                                 : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
                             }`}>
                               {child.label}
+                              {childMaint && (
+                                <span className="ml-1.5 inline-block rounded bg-amber-500/15 px-1 py-px text-xs font-medium text-amber-400 leading-tight">
+                                  维护
+                                </span>
+                              )}
                             </div>
                           </Link>
                         );
@@ -565,6 +568,7 @@ export function TopNav() {
                   );
                 }
 
+                const itemMaint = item.featureFlag && featureFlags[item.featureFlag] === "maintenance";
                 return (
                   <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)}>
                     <div className={`rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
@@ -573,6 +577,11 @@ export function TopNav() {
                         : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
                     }`}>
                       {item.label}
+                      {itemMaint && (
+                        <span className="ml-1.5 inline-block rounded bg-amber-500/15 px-1 py-px text-xs font-medium text-amber-400 leading-tight">
+                          维护
+                        </span>
+                      )}
                     </div>
                   </Link>
                 );

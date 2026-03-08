@@ -32,7 +32,7 @@ async function fetchFeatureFlags(): Promise<FeatureFlags> {
 }
 
 export function useFeatureFlags() {
-  const { data: flags = {} } = useQuery<FeatureFlags>({
+  const { data: flags = {}, isLoading } = useQuery<FeatureFlags>({
     queryKey: ["feature-flags"],
     queryFn: fetchFeatureFlags,
     staleTime: 60_000,
@@ -49,5 +49,5 @@ export function useFeatureFlags() {
     return getState(flagKey);
   }
 
-  return { flags, getState, getStateByPath };
+  return { flags, isLoading, getState, getStateByPath };
 }

@@ -42,8 +42,8 @@ async function updateFlag(configKey: string, value: string): Promise<void> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ value, description: `功能开关: ${configKey}`, is_secret: false }),
   });
-  if (!res.ok) {
-    // If config doesn't exist yet, create it
+  if (res.status === 404) {
+    // Config doesn't exist yet, create it
     const createRes = await authFetch(`${API_BASE}/api/admin/configs`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

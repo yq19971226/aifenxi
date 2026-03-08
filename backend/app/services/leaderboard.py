@@ -15,7 +15,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.redis import get_json, set_with_ttl
-from app.core.sql_compat import count_filter, sum_filter, avg_filter, now_minus_interval_literal
+from app.core.sql_compat import count_filter, sum_filter, avg_filter, now_minus_interval_literal, least_val
 
 logger = logging.getLogger(__name__)
 
@@ -171,9 +171,9 @@ class LeaderboardService:
             ), ranked AS (
                 SELECT
                     user_id, settled, wins, losses, avg_pnl, total_profit,
-                    MIN(ROUND(total_profit / total_loss, 2), 99.9) AS profit_factor,
+                    {least_val('ROUND(total_profit / total_loss, 2)', '99.9')} AS profit_factor,
                     ROW_NUMBER() OVER (
-                        ORDER BY MIN(ROUND(total_profit / total_loss, 2), 99.9) DESC, settled DESC
+                        ORDER BY {least_val('ROUND(total_profit / total_loss, 2)', '99.9')} DESC, settled DESC
                     ) AS rank
                 FROM user_stats
             )
