@@ -6,16 +6,24 @@ import { symbolsApi, type SymbolConfig } from "@/lib/api/symbols";
 interface SymbolSelectorProps {
   value: string;
   onChange: (symbol: string) => void;
+  allowedSymbols?: string[];
 }
 
-export function SymbolSelector({ value, onChange }: SymbolSelectorProps) {
+export function SymbolSelector({ value, onChange, allowedSymbols }: SymbolSelectorProps) {
   const { data: symbols = [], isLoading, isError } = useQuery<SymbolConfig[]>({
     queryKey: ["symbols"],
     queryFn: () => symbolsApi.listSymbols(),
     staleTime: 60_000,
   });
 
-  const enabledSymbols = symbols.filter((s) => s.enabled);
+  let enabledSymbols = symbols.filter((s) => s.enabled);
+  if (allowedSymbols && allowedSymbols.length > 0) {
+    const allowed = new Set(allowedSymbols.map((s) => s.toUpperCase()));
+    enabledSymbols = enabledSymbols.filter((s) => allowed.has(s.symbol.toUpperCase()));
+    if (enabledSymbols.length === 0) {
+      enabledSymbols = allowedSymbols.map((s) => ({ symbol: s.toUpperCase(), enabled: true }));
+    }
+  }
   const options =
     enabledSymbols.length > 0
       ? enabledSymbols

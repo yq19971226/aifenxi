@@ -603,7 +603,7 @@ export default function PlaybookSimPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <SymbolSelector value={symbol} onChange={(v) => { setSymbol(v); setExpandedMatch(0); }} />
+          <SymbolSelector value={symbol} onChange={(v) => { setSymbol(v); setExpandedMatch(0); }} allowedSymbols={["BTCUSDT", "ETHUSDT"]} />
           <button
             onClick={() => runStream(symbol)}
             disabled={streaming}
