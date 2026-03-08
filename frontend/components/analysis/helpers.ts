@@ -193,5 +193,5 @@ export function modeLabel(mode: string): string {
 
 export function blockedReasonLabel(code: string | null | undefined): string {
   if (!code) return "";
-  return BLOCKED_REASON_LABELS[code] || code;
+  return BLOCKED_REASON_LABELS[code] || "分析受阻";
 }

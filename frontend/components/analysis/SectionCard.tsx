@@ -77,6 +77,7 @@ export function DataPairs({ data, hideEmpty = true }: { data: Record<string, unk
             );
           }
 
+          // key_findings 正常为 string[]，但后端降级/fallback 时可能返回单个 string
           if (key === "key_findings" && typeof value === "string" && value.length > 0) {
             return (
               <div key={key}>

@@ -173,7 +173,7 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3"
+        className="flex items-center gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3"
       >
         <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
         <span className="text-sm text-zinc-400">正在连接分析引擎...</span>
@@ -187,7 +187,7 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden"
+      className="rounded-lg border border-white/[0.06] bg-white/[0.02] overflow-hidden"
     >
       {/* Timer + Progress bar header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.04]">

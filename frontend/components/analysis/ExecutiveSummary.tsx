@@ -106,7 +106,7 @@ export function ExecutiveSummary({ report }: { report: AnalysisReportType }) {
       >
         <div className="flex items-center justify-between relative z-10">
           <div className="flex items-center gap-4">
-            <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${signalStyle.bg} border ${signalStyle.border}`}>
+            <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${signalStyle.bg} border ${signalStyle.border}`}>
               {report.signal === "bullish" ? (
                 <TrendingUp className="h-6 w-6 text-emerald-400" />
               ) : report.signal === "bearish" ? (

@@ -43,18 +43,18 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
         className="flex items-center justify-center gap-3 pt-2 flex-wrap"
       >
         <div className="flex items-center gap-1.5">
-          <Zap className="h-3 w-3 text-zinc-600" />
-          <p className="text-xs text-zinc-600">
+          <Zap className="h-3 w-3 text-zinc-500" />
+          <p className="text-xs text-zinc-500">
             {new Date(report.timestamp).toLocaleString("zh-CN")}
           </p>
         </div>
         {(report.engine_type || report.mode_contract_version) && (
           <div className="flex items-center gap-1.5">
-            <Info className="h-3 w-3 text-zinc-600" />
-            <p className="text-xs font-mono text-zinc-600">
+            <Info className="h-3 w-3 text-zinc-500" />
+            <p className="text-xs font-mono text-zinc-500">
               {report.engine_type && <span>{report.engine_type}</span>}
               {report.engine_type && report.mode_contract_version && (
-                <span className="text-zinc-700"> · </span>
+                <span className="text-zinc-600"> · </span>
               )}
               {report.mode_contract_version && (
                 <span>v{report.mode_contract_version}</span>

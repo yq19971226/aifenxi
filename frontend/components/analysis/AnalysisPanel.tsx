@@ -78,10 +78,10 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
   const userLevel = Math.max(adminLevel, quota?.level ?? 0);
 
   const currentQuota = quota?.quotas?.[mode] ?? null;
-  const isModeLocked = (m: AnalysisMode): boolean => {
+  const isModeLocked = useCallback((m: AnalysisMode): boolean => {
     const opt = MODE_OPTIONS.find((o) => o.value === m);
     return (opt?.minLevel ?? 0) > userLevel;
-  };
+  }, [userLevel]);
   const isQuotaExhausted = currentQuota !== null && currentQuota.remaining === 0;
 
   const modeLocked = isModeLocked(mode);
@@ -153,7 +153,7 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
         }, 300);
       }
     },
-    [running, symbol, mode, userLevel, isQuotaExhausted, queryClient],
+    [running, symbol, mode, isModeLocked, isQuotaExhausted, queryClient],
   );
 
   const handleRetry = useCallback(() => {
