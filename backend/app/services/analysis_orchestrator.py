@@ -111,213 +111,25 @@ _TREND_SECTIONS = [
 
 
 # ---------------------------------------------------------------------------
-# SSE 辅助
+# 信号聚合与闸门函数（从 analysis_aggregation.py 导入）
 # ---------------------------------------------------------------------------
 
-
-def _sse(event_obj: object) -> str:
-    """将 pydantic 事件对象序列化为 SSE data 行。"""
-    return f"data: {event_obj.model_dump_json()}\n\n"  # type: ignore[union-attr]
-
-
-# ---------------------------------------------------------------------------
-# 加权平均回退（NSED 失败时）
-# ---------------------------------------------------------------------------
-
-
-def _weighted_average_fallback(
-    reports: list[AgentReport],
-) -> tuple[str, float]:
-    """从多个 AgentReport 计算加权平均信号和置信度。"""
-    weights: dict[str, float] = {
-        "technical": 0.25,
-        "onchain": 0.25,
-        "risk": 0.15,
-        "orderbook": 0.10,
-        "sentiment": 0.10,
-        "news_analyst": 0.08,
-        "adversarial": 0.05,
-        "collusion_detector": 0.05,
-        "calendar": 0.05,
-    }
-    signal_scores: dict[str, float] = {
-        "bullish": 1.0,
-        "neutral": 0.0,
-        "bearish": -1.0,
-    }
-    total_weight = 0.0
-    weighted_score = 0.0
-    weighted_confidence = 0.0
-    for r in reports:
-        w = weights.get(r.agent_id, 0.25)
-        weighted_score += signal_scores.get(r.signal, 0.0) * w
-        weighted_confidence += r.confidence * w
-        total_weight += w
-    if total_weight > 0:
-        avg_score = weighted_score / total_weight
-        avg_confidence = weighted_confidence / total_weight
-    else:
-        return "neutral", 0.0
-    if avg_score > 0.3:
-        return "bullish", avg_confidence
-    elif avg_score < -0.3:
-        return "bearish", avg_confidence
-    else:
-        return "neutral", avg_confidence
-
-
-# ---------------------------------------------------------------------------
-# intraday 聚合：signal × confidence × agent_weight × reliability_weight
-# ---------------------------------------------------------------------------
-
-# V1 agent 权重（可由 mode_contract 或 config 未来覆盖）
-_INTRADAY_AGENT_WEIGHTS: dict[str, float] = {
-    "technical": 0.25,
-    "onchain": 0.20,
-    "risk": 0.15,
-    "orderbook": 0.15,
-    "news_analyst": 0.15,
-    "calendar": 0.10,
-}
-
-
-def _compute_reliability_weight(report: AgentReport | None) -> float:
-    """V1 可靠度权重 — 基于可解释规则映射，不允许黑盒自学习。
-
-    规则:
-    - report is None → 0.0（agent 失败/超时/熔断）
-    - confidence < 0.2 → 0.3（极低置信度 → 大幅降权）
-    - confidence < 0.4 → 0.6（低置信度 → 中等降权）
-    - 否则 → 1.0（正常）
-    """
-    if report is None:
-        return 0.0
-    if report.confidence < 0.2:
-        return 0.3
-    if report.confidence < 0.4:
-        return 0.6
-    return 1.0
-
-
-def _intraday_aggregate(
-    reports: list[AgentReport | None],
-    agent_ids: list[str],
-) -> tuple[str, float]:
-    """intraday 聚合：signal_value × confidence × agent_weight × reliability_weight。
-
-    Args:
-        reports: agent 结果列表（可能含 None）
-        agent_ids: 与 reports 一一对应的 agent_id 列表
-
-    Returns:
-        (signal, confidence) 元组
-    """
-    signal_scores: dict[str, float] = {
-        "bullish": 1.0,
-        "neutral": 0.0,
-        "bearish": -1.0,
-    }
-
-    weighted_score = 0.0
-    weighted_confidence = 0.0
-    total_effective_weight = 0.0
-
-    for report, agent_id in zip(reports, agent_ids):
-        agent_weight = _INTRADAY_AGENT_WEIGHTS.get(agent_id, 0.10)
-        reliability = _compute_reliability_weight(report)
-
-        if report is None or reliability == 0.0:
-            continue
-
-        signal_val = signal_scores.get(report.signal, 0.0)
-        effective_weight = agent_weight * reliability
-
-        weighted_score += signal_val * report.confidence * effective_weight
-        weighted_confidence += report.confidence * effective_weight
-        total_effective_weight += effective_weight
-
-    if total_effective_weight <= 0:
-        return "neutral", 0.0
-
-    avg_score = weighted_score / total_effective_weight
-    avg_confidence = weighted_confidence / total_effective_weight
-
-    if avg_score > 0.3:
-        return "bullish", round(min(avg_confidence, 1.0), 4)
-    elif avg_score < -0.3:
-        return "bearish", round(min(avg_confidence, 1.0), 4)
-    else:
-        return "neutral", round(min(avg_confidence, 1.0), 4)
-
-
-# ---------------------------------------------------------------------------
-# trend 闸门：1w bias + defense gate + divergence
-# ---------------------------------------------------------------------------
-
-
-def _extract_weekly_bias(klines_1w: list) -> str | None:
-    """从周线 K 线提取 bias 方向（bullish / bearish / None）。
-
-    V1 规则（可解释，非黑盒）:
-    - 需要至少 4 根周线
-    - 计算 EMA3 和 EMA7，EMA3 > EMA7 → bullish，反之 → bearish
-    - 数据不足返回 None（不参与闸门）
-    """
-    if not klines_1w or len(klines_1w) < 4:
-        return None
-
-    closes = [k.close for k in klines_1w]
-
-    def _ema(data: list[float], period: int) -> float:
-        if len(data) < period:
-            return data[-1]
-        multiplier = 2.0 / (period + 1)
-        ema = sum(data[:period]) / period
-        for val in data[period:]:
-            ema = (val - ema) * multiplier + ema
-        return ema
-
-    ema3 = _ema(closes, 3)
-    ema7 = _ema(closes, min(7, len(closes)))
-
-    if ema3 > ema7:
-        return "bullish"
-    elif ema3 < ema7:
-        return "bearish"
-    return None
-
-
-def _evaluate_defense_risk(
-    adversarial_report: "AgentReport | None",
-    collusion_report: "AgentReport | None",
-) -> int:
-    """评估防御风险等级。返回 0-4（0=none, 1=low, 2=medium, 3=high, 4=critical）。"""
-    level = 0
-
-    if collusion_report and collusion_report.raw_data:
-        raw = collusion_report.raw_data
-        if raw.get("collusion_detected"):
-            level = max(level, 2)
-        risk = raw.get("risk_level", "none")
-        risk_map = {"none": 0, "low": 1, "medium": 2, "high": 3, "critical": 4}
-        level = max(level, risk_map.get(risk, 0))
-
-    if adversarial_report and adversarial_report.raw_data:
-        raw = adversarial_report.raw_data
-        for move in raw.get("predicted_moves", []):
-            prob = move.get("probability", 0)
-            trap = move.get("trap_type", "none")
-            if prob >= 0.7 and trap != "none":
-                level = max(level, 3)
-            elif prob >= 0.5 and trap != "none":
-                level = max(level, 2)
-
-    return level
-
-
-def _is_comprehensive_mode(mode: AnalysisMode) -> bool:
-    """判断是否为趋势模式（最全面），用于决定是否刷新 analysis:latest 缓存。"""
-    return mode == AnalysisMode.TREND
+from app.services.analysis_aggregation import (  # noqa: E402
+    _INTRADAY_AGENT_WEIGHTS,
+    _sse,
+    _weighted_average_fallback,
+    _intraday_aggregate,
+    _extract_weekly_bias,
+    _evaluate_defense_risk,
+    _is_comprehensive_mode,
+)
+from app.services.analysis_helpers import (  # noqa: E402
+    build_agent_section,
+    compute_atr,
+    aggregate_signal,
+    extract_whale_data,
+    run_post_complete_tasks,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -593,7 +405,7 @@ class AnalysisOrchestrator:
 
             # 8-9. 后置任务改为后台执行，避免阻塞 SSE 结束
             asyncio.create_task(
-                self._run_post_complete_tasks(user_id, symbol, mode, report)
+                run_post_complete_tasks(user_id, symbol, mode, report)
             )
         finally:
             if lock_acquired:
@@ -1136,7 +948,7 @@ class AnalysisOrchestrator:
         # --- 精准点位策略（< 20ms）---
         strategy_data: dict | None = None
         if signal_result.direction != "neutral":
-            atr = self._compute_atr(market_data.klines_15m)
+            atr = compute_atr(market_data.klines_15m)
             if atr and atr > 0:
                 levels = compute_scalping_levels(
                     direction=signal_result.direction,
@@ -1317,7 +1129,7 @@ class AnalysisOrchestrator:
             if _entry is None:
                 continue
             _, _stitle, _ = _entry
-            sections.append(self._build_agent_section(_stitle, agent_results.get(_aid)))
+            sections.append(build_agent_section(_stitle, agent_results.get(_aid)))
             if _aid == "onchain":
                 sections.append(deriv_section)
                 deriv_inserted = True
@@ -1627,7 +1439,7 @@ class AnalysisOrchestrator:
         phase_str = phase.value if phase else None
 
         # 构建巨鲸数据用于交叉验证
-        whale_data = self._extract_whale_data(onchain_report)
+        whale_data = extract_whale_data(onchain_report)
 
         ob_results: list[object] = []
         for interval_key, klines in [("4h", market_data.klines_4h), ("1d", market_data.klines_1d)]:
@@ -1657,7 +1469,7 @@ class AnalysisOrchestrator:
             _entry = _TREND_AGENT_REGISTRY.get(_aid)
             if _entry:
                 _, _stitle, _ = _entry
-                sections.append(self._build_agent_section(_stitle, agent_results.get(_aid)))
+                sections.append(build_agent_section(_stitle, agent_results.get(_aid)))
 
         # --- 防御预警推送 ---
         await self._push_defense_alert(symbol, adversarial_report, collusion_report)
@@ -2289,361 +2101,16 @@ class AnalysisOrchestrator:
     ) -> MarketData:
         """从 Redis 缓存采集市场数据，构建 MarketData。
 
-        各数据源独立降级：不可用时对应字段为空/None。
-        所有 Redis 读取并行执行以最小化延迟。
+        委托给 market_data_collector.collect_market_data() 执行。
         """
-        from app.models.market_data import (
-            CoinGlassData,
-            DerivativesData,
-            IndicatorResult,
-            KlineData,
-            OnchainSnapshot,
-        )
-        from app.models.coingecko import (
-            CoinGeckoData,
-            CoinMarketData,
-            CommunitySentiment,
-            DeveloperActivity,
-            GlobalMarketData,
-            TrendingCoin,
-        )
-
-        redis = get_redis_pool()
-        intervals = MODE_KLINE_INTERVALS[mode]
-
-        # ── 并行读取所有 Redis key ──────────────────────────────
-        async def _safe_get(coro):
-            try:
-                return await asyncio.wait_for(coro, timeout=_DATA_COLLECT_TIMEOUT)
-            except Exception:
-                return None
-
-        # 构建所有并行任务
-        tasks: list = [_safe_get(redis.get(f"latest_price:{symbol}"))]           # [0] price
-        for itv in intervals:
-            tasks.append(_safe_get(get_json(f"klines:{symbol}:{itv}")))          # [1..N] klines
-        kline_offset = 1
-        extra_offset = kline_offset + len(intervals)
-        primary_interval = intervals[0]
-        tasks.append(_safe_get(get_json(f"indicators:{symbol}:{primary_interval}")))  # indicators
-        tasks.append(_safe_get(get_json(f"onchain:{symbol}")))                   # onchain
-        tasks.append(_safe_get(get_json(f"derivatives:{symbol}")))               # derivatives
-        # CoinGlass 数据（9 个 key）
-        tasks.append(_safe_get(get_json(f"cg_oi:{symbol}")))                     # cg: oi
-        tasks.append(_safe_get(get_json(f"cg_cvd:{symbol}")))                    # cg: cvd
-        tasks.append(_safe_get(get_json(f"cg_netflow:{symbol}")))                # cg: netflow
-        tasks.append(_safe_get(get_json(f"cg_orderbook:{symbol}")))              # cg: orderbook
-        tasks.append(_safe_get(get_json(f"cg_large_orders:{symbol}")))           # cg: large_orders
-        tasks.append(_safe_get(get_json(f"cg_fr:{symbol}")))                     # cg: funding_rate
-        tasks.append(_safe_get(get_json(f"cg_option_maxpain:{symbol}")))         # cg: option_maxpain
-        tasks.append(_safe_get(get_json(f"cg_option_info:{symbol}")))            # cg: option_info
-        tasks.append(_safe_get(get_json(f"cg_liquidation:{symbol}")))            # cg: liquidation
-        # CoinGecko 数据（5 个 key）
-        tasks.append(_safe_get(get_json(f"gecko_market:{symbol}")))              # gecko: market
-        tasks.append(_safe_get(get_json(f"gecko_community:{symbol}")))           # gecko: community
-        tasks.append(_safe_get(get_json(f"gecko_developer:{symbol}")))           # gecko: developer
-        tasks.append(_safe_get(get_json("gecko_global")))                        # gecko: global
-        tasks.append(_safe_get(get_json("gecko_trending")))                      # gecko: trending
-
-        results = await asyncio.gather(*tasks)
-
-        # ── 解析结果 ────────────────────────────────────────────
-        # 价格
-        current_price = 0.0
-        if results[0] is not None:
-            try:
-                current_price = float(results[0])
-            except (ValueError, TypeError):
-                logger.warning("解析当前价格失败")
-
-        # K 线
-        klines_map: dict[str, list] = {}
-        for i, itv in enumerate(intervals):
-            cached = results[kline_offset + i]
-            if cached and isinstance(cached, list):
-                klines_map[itv] = [KlineData.model_validate(k) for k in cached]
-            else:
-                klines_map[itv] = []
-
-        # 技术指标
-        indicators = None
-        ind_cached = results[extra_offset]
-        if ind_cached is not None:
-            try:
-                indicators = IndicatorResult.model_validate(ind_cached)
-            except Exception as exc:
-                logger.warning("解析技术指标失败: %s", exc)
-
-        # 链上数据
-        onchain = None
-        oc_cached = results[extra_offset + 1]
-        if oc_cached is not None:
-            try:
-                onchain = OnchainSnapshot.model_validate(oc_cached)
-            except Exception as exc:
-                logger.warning("解析链上数据失败: %s", exc)
-
-        # 合约数据
-        derivatives = None
-        deriv_cached = results[extra_offset + 2]
-        if deriv_cached is not None:
-            try:
-                derivatives = DerivativesData.model_validate(deriv_cached)
-            except Exception as exc:
-                logger.warning("解析合约数据失败: %s", exc)
-
-        # CoinGlass → DerivativesData 回退补充
-        # 当 Binance 合约数据缺失时，用 CoinGlass 资金费率补位
-        cg_fr_raw = results[extra_offset + 3 + 5]  # cg_fr 在 cg_offset+5
-        if cg_fr_raw and isinstance(cg_fr_raw, list) and len(cg_fr_raw) > 0:
-            latest_fr = cg_fr_raw[-1]
-            if derivatives is None:
-                try:
-                    fr_val = float(latest_fr.get("rate", 0))
-                    derivatives = DerivativesData(funding_rate=fr_val)
-                except (ValueError, TypeError):
-                    pass
-            elif derivatives.funding_rate is None:
-                try:
-                    derivatives.funding_rate = float(latest_fr.get("rate", 0))
-                except (ValueError, TypeError):
-                    pass
-
-        # CoinGlass 数据
-        cg_offset = extra_offset + 3
-        coinglass = None
-        try:
-            cg_oi = results[cg_offset]
-            cg_cvd = results[cg_offset + 1]
-            cg_netflow = results[cg_offset + 2]
-            cg_ob = results[cg_offset + 3]
-            cg_lo = results[cg_offset + 4]
-            cg_fr = results[cg_offset + 5]
-            cg_mp = results[cg_offset + 6]
-            cg_info = results[cg_offset + 7]
-            cg_liq = results[cg_offset + 8]
-
-            has_any = any(x is not None for x in [
-                cg_oi, cg_cvd, cg_netflow, cg_ob, cg_lo, cg_fr, cg_mp, cg_info, cg_liq,
-            ])
-            if has_any:
-                coinglass = CoinGlassData(
-                    oi_snapshots=cg_oi if isinstance(cg_oi, list) else [],
-                    cvd_snapshots=cg_cvd if isinstance(cg_cvd, list) else [],
-                    netflow_snapshots=cg_netflow if isinstance(cg_netflow, list) else [],
-                    orderbook_levels=cg_ob if isinstance(cg_ob, list) else [],
-                    large_orders=cg_lo if isinstance(cg_lo, list) else [],
-                    funding_rate_history=cg_fr if isinstance(cg_fr, list) else [],
-                    option_max_pain=cg_mp if isinstance(cg_mp, dict) else None,
-                    option_info=cg_info if isinstance(cg_info, dict) else None,
-                    liquidation=cg_liq if isinstance(cg_liq, dict) else None,
-                )
-        except Exception as exc:
-            logger.warning("解析 CoinGlass 数据失败: %s", exc)
-
-        # CoinGecko 数据
-        gecko_offset = cg_offset + 9
-        coingecko = None
-        try:
-            gk_market = results[gecko_offset]
-            gk_community = results[gecko_offset + 1]
-            gk_developer = results[gecko_offset + 2]
-            gk_global = results[gecko_offset + 3]
-            gk_trending = results[gecko_offset + 4]
-
-            has_gecko = any(x is not None for x in [
-                gk_market, gk_community, gk_developer, gk_global, gk_trending,
-            ])
-            if has_gecko:
-                coingecko = CoinGeckoData(
-                    market=CoinMarketData.model_validate(gk_market) if isinstance(gk_market, dict) else None,
-                    community=CommunitySentiment.model_validate(gk_community) if isinstance(gk_community, dict) else None,
-                    developer=DeveloperActivity.model_validate(gk_developer) if isinstance(gk_developer, dict) else None,
-                    global_data=GlobalMarketData.model_validate(gk_global) if isinstance(gk_global, dict) else None,
-                    trending=[TrendingCoin.model_validate(t) for t in gk_trending] if isinstance(gk_trending, list) else [],
-                )
-        except Exception as exc:
-            logger.warning("解析 CoinGecko 数据失败: %s", exc)
-
-        return MarketData(
-            symbol=symbol,
-            current_price=current_price,
-            klines_5m=klines_map.get("5m", []),
-            klines_15m=klines_map.get("15m", []),
-            klines_30m=klines_map.get("30m", []),
-            klines_1h=klines_map.get("1h", []),
-            klines_4h=klines_map.get("4h", []),
-            klines_1d=klines_map.get("1d", []),
-            klines_1w=klines_map.get("1w", []),
-            indicators=indicators,
-            onchain=onchain,
-            derivatives=derivatives,
-            coinglass=coinglass,
-            coingecko=coingecko,
-        )
+        from app.services.market_data_collector import collect_market_data
+        return await collect_market_data(symbol, mode)
 
     # ===================================================================
-    # 辅助方法
+    # 辅助方法（委托给 analysis_helpers 模块）
     # ===================================================================
 
-    @staticmethod
-    def _build_agent_section(
-        title: str, report: AgentReport | None,
-    ) -> ReportSection:
-        """从 AgentReport 构建 ReportSection，None 时标记 failed。"""
-        if report is not None:
-            return ReportSection(
-                title=title,
-                data={
-                    "signal": report.signal,
-                    "confidence": report.confidence,
-                    "reasoning": report.reasoning,
-                    "key_findings": report.key_findings,
-                    "raw_data": report.raw_data,
-                },
-            )
-        return ReportSection(
-            title=title,
-            status="failed",
-            data={},
-            note="该维度分析不可用",
-        )
-
-    @staticmethod
-    def _compute_atr(klines: list, period: int = 14) -> float | None:
-        """从 K 线计算 ATR。"""
-        if not klines or len(klines) < period + 1:
-            return None
-        trs: list[float] = []
-        for i in range(1, len(klines)):
-            high = klines[i].high
-            low = klines[i].low
-            prev_close = klines[i - 1].close
-            tr = max(high - low, abs(high - prev_close), abs(low - prev_close))
-            trs.append(tr)
-        if len(trs) < period:
-            return None
-        return sum(trs[-period:]) / period
-
-    @staticmethod
-    def _aggregate_signal(
-        reports: list[AgentReport | None],
-    ) -> tuple[str, float]:
-        """从多个 AgentReport 聚合信号。全部失败时返回 neutral/0.0。"""
-        valid = [r for r in reports if r is not None]
-        if not valid:
-            return "neutral", 0.0
-        return _weighted_average_fallback(valid)
-
-    @staticmethod
-    def _extract_whale_data(
-        onchain_report: AgentReport | None,
-    ) -> dict | None:
-        """从 OnchainAgent 报告中提取巨鲸数据用于 OB 交叉验证。"""
-        if onchain_report is None:
-            return None
-        raw = onchain_report.raw_data
-        whale_buy_zones = raw.get("whale_buy_zones", [])
-        whale_sell_zones = raw.get("whale_sell_zones", [])
-        if not whale_buy_zones and not whale_sell_zones:
-            return None
-        return {
-            "whale_buy_zones": whale_buy_zones,
-            "whale_sell_zones": whale_sell_zones,
-        }
-
-    async def _log_analysis(
-        self,
-        user_id: UUID,
-        symbol: str,
-        mode: AnalysisMode,
-        report: AnalysisReport,
-    ) -> None:
-        """记录分析日志到 Redis List（TTL 7 天）。"""
-        try:
-            redis = get_redis_pool()
-            today = datetime.now(timezone.utc).date().isoformat()
-            log_key = f"analysis:log:{user_id}:{today}"
-            log_entry = json.dumps({
-                "symbol": symbol,
-                "mode": mode.value,
-                "signal": report.signal,
-                "confidence": report.confidence,
-                "is_partial": report.is_partial,
-                "execution_time_ms": report.execution_time_ms,
-                "sections_count": len(report.sections),
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-            }, ensure_ascii=False)
-            await redis.rpush(log_key, log_entry)
-            await redis.expire(log_key, 7 * 24 * 3600)
-        except Exception as exc:
-            logger.warning("分析日志记录失败: %s", exc)
-
-    async def _run_post_complete_tasks(
-        self,
-        user_id: UUID,
-        symbol: str,
-        mode: AnalysisMode,
-        report: AnalysisReport,
-    ) -> None:
-        """完成事件后的后置任务，异步后台执行且带超时保护。"""
-        try:
-            await asyncio.wait_for(
-                self._log_analysis(user_id, symbol, mode, report),
-                timeout=3.0,
-            )
-        except Exception as exc:
-            logger.warning("分析后置任务日志写入失败或超时: %s", exc)
-
-        try:
-            await asyncio.wait_for(
-                self._push_high_confidence(user_id, symbol, mode, report),
-                timeout=8.0,
-            )
-        except Exception as exc:
-            logger.warning("分析后置任务推送失败或超时: %s", exc)
-
-    _HIGH_CONFIDENCE_THRESHOLD_DEFAULT = 0.7
-
-    async def _get_signal_push_threshold(self) -> float:
-        """从 ConfigService 动态读取推送阈值，失败时返回默认值。"""
-        try:
-            from app.core.database import AsyncSessionLocal
-            from app.services.config_service import ConfigService
-            async with AsyncSessionLocal() as session:
-                svc = ConfigService(session)
-                val = await svc.get_config("signal_push_threshold", str(self._HIGH_CONFIDENCE_THRESHOLD_DEFAULT))
-                return float(val)
-        except Exception:
-            return self._HIGH_CONFIDENCE_THRESHOLD_DEFAULT
-
-    async def _push_high_confidence(
-        self,
-        user_id: UUID,
-        symbol: str,
-        mode: AnalysisMode,
-        report: AnalysisReport,
-    ) -> None:
-        """高置信信号推送（F2）— 置信度超过阈值时触发推送。"""
-        if report.is_partial or report.signal == "neutral":
-            return
-
-        threshold = await self._get_signal_push_threshold()
-        if report.confidence < threshold:
-            return
-
-        signal_labels = {"bullish": "看多 📈", "bearish": "看空 📉"}
-        try:
-            await dispatch_fire_and_forget(
-                user_id=str(user_id),
-                event_type="high_confidence_signal",
-                data={
-                    "symbol": symbol,
-                    "signal": report.signal,
-                    "signal_label": signal_labels.get(report.signal, report.signal),
-                    "confidence_pct": f"{report.confidence * 100:.0f}%",
-                    "mode": mode.value,
-                },
-            )
-        except Exception as exc:
-            logger.warning("高置信推送失败: %s", exc)
+    _build_agent_section = staticmethod(build_agent_section)
+    _compute_atr = staticmethod(compute_atr)
+    _aggregate_signal = staticmethod(aggregate_signal)
+    _extract_whale_data = staticmethod(extract_whale_data)

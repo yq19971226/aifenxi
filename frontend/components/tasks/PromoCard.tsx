@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useCallback, useState } from "react";
-import { Download, TrendingUp, TrendingDown, Shield, Sparkles } from "lucide-react";
+import { Download, Shield } from "lucide-react";
 import html2canvas from "html2canvas";
 
 interface PromoCardProps {

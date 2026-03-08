@@ -10,7 +10,6 @@ import {
   Crown,
   Star,
   User,
-  MoreHorizontal,
 } from "lucide-react";
 import {
   getUsers,
