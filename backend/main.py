@@ -109,7 +109,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                     verified_stages INT DEFAULT 0,
                     status {_v20} DEFAULT 'active',
                     final_accuracy FLOAT DEFAULT NULL,
-                    published BOOLEAN DEFAULT FALSE
+                    published BOOLEAN DEFAULT FALSE,
+                    signal {_v20} DEFAULT 'neutral',
+                    snapshot_price FLOAT DEFAULT NULL,
+                    stage_entry_price FLOAT DEFAULT NULL,
+                    stage_entered_at TIMESTAMP DEFAULT NULL,
+                    failure_reason TEXT DEFAULT NULL,
+                    risk_flag BOOLEAN DEFAULT FALSE,
+                    risk_note TEXT DEFAULT NULL
                 )
             """))
             await session.commit()

@@ -43,6 +43,9 @@ import {
   type PhaseHistory,
 } from "@/lib/api/playbook";
 import { SymbolSelector } from "@/components/layout/SymbolSelector";
+import PlaybookStoryline from "./PlaybookStoryline";
+import { PositionCalculator } from "@/components/trade/PositionCalculator";
+import { fromDefenseStrategy } from "@/lib/utils/position-sizing";
 
 /* ── Signal helpers ── */
 
@@ -80,6 +83,7 @@ function AdversarialL4({
   stepStatus: StepStatuses;
 }) {
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
 
   const dealer = sim.dealer_prediction;
   const defense = sim.defense_strategy;
@@ -157,18 +161,55 @@ function AdversarialL4({
   ];
 
   const completedCount = steps.filter((s) => s.done).length;
+  const allDone = completedCount === steps.length;
+
+  // Auto-collapse when all steps complete
+  const prevAllDone = useRef(false);
+  useEffect(() => {
+    if (allDone && !prevAllDone.current) {
+      setCollapsed(true);
+    }
+    prevAllDone.current = allDone;
+  }, [allDone]);
+
+  const summaryParts: string[] = [];
+  if (dealer?.dealer_plan) summaryParts.push(`庄家可信度${judge?.dealer_credibility != null ? (judge.dealer_credibility * 100).toFixed(0) + "%" : "-"}`);
+  if (defense?.confidence != null) summaryParts.push(`防御可行度${(defense.confidence * 100).toFixed(0)}%`);
+  if (judge?.adoption) summaryParts.push(`裁判${judge.adoption === "adopt" ? "采纳防御" : judge.adoption === "partial" ? "部分采纳" : "建议观望"}`);
 
   return (
     <div className="card p-5 space-y-5">
-      <div className="flex items-center justify-between">
+      <button
+        onClick={() => allDone && setCollapsed(!collapsed)}
+        className={`w-full flex items-center justify-between ${allDone ? "cursor-pointer" : "cursor-default"}`}
+      >
         <div className="flex items-center gap-2">
           <Swords size={16} className="text-orange-400" />
-          <span className="text-sm font-semibold text-white">{"AI \u5BF9\u6297\u63A8\u6F14 (3AI)"}</span>
+          <span className="text-sm font-semibold text-white">{"AI \u63A8\u7406\u8FC7\u7A0B"}</span>
         </div>
-        <span className="text-xs font-mono text-zinc-500">
-          {completedCount}/{steps.length} {"\u5B8C\u6210"}
-        </span>
-      </div>
+        <div className="flex items-center gap-2">
+          {allDone && collapsed && summaryParts.length > 0 && (
+            <span className="text-xs text-zinc-400">{summaryParts.join(" \u00B7 ")}</span>
+          )}
+          <span className="text-xs font-mono text-zinc-500">
+            {completedCount}/{steps.length} {"\u5B8C\u6210"}
+          </span>
+          {allDone && (
+            <ChevronDown size={14} className={`text-zinc-500 transition-transform duration-200 ${collapsed ? "" : "rotate-180"}`} />
+          )}
+        </div>
+      </button>
+
+      {/* Collapsed: only show progress bar */}
+      {collapsed && (
+        <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
+          <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-orange-500 via-blue-500 via-amber-500 to-emerald-500 w-full" />
+        </div>
+      )}
+
+      {/* Expanded: full detail */}
+      {!collapsed && (
+        <>
       {/* Progress bar */}
       <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
         <div
@@ -233,6 +274,8 @@ function AdversarialL4({
           </motion.div>
         )}
       </AnimatePresence>
+        </>
+      )}
     </div>
   );
 }
@@ -521,7 +564,7 @@ export default function PlaybookSimPage() {
 
   const { data: plaza } = useQuery<PlazaFeed>({
     queryKey: ["plazaFeed", symbol, 1],
-    queryFn: () => fetchPlazaFeed({ symbol, page: 1, page_size: 8 }),
+    queryFn: () => fetchPlazaFeed({ symbol, page: 1, page_size: 10 }),
     retry: false,
     staleTime: 30_000,
   });
@@ -542,6 +585,12 @@ export default function PlaybookSimPage() {
   const secondMatch = sim?.top_matches?.[1] || null;
   const isLowConfidence = !!bestMatch && bestMatch.match_pct < 30;
   const isCrowdedMatch = !!bestMatch && !!secondMatch && Math.abs(bestMatch.match_pct - secondMatch.match_pct) <= 5;
+
+  const storylinePred = bestMatch
+    ? plaza?.items?.find(
+        (p) => p.symbol === symbol.toUpperCase() && p.playbook_name === bestMatch.name
+      )
+    : undefined;
 
   return (
     <div className="mx-auto max-w-[1500px] px-4 md:px-8 py-8 space-y-6">
@@ -619,6 +668,27 @@ export default function PlaybookSimPage() {
         <div className="space-y-6">
           {/* AI Adversarial L4 Flow */}
           <AdversarialL4 sim={sim} latest={latest ?? null} stepStatus={stepStatus} />
+
+          {/* Playbook Storyline — 主视觉区 */}
+          {bestMatch && bestMatch.stages && bestMatch.stages.length > 0 && (
+            <PlaybookStoryline
+              match={bestMatch}
+              status={storylinePred?.status}
+              riskFlag={storylinePred?.risk_flag}
+              riskNote={storylinePred?.risk_note}
+              failureReason={storylinePred?.failure_reason}
+              verifiedStages={storylinePred?.verified_stages}
+              finalAccuracy={storylinePred?.final_accuracy}
+            />
+          )}
+
+          {/* Position calculator — 反制策略可用时显示 */}
+          {sim.defense_strategy && (
+            <PositionCalculator
+              input={fromDefenseStrategy(sim.defense_strategy)}
+              confidence={sim.defense_strategy.confidence}
+            />
+          )}
 
           {/* Overview cards */}
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -888,13 +958,27 @@ export default function PlaybookSimPage() {
                           {item.match_pct.toFixed(0)}%
                         </span>
                         <span className={`rounded px-2 py-0.5 text-xs font-medium ${
-                          item.status === "active"
-                            ? "bg-emerald-500/10 text-emerald-400"
-                            : item.status === "completed"
-                              ? "bg-white/[0.06] text-zinc-300"
-                              : "bg-white/[0.04] text-zinc-500"
+                          item.status === "active" && item.risk_flag
+                            ? "bg-amber-500/10 text-amber-400"
+                            : item.status === "active"
+                              ? "bg-emerald-500/10 text-emerald-400"
+                              : item.status === "completed"
+                                ? "bg-white/[0.06] text-zinc-300"
+                                : item.status === "failed"
+                                  ? "bg-red-500/10 text-red-400"
+                                  : "bg-white/[0.04] text-zinc-500"
                         }`}>
-                          {item.status === "active" ? "\u8FDB\u884C\u4E2D" : item.status === "completed" ? "\u5DF2\u5B8C\u6210" : item.status}
+                          {item.status === "active" && item.risk_flag
+                            ? "\u9700\u5173\u6CE8"
+                            : item.status === "active"
+                              ? "\u8FDB\u884C\u4E2D"
+                              : item.status === "completed"
+                                ? "\u5DF2\u5B8C\u6210"
+                                : item.status === "failed"
+                                  ? "\u5DF2\u5931\u6548"
+                                  : item.status === "expired"
+                                    ? "\u5DF2\u8FC7\u671F"
+                                    : item.status}
                         </span>
                       </div>
                     </div>
@@ -999,7 +1083,7 @@ function MatchCard({
                             <span className={`text-xs text-center truncate w-full px-0.5 ${
                               isCurrent ? "text-indigo-400 font-semibold" : isPast ? "text-indigo-400/60" : "text-zinc-600"
                             }`}>
-                              {stage.phase || stage.name}
+                              {stage.name || stage.phase}
                             </span>
                           </div>
                           {/* Connector */}

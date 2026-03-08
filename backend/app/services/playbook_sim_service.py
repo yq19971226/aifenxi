@@ -386,6 +386,7 @@ async def _run_adversarial_pipeline(
             [dealer_prediction, defense_strategy, judge_adoption]
         ),
         "total_playbooks": len(PLAYBOOK_PATTERNS),
+        "snapshot_price": report.get("current_price"),
     }
 
 
@@ -538,6 +539,7 @@ async def _simulate_stream_impl(
             [dealer_prediction, defense_strategy, judge_adoption]
         ),
         "total_playbooks": len(PLAYBOOK_PATTERNS),
+        "snapshot_price": report.get("current_price"),
     }
 
     # 缓存
@@ -716,6 +718,8 @@ async def save_prediction(
 
     stages_json = json.dumps(top.get("stages", []), ensure_ascii=False)
     current_stage_idx = top.get("current_stage_idx", -1)
+    signal = top.get("signal", "neutral")
+    snapshot_price = result.get("snapshot_price")
 
     try:
         result_row = await insert_returning(
@@ -723,10 +727,10 @@ async def save_prediction(
             """
                 INSERT INTO playbook_predictions
                     (symbol, playbook_name, match_pct, current_stage_idx,
-                     stages_json, status, published)
+                     stages_json, status, published, signal, snapshot_price)
                 VALUES
                     (:symbol, :name, :match_pct, :stage_idx,
-                     :stages_json, 'active', :published)
+                     :stages_json, 'active', :published, :signal, :snapshot_price)
                 RETURNING id
             """,
             {
@@ -736,6 +740,8 @@ async def save_prediction(
                 "stage_idx": current_stage_idx,
                 "stages_json": stages_json,
                 "published": should_publish,
+                "signal": signal,
+                "snapshot_price": snapshot_price,
             },
             table="playbook_predictions",
         )

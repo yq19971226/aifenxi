@@ -73,6 +73,30 @@ _BUILTIN_TEMPLATES: dict[EventType, dict[str, str]] = {
         ),
         "short": "{{symbol}} 剧本: {{matched_playbook}} ({{probability_pct}})",
     },
+    "playbook_completed": {
+        "title": "[Axiom] {{symbol}} 剧本验证完成",
+        "telegram": (
+            "✅ <b>剧本验证完成</b>\n"
+            "━━━━━━━━━━━━━━━\n"
+            "💎 标的: {{symbol}}\n"
+            "📖 剧本: {{matched_playbook}}\n"
+            "📊 阶段验证: {{stage_match_ratio}}\n"
+            "━━━━━━━━━━━━━━━"
+        ),
+        "short": "{{symbol}} 剧本{{matched_playbook}}验证完成 ({{stage_match_ratio}})",
+    },
+    "playbook_failed": {
+        "title": "[Axiom] {{symbol}} 剧本预测失效",
+        "telegram": (
+            "❌ <b>剧本预测失效</b>\n"
+            "━━━━━━━━━━━━━━━\n"
+            "💎 标的: {{symbol}}\n"
+            "📖 剧本: {{matched_playbook}}\n"
+            "⚠️ 失效原因: {{failure_reason}}\n"
+            "━━━━━━━━━━━━━━━"
+        ),
+        "short": "{{symbol}} 剧本{{matched_playbook}}失效: {{failure_reason}}",
+    },
     "risk_alert": {
         "title": "[Axiom] {{symbol}} 风险预警",
         "telegram": (

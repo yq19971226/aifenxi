@@ -1,4 +1,5 @@
 import { authFetch, authHeaders } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -84,6 +85,7 @@ export interface SimResult {
   judge_adoption: JudgeAdoption | null;
   adversarial_complete: boolean;
   total_playbooks: number;
+  snapshot_price?: number | null;
   is_masked?: boolean;
   error?: string;
 }
@@ -99,6 +101,12 @@ export interface PlazaItem {
   final_accuracy: number | null;
   verified_stages?: number;
   stages: PlaybookStage[] | null;
+  signal?: string;
+  snapshot_price?: number | null;
+  stage_entry_price?: number | null;
+  failure_reason?: string | null;
+  risk_flag?: boolean;
+  risk_note?: string | null;
 }
 
 export interface PlazaFeed {
@@ -187,17 +195,9 @@ function normalizeSimResult(result: SimResult): SimResult {
   };
 }
 
-async function handleRes<T>(res: Response, msg: string): Promise<T> {
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: msg }));
-    throw new Error(err.detail || msg);
-  }
-  return res.json();
-}
-
 export async function fetchSimulation(symbol: string): Promise<SimResult> {
   const res = await authFetch(`${API_BASE}/api/playbook-sim/simulate/${symbol}`);
-  const result = await handleRes<SimResult>(res, "剧本演练失败");
+  const result = await handleApiResponse<SimResult>(res, "剧本演练失败");
   return normalizeSimResult(result);
 }
 
@@ -314,10 +314,10 @@ export async function fetchPlazaFeed(params: {
   sp.set("page", String(params.page || 1));
   sp.set("page_size", String(params.page_size || 20));
   const res = await authFetch(`${API_BASE}/api/playbook-sim/plaza/feed?${sp}`);
-  return handleRes(res, "获取剧本广场失败");
+  return handleApiResponse(res, "获取剧本广场失败");
 }
 
 export async function fetchPlazaStats(): Promise<PlazaStats> {
   const res = await authFetch(`${API_BASE}/api/playbook-sim/plaza/stats`);
-  return handleRes(res, "获取剧本广场统计失败");
+  return handleApiResponse(res, "获取剧本广场统计失败");
 }

@@ -210,6 +210,8 @@ export default function PlaybookReviewPage() {
                           ? "bg-[var(--color-accent)]/10 text-accent"
                           : item.status === "completed"
                           ? "bg-[var(--color-bull)]/10 text-bull"
+                          : item.status === "failed"
+                          ? "bg-[var(--color-bear)]/10 text-bear"
                           : "bg-white/[0.04] text-zinc-500"
                       }`}
                     >
@@ -217,6 +219,10 @@ export default function PlaybookReviewPage() {
                         ? "进行中"
                         : item.status === "completed"
                         ? "已完成"
+                        : item.status === "failed"
+                        ? "已失效"
+                        : item.status === "expired"
+                        ? "已过期"
                         : item.status}
                     </span>
                   </td>

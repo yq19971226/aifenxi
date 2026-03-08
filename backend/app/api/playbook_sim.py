@@ -112,7 +112,13 @@ async def plaza_feed(
     if playbook:
         conditions.append("playbook_name = :playbook")
         params["playbook"] = playbook
+    _VALID_STATUSES = {"active", "completed", "failed", "expired"}
     if status_filter:
+        if status_filter not in _VALID_STATUSES:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"无效的状态筛选: {status_filter}，允许值: {', '.join(sorted(_VALID_STATUSES))}",
+            )
         conditions.append("status = :status")
         params["status"] = status_filter
 
@@ -131,7 +137,8 @@ async def plaza_feed(
             text(f"""
                 SELECT id, symbol, playbook_name, match_pct, current_stage_idx,
                        stages_json, status, final_accuracy, verified_stages,
-                       created_at
+                       created_at, signal, snapshot_price, stage_entry_price,
+                       failure_reason, risk_flag, risk_note
                 FROM playbook_predictions
                 WHERE {where}
                 ORDER BY created_at DESC
@@ -158,6 +165,12 @@ async def plaza_feed(
                 item["current_stage_idx"] = row["current_stage_idx"]
                 item["final_accuracy"] = float(row["final_accuracy"]) if row["final_accuracy"] else None
                 item["verified_stages"] = row["verified_stages"]
+                item["signal"] = row["signal"] or "neutral"
+                item["snapshot_price"] = float(row["snapshot_price"]) if row["snapshot_price"] else None
+                item["stage_entry_price"] = float(row["stage_entry_price"]) if row["stage_entry_price"] else None
+                item["failure_reason"] = row["failure_reason"]
+                item["risk_flag"] = bool(row["risk_flag"]) if row["risk_flag"] is not None else False
+                item["risk_note"] = row["risk_note"]
                 try:
                     item["stages"] = _json.loads(row["stages_json"]) if row["stages_json"] else []
                 except Exception:

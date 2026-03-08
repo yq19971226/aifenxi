@@ -17,7 +17,14 @@ CREATE TABLE IF NOT EXISTS playbook_predictions (
     final_accuracy  REAL,
     verified_stages INTEGER DEFAULT 0,
     published       BOOLEAN DEFAULT 0,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    signal          TEXT DEFAULT 'neutral',
+    snapshot_price  REAL,
+    stage_entry_price REAL,
+    stage_entered_at TIMESTAMP,
+    failure_reason  TEXT,
+    risk_flag       BOOLEAN DEFAULT 0,
+    risk_note       TEXT
 )
 """)
 print("Created: playbook_predictions")
