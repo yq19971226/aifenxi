@@ -18,6 +18,7 @@ import {
   Wallet,
   PieChart,
   GraduationCap,
+  Server,
   type LucideIcon,
 } from "lucide-react";
 
@@ -80,6 +81,12 @@ export const ADMIN_MENU_GROUPS: AdminMenuGroup[] = [
     label: "AI",
     items: [
       { label: "自主学习", href: "/admin/learning", icon: GraduationCap },
+    ],
+  },
+  {
+    label: "系统",
+    items: [
+      { label: "系统管理", href: "/admin/system", icon: Server },
     ],
   },
 ];

@@ -1,0 +1,21 @@
+[Unit]
+Description=Axiom Deploy Agent - 一键部署代理服务
+After=network.target docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/axiom
+ExecStart=/usr/bin/python3 /opt/axiom/scripts/deploy-agent.py
+Restart=always
+RestartSec=5
+Environment=DEPLOY_AGENT_TOKEN=
+Environment=DEPLOY_AGENT_PORT=9321
+
+# 安全限制
+NoNewPrivileges=false
+ProtectSystem=false
+
+[Install]
+WantedBy=multi-user.target

@@ -46,6 +46,7 @@ from app.api.backtest import router as backtest_router
 from app.api.partner import user_router as partner_user_router, admin_router as partner_admin_router, withdrawal_admin_router
 from app.api.tasks import user_router as tasks_user_router, admin_router as tasks_admin_router
 from app.api.announcements import user_router as announcements_user_router, admin_router as announcements_admin_router
+from app.api.admin_system import router as admin_system_router
 from app.api.dashboard_overview import router as dashboard_overview_router
 from app.core.config import settings
 from app.core.logging import setup_logging
@@ -259,6 +260,7 @@ app.include_router(tasks_user_router)
 app.include_router(tasks_admin_router)
 app.include_router(announcements_user_router)
 app.include_router(announcements_admin_router)
+app.include_router(admin_system_router)
 app.include_router(dashboard_overview_router)
 
 
