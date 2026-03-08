@@ -89,6 +89,8 @@ services:
       - HTTP_PROXY=${HTTP_PROXY:-}
       - HTTPS_PROXY=${HTTPS_PROXY:-}
       - NO_PROXY=postgres,redis,localhost,127.0.0.1
+      - DEPLOY_AGENT_URL=${DEPLOY_AGENT_URL:-http://host.docker.internal:9321}
+      - DEPLOY_AGENT_TOKEN=${DEPLOY_AGENT_TOKEN:-}
     ports:
       - "8000:8000"
     depends_on:

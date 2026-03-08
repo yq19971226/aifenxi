@@ -155,12 +155,56 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
 ---
 
-## 后台一键更新（未来版本）
+## 后台一键更新（已实现）
 
-实现 `/api/admin/system/update` 端点后，上述 3.2~3.6 步骤将自动化：
-1. Admin 后台点击"系统更新"按钮
-2. 后端执行 git pull + docker rebuild + healthcheck
-3. 前端显示更新进度
-4. 完成后自动刷新页面
+### 架构
+
+```
+Admin 浏览器 → 后端 API → 部署代理(宿主机:9321) → git pull + docker rebuild
+```
+
+- **部署代理** (`scripts/deploy-agent.py`)：运行在宿主机的轻量 HTTP 服务，监听 `127.0.0.1:9321`
+- **后端 API** (`/api/admin/system/deploy`)：SSE 流式转发部署日志
+- **前端页面** (`/admin/system`)：一键更新按钮 + 实时日志 + 容器状态
+
+### 使用方式
+
+1. 本地修改代码 → `git commit` → `git push origin main`
+2. 打开 Admin 后台 → 侧边栏「系统管理」
+3. 查看是否有新提交可更新（页面自动检测）
+4. 点击「一键更新」按钮
+5. 等待部署完成（页面实时显示日志）
+
+### 首次服务器配置
+
+```bash
+# 1. 将代码克隆到服务器
+git clone <your-repo> /opt/axiom
+
+# 2. 一键初始化（安装 Docker/Nginx/SSL/防火墙/部署代理）
+sudo bash /opt/axiom/scripts/server-init.sh your-domain.com
+
+# 3. 编辑 .env
+nano /opt/axiom/.env
+
+# 4. 启动服务
+cd /opt/axiom
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+# 5. 创建管理员
+docker compose exec backend python scripts/create_admin.py
+```
+
+### 相关文件
+
+| 文件 | 说明 |
+|---|---|
+| `scripts/deploy.sh` | 部署脚本（git pull + docker build + health check）|
+| `scripts/deploy-agent.py` | 宿主机部署代理（HTTP 服务）|
+| `scripts/axiom-deploy-agent.service` | systemd 服务文件 |
+| `scripts/server-init.sh` | 服务器一键初始化 |
+| `nginx/axiom.conf` | Nginx 反向代理配置 |
+| `backend/app/api/admin_system.py` | 后端系统管理 API |
+| `frontend/app/(main)/admin/system/page.tsx` | 前端系统管理页面 |
 
 参见 `/release-version` workflow 了解版本管理细节。
