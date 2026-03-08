@@ -36,6 +36,11 @@ _last_deploy: dict | None = None
 
 AUTH_TOKEN = os.environ.get("DEPLOY_AGENT_TOKEN", "")
 
+# git fetch 结果缓存，避免每 30s 轮询都执行网络请求
+_git_cache: dict | None = None
+_git_cache_time: float = 0
+GIT_CACHE_TTL = 60  # 秒
+
 
 def _json_response(handler: BaseHTTPRequestHandler, status: int, data: dict):
     body = json.dumps(data, ensure_ascii=False).encode("utf-8")
@@ -56,7 +61,24 @@ def _check_auth(handler: BaseHTTPRequestHandler) -> bool:
     return False
 
 
-def _git_info() -> dict:
+def _git_commit_short() -> str:
+    """仅获取当前 commit hash，无网络请求。"""
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"],
+            cwd=PROJECT_DIR, text=True, timeout=5
+        ).strip()
+    except Exception:
+        return "unknown"
+
+
+def _git_info(force_fetch: bool = False) -> dict:
+    global _git_cache, _git_cache_time
+
+    # 返回缓存（60s 内不重复 fetch）
+    if not force_fetch and _git_cache and (time.time() - _git_cache_time < GIT_CACHE_TTL):
+        return _git_cache
+
     try:
         commit = subprocess.check_output(
             ["git", "rev-parse", "--short", "HEAD"],
@@ -90,13 +112,16 @@ def _git_info() -> dict:
                 cwd=PROJECT_DIR, text=True, timeout=5
             ).strip()
             behind = int(behind_output)
-        return {
+        result = {
             "commit": commit,
             "message": message,
             "branch": branch,
             "behind": behind,
             "has_update": behind > 0,
         }
+        _git_cache = result
+        _git_cache_time = time.time()
+        return result
     except Exception as e:
         return {"error": str(e)}
 
@@ -230,8 +255,11 @@ class DeployHandler(BaseHTTPRequestHandler):
                 "success": success,
                 "elapsed_s": elapsed,
                 "finished_at": datetime.now(timezone.utc).isoformat(),
-                "commit": _git_info().get("commit", "unknown"),
+                "commit": _git_commit_short(),
             }
+            # 部署完成后清除 git 缓存，下次查询会重新 fetch
+            _git_cache = None
+            _git_cache_time = 0
             _deploy_lock.release()
 
 

@@ -52,7 +52,7 @@ log "代码已更新: ${OLD_COMMIT} → ${NEW_COMMIT}"
 
 # ── 3. 构建镜像 ──
 log "步骤 3/6: 构建 Docker 镜像..."
-$COMPOSE_CMD build --no-cache >> "$LOG_FILE" 2>&1 || {
+$COMPOSE_CMD build >> "$LOG_FILE" 2>&1 || {
     err "Docker 构建失败"
     exit 2
 }
