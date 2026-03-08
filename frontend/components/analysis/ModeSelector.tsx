@@ -64,7 +64,7 @@ export function ModeSelector({ mode, userLevel, running, onSelect }: ModeSelecto
               {selected && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-indigo-400" />}
             </div>
             <p className={`text-sm mt-1.5 ${
-              selected ? "text-zinc-400" : locked ? "text-zinc-700" : "text-zinc-500"
+              selected ? "text-zinc-400" : locked ? "text-zinc-600" : "text-zinc-500"
             }`}>
               {opt.desc}
             </p>

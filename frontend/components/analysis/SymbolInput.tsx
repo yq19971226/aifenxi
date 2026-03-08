@@ -21,6 +21,8 @@ export function SymbolInput({
   canStart,
   onStart,
 }: SymbolInputProps) {
+  const displaySymbols = quickSymbols.slice(0, 5);
+
   return (
     <div className="flex flex-col lg:flex-row items-end gap-4 bg-white/[0.01] border border-white/[0.03] p-5 rounded-lg">
       <div className="w-full flex-1 space-y-2">
@@ -34,10 +36,12 @@ export function SymbolInput({
             onChange={(e) => onSymbolChange(e.target.value.toUpperCase())}
             placeholder="BTCUSDT"
             disabled={running}
-            className="w-full bg-black/40 border border-white/[0.08] focus:border-indigo-500/50 rounded-lg py-3.5 pl-4 pr-44 text-white text-base font-mono transition-all outline-none"
+            className={`w-full bg-black/40 border border-white/[0.08] focus:border-indigo-500/50 rounded-lg py-3.5 pl-4 text-white text-base font-mono transition-all outline-none ${
+              displaySymbols.length >= 4 ? "pr-44" : displaySymbols.length >= 2 ? "pr-28" : "pr-16"
+            }`}
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-            {quickSymbols.map((s) => (
+            {displaySymbols.map((s) => (
               <button
                 key={s}
                 type="button"

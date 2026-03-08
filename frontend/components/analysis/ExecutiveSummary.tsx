@@ -46,7 +46,7 @@ function ActionAdviceBanner({ strategy }: { strategy: StrategyData }) {
         止损 <span className="font-mono font-medium text-red-400">{formatPrice(strategy.stop_loss)}</span>
         {strategy.targets.length > 0 && (
           <>
-            <span className="mx-2 text-zinc-600">·</span>
+            <span className="mx-2 text-zinc-500">·</span>
             目标 <span className="font-mono font-medium text-emerald-400">{formatPrice(strategy.targets[0])}</span>
             {strategy.targets.length > 1 && <span className="text-zinc-500"> +{strategy.targets.length - 1}</span>}
           </>
@@ -119,9 +119,9 @@ export function ExecutiveSummary({ report }: { report: AnalysisReportType }) {
               <p className={`text-lg font-bold ${signalStyle.text}`}>{signalStyle.label}</p>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className="text-sm font-medium text-zinc-300">{report.symbol}</span>
-                <span className="text-zinc-600">·</span>
+                <span className="text-zinc-500">·</span>
                 <span className="text-sm text-zinc-500">{modeLabel(report.mode)}</span>
-                <span className="text-zinc-600">·</span>
+                <span className="text-zinc-500">·</span>
                 <span className="text-xs font-mono text-zinc-500">{(report.execution_time_ms / 1000).toFixed(1)}s</span>
               </div>
             </div>

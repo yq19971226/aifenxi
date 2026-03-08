@@ -88,7 +88,7 @@ function StrategyRangeBar({
         ))}
       </div>
       {/* Price labels */}
-      <div className="flex justify-between text-xs font-mono text-zinc-600">
+      <div className="flex justify-between text-xs font-mono text-zinc-500">
         <span>{formatPrice(min)}</span>
         <span>{formatPrice(max)}</span>
       </div>
