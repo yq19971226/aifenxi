@@ -514,19 +514,6 @@ class DataSourceManager:
         gecko_group = await self._registry.get_group("coingecko_source")
         fred_group = await self._registry.get_group("fred_source")
 
-        exchanges: list[ExchangeStatusItem] = []
-        if combo:
-            for src in combo.sources:
-                exchanges.append(
-                    ExchangeStatusItem(
-                        source_id=src.source_id,
-                        name=src.name,
-                        enabled=src.enabled,
-                        status=src.status,
-                        weight=src.weight,
-                    )
-                )
-                
         score = await self.recalculate_completeness()
         primary_sources, domain_completeness, missing_domains = await self._build_primary_sources_snapshot(
             combo,
@@ -535,6 +522,34 @@ class DataSourceManager:
             gecko_group,
             fred_group,
         )
+
+        # 用实际数据探测结果构建 primary_status_map，校正注册表中可能过时的连接器状态
+        primary_status_map: dict[str, DataSourceStatus] = {}
+        for ps in primary_sources:
+            if ps.source_id == "binance":
+                primary_status_map["binance_futures"] = ps.status
+
+        exchanges: list[ExchangeStatusItem] = []
+        if combo:
+            for src in combo.sources:
+                # 如果注册表标记 stale/error 但实际数据探测显示 enabled，以探测结果为准
+                effective_status = src.status
+                probe_status = primary_status_map.get(src.source_id)
+                if (
+                    probe_status == DataSourceStatus.ENABLED
+                    and effective_status in (DataSourceStatus.STALE, DataSourceStatus.ERROR)
+                ):
+                    effective_status = DataSourceStatus.ENABLED
+
+                exchanges.append(
+                    ExchangeStatusItem(
+                        source_id=src.source_id,
+                        name=src.name,
+                        enabled=src.enabled,
+                        status=effective_status,
+                        weight=src.weight,
+                    )
+                )
 
         # 获取 CoinGlass 套餐等级
         try:
