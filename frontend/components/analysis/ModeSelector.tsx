@@ -3,6 +3,7 @@
 import { Activity, Bot, Lock, Zap } from "lucide-react";
 
 import type { AnalysisMode } from "@/lib/api/analysis";
+import { MODE_CONTRACTS, deriveAgentCount, deriveTierLabel } from "@/lib/mode-contract";
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -16,10 +17,14 @@ export interface ModeOption {
   tierLabel: string;
 }
 
+const _sc = MODE_CONTRACTS["scalping"];
+const _ic = MODE_CONTRACTS["intraday"];
+const _tc = MODE_CONTRACTS["trend"];
+
 export const MODE_OPTIONS: ModeOption[] = [
-  { value: "scalping", label: "实时短线", desc: "快速技术面分析", agents: 1, icon: Zap, minLevel: 0, tierLabel: "" },
-  { value: "intraday", label: "日内博弈", desc: "多维度交叉验证", agents: 6, icon: Activity, minLevel: 1, tierLabel: "专业版" },
-  { value: "trend", label: "趋势布局", desc: "全智能体深度博弈", agents: 10, icon: Bot, minLevel: 2, tierLabel: "旗舰版" },
+  { value: "scalping", label: "实时短线", desc: "快速技术面分析", agents: deriveAgentCount(_sc), icon: Zap, minLevel: _sc.min_level, tierLabel: deriveTierLabel(_sc) },
+  { value: "intraday", label: "日内博弈", desc: "多维度交叉验证", agents: deriveAgentCount(_ic), icon: Activity, minLevel: _ic.min_level, tierLabel: deriveTierLabel(_ic) },
+  { value: "trend", label: "趋势布局", desc: "全智能体深度博弈", agents: deriveAgentCount(_tc), icon: Bot, minLevel: _tc.min_level, tierLabel: deriveTierLabel(_tc) },
 ];
 
 // ── Component ────────────────────────────────────────────────

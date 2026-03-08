@@ -76,7 +76,7 @@ export function DeepAnalysis({ sections }: { sections: ReportSection[] }) {
               <Icon className="h-3.5 w-3.5" />
               {tab.label}
               {count > 0 && (
-                <span className="ml-1 text-xs text-zinc-600 font-mono">{count}</span>
+                <span className="ml-1 text-xs text-zinc-500 font-mono">{count}</span>
               )}
             </button>
           );

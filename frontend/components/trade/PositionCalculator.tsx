@@ -147,13 +147,13 @@ export function PositionCalculator({
             isWorthTaking={isWorthTaking}
             confidence={confidence}
           />
-          <span className="text-xs text-zinc-600">
+          <span className="text-xs text-zinc-500">
             {preferences?.leverage}x · {((preferences?.riskPct ?? 0) * 100).toFixed(0)}% 风险
           </span>
         </div>
 
         {/* Disclaimer */}
-        <p className="text-xs text-zinc-600 border-t border-white/[0.04] pt-2">
+        <p className="text-xs text-zinc-500 border-t border-white/[0.04] pt-2">
           以上为基于您输入参数的数学计算结果，不构成投资建议
         </p>
       </div>

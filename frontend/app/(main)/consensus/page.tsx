@@ -153,7 +153,7 @@ function AdversarialFlow({ report }: { report: AnalysisReportType }) {
   ];
 
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+    <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-5">
       <div className="flex items-center gap-2 mb-4">
         <Activity size={16} className="text-indigo-400" />
         <span className="text-sm font-semibold text-zinc-200">{"AI \u5BF9\u6297\u6D41\u7A0B"}</span>
@@ -167,7 +167,7 @@ function AdversarialFlow({ report }: { report: AnalysisReportType }) {
                 step.done ? `${step.bgColor} border ${step.border}` : "bg-white/[0.02] border border-white/[0.05]"
               } flex-1 min-w-0 transition-colors`}
             >
-              <span className={step.done ? step.color : "text-zinc-600"}>{step.icon}</span>
+              <span className={step.done ? step.color : "text-zinc-500"}>{step.icon}</span>
               <span
                 className={`text-sm font-medium truncate ${
                   step.done ? step.color : "text-zinc-500"
@@ -209,7 +209,7 @@ function ModelCard({ vote }: { vote: ModelVote }) {
   const sigStyle = SIGNAL_COLORS[vote.signal] ?? SIGNAL_COLORS.neutral;
 
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 hover:bg-white/[0.03] transition-colors">
+    <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-5 hover:bg-white/[0.03] transition-colors">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className={`w-1 h-4 rounded-full ${colors.bg}`} />
@@ -278,7 +278,7 @@ function WeightDonut({ weights }: { weights: Record<string, number> }) {
   });
 
   return (
-    <div className="card-surface rounded-xl p-5">
+    <div className="card-surface rounded-lg p-5">
       <p className="text-xs uppercase tracking-widest text-zinc-500">
         {"\u6743\u91CD\u5206\u5E03"}
       </p>
@@ -330,7 +330,7 @@ function DivergenceGauge({ divergence }: { divergence: number }) {
     pct <= 30 ? "var(--color-bull)" : pct <= 60 ? "#FACC15" : "var(--color-bear)";
 
   return (
-    <div className="card-surface rounded-xl p-5">
+    <div className="card-surface rounded-lg p-5">
       <p className="text-xs uppercase tracking-widest text-zinc-500">
         {"\u5206\u6B67\u5EA6"}
       </p>
@@ -356,7 +356,7 @@ function DivergenceGauge({ divergence }: { divergence: number }) {
           }}
         />
       </div>
-      <div className="mt-1 flex justify-between text-xs text-zinc-600">
+      <div className="mt-1 flex justify-between text-xs text-zinc-500">
         <span>0%</span>
         <span>50%</span>
         <span>100%</span>
@@ -427,10 +427,10 @@ export default function ConsensusPage() {
   const userLevel = Math.max(adminLevel, quota?.level ?? 0);
   const currentQuota = quota?.quotas?.[mode] ?? null;
 
-  const isModeLocked = (m: AnalysisMode): boolean => {
+  const isModeLocked = useCallback((m: AnalysisMode): boolean => {
     const cfg = MODE_CONFIGS.find((c) => c.value === m);
     return (cfg?.minLevel ?? 0) > userLevel;
-  };
+  }, [userLevel]);
   const isQuotaExhausted = currentQuota !== null && currentQuota.remaining === 0;
   const canStart = symbol.trim().length > 0 && !isModeLocked(mode) && !isQuotaExhausted && !running;
 
@@ -450,7 +450,7 @@ export default function ConsensusPage() {
       setError(null);
       setProgressSteps([]);
     },
-    [userLevel, running],
+    [isModeLocked, running],
   );
 
   const handleStart = useCallback(
@@ -505,7 +505,7 @@ export default function ConsensusPage() {
         queryClient.invalidateQueries({ queryKey: ["consensus", symbol] });
       }
     },
-    [running, symbol, mode, userLevel, isQuotaExhausted, queryClient],
+    [running, symbol, mode, isModeLocked, isQuotaExhausted, queryClient],
   );
 
   // Which report to display: analysis report (fresh) > consensus cache
@@ -558,7 +558,7 @@ export default function ConsensusPage() {
                 <span className="rounded bg-white/[0.06] px-2 py-0.5 font-mono text-zinc-300">
                   {cfg.agents}
                 </span>
-                <span className="text-zinc-600">{cfg.periods}</span>
+                <span className="text-zinc-500">{cfg.periods}</span>
               </div>
               {locked && cfg.tierLabel && (
                 <span className="mt-2 inline-block rounded bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">
@@ -576,7 +576,7 @@ export default function ConsensusPage() {
           type="button"
           onClick={() => handleStart(false)}
           disabled={!canStart}
-          className={`w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all ${
+          className={`w-full sm:w-auto px-8 py-3.5 rounded-lg font-bold text-base flex items-center justify-center gap-2 transition-all ${
             running
               ? "bg-white/[0.05] text-zinc-400 border border-white/[0.1]"
               : canStart
@@ -670,7 +670,7 @@ export default function ConsensusPage() {
       {displayConsensus && !running && !displayReport && (
         <div className="space-y-6 relative z-10">
           {/* Consensus summary */}
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-6">
             <div className="flex flex-wrap items-center gap-8">
               <div className="flex flex-col items-start gap-1">
                 <span className="text-xs font-medium uppercase tracking-widest text-zinc-500">
