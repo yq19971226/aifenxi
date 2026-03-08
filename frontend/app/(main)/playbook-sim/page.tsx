@@ -20,6 +20,8 @@ import {
   type PhaseHistory,
 } from "@/lib/api/playbook";
 import { SymbolSelector } from "@/components/layout/SymbolSelector";
+import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
+import { MaintenancePlaceholder } from "@/components/layout/MaintenancePlaceholder";
 import { PositionCalculator } from "@/components/trade/PositionCalculator";
 import { fromDefenseStrategy } from "@/lib/utils/position-sizing";
 import { SIGNAL_MAP } from "./playbook-constants";
@@ -31,6 +33,9 @@ import PlazaSection from "./PlazaSection";
 import AnalysisColumn from "./AnalysisColumn";
 
 export default function PlaybookSimPage() {
+  const { getState } = useFeatureFlags();
+  const playbookState = getState("playbook");
+
   const searchParams = useSearchParams();
   const initialSymbol = searchParams.get("symbol") || "BTCUSDT";
   const [symbol, setSymbol] = useState(initialSymbol);
@@ -88,6 +93,10 @@ export default function PlaybookSimPage() {
         (p) => p.symbol === symbol.toUpperCase() && p.playbook_name === bestMatch.name
       )
     : undefined;
+
+  if (playbookState !== "active") {
+    return <MaintenancePlaceholder featureName="剧本推演" />;
+  }
 
   return (
     <div className="mx-auto max-w-[1500px] px-4 md:px-8 py-8 space-y-6">
@@ -175,6 +184,7 @@ export default function PlaybookSimPage() {
             <PositionCalculator
               input={fromDefenseStrategy(sim.defense_strategy)}
               confidence={sim.defense_strategy.confidence}
+              isWorthTaking={sim.judge_adoption?.adoption !== "wait"}
             />
           )}
 

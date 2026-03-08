@@ -11,6 +11,8 @@ import {
   ArrowRight, AlertCircle,
 } from "lucide-react";
 import PromoCard from "@/components/tasks/PromoCard";
+import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
+import { MaintenancePlaceholder } from "@/components/layout/MaintenancePlaceholder";
 
 type Tab = "today" | "history";
 
@@ -21,6 +23,7 @@ const ST: Record<string, { label: string; color: string; bg: string; icon: typeo
 };
 
 export default function TasksPage() {
+  const { getState } = useFeatureFlags();
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("today");
   const [selTpl, setSelTpl] = useState("");
@@ -37,6 +40,10 @@ export default function TasksPage() {
   });
 
   const copyText = (text: string, idx: number) => { navigator.clipboard.writeText(text); setCopied(idx); setTimeout(() => setCopied(null), 2000); };
+
+  if (getState("task") !== "active") {
+    return <MaintenancePlaceholder featureName="任务中心" />;
+  }
 
   if (isLoading) return <PageTransition><div className="mx-auto max-w-3xl px-4 py-8 space-y-4">{[1,2,3].map(i => <div key={i} className="h-24 skeleton rounded-xl" />)}</div></PageTransition>;
 

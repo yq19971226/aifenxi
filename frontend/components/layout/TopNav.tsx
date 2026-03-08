@@ -50,8 +50,8 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: "\u770B\u677F", href: "/dashboard", icon: LayoutDashboard, minRole: "user" },
   { label: "\u5206\u6790", href: "/consensus", icon: Brain, minRole: "user" },
-  { label: "\u5267\u672C", href: "/playbook-sim", icon: Activity, minRole: "user" },
-  { label: "\u7EE9\u6548", href: "/performance", icon: TrendingUp, minRole: "user" },
+  { label: "\u5267\u672C", href: "/playbook-sim", icon: Activity, minRole: "user", featureFlag: "playbook" },
+  { label: "\u6392\u884C\u699C", href: "/leaderboard", icon: TrendingUp, minRole: "user", featureFlag: "leaderboard" },
   { label: "\u9884\u8B66", href: "/alerts", icon: Shield, minRole: "user" },
   {
     label: "\u589E\u957F",
@@ -59,8 +59,8 @@ const navItems: NavItem[] = [
     icon: Gift,
     minRole: "user",
     children: [
-      { label: "\u4EFB\u52A1\u4E2D\u5FC3", href: "/tasks" },
-      { label: "\u5408\u4F19\u4EBA", href: "/partner" },
+      { label: "\u4EFB\u52A1\u4E2D\u5FC3", href: "/tasks", featureFlag: "task" },
+      { label: "\u5408\u4F19\u4EBA", href: "/partner", featureFlag: "partner" },
     ],
   },
   {
@@ -124,13 +124,22 @@ export function TopNav() {
   const userRole: UserRole = user?.role ?? "user";
   const { unreadCount: alertCount, clearUnread: clearAlertCount } = useAlertSocket();
 
-  // Feature flags
-  const [featureFlags, setFeatureFlags] = useState<Record<string, boolean>>({});
+  // Feature flags (tri-state: active / maintenance / hidden)
+  const [featureFlags, setFeatureFlags] = useState<Record<string, string>>({});
   useEffect(() => {
     const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
     fetch(`${API_BASE}/api/feature-flags`)
       .then((r) => (r.ok ? r.json() : {}))
-      .then(setFeatureFlags)
+      .then((data: Record<string, string>) => {
+        const normalized: Record<string, string> = {};
+        for (const [k, v] of Object.entries(data)) {
+          const s = String(v).toLowerCase();
+          if (s === "true") normalized[k] = "active";
+          else if (s === "false") normalized[k] = "hidden";
+          else normalized[k] = s;
+        }
+        setFeatureFlags(normalized);
+      })
       .catch(() => {});
   }, []);
 
@@ -142,13 +151,14 @@ export function TopNav() {
           if (!item.children) return item;
           const filteredChildren = item.children.filter((child) => {
             if (!isNavItemVisible(child.href, userRole)) return false;
-            if (child.featureFlag && featureFlags[child.featureFlag] === false) return false;
+            if (child.featureFlag && featureFlags[child.featureFlag] === "hidden") return false;
             return true;
           });
           return { ...item, children: filteredChildren };
         })
         .filter((item) => {
           if (ROLE_LEVEL[userRole] < ROLE_LEVEL[item.minRole]) return false;
+          if (item.featureFlag && featureFlags[item.featureFlag] === "hidden") return false;
           if (item.children && item.children.length === 0) return false;
           return true;
         }),
@@ -319,6 +329,11 @@ export function TopNav() {
                               }`}
                             >
                               {child.label}
+                              {child.featureFlag && featureFlags[child.featureFlag] === "maintenance" && (
+                                <span className="ml-1.5 inline-block rounded bg-amber-500/15 px-1 py-px text-[10px] font-medium text-amber-400 leading-tight">
+                                  维护
+                                </span>
+                              )}
                             </div>
                           </Link>
                         );
@@ -330,6 +345,7 @@ export function TopNav() {
             );
           }
 
+          const isMaintenance = item.featureFlag && featureFlags[item.featureFlag] === "maintenance";
           return (
             <Link key={item.href} href={item.href} className="flex-shrink-0">
               <div
@@ -340,6 +356,11 @@ export function TopNav() {
                 }`}
               >
                 <span className="whitespace-nowrap">{item.label}</span>
+                {isMaintenance && (
+                  <span className="ml-1.5 inline-block rounded bg-amber-500/15 px-1 py-px text-[10px] font-medium text-amber-400 leading-tight">
+                    维护
+                  </span>
+                )}
               </div>
             </Link>
           );

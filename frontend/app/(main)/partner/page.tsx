@@ -14,6 +14,8 @@ import {
   Users, Copy, Wallet, ArrowDownToLine, DollarSign, UserPlus,
   Clock, CheckCircle2, XCircle, Link as LinkIcon, Percent, Snowflake,
 } from "lucide-react";
+import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
+import { MaintenancePlaceholder } from "@/components/layout/MaintenancePlaceholder";
 
 type Tab = "overview" | "invitations" | "commissions" | "wallet";
 
@@ -33,6 +35,7 @@ const W_STATUS: Record<string, { label: string; color: string; icon: typeof Cloc
 };
 
 export default function PartnerPage() {
+  const { getState } = useFeatureFlags();
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("overview");
   const [trc20Input, setTrc20Input] = useState("");
@@ -61,6 +64,10 @@ export default function PartnerPage() {
     setLinkCopied(true);
     setTimeout(() => setLinkCopied(false), 2000);
   };
+
+  if (getState("partner") !== "active") {
+    return <MaintenancePlaceholder featureName="合伙人" />;
+  }
 
   if (isLoading) {
     return (<PageTransition><div className="mx-auto max-w-4xl px-4 py-8 space-y-4">{Array.from({ length: 4 }).map((_, i) => (<div key={i} className="h-20 skeleton rounded-xl" />))}</div></PageTransition>);

@@ -595,9 +595,24 @@ async def kline_scheduler_status() -> dict:
 
 
 @app.get("/api/feature-flags", tags=["system"])
-async def feature_flags() -> dict[str, bool]:
-    """返回功能开关状态。"""
+async def feature_flags() -> dict[str, str]:
+    """返回功能开关状态。三态: active / maintenance / hidden。"""
     from app.services.config_service import get_config_value
-    task_enabled = (await get_config_value("task_feature_enabled", "true")).lower() == "true"
-    partner_enabled = (await get_config_value("partner_feature_enabled", "true")).lower() == "true"
-    return {"task": task_enabled, "partner": partner_enabled}
+
+    VALID_STATES = {"active", "maintenance", "hidden"}
+
+    async def _read(key: str, default: str = "active") -> str:
+        raw = (await get_config_value(key, default)).lower().strip()
+        # 兼容旧的 true/false 值
+        if raw == "true":
+            return "active"
+        if raw == "false":
+            return "hidden"
+        return raw if raw in VALID_STATES else default
+
+    return {
+        "playbook": await _read("playbook_feature_enabled", "active"),
+        "leaderboard": await _read("leaderboard_feature_enabled", "active"),
+        "task": await _read("task_feature_enabled", "active"),
+        "partner": await _read("partner_feature_enabled", "active"),
+    }
