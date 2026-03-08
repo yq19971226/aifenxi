@@ -65,10 +65,6 @@ export default function AdminSystemPage() {
   const [deployResult, setDeployResult] = useState<"success" | "error" | null>(null);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (user?.role !== "admin") return;
-  }, [user]);
-
   const {
     data: status,
     isLoading,
@@ -84,17 +80,67 @@ export default function AdminSystemPage() {
     logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [logs]);
 
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [refreshCountdown, setRefreshCountdown] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (refreshCountdown === null || refreshCountdown <= 0) return;
+    const timer = setTimeout(() => {
+      if (refreshCountdown === 1) {
+        window.location.reload();
+      } else {
+        setRefreshCountdown(refreshCountdown - 1);
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [refreshCountdown]);
+
+  const pollFinalResult = useCallback(async () => {
+    setLogs((prev) => [...prev, "[log] SSE 连接中断（后端正在重启），轮询最终结果..."]);
+    for (let i = 0; i < 24; i++) {
+      await new Promise((r) => setTimeout(r, 5000));
+      try {
+        const st = await fetchSystemStatus();
+        if (!st.deploying) {
+          const ok = st.last_deploy?.success ?? false;
+          setDeployResult(ok ? "success" : "error");
+          setLogs((prev) => [
+            ...prev,
+            ok
+              ? `[done] 部署成功 (版本 ${st.last_deploy?.commit})`
+              : "[error] 部署失败，请检查服务器日志",
+          ]);
+          setDeploying(false);
+          queryClient.invalidateQueries({ queryKey: ["admin-system-status"] });
+          if (ok) setRefreshCountdown(8);
+          return;
+        }
+        setLogs((prev) => [...prev, `[log] 部署仍在进行中... (${(i + 1) * 5}s)`]);
+      } catch {
+        setLogs((prev) => [...prev, `[log] 服务暂不可用，继续等待... (${(i + 1) * 5}s)`]);
+      }
+    }
+    setLogs((prev) => [...prev, "[error] 轮询超时（120s），请手动检查服务器状态"]);
+    setDeployResult("error");
+    setDeploying(false);
+  }, [queryClient]);
+
   const handleDeploy = useCallback(async () => {
     if (deploying) return;
+    setShowConfirm(false);
     setDeploying(true);
     setLogs([]);
     setDeployResult(null);
+    setRefreshCountdown(null);
 
     try {
       await startDeploy(
         (event: DeployEvent) => {
           setLogs((prev) => [...prev, `[${event.type}] ${event.data}`]);
-          if (event.type === "done") setDeployResult("success");
+          if (event.type === "done") {
+            setDeployResult("success");
+            setRefreshCountdown(8);
+          }
           if (event.type === "error") setDeployResult("error");
         },
         () => {
@@ -104,11 +150,15 @@ export default function AdminSystemPage() {
       );
     } catch (err) {
       const msg = err instanceof Error ? err.message : "未知错误";
-      setLogs((prev) => [...prev, `[error] ${msg}`]);
-      setDeployResult("error");
-      setDeploying(false);
+      if (msg.includes("network") || msg.includes("fetch") || msg.includes("Failed")) {
+        await pollFinalResult();
+      } else {
+        setLogs((prev) => [...prev, `[error] ${msg}`]);
+        setDeployResult("error");
+        setDeploying(false);
+      }
     }
-  }, [deploying, queryClient]);
+  }, [deploying, queryClient, pollFinalResult]);
 
   const git = status?.git;
   const containers = status?.containers ?? [];
@@ -192,7 +242,7 @@ export default function AdminSystemPage() {
           {/* Deploy Button */}
           <button
             type="button"
-            onClick={handleDeploy}
+            onClick={() => setShowConfirm(true)}
             disabled={deploying || !status?.agent_connected}
             className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm disabled:opacity-40"
           >
@@ -241,6 +291,11 @@ export default function AdminSystemPage() {
               <span className="flex items-center gap-1 text-xs text-emerald-400">
                 <CheckCircle2 size={13} />
                 部署成功
+                {refreshCountdown !== null && refreshCountdown > 0 && (
+                  <span className="ml-2 text-zinc-500">
+                    {refreshCountdown}s 后自动刷新
+                  </span>
+                )}
               </span>
             )}
             {deployResult === "error" && (
@@ -310,6 +365,50 @@ export default function AdminSystemPage() {
           </div>
         )}
       </div>
+
+      {/* Confirm Dialog */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="mx-4 w-full max-w-md rounded-xl border border-white/[0.08] bg-zinc-900 p-6 shadow-2xl">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10">
+                <AlertTriangle size={20} className="text-amber-400" />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-zinc-100">确认系统更新</h3>
+                <p className="text-xs text-zinc-500">此操作将中断服务数分钟</p>
+              </div>
+            </div>
+            <div className="mb-5 space-y-2 rounded-lg bg-white/[0.03] px-4 py-3 text-sm text-zinc-400">
+              <p>更新过程将执行以下操作：</p>
+              <ul className="ml-4 list-disc space-y-1 text-xs text-zinc-500">
+                <li>备份数据库</li>
+                <li>拉取最新代码</li>
+                <li>重新构建 Docker 镜像</li>
+                <li>重启所有服务容器</li>
+                <li>自动健康检查</li>
+              </ul>
+              <p className="text-xs text-amber-400/80">⚠ 更新期间所有用户将暂时无法访问系统</p>
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowConfirm(false)}
+                className="rounded-md bg-white/[0.06] px-4 py-2 text-sm text-zinc-400 hover:bg-white/[0.1]"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                onClick={handleDeploy}
+                className="btn-primary rounded-md px-4 py-2 text-sm"
+              >
+                确认更新
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

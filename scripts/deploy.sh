@@ -40,8 +40,10 @@ fi
 
 # ── 2. 拉取最新代码 ──
 log "步骤 2/6: 拉取最新代码..."
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+log "当前分支: ${CURRENT_BRANCH}"
 git fetch origin >> "$LOG_FILE" 2>&1
-git pull origin main >> "$LOG_FILE" 2>&1 || {
+git pull origin "${CURRENT_BRANCH}" >> "$LOG_FILE" 2>&1 || {
     err "git pull 失败，可能有冲突"
     exit 1
 }

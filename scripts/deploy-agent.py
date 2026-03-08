@@ -18,11 +18,16 @@ import threading
 import os
 import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from socketserver import ThreadingMixIn
 from datetime import datetime, timezone
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEPLOY_SCRIPT = os.path.join(PROJECT_DIR, "scripts", "deploy.sh")
-COMPOSE_CMD = f"docker compose -f {PROJECT_DIR}/docker-compose.yml -f {PROJECT_DIR}/docker-compose.prod.yml"
+COMPOSE_CMD = [
+    "docker", "compose",
+    "-f", os.path.join(PROJECT_DIR, "docker-compose.yml"),
+    "-f", os.path.join(PROJECT_DIR, "docker-compose.prod.yml"),
+]
 
 # 全局部署锁 — 同一时间只允许一个部署
 _deploy_lock = threading.Lock()
@@ -99,7 +104,7 @@ def _git_info() -> dict:
 def _docker_status() -> list[dict]:
     try:
         output = subprocess.check_output(
-            f"{COMPOSE_CMD} ps --format json".split(),
+            [*COMPOSE_CMD, "ps", "--format", "json"],
             cwd=PROJECT_DIR, text=True, timeout=10
         )
         containers = []
@@ -120,6 +125,10 @@ def _docker_status() -> list[dict]:
         return containers
     except Exception as e:
         return [{"error": str(e)}]
+
+
+class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+    daemon_threads = True
 
 
 class DeployHandler(BaseHTTPRequestHandler):
@@ -190,7 +199,7 @@ class DeployHandler(BaseHTTPRequestHandler):
             send_event("log", "开始部署...")
 
             process = subprocess.Popen(
-                ["bash", DEPLOY_SCRIPT, "--no-backup"],
+                ["bash", DEPLOY_SCRIPT],
                 cwd=PROJECT_DIR,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
@@ -229,7 +238,7 @@ class DeployHandler(BaseHTTPRequestHandler):
 def main():
     host = "127.0.0.1"
     port = int(os.environ.get("DEPLOY_AGENT_PORT", "9321"))
-    server = HTTPServer((host, port), DeployHandler)
+    server = ThreadingHTTPServer((host, port), DeployHandler)
     print(f"Axiom Deploy Agent 运行在 {host}:{port}")
     print(f"项目目录: {PROJECT_DIR}")
     try:
