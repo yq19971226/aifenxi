@@ -20,7 +20,7 @@ async def list_symbols(
     user: UserInfo = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> list[SymbolConfig]:
-    """获取交易对列表。免费用户仅返回 BTCUSDT。"""
+    """获取交易对列表（返回所有 admin 启用的币种）。"""
     registry = SymbolRegistry(session)
     try:
         symbols = await registry.list_symbols(enabled_only=True)
@@ -30,9 +30,6 @@ async def list_symbols(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="获取交易对列表失败",
         )
-
-    if user.membership_level == 0:
-        symbols = [s for s in symbols if s.symbol == "BTCUSDT"]
 
     return symbols
 

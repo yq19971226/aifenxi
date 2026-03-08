@@ -42,7 +42,7 @@ export function SymbolSelector({ value, onChange }: SymbolSelectorProps) {
         ))}
       </select>
       {isSingleOption && (
-        <span className="text-xs text-zinc-600" title="升级套餐解锁更多币种">仅限 1 币种</span>
+        <span className="text-xs text-zinc-500" title="管理员仅启用了 1 个币种">单币种</span>
       )}
     </div>
   );
