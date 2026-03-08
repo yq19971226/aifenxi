@@ -15,7 +15,6 @@ export interface SignalStyle {
   bg: string;
   border: string;
   label: string;
-  icon: string;
 }
 
 export interface StatusStyle {
@@ -40,7 +39,6 @@ export function getSignalStyle(signal: SignalDirection): SignalStyle {
         bg: "bg-emerald-500/10",
         border: "border-emerald-500/30",
         label: "看涨",
-        icon: "",
       };
     case "bearish":
       return {
@@ -48,7 +46,6 @@ export function getSignalStyle(signal: SignalDirection): SignalStyle {
         bg: "bg-red-500/10",
         border: "border-red-500/30",
         label: "看跌",
-        icon: "",
       };
     case "neutral":
     default:
@@ -57,7 +54,6 @@ export function getSignalStyle(signal: SignalDirection): SignalStyle {
         bg: "bg-zinc-500/10",
         border: "border-zinc-500/30",
         label: "中性",
-        icon: "",
       };
   }
 }

@@ -5,7 +5,7 @@ import type { ReportSection } from "@/lib/api/analysis";
 // ── Key findings summary ─────────────────────────────────────
 
 export function KeyFindingsSummary({ sections }: { sections: ReportSection[] }) {
-  const allFindings: { text: string; signal: string }[] = [];
+  const allFindings: { text: string; signal: string; source: string }[] = [];
 
   sections.forEach((s) => {
     if (s.status !== "completed" || !s.data) return;
@@ -14,7 +14,7 @@ export function KeyFindingsSummary({ sections }: { sections: ReportSection[] }) 
     if (Array.isArray(kf)) {
       kf.slice(0, 3).forEach((item) => {
         const text = typeof item === "string" ? item : JSON.stringify(item);
-        if (text && text.length > 2) allFindings.push({ text, signal: sig });
+        if (text && text.length > 2) allFindings.push({ text, signal: sig, source: s.title });
       });
     }
   });
@@ -24,7 +24,7 @@ export function KeyFindingsSummary({ sections }: { sections: ReportSection[] }) 
   const display = allFindings.slice(0, 10);
 
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+    <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
       <p className="text-xs uppercase tracking-widest text-zinc-500 mb-3">
         关键发现
       </p>
@@ -42,6 +42,7 @@ export function KeyFindingsSummary({ sections }: { sections: ReportSection[] }) 
             />
             <span className="text-sm text-zinc-300 leading-relaxed">
               {f.text}
+              <span className="ml-1.5 text-xs text-zinc-600">{f.source}</span>
             </span>
           </li>
         ))}

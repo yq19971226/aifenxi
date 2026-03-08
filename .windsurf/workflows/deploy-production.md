@@ -182,17 +182,18 @@ Admin 浏览器 → 后端 API → 部署代理(宿主机:9321) → git pull + d
 git clone <your-repo> /opt/axiom
 
 # 2. 一键初始化（安装 Docker/Nginx/SSL/防火墙/部署代理）
+#    会自动生成 .env（数据库密码、JWT 密钥已自动随机生成）
 sudo bash /opt/axiom/scripts/server-init.sh your-domain.com
 
-# 3. 编辑 .env
-nano /opt/axiom/.env
-
-# 4. 启动服务
+# 3. 启动服务
 cd /opt/axiom
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
-# 5. 创建管理员
+# 4. 创建管理员
 docker compose exec backend python scripts/create_admin.py
+
+# 5. 登录后台 → 管理 → API 密钥 页面填写 DMXAPI 等业务密钥
+#    无需手动编辑 .env！
 ```
 
 ### 相关文件

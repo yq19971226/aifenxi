@@ -106,7 +106,7 @@ export function DeepAnalysis({ sections }: { sections: ReportSection[] }) {
                 )}
                 <div className="space-y-2">
                   {group.sections.map((section, idx) => (
-                    <SectionCard key={`${section.title}-${idx}`} section={section} />
+                    <SectionCard key={`${section.title}-${idx}`} section={section} defaultExpanded={idx === 0} />
                   ))}
                 </div>
               </div>

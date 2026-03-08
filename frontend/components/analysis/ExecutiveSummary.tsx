@@ -16,7 +16,6 @@ import {
 import type { AnalysisReport as AnalysisReportType, ReportSection } from "@/lib/api/analysis";
 import type { StrategyData } from "@/lib/types/strategy";
 import {
-  blockedReasonLabel,
   formatCachedTime,
   formatPrice,
   getSignalStyle,
@@ -149,7 +148,7 @@ export function ExecutiveSummary({ report }: { report: AnalysisReportType }) {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className={`rounded-2xl border p-5 relative overflow-hidden ${signalStyle.bg} ${signalStyle.border}`}
+        className={`rounded-lg border p-5 relative overflow-hidden ${signalStyle.bg} ${signalStyle.border}`}
       >
         <div className="flex items-center justify-between relative z-10">
           <div className="flex items-center gap-4">
@@ -198,7 +197,7 @@ export function ExecutiveSummary({ report }: { report: AnalysisReportType }) {
               </span>
             )}
             {report.regime_suggestion && (
-              <p className="text-xs text-zinc-500 ml-auto max-w-[240px] truncate" title={report.regime_suggestion}>
+              <p className="text-xs text-zinc-500 ml-auto max-w-[240px] md:truncate line-clamp-2 md:line-clamp-none" title={report.regime_suggestion}>
                 {report.regime_suggestion}
               </p>
             )}
@@ -224,10 +223,10 @@ export function ExecutiveSummary({ report }: { report: AnalysisReportType }) {
       {report.strategy && report.mode !== "scalping" && (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.3 }}>
           <PositionCalculator
-            input={fromStrategy(report.strategy as StrategyData)}
-            isWorthTaking={(report.strategy as StrategyData).is_worth_taking}
-            confidence={(report.strategy as StrategyData).confidence}
-            isFallback={(report.strategy as StrategyData).is_fallback}
+            input={fromStrategy(report.strategy)}
+            isWorthTaking={report.strategy.is_worth_taking}
+            confidence={report.strategy.confidence}
+            isFallback={report.strategy.is_fallback}
           />
         </motion.div>
       )}

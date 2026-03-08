@@ -164,11 +164,12 @@ export function SectionCard({ section, defaultExpanded = false }: { section: Rep
   const signalColor = sectionSignal === "bullish" ? "text-emerald-400" : sectionSignal === "bearish" ? "text-red-400" : "";
 
   return (
-    <div id={`section-${section.title}`} className="rounded-lg border border-white/[0.06] bg-bg-elevated/60">
+    <div id={`section-${section.title}`} className="rounded-lg border border-white/[0.06] bg-zinc-900/60">
       {/* Header — clickable */}
       <button
         type="button"
         onClick={() => setExpanded((prev) => !prev)}
+        aria-expanded={expanded}
         className="flex w-full items-center justify-between px-3 py-2.5 text-left transition-colors hover:bg-white/[0.03]"
       >
         <div className="flex items-center gap-2 min-w-0 flex-wrap">

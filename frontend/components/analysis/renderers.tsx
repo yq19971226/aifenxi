@@ -194,6 +194,7 @@ export function CollapsibleSection({ label, children, defaultOpen = false }: { l
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
         className="flex items-center gap-1 text-sm font-medium text-zinc-400 hover:text-zinc-300 transition-colors"
       >
         <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.15 }}>

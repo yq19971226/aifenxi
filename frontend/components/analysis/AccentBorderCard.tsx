@@ -11,9 +11,9 @@ interface AccentBorderCardProps {
   children: React.ReactNode;
 }
 
-const STYLE_MAP: Record<AccentType, { border: string; bg: string; titleColor: string; pulse?: boolean }> = {
+const STYLE_MAP: Record<AccentType, { border: string; bg: string; titleColor: string; pulseIcon?: boolean }> = {
   "action-long": {
-    border: "border-l-[3px] border-l-emerald-500 md:border-l-[3px] border-t-[3px] border-t-emerald-500 md:border-t-0",
+    border: "border-l-0 md:border-l-[3px] border-l-emerald-500 border-t-[3px] border-t-emerald-500 md:border-t-0",
     bg: "bg-emerald-500/[0.04]",
     titleColor: "text-emerald-400",
   },
@@ -31,16 +31,16 @@ const STYLE_MAP: Record<AccentType, { border: string; bg: string; titleColor: st
     border: "border-l-0 md:border-l-[3px] border-l-red-500 border-t-[3px] border-t-red-500 md:border-t-0",
     bg: "bg-red-500/[0.06]",
     titleColor: "text-red-400",
-    pulse: true,
+    pulseIcon: true,
   },
 };
 
 export function AccentBorderCard({ type, title, icon: Icon, children }: AccentBorderCardProps) {
   const s = STYLE_MAP[type];
   return (
-    <div className={`rounded-lg ${s.border} ${s.bg} ${s.pulse ? "animate-pulse" : ""} px-4 py-3`}>
+    <div className={`rounded-lg ${s.border} ${s.bg} px-4 py-3`}>
       <div className="flex items-center gap-2 mb-2">
-        {Icon && <Icon className={`h-4 w-4 ${s.titleColor}`} />}
+        {Icon && <Icon className={`h-4 w-4 ${s.titleColor} ${s.pulseIcon ? "animate-pulse" : ""}`} />}
         <span className={`text-sm font-semibold ${s.titleColor}`}>{title}</span>
       </div>
       {children}

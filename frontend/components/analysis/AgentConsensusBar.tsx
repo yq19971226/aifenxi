@@ -9,7 +9,6 @@ import { getSectionIcon } from "./helpers";
 
 interface AgentConsensusBarProps {
   sections: ReportSection[];
-  onScrollToSection?: (title: string) => void;
 }
 
 function signalArrow(signal: string): { char: string; color: string } {
@@ -18,7 +17,7 @@ function signalArrow(signal: string): { char: string; color: string } {
   return { char: "●", color: "text-zinc-500" };
 }
 
-export function AgentConsensusBar({ sections, onScrollToSection }: AgentConsensusBarProps) {
+export function AgentConsensusBar({ sections }: AgentConsensusBarProps) {
   const [expanded, setExpanded] = useState(false);
 
   const agentSections = sections.filter(
@@ -46,11 +45,7 @@ export function AgentConsensusBar({ sections, onScrollToSection }: AgentConsensu
   const avgConf = confCount > 0 ? confSum / confCount : 0;
 
   const handleClick = (title: string) => {
-    if (onScrollToSection) {
-      onScrollToSection(title);
-    } else {
-      document.getElementById(`section-${title}`)?.scrollIntoView({ behavior: "smooth" });
-    }
+    document.getElementById(`section-${title}`)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -59,6 +54,7 @@ export function AgentConsensusBar({ sections, onScrollToSection }: AgentConsensu
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
         className="flex w-full items-center justify-between px-4 py-2.5 text-left transition-colors hover:bg-white/[0.03]"
       >
         <div className="flex items-center gap-2 text-sm">
