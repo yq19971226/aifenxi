@@ -36,8 +36,8 @@ export async function fetchPlaybookLatest(
   );
   if (res.status === 404) return null;
   if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(body.detail || res.statusText);
+    const body = await res.json().catch(() => ({ detail: "请求失败" }));
+    throw new Error(body.detail || "请求失败");
   }
   return res.json();
 }

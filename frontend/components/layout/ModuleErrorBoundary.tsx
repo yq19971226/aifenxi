@@ -25,7 +25,7 @@ export class ModuleErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error): void {
-    console.error(`[${this.props.moduleName}] Ⱦ쳣:`, error);
+    console.error(`[${this.props.moduleName}] 渲染异常:`, error);
   }
 
   render(): ReactNode {
@@ -34,7 +34,7 @@ export class ModuleErrorBoundary extends Component<
         <div className="rounded-xl card-surface p-6">
           <div className="flex items-center justify-center py-6">
             <span className="text-sm text-red-400">
-              {this.props.moduleName} ʧ
+              {this.props.moduleName} 加载失败
             </span>
           </div>
         </div>

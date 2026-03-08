@@ -29,8 +29,8 @@ export async function fetchConsensusLatest(
   );
   if (res.status === 404) return null;
   if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(body.detail || res.statusText);
+    const body = await res.json().catch(() => ({ detail: "请求失败" }));
+    throw new Error(body.detail || "请求失败");
   }
   return res.json();
 }
@@ -38,8 +38,8 @@ export async function fetchConsensusLatest(
 export async function fetchConsensusWeights(): Promise<Record<string, number>> {
   const res = await authFetch(`${API_BASE}/api/consensus/weights`);
   if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(body.detail || res.statusText);
+    const body = await res.json().catch(() => ({ detail: "请求失败" }));
+    throw new Error(body.detail || "请求失败");
   }
   return res.json();
 }
