@@ -1,0 +1,207 @@
+x-backend-common: &backend-common
+  build:
+    context: ./backend
+    target: production
+  env_file: .env
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  restart: unless-stopped
+  networks:
+    - omnimind-net
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  postgres:
+    image: timescale/timescaledb:latest-pg15
+    command: postgres -c max_connections=200 -c shared_buffers=256MB
+    environment:
+      POSTGRES_USER: omnimind
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: omnimind
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/migrations/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ./backend/migrations/v2_enhancements.sql:/docker-entrypoint-initdb.d/02_v2_enhancements.sql
+      - ./backend/migrations/seed_cases.sql:/docker-entrypoint-initdb.d/03_seed_cases.sql
+      - ./backend/migrations/v3_dynamic_config.sql:/docker-entrypoint-initdb.d/04_v3_dynamic_config.sql
+      - ./backend/migrations/v4_role_system.sql:/docker-entrypoint-initdb.d/05_v4_role_system.sql
+      - ./backend/migrations/seed_cases_2025.sql:/docker-entrypoint-initdb.d/06_seed_cases_2025.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U omnimind"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+    restart: unless-stopped
+    networks:
+      - omnimind-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 512mb --maxmemory-policy volatile-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+        reservations:
+          memory: 128M
+    restart: unless-stopped
+    networks:
+      - omnimind-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backend:
+    <<: *backend-common
+    environment:
+      - HTTP_PROXY=${HTTP_PROXY:-}
+      - HTTPS_PROXY=${HTTPS_PROXY:-}
+      - NO_PROXY=postgres,redis,localhost,127.0.0.1
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+
+  worker:
+    <<: *backend-common
+    environment:
+      - HTTP_PROXY=${HTTP_PROXY:-}
+      - HTTPS_PROXY=${HTTPS_PROXY:-}
+      - NO_PROXY=postgres,redis,localhost,127.0.0.1
+    command: celery -A workers.celery_app worker --loglevel=info --concurrency=4
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A workers.celery_app inspect ping --timeout 10 || exit 1"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+
+  beat:
+    <<: *backend-common
+    environment:
+      - HTTP_PROXY=${HTTP_PROXY:-}
+      - HTTPS_PROXY=${HTTPS_PROXY:-}
+      - NO_PROXY=postgres,redis,localhost,127.0.0.1
+    command: celery -A workers.celery_app beat --loglevel=info --schedule=/tmp/celerybeat-schedule --pidfile=/tmp/celerybeat.pid
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/celerybeat.pid && kill -0 $(cat /tmp/celerybeat.pid) || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+        reservations:
+          memory: 64M
+
+  frontend:
+    build:
+      context: ./frontend
+      target: production
+      args:
+        - API_PROXY_URL=http://backend:8000
+    ports:
+      - "3000:3000"
+    environment:
+      - API_PROXY_URL=http://backend:8000
+      - NEXT_PUBLIC_API_URL=
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+      - NODE_ENV=production
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "-O", "/dev/null", "http://localhost:3000/dashboard"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+        reservations:
+          memory: 128M
+    restart: unless-stopped
+    networks:
+      - omnimind-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  omnimind-net:
+    driver: bridge

@@ -1,0 +1,125 @@
+# Production overrides - use with:
+# docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  postgres:
+    ports: []  # No external port exposure in production
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-omnimind}
+    command: >
+      postgres
+        -c shared_buffers=256MB
+        -c effective_cache_size=768MB
+        -c work_mem=16MB
+        -c maintenance_work_mem=128MB
+        -c max_connections=100
+        -c log_min_duration_statement=1000
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "10"
+
+  redis:
+    ports: []  # No external port exposure in production
+    command: >
+      redis-server
+        --maxmemory 512mb
+        --maxmemory-policy allkeys-lru
+        --save 60 1000
+        --appendonly yes
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "10"
+
+  backend:
+    environment:
+      - APP_ENV=production
+      - UVICORN_WORKERS=4
+    command: >
+      uvicorn main:app
+        --host 0.0.0.0
+        --port 8000
+        --workers 4
+        --log-level warning
+        --no-access-log
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "10"
+
+  worker:
+    command: >
+      celery -A workers.celery_app worker
+        --loglevel=warning
+        --concurrency=8
+        --max-tasks-per-child=1000
+        --without-heartbeat
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+        reservations:
+          memory: 512M
+      replicas: 2
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "10"
+
+  beat:
+    command: >
+      celery -A workers.celery_app beat
+        --loglevel=warning
+        --pidfile=/tmp/celerybeat.pid
+        --schedule=/tmp/celerybeat-schedule
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "10"
+
+  frontend:
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${PUBLIC_API_URL:-http://backend:8000}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "10"

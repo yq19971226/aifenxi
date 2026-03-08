@@ -1,0 +1,151 @@
+# AXIOM 项目全局 AI 编码规则
+# 所有 Cascade 对话在本项目中编写代码时必须遵守以下规则。
+
+---
+
+# 第一部分：编码规范
+
+## 一、文件与组件规模
+
+- **单文件上限 300 行**。超过时必须拆分为子组件/子模块，而非继续追加。
+- **单个 React 组件只做一件事**。TopNav 不能同时管时钟、WebSocket、轮询、权限过滤。
+- 页面文件（page.tsx）只做布局编排，业务逻辑提到 hooks 或 services 中。
+
+## 二、前端数据获取
+
+- **统一使用 `@tanstack/react-query`**（useQuery / useMutation）。禁止在新代码中使用 useState + useEffect + fetch 手动管理异步状态。
+- API 调用统一走 `lib/api/` 下的封装函数，使用 `authFetch`，不要裸用 `fetch`。
+- 错误不允许被 `catch(() => {})` 吞掉。至少 `console.error` 或通过 toast 提示用户。
+
+## 三、后台管理区域
+
+- `/admin/*` 页面使用独立的 `AdminLayout`（带侧边栏），不共用前台 TopNav 下拉。
+- Admin 侧边栏菜单按功能分组（概览、系统配置、用户运营、内容审核、财务、AI）。
+- 每个 admin 页面必须在组件顶部通过 `useAuth` + role 检查做前端守卫，不能只依赖外层 AuthGuard 的 redirect。
+
+## 四、权限与安全
+
+- 前端权限是 UX 优化，不是安全边界。所有敏感操作必须有后端 API 层的 `require_admin` / `require_operator` 校验。
+- 路由权限真相源是 `lib/route-permissions.ts`，新增 admin 页面必须同步更新此文件。
+- operator 角色只能看到白名单中的 admin 页面，不要在 navItems 中设 minRole: "operator" 后让其看到空菜单。
+
+## 五、错误处理与边界
+
+- `app/(main)/` 下必须有 `error.tsx`（错误边界）和 `loading.tsx`（加载骨架屏）。
+- `app/(main)/admin/` 下也必须有独立的 `error.tsx`。
+- API 请求失败时显示用户可理解的中文错误提示，不要白屏或显示英文堆栈。
+
+## 六、避免前端硬编码后端数据
+
+- 智能体列表、模型映射、币种列表等元数据必须从 API 获取，不要在前端 const 数组中写死。
+- 如果 API 尚不存在，先创建 API 端点，再在前端调用。不要用 TODO 注释的硬编码"临时方案"。
+
+## 七、占位页面
+
+- 如果功能未实现，对应的菜单项应通过 `featureFlag` 隐藏，不要在导航中可见但点进去是"即将推出"。
+- 已有 featureFlag 机制，使用它。
+
+## 八、样式一致性
+
+- 颜色使用 CSS 变量（`var(--color-accent)` 等）和 Tailwind zinc 色阶，不要混用硬编码 hex。
+- 组件使用 globals.css 中定义的 `.card` / `.btn-primary` / `.input` 等类，不要每个页面重新发明样式。
+- 圆角统一 `rounded-lg`（card）或 `rounded-md`（button/input），不要混用 `rounded-xl` / `rounded-2xl`。
+
+## 九、代码质量
+
+- 不要留未使用的变量、未使用的 import、未使用的 state。
+- 不要留空的 catch 块。
+- 新增文件必须通过 `tsc --noEmit`（前端）或 `python -m py_compile`（后端）验证。
+- 修改现有文件后，检查同目录下是否有受影响的导入方。
+
+## 十、后端 API
+
+- 新增 API 端点必须有 `require_admin` 或 `get_current_user` 依赖注入，不要创建无鉴权的管理端点。
+- 返回结构遵循现有模式：`{ data, message, code }` 或直接返回 Pydantic model。
+- 数据库操作使用 service 层，不要在 router 函数中直接写 SQL。
+
+---
+
+# 第二部分：项目卫生
+
+## 十一、禁止产生垃圾文件
+
+- **不要在项目根目录创建临时脚本**（如 `_fix_xxx.py`、`_compact.py`）。临时脚本放 `scripts/tmp/` 且用后删除。
+- **不要在根目录创建 AI 生成的报告文件**（如 `AGENT_MANAGEMENT_COMPLETE.md`、`AUDIT_REPORT.md`）。正式文档放 `docs/`，临时分析结果放 `scripts/tmp/` 或直接输出到对话。
+- 根目录只允许存在：README.md、.env*、.gitignore、docker-compose*.yml、配置文件。
+- `test.db`（SQLite 开发数据库）不应提交到 git，已在 .gitignore。
+- `.html` 参考文档（如 `coinglass_api_docs.html`）应移入 `docs/reference/` 或 .gitignore。
+
+## 十二、Git 纪律
+
+- **每次有意义的变更后 commit**，不要积累大量未提交更改。
+- Commit message 格式：`<type>(<scope>): <简要描述>`，例如 `fix(coinglass): repair long-short ratio dedup`。
+- type 选项：`feat` / `fix` / `refactor` / `docs` / `chore` / `test` / `perf` / `ci`。
+- **不要 commit 包含 secrets 的文件**（.env、seed_admin.py 等），已在 .gitignore。
+- 大变更前先 `git stash` 或创建分支，不要在 main 上做风险操作。
+
+## 十三、文档管理
+
+- `docs/` 目录中的文档如果已过时，标记为 `[ARCHIVED]` 并移入 `docs/archive/`。
+- 新功能的设计文档使用 `.kiro/specs/<feature>/` 结构。
+- README.md 保持最新：至少包含项目简介、快速启动步骤、技术栈、目录结构。
+- 不要在代码中用注释写大段设计文档，放到 `docs/` 或 `.kiro/specs/`。
+
+## 十四、依赖管理
+
+- 后端：`backend/requirements.txt` 锁定版本号（`package==x.y.z`），不要用 `>=` 范围。
+- 前端：使用 `package-lock.json`，不要手动编辑。
+- 安装新依赖前检查是否与现有依赖冲突。MCP SDK 已导致 starlette/pydantic 升级冲突，要隔离环境。
+- 系统级工具（如 MCP Server）使用独立 venv，不要污染项目的 Python 环境。
+
+---
+
+# 第三部分：部署与发布
+
+## 十五、版本号
+
+- 使用语义化版本：`MAJOR.MINOR.PATCH`（如 `1.2.3`）。
+- 版本号记录在 `backend/app/core/config.py` 的 `APP_VERSION` 和 `frontend/package.json` 的 `version`。
+- 每次发布必须更新 `CHANGELOG.md`。
+
+## 十六、本地开发 → 线上部署流程
+
+- **本地修复** → **本地验证** → **git commit** → **git push** → **服务器 pull + 重建** → **健康检查**。
+- 严禁直接在服务器上修改代码。所有变更必须通过 git 推送。
+- 部署使用 `docker compose`，不要手动 pip install 或 npm install 到服务器。
+
+## 十七、后台一键更新
+
+- 通过 admin API `/api/admin/system/update` 触发，步骤：
+  1. `git pull origin main`
+  2. `docker compose build --no-cache backend worker beat frontend`
+  3. `docker compose up -d --remove-orphans`
+  4. 等待 healthcheck 全部 green
+  5. 返回更新结果（成功/失败 + 日志）
+- 更新前自动执行数据库备份（`scripts/backup_db.sh`）。
+- 更新期间前端显示维护中提示。
+
+## 十八、回滚
+
+- Docker 镜像保留最近 3 个版本的 tag（`v1.2.3`、`v1.2.2`、`v1.2.1`）。
+- 回滚命令：`docker compose up -d --no-build`（使用上一个 tag 的镜像）。
+- 数据库回滚：从 `scripts/backup_db.sh` 的备份恢复。
+
+---
+
+# 第四部分：可用的 Workflow（斜杠命令）
+
+以下 workflow 已在 `.windsurf/workflows/` 中定义，在对话中输入对应斜杠命令触发：
+
+- `/frontend-page-checklist` — 新增/修改前端页面的质量清单
+- `/component-split` — 组件超 300 行时的拆分流程
+- `/admin-sidebar-pattern` — Admin 侧边栏布局实施方案
+- `/backend-api-checklist` — 新增后端 API 端点的检查清单
+- `/migrate-to-react-query` — useState+fetch → react-query 迁移
+- `/coinglass-endpoint-checklist` — CoinGlass 端点变更同步清单
+- `/pre-launch-checklist` — 上线前完整检查清单
+- `/code-cleanup` — 代码/文档/缓存瘦身
+- `/deploy-production` — 本地 → 线上部署完整流程
+- `/release-version` — 版本发布 + CHANGELOG
+- `/hotfix` — 线上紧急修复流程
+- `/docs-audit` — 工程文档一致性审计

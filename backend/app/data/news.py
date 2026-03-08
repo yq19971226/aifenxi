@@ -1,0 +1,170 @@
+"""新闻数据采集模块 — CryptoPanic + 缓存。
+
+数据源：
+- CryptoPanic API（免费层可用，支持币种过滤）
+- Redis 缓存（news:feed:{symbol}，TTL 10min）
+
+输出：标准化的新闻条目列表，每条包含标题、来源、发布时间、
+投票数据（正面/负面/重要/有毒）和原始 URL。
+"""
+
+import asyncio
+import logging
+from datetime import datetime, timezone
+from typing import Any, Optional
+
+import httpx
+from pydantic import BaseModel, Field
+
+from app.core.redis import get_json, set_with_ttl
+
+logger = logging.getLogger(__name__)
+
+_CRYPTOPANIC_API = "https://cryptopanic.com/api/free/v1/posts/"
+_CACHE_PREFIX = "news:feed"
+_CACHE_TTL = 600  # 10 minutes
+_REQUEST_TIMEOUT = 20.0
+
+# CryptoPanic 币种代码映射（去掉 USDT 后缀）
+_SYMBOL_MAP: dict[str, str] = {
+    "BTCUSDT": "BTC",
+    "ETHUSDT": "ETH",
+    "BNBUSDT": "BNB",
+    "SOLUSDT": "SOL",
+    "XRPUSDT": "XRP",
+}
+
+
+class NewsItem(BaseModel):
+    """标准化新闻条目。"""
+
+    title: str
+    source: str = ""
+    published_at: str = ""
+    url: str = ""
+    kind: str = "news"  # news / media
+    currencies: list[str] = Field(default_factory=list)
+    votes: dict[str, int] = Field(default_factory=dict)
+    domain: str = ""
+
+
+class NewsCollector:
+    """新闻数据采集器 — CryptoPanic API + Redis 缓存。"""
+
+    def __init__(self, api_token: Optional[str] = None) -> None:
+        self._api_token = api_token
+
+    async def fetch_news(
+        self,
+        symbol: str = "BTCUSDT",
+        limit: int = 20,
+    ) -> list[NewsItem]:
+        """获取指定交易对的最新新闻。
+
+        优先从 Redis 缓存读取，缓存未命中时调用 CryptoPanic API。
+        """
+        symbol = symbol.upper()
+        cache_key = f"{_CACHE_PREFIX}:{symbol}"
+
+        # 0. 检查数据源开关
+        from app.data.source_gate import is_enabled
+        if not await is_enabled("cryptopanic"):
+            logger.debug("CryptoPanic source disabled, skipping", extra={"symbol": symbol})
+            return []
+
+        # 1. 尝试读取缓存
+        try:
+            cached = await get_json(cache_key)
+            if cached and isinstance(cached, list):
+                logger.debug("News cache hit", extra={"symbol": symbol})
+                return [NewsItem(**item) for item in cached]
+        except Exception:
+            pass
+
+        # 2. 获取 API Token
+        api_token = self._api_token
+        if not api_token:
+            try:
+                from app.services.config_service import get_config_value
+                api_token = await get_config_value("cryptopanic_api_token")
+            except Exception:
+                pass
+
+        # 3. 调用 CryptoPanic API
+        items = await self._fetch_from_cryptopanic(symbol, api_token, limit)
+
+        # 4. 缓存结果
+        if items:
+            try:
+                cache_data = [item.model_dump() for item in items]
+                await set_with_ttl(cache_key, cache_data, _CACHE_TTL)
+            except Exception as exc:
+                logger.warning("News cache write failed", extra={"error": str(exc)})
+
+        return items
+
+    async def _fetch_from_cryptopanic(
+        self,
+        symbol: str,
+        api_token: Optional[str],
+        limit: int,
+    ) -> list[NewsItem]:
+        """从 CryptoPanic API 获取新闻。"""
+        if not api_token:
+            logger.warning("CryptoPanic API token not configured, returning empty")
+            return []
+
+        currency = _SYMBOL_MAP.get(symbol, symbol.replace("USDT", ""))
+        params: dict[str, Any] = {
+            "auth_token": api_token,
+            "currencies": currency,
+            "kind": "news",
+            "public": "true",
+        }
+
+        try:
+            async with httpx.AsyncClient(timeout=_REQUEST_TIMEOUT) as client:
+                resp = await asyncio.wait_for(
+                    client.get(_CRYPTOPANIC_API, params=params),
+                    timeout=_REQUEST_TIMEOUT,
+                )
+                resp.raise_for_status()
+                data = resp.json()
+
+            results = data.get("results", [])
+            items: list[NewsItem] = []
+            for entry in results[:limit]:
+                source_info = entry.get("source", {})
+                currencies = [
+                    c.get("code", "")
+                    for c in entry.get("currencies", [])
+                    if isinstance(c, dict)
+                ]
+                votes = entry.get("votes", {})
+                items.append(
+                    NewsItem(
+                        title=entry.get("title", ""),
+                        source=source_info.get("title", "") if isinstance(source_info, dict) else str(source_info),
+                        published_at=entry.get("published_at", ""),
+                        url=entry.get("url", ""),
+                        kind=entry.get("kind", "news"),
+                        currencies=currencies,
+                        votes={
+                            "positive": votes.get("positive", 0),
+                            "negative": votes.get("negative", 0),
+                            "important": votes.get("important", 0),
+                            "toxic": votes.get("toxic", 0),
+                        } if isinstance(votes, dict) else {},
+                        domain=entry.get("domain", ""),
+                    )
+                )
+
+            logger.info(
+                "CryptoPanic news fetched",
+                extra={"symbol": symbol, "count": len(items)},
+            )
+            return items
+
+        except Exception:
+            logger.warning("CryptoPanic API request failed", exc_info=True)
+            return []

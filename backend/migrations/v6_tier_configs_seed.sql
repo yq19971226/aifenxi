@@ -1,0 +1,51 @@
+-- ============================================================
+-- OmniMind V6 会员等级参数种子数据
+-- 版本: v6.0
+-- 描述: 将会员等级相关的硬编码参数写入 system_configs 表，
+--       使其可通过管理后台动态配置。
+-- 依赖: v3_dynamic_config.sql 已执行（system_configs 表已存在）
+-- 注意: 值会通过 ConfigService.create_config() 加密存储，
+--       此脚本直接 INSERT 明文仅供参考，实际应通过 API 或启动脚本写入。
+-- ============================================================
+
+-- 以下 SQL 用于记录预期的配置键和默认值。
+-- 实际写入请通过管理后台"配置管理"页面手动添加，或通过启动脚本调用 ConfigService.create_config()。
+
+-- ┌─────────────────────────────────┬──────────┬──────────┬─────────────────────────────┐
+-- │ config_key                      │ value    │ category │ description                 │
+-- ├─────────────────────────────────┼──────────┼──────────┼─────────────────────────────┤
+-- │ chat_daily_limit_free           │ 5        │ tier     │ 免费用户每日对话次数上限    │
+-- │ chat_daily_limit_pro            │ 50       │ tier     │ 专业用户每日对话次数上限    │
+-- │ chat_daily_limit_flagship       │ 200      │ tier     │ 旗舰用户每日对话次数上限    │
+-- │ query_limit_free                │ 3        │ tier     │ 免费用户每日查询次数上限    │
+-- │ perf_days_free                  │ 7        │ tier     │ 免费用户绩效查看天数        │
+-- └─────────────────────────────────┴──────────┴──────────┴─────────────────────────────┘
+
+-- 注意: system_configs 表的 encrypted_value 字段需要加密值，
+-- 不能直接 INSERT 明文。请使用以下 Python 启动脚本写入：
+
+-- ```python
+-- # scripts/seed_tier_configs.py
+-- import asyncio
+-- from app.services.config_service import ConfigService, ConfigCreate
+-- from app.core.database import AsyncSessionLocal
+--
+-- TIER_CONFIGS = [
+--     ConfigCreate(config_key="chat_daily_limit_free", value="5", category="tier", description="免费用户每日对话次数上限", is_secret=False),
+--     ConfigCreate(config_key="chat_daily_limit_pro", value="50", category="tier", description="专业用户每日对话次数上限", is_secret=False),
+--     ConfigCreate(config_key="chat_daily_limit_flagship", value="200", category="tier", description="旗舰用户每日对话次数上限", is_secret=False),
+--     ConfigCreate(config_key="query_limit_free", value="3", category="tier", description="免费用户每日查询次数上限", is_secret=False),
+--     ConfigCreate(config_key="perf_days_free", value="7", category="tier", description="免费用户绩效查看天数", is_secret=False),
+-- ]
+--
+-- async def seed():
+--     async with AsyncSessionLocal() as session:
+--         svc = ConfigService(session)
+--         for cfg in TIER_CONFIGS:
+--             existing = await svc.get_config_detail(cfg.config_key)
+--             if existing is None:
+--                 await svc.create_config(cfg, admin_user_id="system")
+--         await session.commit()
+--
+-- asyncio.run(seed())
+-- ```
