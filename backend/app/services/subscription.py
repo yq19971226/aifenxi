@@ -4,7 +4,7 @@
 """
 
 import logging
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 
 from pydantic import BaseModel
 from sqlalchemy import text
@@ -175,7 +175,7 @@ async def check_expiration(session: AsyncSession, user_id: str) -> bool:
 
 async def increment_query_count(session: AsyncSession, user_id: str) -> int:
     """递增每日查询计数。跨日自动重置。返回新计数值。"""
-    today = date.today()
+    today = datetime.now(timezone.utc).date()
 
     try:
         # 先重置跨日计数
@@ -220,7 +220,7 @@ async def check_query_limit(user_id: str) -> bool:
     TTL: 到次日 0 点的秒数
     """
     redis = get_redis_pool()
-    today_str = date.today().isoformat()
+    today_str = datetime.now(timezone.utc).date().isoformat()
     key = f"rate_limit:{user_id}:{today_str}"
 
     # 从动态配置读取免费用户限额

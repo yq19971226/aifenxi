@@ -69,6 +69,30 @@ def _build_signal_descriptions(
         except (ValueError, TypeError):
             pass
 
+    # ── MACD 信号 ──
+    macd_val = indicators.get("macd")
+    macd_sig = indicators.get("macd_signal")
+    macd_hist = indicators.get("macd_histogram")
+    if isinstance(macd_val, (int, float)) and isinstance(macd_sig, (int, float)):
+        if macd_val > macd_sig and isinstance(macd_hist, (int, float)) and macd_hist > 0:
+            descs.append("MACD金叉")
+        elif macd_val < macd_sig and isinstance(macd_hist, (int, float)) and macd_hist < 0:
+            descs.append("MACD死叉")
+
+    # ── 布林带信号 ──
+    bb_upper = indicators.get("bb_upper")
+    bb_lower = indicators.get("bb_lower")
+    bb_middle = indicators.get("bb_middle")
+    if isinstance(bb_upper, (int, float)) and isinstance(bb_lower, (int, float)) and price > 0:
+        if price >= bb_upper:
+            descs.append("价格触及布林上轨")
+        elif price <= bb_lower:
+            descs.append("价格触及布林下轨")
+        elif isinstance(bb_middle, (int, float)) and bb_upper > bb_lower:
+            bandwidth = (bb_upper - bb_lower) / bb_middle if bb_middle > 0 else 0
+            if bandwidth < 0.02:
+                descs.append("布林带收窄")
+
     # ── 成交量（每个区间仅 1 个描述）──
     vol = indicators.get("volume") or indicators.get("vol")
     vol_ma = indicators.get("volume_ma") or indicators.get("vol_ma20")
@@ -163,16 +187,15 @@ async def _get_market_snapshot(symbol: str) -> dict | None:
     except Exception as exc:
         logger.error("获取市场快照失败: %s", exc)
 
-    # Fallback 1: 扫描 analysis:cache 获取任意可用报告
+    # Fallback 1: 按确定性 key 逐模式尝试（避免 O(N) redis.keys 扫描）
     try:
         redis = get_redis_pool()
-        keys = await redis.keys(f"analysis:cache:{symbol}:*")
-        for key in keys:
-            raw = await redis.get(key)
+        for mode in ("trend", "intraday", "scalping"):
+            raw = await redis.get(f"analysis:cache:{symbol}:{mode}")
             if raw:
                 data = json.loads(raw)
                 if isinstance(data, dict) and data.get("symbol"):
-                    logger.info("market_snapshot_fallback key=%s", key)
+                    logger.info("market_snapshot_fallback mode=%s", mode)
                     return data
     except Exception as exc:
         logger.warning("market_snapshot_fallback 失败: %s", exc)

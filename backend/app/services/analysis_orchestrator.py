@@ -132,13 +132,13 @@ def _weighted_average_fallback(
     weights: dict[str, float] = {
         "technical": 0.25,
         "onchain": 0.25,
-        "playbook": 0.15,
         "risk": 0.15,
         "orderbook": 0.10,
         "sentiment": 0.10,
         "news_analyst": 0.08,
         "adversarial": 0.05,
         "collusion_detector": 0.05,
+        "calendar": 0.05,
     }
     signal_scores: dict[str, float] = {
         "bullish": 1.0,

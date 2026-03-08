@@ -289,7 +289,7 @@ async def handle_webhook(
                 text(
                     """
                     UPDATE payments
-                    SET status = 'completed', updated_at = NOW()
+                    SET status = 'completed', updated_at = CURRENT_TIMESTAMP
                     WHERE payment_id = :payment_id
                     """
                 ),
@@ -342,7 +342,7 @@ async def handle_webhook(
                 text(
                     """
                     UPDATE payments
-                    SET status = :status, updated_at = NOW()
+                    SET status = :status, updated_at = CURRENT_TIMESTAMP
                     WHERE payment_id = :payment_id
                     """
                 ),
@@ -400,6 +400,20 @@ async def get_payment_history(
 
 # ── 内部辅助函数 ──────────────────────────────────────────────
 
+_http_client: httpx.AsyncClient | None = None
+
+
+def _get_http_client() -> httpx.AsyncClient:
+    """获取可复用的 httpx 客户端（连接池）。"""
+    global _http_client
+    if _http_client is None or _http_client.is_closed:
+        _http_client = httpx.AsyncClient(
+            timeout=API_TIMEOUT_SECONDS,
+            limits=httpx.Limits(max_connections=10, max_keepalive_connections=5),
+        )
+    return _http_client
+
+
 async def _call_nowpayments_create(
     amount: float,
     pay_currency: str,
@@ -414,21 +428,20 @@ async def _call_nowpayments_create(
         order_id: 订单 ID
         api_key: NowPayments API Key（由调用方从 ConfigService 获取）
     """
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"{NOWPAYMENTS_API_BASE}/payment",
-            headers={
-                "x-api-key": api_key,
-                "Content-Type": "application/json",
-            },
-            json={
-                "price_amount": amount,
-                "price_currency": "usd",
-                "pay_currency": pay_currency,
-                "order_id": order_id,
-                "order_description": f"Axiom membership plan",
-            },
-            timeout=API_TIMEOUT_SECONDS,
-        )
-        response.raise_for_status()
-        return response.json()
+    client = _get_http_client()
+    response = await client.post(
+        f"{NOWPAYMENTS_API_BASE}/payment",
+        headers={
+            "x-api-key": api_key,
+            "Content-Type": "application/json",
+        },
+        json={
+            "price_amount": amount,
+            "price_currency": "usd",
+            "pay_currency": pay_currency,
+            "order_id": order_id,
+            "order_description": "Axiom membership plan",
+        },
+    )
+    response.raise_for_status()
+    return response.json()

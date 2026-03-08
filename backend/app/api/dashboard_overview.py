@@ -78,6 +78,20 @@ async def _get_symbol_overview(symbol: str) -> SymbolOverview:
         overview.alert_level = defense.get("alert_level", "none")
         overview.dealer_intent = (defense.get("adversarial") or {}).get("dealer_intent", "")
         overview.collusion_detected = (defense.get("collusion") or {}).get("collusion_detected", False)
+    else:
+        # Fallback: 从分析报告中提取防御数据
+        try:
+            report = await get_json(f"analysis:latest:{symbol}")
+            if isinstance(report, dict):
+                for section in report.get("sections", []):
+                    title = section.get("title", "")
+                    data = section.get("data")
+                    if title == "对抗推演" and isinstance(data, dict):
+                        overview.dealer_intent = data.get("dealer_intent", "")
+                    elif title == "合谋检测" and isinstance(data, dict):
+                        overview.collusion_detected = data.get("collusion_detected", False)
+        except Exception:
+            pass
 
     return overview
 

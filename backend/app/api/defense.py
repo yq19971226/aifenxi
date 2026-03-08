@@ -66,7 +66,7 @@ async def get_latest_defense(
             return DefenseSummary(**cached)
 
         # 从最新分析报告中提取
-        report_data = await get_json(f"analysis:{symbol}:trend:latest")
+        report_data = await get_json(f"analysis:latest:{symbol}")
         if not report_data:
             return None
 
@@ -116,7 +116,7 @@ async def get_alert_level(
 
         if not cached:
             # 尝试从分析报告提取
-            report_data = await get_json(f"analysis:{symbol}:trend:latest")
+            report_data = await get_json(f"analysis:latest:{symbol}")
             if not report_data:
                 return DefenseAlertLevel(symbol=symbol)
 
