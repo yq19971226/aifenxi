@@ -41,12 +41,6 @@ const DIR_LABELS: Record<string, string> = {
   neutral: "观望",
 };
 
-const DIR_COLORS: Record<string, string> = {
-  bullish: "text-bull",
-  bearish: "text-bear",
-  neutral: "text-zinc-400",
-};
-
 export default function BacktestPage() {
   const [days, setDays] = useState(30);
   const [symbol, setSymbol] = useState<string>("");

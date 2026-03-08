@@ -31,14 +31,6 @@ interface AnalysisProgressProps {
   startTime?: number;
 }
 
-// ── Estimated durations per mode (seconds) ──────────────────
-
-const MODE_ESTIMATED_SECONDS: Record<string, number> = {
-  scalping: 8,
-  intraday: 20,
-  trend: 35,
-};
-
 // ── Agent icon mapping ──────────────────────────────────────
 
 const AGENT_ICONS: Record<string, { icon: typeof Zap; color: string }> = {

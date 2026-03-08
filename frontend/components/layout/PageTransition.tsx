@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 
 interface PageTransitionProps {
   children: ReactNode;
-  stagger?: boolean; // Whether children should stagger in
 }
 
 const variants = {
@@ -31,7 +30,7 @@ const reducedVariants = {
   },
 };
 
-export function PageTransition({ children, stagger = true }: PageTransitionProps) {
+export function PageTransition({ children }: PageTransitionProps) {
   const prefersReduced = useReducedMotion();
 
   return (

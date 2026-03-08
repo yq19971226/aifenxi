@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { PageTransition } from "@/components/layout/PageTransition";
-import { adminPartnerApi, type PartnerListItem, type PartnerOverview } from "@/lib/api/partner";
+import { adminPartnerApi, type PartnerListItem } from "@/lib/api/partner";
 import { Users, DollarSign, ArrowDownToLine, Clock, TrendingUp } from "lucide-react";
 
 export default function PartnerStatsPage() {

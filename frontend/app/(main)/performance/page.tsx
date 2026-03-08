@@ -16,7 +16,7 @@ import {
 import { mapConfidenceLabel } from "@/lib/utils/confidence";
 import { useAuth } from "@/lib/auth-context";
 import { effectiveLevel } from "@/lib/utils/membershipLevel";
-import { Skeleton, SkeletonCard, SkeletonChart } from "@/components/ui/Skeleton";
+import { Skeleton, SkeletonCard } from "@/components/ui/Skeleton";
 
 // ── Filter options ───────────────────────────────────────────
 

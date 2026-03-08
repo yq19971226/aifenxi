@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { authHeaders } from "@/lib/api/auth";
-import { fetchModelAssignments, type ModelAssignment } from "@/lib/api/admin-models";
+import { fetchModelAssignments } from "@/lib/api/admin-models";
 import {
   Activity,
   Brain,

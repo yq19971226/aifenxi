@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchConsensusLatest } from "@/lib/api/consensus";
-import type { ConsensusReport, ModelVote } from "@/lib/api/consensus";
+import type { ModelVote } from "@/lib/api/consensus";
 import {
   fetchAnalysisQuota,
   runAnalysis,

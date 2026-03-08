@@ -32,8 +32,6 @@ import {
 
 import type {
   AnalysisReport as AnalysisReportType,
-  AnalysisStatus,
-  DataQualitySnapshot,
   ReportSection,
   SectionStatus,
   SignalDirection,
@@ -282,20 +280,6 @@ function getSectionStatusStyle(status: SectionStatus): StatusStyle {
     case "missing":
     default:
       return { text: "text-zinc-500", bg: "bg-zinc-500/15", label: "缺失" };
-  }
-}
-
-function SectionStatusIcon({ status }: { status: SectionStatus }) {
-  switch (status) {
-    case "completed":
-      return <Check className="h-3 w-3" />;
-    case "failed":
-      return <X className="h-3 w-3" />;
-    case "timeout":
-      return <Clock className="h-3 w-3" />;
-    case "missing":
-    default:
-      return <Minus className="h-3 w-3" />;
   }
 }
 

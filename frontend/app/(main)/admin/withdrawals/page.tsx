@@ -7,7 +7,6 @@ import { adminPartnerApi, type WithdrawalRecord } from "@/lib/api/partner";
 import {
   CheckCircle2,
   XCircle,
-  Clock,
   Filter,
   ExternalLink,
 } from "lucide-react";

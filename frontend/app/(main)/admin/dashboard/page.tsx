@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Users,
@@ -9,8 +9,6 @@ import {
   Clock,
   Brain,
   TrendingUp,
-  FileText,
-  Bell,
   CheckCircle2,
   XCircle,
   AlertTriangle,

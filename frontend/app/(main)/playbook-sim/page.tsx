@@ -72,7 +72,7 @@ const INITIAL_STEP_STATUS: StepStatuses = {
 
 function AdversarialL4({
   sim,
-  latest,
+  latest: _latest,
   stepStatus,
 }: {
   sim: SimResult;

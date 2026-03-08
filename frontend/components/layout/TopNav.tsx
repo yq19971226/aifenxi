@@ -24,9 +24,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { getDataSourceStatus, type DataSourceStatusSnapshot } from "@/lib/api/datasources";
+// import { getDataSourceStatus, type DataSourceStatusSnapshot } from "@/lib/api/datasources";
 import { useAlertSocket } from "@/lib/ws/useAlertSocket";
-import { type UserRole, ROLE_LEVEL, isNavItemVisible, getMinRole } from "@/lib/route-permissions";
+import { type UserRole, ROLE_LEVEL, isNavItemVisible } from "@/lib/route-permissions";
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -109,7 +109,7 @@ function DropdownMenu({
 export function TopNav() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const [time, setTime] = useState("");
+  const [_time, setTime] = useState("");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -136,25 +136,23 @@ export function TopNav() {
       .catch(() => {});
   }, []);
 
-  // Live datasource status
-  const [dsStatus, setDsStatus] = useState<DataSourceStatusSnapshot | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    const poll = async () => {
-      try {
-        const s = await getDataSourceStatus();
-        if (!cancelled) setDsStatus(s);
-      } catch { /* ignore */ }
-    };
-    poll();
-    const timer = setInterval(poll, 30_000);
-    return () => { cancelled = true; clearInterval(timer); };
-  }, []);
+  // Live datasource status (disabled - uncomment when needed)
+  // const [dsStatus, setDsStatus] = useState<DataSourceStatusSnapshot | null>(null);
+  // useEffect(() => {
+  // let cancelled = false;
+  // const poll = async () => {
+  // try {
+  // const s = await getDataSourceStatus();
+  // if (!cancelled) setDsStatus(s);
+  // } catch { /* ignore */ }
+  // };
+  // poll();
+  // const timer = setInterval(poll, 30_000);
+  // return () => { cancelled = true; clearInterval(timer); };
+  // }, []);
 
-  const dsScore = dsStatus
-    ? Math.round((dsStatus.domain_completeness ?? dsStatus.completeness_score) * 100)
-    : null;
-  const dsHealthy = dsScore !== null && dsScore >= 50;
+  // const dsScore = dsStatus ? Math.round((dsStatus.domain_completeness ?? dsStatus.completeness_score) * 100) : null;
+  // const dsHealthy = dsScore !== null && dsScore >= 50;
 
   // Filter nav items by shared route-permissions + feature flags
   const filteredItems = useMemo(
