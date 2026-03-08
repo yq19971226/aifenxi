@@ -31,7 +31,18 @@ services:
       - ./backend/migrations/seed_cases.sql:/docker-entrypoint-initdb.d/03_seed_cases.sql
       - ./backend/migrations/v3_dynamic_config.sql:/docker-entrypoint-initdb.d/04_v3_dynamic_config.sql
       - ./backend/migrations/v4_role_system.sql:/docker-entrypoint-initdb.d/05_v4_role_system.sql
-      - ./backend/migrations/seed_cases_2025.sql:/docker-entrypoint-initdb.d/06_seed_cases_2025.sql
+      - ./backend/migrations/v5_notification_log.sql:/docker-entrypoint-initdb.d/06_v5_notification_log.sql
+      - ./backend/migrations/v6_tier_configs_seed.sql:/docker-entrypoint-initdb.d/07_v6_tier_configs_seed.sql
+      - ./backend/migrations/v7_accuracy_enhancement.sql:/docker-entrypoint-initdb.d/08_v7_accuracy_enhancement.sql
+      - ./backend/migrations/v8_growth_system.sql:/docker-entrypoint-initdb.d/09_v8_growth_system.sql
+      - ./backend/migrations/v9_extra_symbols.sql:/docker-entrypoint-initdb.d/10_v9_extra_symbols.sql
+      - ./backend/migrations/v9_payment_duration.sql:/docker-entrypoint-initdb.d/11_v9_payment_duration.sql
+      - ./backend/migrations/v10_calendar_events.sql:/docker-entrypoint-initdb.d/12_v10_calendar_events.sql
+      - ./backend/migrations/v11_agent_configs.sql:/docker-entrypoint-initdb.d/13_v11_agent_configs.sql
+      - ./backend/migrations/v_coinglass.sql:/docker-entrypoint-initdb.d/14_v_coinglass.sql
+      - ./backend/migrations/v3_leaderboard.sql:/docker-entrypoint-initdb.d/15_v3_leaderboard.sql
+      - ./backend/migrations/add_playbook_lifecycle_fields.sql:/docker-entrypoint-initdb.d/16_add_playbook_lifecycle.sql
+      - ./backend/migrations/seed_cases_2025.sql:/docker-entrypoint-initdb.d/99_seed_cases_2025.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U omnimind"]
       interval: 10s

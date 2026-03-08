@@ -9,7 +9,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.redis import get_redis_pool
-from app.core.sql_compat import insert_returning, update_returning, jsonb_func_cast
+from app.core.sql_compat import insert_returning, update_returning, jsonb_func_cast, now_func
 from app.models.alert import (
     AlertRuleCreate,
     AlertRuleResponse,
@@ -125,7 +125,7 @@ class AlertRuleEngine:
         result = await update_returning(
             self._session,
             f"""
-                UPDATE alert_rules SET {set_clause}, updated_at = NOW()
+                UPDATE alert_rules SET {set_clause}, updated_at = {now_func()}
                 WHERE id = :rule_id AND user_id = :user_id
                 RETURNING id, name, symbol, expression, enabled, notify_channels,
                           last_triggered_at, created_at
@@ -285,7 +285,7 @@ class AlertRuleEngine:
         )
         await self._session.execute(
             text(
-                "UPDATE alert_rules SET last_triggered_at = NOW() WHERE id = :rule_id"
+                f"UPDATE alert_rules SET last_triggered_at = {now_func()} WHERE id = :rule_id"
             ),
             {"rule_id": str(rule_id)},
         )

@@ -174,6 +174,13 @@ def interval_sub(column: str, value: int, unit: str = "hours") -> str:
     return f"{column} - INTERVAL '{value} {unit}'"
 
 
+def now_func() -> str:
+    """PostgreSQL ``NOW()`` → SQLite ``datetime('now')``."""
+    if is_sqlite:
+        return "datetime('now')"
+    return "NOW()"
+
+
 def jsonb_cast(param: str) -> str:
     """PostgreSQL ``:param::jsonb`` → SQLite just ``:param`` (stored as TEXT)."""
     if is_sqlite:

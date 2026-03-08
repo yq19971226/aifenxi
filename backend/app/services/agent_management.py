@@ -22,6 +22,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.redis import get_json, set_with_ttl
+from app.core.sql_compat import now_func, timestamptz_default
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +120,7 @@ class AgentManagementService:
         """确保 agent_configs 表存在"""
         try:
             await self.session.execute(
-                text("""
+                text(f"""
                     CREATE TABLE IF NOT EXISTS agent_configs (
                         agent_id VARCHAR(50) PRIMARY KEY,
                         agent_name VARCHAR(100) NOT NULL,
@@ -127,8 +128,8 @@ class AgentManagementService:
                         category VARCHAR(50),
                         priority INTEGER DEFAULT 0,
                         enabled BOOLEAN DEFAULT TRUE,
-                        created_at TIMESTAMPTZ DEFAULT NOW(),
-                        updated_at TIMESTAMPTZ DEFAULT NOW()
+                        created_at {timestamptz_default()},
+                        updated_at {timestamptz_default()}
                     )
                 """)
             )
@@ -274,10 +275,10 @@ class AgentManagementService:
         """更新智能体启用状态"""
         try:
             result = await self.session.execute(
-                text("""
+                text(f"""
                     UPDATE agent_configs
                     SET enabled = :enabled,
-                        updated_at = NOW()
+                        updated_at = {now_func()}
                     WHERE agent_id = :agent_id
                 """),
                 {"agent_id": agent_id, "enabled": enabled},

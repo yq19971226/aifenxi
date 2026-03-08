@@ -7,7 +7,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.redis import get_redis_pool
-from app.core.sql_compat import count_filter, insert_returning
+from app.core.sql_compat import count_filter, insert_returning, now_func
 from app.services.config_service import get_config_value
 
 logger = logging.getLogger(__name__)
@@ -312,10 +312,10 @@ async def approve_submission(
     # 更新提交状态
     await session.execute(
         text(
-            """
+            f"""
             UPDATE task_submissions
             SET status = 'approved', reward_granted = true,
-                reviewed_by = :admin_id, reviewed_at = NOW()
+                reviewed_by = :admin_id, reviewed_at = {now_func()}
             WHERE id = :sid
             """
         ),
@@ -366,10 +366,10 @@ async def reject_submission(
 
     await session.execute(
         text(
-            """
+            f"""
             UPDATE task_submissions
             SET status = 'rejected', reject_reason = :reason,
-                reviewed_by = :admin_id, reviewed_at = NOW()
+                reviewed_by = :admin_id, reviewed_at = {now_func()}
             WHERE id = :sid
             """
         ),
@@ -421,7 +421,7 @@ async def update_template(session: AsyncSession, template_id: str, data: dict) -
 async def delete_template(session: AsyncSession, template_id: str) -> None:
     """软删除（停用）任务模板。"""
     await session.execute(
-        text("UPDATE task_templates SET is_active = false, updated_at = NOW() WHERE id = :tid"),
+        text(f"UPDATE task_templates SET is_active = false, updated_at = {now_func()} WHERE id = :tid"),
         {"tid": template_id},
     )
     await session.flush()

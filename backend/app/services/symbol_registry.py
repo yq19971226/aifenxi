@@ -12,6 +12,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.redis import publish_stream
+from app.core.sql_compat import now_func
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +116,7 @@ class SymbolRegistry:
         if sets:
             set_clause = ", ".join(sets)
             await self._session.execute(
-                text(f"UPDATE symbol_registry SET {set_clause}, updated_at = NOW() WHERE symbol = :symbol"),
+                text(f"UPDATE symbol_registry SET {set_clause}, updated_at = {now_func()} WHERE symbol = :symbol"),
                 params,
             )
 
@@ -135,12 +136,12 @@ class SymbolRegistry:
     async def mark_error(self, symbol: str, error_count: int) -> None:
         """标记采集失败次数，连续3次 → 禁用 + 告警。"""
         await self._session.execute(
-            text("UPDATE symbol_registry SET error_count = :count, updated_at = NOW() WHERE symbol = :symbol"),
+            text(f"UPDATE symbol_registry SET error_count = :count, updated_at = {now_func()} WHERE symbol = :symbol"),
             {"count": error_count, "symbol": symbol},
         )
         if error_count >= 3:
             await self._session.execute(
-                text("UPDATE symbol_registry SET enabled = false, updated_at = NOW() WHERE symbol = :symbol"),
+                text(f"UPDATE symbol_registry SET enabled = false, updated_at = {now_func()} WHERE symbol = :symbol"),
                 {"symbol": symbol},
             )
             try:
@@ -155,8 +156,8 @@ class SymbolRegistry:
     async def soft_delete(self, symbol: str) -> bool:
         """软删除交易对（设置 enabled=false）。返回是否找到并删除。"""
         result = await self._session.execute(
-            text("""
-                UPDATE symbol_registry SET enabled = false, updated_at = NOW()
+            text(f"""
+                UPDATE symbol_registry SET enabled = false, updated_at = {now_func()}
                 WHERE symbol = :symbol AND enabled = true
             """),
             {"symbol": symbol},

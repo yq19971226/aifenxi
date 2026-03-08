@@ -8,7 +8,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.redis import get_redis_pool
-from app.core.sql_compat import insert_returning
+from app.core.sql_compat import insert_returning, now_func
 from app.services.config_service import get_config_value
 
 logger = structlog.get_logger(__name__)
@@ -315,11 +315,11 @@ async def upsert_wallet(session: AsyncSession, user_id: str, trc20_address: str)
     # Upsert
     await session.execute(
         text(
-            """
+            f"""
             INSERT INTO partner_wallets (user_id, trc20_address, is_verified, updated_at)
-            VALUES (:uid, :addr, true, NOW())
+            VALUES (:uid, :addr, true, {now_func()})
             ON CONFLICT (user_id)
-            DO UPDATE SET trc20_address = :addr, is_verified = true, updated_at = NOW()
+            DO UPDATE SET trc20_address = :addr, is_verified = true, updated_at = {now_func()}
             """
         ),
         {"uid": user_id, "addr": address},
@@ -449,10 +449,10 @@ async def approve_withdrawal(
 
     await session.execute(
         text(
-            """
+            f"""
             UPDATE withdrawals
             SET status = 'completed', tx_hash = :tx_hash,
-                reviewed_by = :admin_id, reviewed_at = NOW()
+                reviewed_by = :admin_id, reviewed_at = {now_func()}
             WHERE id = :wid
             """
         ),
@@ -485,10 +485,10 @@ async def reject_withdrawal(
 
     await session.execute(
         text(
-            """
+            f"""
             UPDATE withdrawals
             SET status = 'rejected', reject_reason = :reason,
-                reviewed_by = :admin_id, reviewed_at = NOW()
+                reviewed_by = :admin_id, reviewed_at = {now_func()}
             WHERE id = :wid
             """
         ),

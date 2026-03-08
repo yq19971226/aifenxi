@@ -8,7 +8,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.encryption import EncryptionModule
-from app.core.sql_compat import insert_returning, update_returning
+from app.core.sql_compat import insert_returning, update_returning, now_func
 from app.core.redis import get_redis_pool
 
 logger = structlog.get_logger(__name__)
@@ -265,7 +265,7 @@ class ConfigService:
         old_is_secret: bool = old_row["is_secret"]
 
         # 构建 UPDATE SET 子句
-        sets: list[str] = ["updated_at = NOW()"]
+        sets: list[str] = [f"updated_at = {now_func()}"]
         params: dict = {"key": key}
 
         encrypted_new = self._enc.encrypt(data.value)
