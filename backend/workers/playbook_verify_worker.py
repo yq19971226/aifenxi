@@ -201,149 +201,78 @@ async def _verify_all() -> dict[str, int]:
     }
 
 
-async def _verify_one(
-    session, pred: dict, *,
-    cached_price: float | None = None,
-    cached_phase: object = None,
-) -> str | None:
-    """验证单条预测，返回操作类型。"""
+def _parse_datetime(raw, fallback: datetime) -> datetime:
+    """将 str/datetime 统一为 timezone-aware datetime。"""
+    if isinstance(raw, str):
+        try:
+            raw = datetime.fromisoformat(raw)
+        except Exception:
+            return fallback
+    if isinstance(raw, datetime):
+        return raw.replace(tzinfo=timezone.utc) if raw.tzinfo is None else raw
+    return fallback
+
+
+async def _handle_stage_match(
+    session, pred: dict, next_idx: int, new_verified: int,
+    current_price: float | None, now: datetime,
+    stages: list, stage_name: str, next_stage: dict,
+) -> str:
+    """处理阶段匹配成功：更新数据库、推送通知、判定是否全部完成。"""
     pred_id = pred["id"]
     symbol = pred["symbol"]
-    current_idx = pred["current_stage_idx"] or 0
-    verified_count = pred["verified_stages"] or 0
-    created_at = pred["created_at"]
-    snapshot_price = pred.get("snapshot_price")
-    stage_entry_price = pred.get("stage_entry_price")
-    stage_entered_at_raw = pred.get("stage_entered_at")
-    prev_risk_note = pred.get("risk_note") or ""
+    playbook_name = pred["playbook_name"]
 
-    # 解析阶段列表
+    await session.execute(
+        text("""
+            UPDATE playbook_predictions
+            SET current_stage_idx = :idx,
+                verified_stages = :verified,
+                stage_entry_price = :price,
+                stage_entered_at = :entered_at,
+                risk_flag = FALSE,
+                risk_note = NULL
+            WHERE id = :id AND status = 'active'
+        """),
+        {"idx": next_idx, "verified": new_verified,
+         "price": current_price, "entered_at": now, "id": pred_id},
+    )
+    await session.commit()
+
+    logger.info(
+        "阶段验证成功: prediction=%s, symbol=%s, playbook=%s, stage=%d/%d",
+        pred_id, symbol, playbook_name, next_idx + 1, len(stages),
+    )
+
     try:
-        stages = json.loads(pred["stages_json"]) if pred["stages_json"] else []
-    except Exception:
-        logger.error("阶段数据损坏，无法解析 stages_json: prediction=%s", pred_id)
-        stages = []
+        await broadcast(
+            session=session,
+            event_type="playbook_switch",
+            data={
+                "symbol": symbol,
+                "matched_playbook": playbook_name,
+                "probability_pct": f"{(new_verified / len(stages) * 100):.0f}%",
+                "stage_description": stage_name,
+                "next_move": next_stage.get("next_stage_probability", "待观察"),
+            },
+        )
+    except Exception as exc:
+        logger.warning("阶段转换推送失败: %s", exc)
 
-    if not stages:
-        await _update_status(session, pred_id, "expired")
-        return "expired"
-
-    now = datetime.now(timezone.utc)
-
-    # 解析 created_at
-    if isinstance(created_at, str):
-        try:
-            created_at = datetime.fromisoformat(created_at)
-        except Exception:
-            created_at = now
-    if created_at.tzinfo is None:
-        created_at = created_at.replace(tzinfo=timezone.utc)
-    total_elapsed_hours = (now - created_at).total_seconds() / 3600
-
-    if total_elapsed_hours >= _EXPIRY_HOURS and verified_count == 0:
-        await _update_status(session, pred_id, "expired")
-        return "expired"
-
-    # 解析 stage_entered_at（用于硬失效判定）
-    stage_entered_at = None
-    if stage_entered_at_raw:
-        if isinstance(stage_entered_at_raw, str):
-            try:
-                stage_entered_at = datetime.fromisoformat(stage_entered_at_raw)
-            except Exception:
-                pass
-        elif isinstance(stage_entered_at_raw, datetime):
-            stage_entered_at = stage_entered_at_raw
-    if stage_entered_at and stage_entered_at.tzinfo is None:
-        stage_entered_at = stage_entered_at.replace(tzinfo=timezone.utc)
-    # fallback: 无 stage_entered_at 时用 created_at
-    stage_ref_time = stage_entered_at or created_at
-    stage_elapsed_hours = (now - stage_ref_time).total_seconds() / 3600
-
-    # 获取当前市场阶段（优先用缓存）
-    current_phase = cached_phase if cached_phase is not None else await get_current_phase(symbol)
-    if current_phase is None:
-        logger.warning("无法获取市场阶段，跳过验证: prediction=%s, symbol=%s", pred_id, symbol)
-        return None
-    current_phase_str = current_phase.value
-
-    # 下一个待验证阶段
-    next_idx = current_idx + 1 if current_idx >= 0 else 0
-    if next_idx >= len(stages):
-        accuracy = verified_count / len(stages) if stages else 0
-        await _complete_prediction(session, pred_id, accuracy, symbol,
-                                   pred["playbook_name"])
+    if next_idx + 1 >= len(stages):
+        accuracy = new_verified / len(stages)
+        await _complete_prediction(session, pred_id, accuracy,
+                                   symbol, playbook_name)
         return "completed"
 
-    next_stage = stages[next_idx]
-    expected_phase = next_stage.get("phase", "")
-    stage_name = next_stage.get("name", f"阶段{next_idx + 1}")
+    return "verified"
 
-    # ── 硬失效判定 ──
-    expected_dir = _PHASE_EXPECTED_DIR.get(expected_phase)
-    max_dur = _parse_max_duration_hours(next_stage.get("typical_duration", ""))
-    base_price = stage_entry_price or snapshot_price
-    current_price = cached_price if cached_price is not None else await _get_current_price(symbol)
-    if current_price is None:
-        logger.warning("无法获取最新价格，跳过硬失效判定: prediction=%s, symbol=%s", pred_id, symbol)
 
-    failure_reason = _check_hard_failure(
-        expected_dir, base_price, current_price,
-        stage_elapsed_hours, max_dur, stage_name,
-    )
-    if failure_reason:
-        await _fail_prediction(session, pred_id, failure_reason,
-                               symbol, pred["playbook_name"])
-        return "failed"
-
-    # ── 阶段匹配判定 ──
-    if current_phase_str == expected_phase:
-        new_verified = verified_count + 1
-        await session.execute(
-            text("""
-                UPDATE playbook_predictions
-                SET current_stage_idx = :idx,
-                    verified_stages = :verified,
-                    stage_entry_price = :price,
-                    stage_entered_at = :entered_at,
-                    risk_flag = FALSE,
-                    risk_note = NULL
-                WHERE id = :id AND status = 'active'
-            """),
-            {"idx": next_idx, "verified": new_verified,
-             "price": current_price, "entered_at": now, "id": pred_id},
-        )
-        await session.commit()
-
-        logger.info(
-            "阶段验证成功: prediction=%s, symbol=%s, playbook=%s, stage=%d/%d",
-            pred_id, symbol, pred["playbook_name"], next_idx + 1, len(stages),
-        )
-
-        try:
-            await broadcast(
-                session=session,
-                event_type="playbook_switch",
-                data={
-                    "symbol": symbol,
-                    "matched_playbook": pred["playbook_name"],
-                    "probability_pct": f"{(new_verified / len(stages) * 100):.0f}%",
-                    "stage_description": stage_name,
-                    "next_move": next_stage.get("next_stage_probability", "待观察"),
-                },
-            )
-        except Exception as exc:
-            logger.warning("阶段转换推送失败: %s", exc)
-
-        if next_idx + 1 >= len(stages):
-            accuracy = new_verified / len(stages)
-            await _complete_prediction(session, pred_id, accuracy,
-                                       symbol, pred["playbook_name"])
-            return "completed"
-
-        return "verified"
-
-    # ── 软失效判定（阶段未匹配）──
+async def _handle_soft_failure(
+    session, pred_id: str, prev_risk_note: str,
+    stage_name: str, expected_phase: str, current_phase_str: str,
+) -> None:
+    """处理阶段未匹配：累计 miss 计数，超阈值标记风险。"""
     miss_count = _parse_miss_count(prev_risk_note) + 1
     if miss_count >= _SOFT_FAIL_THRESHOLD:
         risk_note = (
@@ -374,6 +303,88 @@ async def _verify_one(
         )
         await session.commit()
 
+
+async def _verify_one(
+    session, pred: dict, *,
+    cached_price: float | None = None,
+    cached_phase: object = None,
+) -> str | None:
+    """验证单条预测，返回操作类型。"""
+    pred_id = pred["id"]
+    symbol = pred["symbol"]
+    current_idx = pred["current_stage_idx"] or 0
+    verified_count = pred["verified_stages"] or 0
+
+    # 解析阶段列表
+    try:
+        stages = json.loads(pred["stages_json"]) if pred["stages_json"] else []
+    except Exception:
+        logger.error("阶段数据损坏，无法解析 stages_json: prediction=%s", pred_id)
+        stages = []
+
+    if not stages:
+        await _update_status(session, pred_id, "expired")
+        return "expired"
+
+    now = datetime.now(timezone.utc)
+    created_at = _parse_datetime(pred["created_at"], now)
+    total_elapsed_hours = (now - created_at).total_seconds() / 3600
+
+    if total_elapsed_hours >= _EXPIRY_HOURS and verified_count == 0:
+        await _update_status(session, pred_id, "expired")
+        return "expired"
+
+    stage_entered_at = _parse_datetime(pred.get("stage_entered_at"), created_at)
+    stage_elapsed_hours = (now - stage_entered_at).total_seconds() / 3600
+
+    # 获取当前市场阶段
+    current_phase = cached_phase if cached_phase is not None else await get_current_phase(symbol)
+    if current_phase is None:
+        logger.warning("无法获取市场阶段，跳过验证: prediction=%s, symbol=%s", pred_id, symbol)
+        return None
+    current_phase_str = current_phase.value
+
+    # 下一个待验证阶段
+    next_idx = current_idx + 1 if current_idx >= 0 else 0
+    if next_idx >= len(stages):
+        accuracy = verified_count / len(stages) if stages else 0
+        await _complete_prediction(session, pred_id, accuracy, symbol,
+                                   pred["playbook_name"])
+        return "completed"
+
+    next_stage = stages[next_idx]
+    expected_phase = next_stage.get("phase", "")
+    stage_name = next_stage.get("name", f"阶段{next_idx + 1}")
+
+    # ── 硬失效判定 ──
+    expected_dir = _PHASE_EXPECTED_DIR.get(expected_phase)
+    max_dur = _parse_max_duration_hours(next_stage.get("typical_duration", ""))
+    base_price = pred.get("stage_entry_price") or pred.get("snapshot_price")
+    current_price = cached_price if cached_price is not None else await _get_current_price(symbol)
+    if current_price is None:
+        logger.warning("无法获取最新价格，跳过硬失效判定: prediction=%s, symbol=%s", pred_id, symbol)
+
+    failure_reason = _check_hard_failure(
+        expected_dir, base_price, current_price,
+        stage_elapsed_hours, max_dur, stage_name,
+    )
+    if failure_reason:
+        await _fail_prediction(session, pred_id, failure_reason,
+                               symbol, pred["playbook_name"])
+        return "failed"
+
+    # ── 阶段匹配 ──
+    if current_phase_str == expected_phase:
+        return await _handle_stage_match(
+            session, pred, next_idx, verified_count + 1,
+            current_price, now, stages, stage_name, next_stage,
+        )
+
+    # ── 软失效（阶段未匹配）──
+    await _handle_soft_failure(
+        session, pred_id, pred.get("risk_note") or "",
+        stage_name, expected_phase, current_phase_str,
+    )
     return None
 
 
