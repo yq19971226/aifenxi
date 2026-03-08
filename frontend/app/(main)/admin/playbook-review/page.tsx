@@ -17,8 +17,9 @@ export default function PlaybookReviewPage() {
     "all" | "true" | "false"
   >("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [opError, setOpError] = useState<string | null>(null);
 
-  const { data, isLoading } = useQuery<AdminPredictionList>({
+  const { data, isLoading, error: fetchError } = useQuery<AdminPredictionList>({
     queryKey: ["adminPredictions", page, filterPublished],
     queryFn: () =>
       fetchAdminPredictions({
@@ -34,20 +35,24 @@ export default function PlaybookReviewPage() {
   const toggleMut = useMutation({
     mutationFn: ({ id, pub }: { id: string; pub: boolean }) =>
       togglePublish(id, pub),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["adminPredictions"] }),
+    onSuccess: () => { setOpError(null); qc.invalidateQueries({ queryKey: ["adminPredictions"] }); },
+    onError: (err: Error) => setOpError(err.message || "发布/下架操作失败"),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => deletePrediction(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["adminPredictions"] }),
+    onSuccess: () => { setOpError(null); qc.invalidateQueries({ queryKey: ["adminPredictions"] }); },
+    onError: (err: Error) => setOpError(err.message || "删除失败"),
   });
 
   const batchMut = useMutation({
     mutationFn: (ids: number[]) => batchPublish(ids),
     onSuccess: () => {
+      setOpError(null);
       setSelected(new Set());
       qc.invalidateQueries({ queryKey: ["adminPredictions"] });
     },
+    onError: (err: Error) => setOpError(err.message || "批量发布失败"),
   });
 
   const toggleSelect = (id: string) => {
@@ -71,6 +76,13 @@ export default function PlaybookReviewPage() {
   return (
     <div className="flex flex-col gap-4 p-6">
       <h1 className="text-xl font-semibold text-zinc-200">剧本广场审核</h1>
+
+      {/* 错误提示 */}
+      {(opError || fetchError) && (
+        <div className="rounded-lg border border-[var(--color-bear)]/30 bg-[var(--color-bear)]/5 px-4 py-3 text-sm text-bear">
+          {opError || (fetchError instanceof Error ? fetchError.message : "加载失败")}
+        </div>
+      )}
 
       {/* 工具栏 */}
       <div className="flex flex-wrap items-center gap-3">

@@ -9,34 +9,41 @@ interface SymbolSelectorProps {
 }
 
 export function SymbolSelector({ value, onChange }: SymbolSelectorProps) {
-  const { data: symbols = [], isLoading } = useQuery<SymbolConfig[]>({
+  const { data: symbols = [], isLoading, isError } = useQuery<SymbolConfig[]>({
     queryKey: ["symbols"],
     queryFn: () => symbolsApi.listSymbols(),
     staleTime: 60_000,
   });
 
-  // Fallback: if API hasn't loaded yet, show current value
+  const enabledSymbols = symbols.filter((s) => s.enabled);
   const options =
-    symbols.length > 0
-      ? symbols.filter((s) => s.enabled)
+    enabledSymbols.length > 0
+      ? enabledSymbols
       : [{ symbol: value, enabled: true }];
 
+  const isSingleOption = options.length <= 1 && !isLoading && !isError;
+
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      disabled={isLoading || options.length <= 1}
-      className="rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-sm font-medium text-zinc-200 outline-none transition-colors hover:border-accent/50 focus:border-accent disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      {options.map((s) => (
-        <option
-          key={s.symbol}
-          value={s.symbol}
-          className="bg-[#0F1117] text-zinc-200"
-        >
-          {s.symbol}
-        </option>
-      ))}
-    </select>
+    <div className="flex items-center gap-2">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={isLoading}
+        className="rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-sm font-medium text-zinc-200 outline-none transition-colors hover:border-accent/50 focus:border-accent disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {options.map((s) => (
+          <option
+            key={s.symbol}
+            value={s.symbol}
+            className="bg-[#0F1117] text-zinc-200"
+          >
+            {s.symbol}
+          </option>
+        ))}
+      </select>
+      {isSingleOption && (
+        <span className="text-xs text-zinc-600" title="升级套餐解锁更多币种">仅限 1 币种</span>
+      )}
+    </div>
   );
 }

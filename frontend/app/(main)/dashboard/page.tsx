@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -315,9 +315,8 @@ function SummaryCards({ symbols }: { symbols: SymbolOverview[] }) {
 
 export default function DashboardPage() {
   const [expandedSymbol, setExpandedSymbol] = useState<string | null>(null);
-  const [userCapabilities, setUserCapabilities] = useState<PlanCapabilities["user_capabilities"] | null>(null);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["dashboard-overview"],
     queryFn: fetchDashboardOverview,
     refetchInterval: 30_000,
@@ -329,11 +328,7 @@ export default function DashboardPage() {
     staleTime: 300_000,
   });
 
-  useEffect(() => {
-    if (capabilitiesData?.user_capabilities) {
-      setUserCapabilities(capabilitiesData.user_capabilities);
-    }
-  }, [capabilitiesData]);
+  const userCapabilities = capabilitiesData?.user_capabilities ?? null;
 
   const symbols = data?.symbols ?? [];
 
@@ -360,6 +355,17 @@ export default function DashboardPage() {
             {"30s 自动刷新"}
           </div>
         </div>
+
+        {/* ── Error ── */}
+        {error && !isLoading && (
+          <div className="card p-5 flex items-center gap-3">
+            <AlertTriangle size={18} className="text-amber-400 shrink-0" />
+            <div>
+              <p className="text-sm text-zinc-300">{"加载失败"}</p>
+              <p className="text-xs text-zinc-500 mt-0.5">{error instanceof Error ? error.message : "获取概览数据失败，30s 后自动重试"}</p>
+            </div>
+          </div>
+        )}
 
         {/* ── Summary Cards ── */}
         {!isLoading && symbols.length > 0 && <SummaryCards symbols={symbols} />}
@@ -405,11 +411,14 @@ export default function DashboardPage() {
                       <td className="px-4 py-4">
                         <div className="h-5 w-14 skeleton rounded-full" />
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="hidden md:table-cell px-4 py-4">
                         <div className="h-1.5 w-16 skeleton rounded-full" />
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="hidden lg:table-cell px-4 py-4">
                         <div className="h-4 w-12 skeleton rounded" />
+                      </td>
+                      <td className="hidden lg:table-cell px-4 py-4">
+                        <div className="h-4 w-10 skeleton rounded" />
                       </td>
                     </tr>
                   ))}
