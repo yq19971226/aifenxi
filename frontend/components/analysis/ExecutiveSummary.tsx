@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
   ArrowRightLeft,
-  ChevronDown,
   Database,
   Minus,
   Shield,
@@ -29,75 +27,31 @@ import { AnalysisStatusBanner } from "./StatusBanner";
 import { PositionCalculator } from "@/components/trade/PositionCalculator";
 import { fromStrategy } from "@/lib/utils/position-sizing";
 
-// ── Action advice card (操作建议色条) ────────────────────────
+// ── Action advice banner (compact — details already in StrategyCard) ──
 
-function ActionAdviceCard({ strategy }: { strategy: StrategyData }) {
-  const [reasoningExpanded, setReasoningExpanded] = useState(false);
+function ActionAdviceBanner({ strategy }: { strategy: StrategyData }) {
   const dir = strategy.direction;
-  const isFallback = strategy.is_fallback;
-
-  if (isFallback || dir === "neutral") return null;
-
-  const entryLow = strategy.entry_low;
-  const entryHigh = strategy.entry_high;
-  const stopLoss = strategy.stop_loss;
-  const targets = strategy.targets || [];
-  const reasoning = strategy.reasoning || "";
-  const showReasoning = reasoning.length > 0 && !isFallbackReasoning(reasoning);
+  if (strategy.is_fallback || dir === "neutral") return null;
 
   const isLong = dir === "long";
   const accentType: AccentType = isLong ? "action-long" : "action-short";
-
-  const entryStr = entryLow && entryHigh
-    ? `入场 ${formatPrice(entryLow)} ~ ${formatPrice(entryHigh)}`
+  const entryStr = strategy.entry_low && strategy.entry_high
+    ? ` · 入场 ${formatPrice(strategy.entry_low)} ~ ${formatPrice(strategy.entry_high)}`
     : "";
-  const title = isLong
-    ? `建议做多${entryStr ? ` · ${entryStr}` : ""}`
-    : `建议做空${entryStr ? ` · ${entryStr}` : ""}`;
+  const title = `建议${isLong ? "做多" : "做空"}${entryStr}`;
 
   return (
     <AccentBorderCard type={accentType} title={title} icon={isLong ? TrendingUp : TrendingDown}>
-      <div className="space-y-1.5">
-        {stopLoss && (
-          <p className="text-sm text-zinc-400">
-            止损 <span className="font-mono font-medium text-red-400">{formatPrice(stopLoss)}</span>
-          </p>
+      <p className="text-sm text-zinc-400">
+        止损 <span className="font-mono font-medium text-red-400">{formatPrice(strategy.stop_loss)}</span>
+        {strategy.targets.length > 0 && (
+          <>
+            <span className="mx-2 text-zinc-600">·</span>
+            目标 <span className="font-mono font-medium text-emerald-400">{formatPrice(strategy.targets[0])}</span>
+            {strategy.targets.length > 1 && <span className="text-zinc-500"> +{strategy.targets.length - 1}</span>}
+          </>
         )}
-        {targets.length > 0 && (
-          <p className="text-sm text-zinc-400">
-            目标{" "}
-            {targets.map((t, i) => (
-              <span key={i} className="font-mono font-medium text-emerald-400">
-                {i > 0 && " / "}{formatPrice(t)}
-              </span>
-            ))}
-          </p>
-        )}
-        {strategy.risk_reward_ratio > 0 && (
-          <p className="text-sm text-zinc-400">
-            盈亏比 <span className="font-mono font-medium text-zinc-200">1 : {strategy.risk_reward_ratio.toFixed(1)}</span>
-          </p>
-        )}
-        {showReasoning && (
-          <div className="mt-2">
-            <button
-              type="button"
-              onClick={() => setReasoningExpanded((v) => !v)}
-              className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-400 transition-colors"
-            >
-              <motion.div animate={{ rotate: reasoningExpanded ? 180 : 0 }} transition={{ duration: 0.15 }}>
-                <ChevronDown className="h-3 w-3" />
-              </motion.div>
-              分析逻辑
-            </button>
-            {reasoningExpanded && (
-              <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed whitespace-pre-wrap">
-                {reasoning}
-              </p>
-            )}
-          </div>
-        )}
-      </div>
+      </p>
     </AccentBorderCard>
   );
 }
@@ -212,10 +166,10 @@ export function ExecutiveSummary({ report }: { report: AnalysisReportType }) {
         </motion.div>
       )}
 
-      {/* Action advice accent card */}
+      {/* Action advice banner (compact) */}
       {report.strategy && (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.3 }}>
-          <ActionAdviceCard strategy={report.strategy} />
+          <ActionAdviceBanner strategy={report.strategy} />
         </motion.div>
       )}
 
@@ -260,9 +214,9 @@ export function ExecutiveSummary({ report }: { report: AnalysisReportType }) {
             </span>
           )}
           {report.completeness_warning && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-xs font-medium text-orange-400">
+            <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-xs font-medium text-orange-400" title={report.completeness_warning}>
               <AlertTriangle className="h-3 w-3" />
-              {report.completeness_warning}
+              数据不完整
             </span>
           )}
         </div>

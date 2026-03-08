@@ -98,7 +98,7 @@ export function DeepAnalysis({ sections }: { sections: ReportSection[] }) {
                 {(tabGroups.get(effectiveTab)?.length ?? 0) > 1 && (
                   <div className="flex items-center gap-2 pt-2">
                     <div className="h-px flex-1 bg-white/[0.06]" />
-                    <span className="text-[11px] uppercase tracking-widest text-zinc-500 font-medium shrink-0">
+                    <span className="text-xs uppercase tracking-widest text-zinc-500 font-medium shrink-0">
                       {group.label}
                     </span>
                     <div className="h-px flex-1 bg-white/[0.06]" />

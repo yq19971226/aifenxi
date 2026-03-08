@@ -159,8 +159,10 @@ export function SectionCard({ section, defaultExpanded = false }: { section: Rep
   const sectionIcon = getSectionIcon(section.title);
   const SectionIconComp = sectionIcon.icon;
 
-  const sectionSignal = section.data?.signal as string | undefined;
-  const sectionConf = section.data?.confidence as number | undefined;
+  const rawSignal = section.data?.signal;
+  const sectionSignal = typeof rawSignal === "string" ? rawSignal : undefined;
+  const rawConf = section.data?.confidence;
+  const sectionConf = typeof rawConf === "number" ? rawConf : undefined;
   const signalColor = sectionSignal === "bullish" ? "text-emerald-400" : sectionSignal === "bearish" ? "text-red-400" : "";
 
   return (

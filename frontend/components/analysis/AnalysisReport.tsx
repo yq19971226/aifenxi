@@ -14,19 +14,26 @@ interface AnalysisReportProps {
 }
 
 export function AnalysisReport({ report }: AnalysisReportProps) {
+  const isBlocked = report.status === "blocked";
+
   return (
     <div className="space-y-5">
-      {/* Layer 1: Executive Summary */}
+      {/* Layer 1: Executive Summary (always shown — includes StatusBanner for blocked) */}
       <ExecutiveSummary report={report} />
 
-      {/* Layer 1.5: Agent Consensus Bar */}
-      <AgentConsensusBar sections={report.sections} />
+      {/* Layers 1.5–3: skip when blocked — strategy data is unreliable */}
+      {!isBlocked && (
+        <>
+          {/* Layer 1.5: Agent Consensus Bar */}
+          <AgentConsensusBar sections={report.sections} />
 
-      {/* Layer 2: Key Findings */}
-      <KeyFindingsSummary sections={report.sections} />
+          {/* Layer 2: Key Findings */}
+          <KeyFindingsSummary sections={report.sections} />
 
-      {/* Layer 3: Deep Analysis (Tab system) */}
-      <DeepAnalysis sections={report.sections} />
+          {/* Layer 3: Deep Analysis (Tab system) */}
+          <DeepAnalysis sections={report.sections} />
+        </>
+      )}
 
       {/* Footer: timestamp + engine metadata */}
       <motion.div
