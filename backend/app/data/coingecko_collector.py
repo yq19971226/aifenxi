@@ -52,9 +52,9 @@ SYMBOL_TO_COIN_ID: dict[str, str] = {
     "PEPEUSDT": "pepe",
 }
 
-_MARKET_TTL = 1800       # 30 分钟
+_MARKET_TTL = 3600       # 1 小时（2x 采集间隔）
 _COMMUNITY_TTL = 3600    # 1 小时
-_GLOBAL_TTL = 1800       # 30 分钟
+_GLOBAL_TTL = 3600       # 1 小时（2x 采集间隔）
 _TRENDING_TTL = 7200     # 2 小时
 
 

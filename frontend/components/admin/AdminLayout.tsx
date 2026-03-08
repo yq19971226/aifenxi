@@ -1,17 +1,27 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AdminSidebar, AdminMobileNav } from "./AdminSidebar";
-import type { UserRole } from "@/lib/route-permissions";
+import { isRouteAllowed, type UserRole } from "@/lib/route-permissions";
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
+  const pathname = usePathname();
   const role: UserRole = user?.role ?? "user";
 
   if (!user || (role !== "admin" && role !== "operator")) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
         <p className="text-sm text-zinc-500">无权限访问管理后台</p>
+      </div>
+    );
+  }
+
+  if (!isRouteAllowed(pathname, role)) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <p className="text-sm text-zinc-500">无权限访问此页面</p>
       </div>
     );
   }

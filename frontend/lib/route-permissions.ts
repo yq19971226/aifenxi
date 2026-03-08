@@ -1,5 +1,5 @@
 /**
- * 路由权限真相源 — AuthGuard 与 TopNav 共用此配置。
+ * 路由权限真相源 — AuthGuard、TopNav、AdminSidebar 共用此配置。
  *
  * 规则（按 requirements.md 冻结决策）：
  * 1. `/admin/*` 默认 admin-only

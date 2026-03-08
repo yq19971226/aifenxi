@@ -59,14 +59,16 @@ _configs.json
 fix_report*.txt
 
 # AI temp scripts & reports
-scripts/tmp/
-_*.py
-*_COMPLETE.md
-*_FINAL.md
-AUDIT_REPORT.md
-*_CHECKLIST.md
-*_SUMMARY.md
-MODEL_ROUTING_SUMMARY.md
+**/scripts/tmp/
+_fix_*.py
+_compact*.py
+_temp_*.py
+/*_COMPLETE.md
+/*_FINAL.md
+/AUDIT_REPORT.md
+/*_CHECKLIST.md
+/*_SUMMARY.md
+/MODEL_ROUTING_SUMMARY.md
 
 # Reference docs (large HTML)
 docs/reference/*.html
