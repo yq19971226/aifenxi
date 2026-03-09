@@ -32,29 +32,46 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+// ── HMR 状态缓存 ─────────────────────────────────────────────
+// 模块级变量在 Fast Refresh 时不会被重置，
+// 避免每次 HMR re-mount 时 user→null → loading→true → 白屏。
+let __cachedUser: UserInfo | null = null;
+let __cachedReady = false;
+
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<UserInfo | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<UserInfo | null>(__cachedUser);
+  const [loading, setLoading] = useState(!__cachedReady);
 
   useEffect(() => {
+    if (__cachedReady && __cachedUser) {
+      setUser(__cachedUser);
+      setLoading(false);
+      return;
+    }
     async function init() {
       const token = getAccessToken();
       if (!token) {
+        __cachedUser = null;
+        __cachedReady = true;
         setLoading(false);
         return;
       }
       try {
         const u = await fetchCurrentUser();
+        __cachedUser = u;
         setUser(u);
       } catch {
         try {
           await refreshAccessToken();
           const u = await fetchCurrentUser();
+          __cachedUser = u;
           setUser(u);
         } catch {
           clearTokens();
+          __cachedUser = null;
         }
       } finally {
+        __cachedReady = true;
         setLoading(false);
       }
     }
@@ -64,6 +81,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = useCallback(async (email: string, password: string) => {
     await apiLogin(email, password);
     const u = await fetchCurrentUser();
+    __cachedUser = u;
     setUser(u);
   }, []);
 
@@ -71,11 +89,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await apiRegister(email, password, referralCode);
     await apiLogin(email, password);
     const u = await fetchCurrentUser();
+    __cachedUser = u;
     setUser(u);
   }, []);
 
   const logout = useCallback(() => {
     clearTokens();
+    __cachedUser = null;
+    __cachedReady = false;
     setUser(null);
   }, []);
 
