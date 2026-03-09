@@ -3,7 +3,7 @@
 import { forwardRef } from "react";
 
 import type { AnalysisReport } from "@/lib/api/analysis";
-import { modeLabel } from "./helpers";
+import { modeLabel, formatPrice } from "./helpers";
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -125,19 +125,39 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
             </div>
           </div>
 
-          {/* ── Section 2: 策略参数 ── */}
+          {/* ── Section 2: 交易参数 ── */}
           {report.strategy && !report.strategy.is_fallback && dir !== "neutral" && (
             <div style={S.sectionBox("#6366f1")}>
               <div style={S.row}>
-                <span style={S.label}>盈亏比</span>
-                <span style={{ ...S.value, color: "#6366f1" }}>
-                  {report.strategy.risk_reward_ratio.toFixed(2)} 📊
+                <span style={S.label}>进场区间 💰</span>
+                <span style={{ ...S.value, color: "#6366f1", fontWeight: 700 }}>
+                  {formatPrice(report.strategy.entry_low)} ~ {formatPrice(report.strategy.entry_high)}
+                </span>
+              </div>
+              <div style={S.row}>
+                <span style={S.label}>止损价格 🛑</span>
+                <span style={{ ...S.value, color: "#ef4444", fontWeight: 700 }}>
+                  {formatPrice(report.strategy.stop_loss)}
+                </span>
+              </div>
+              {report.strategy.targets.length > 0 && (
+                <div style={S.row}>
+                  <span style={S.label}>止盈目标 🎯</span>
+                  <span style={{ ...S.value, color: "#10b981", fontWeight: 700 }}>
+                    {report.strategy.targets.map((tp) => formatPrice(tp)).join(" / ")}
+                  </span>
+                </div>
+              )}
+              <div style={S.row}>
+                <span style={S.label}>盈亏比 📊</span>
+                <span style={{ ...S.value, color: "#6366f1", fontWeight: 700 }}>
+                  {report.strategy.risk_reward_ratio.toFixed(2)}
                 </span>
               </div>
               <div style={S.row}>
                 <span style={S.label}>值得操作</span>
                 <span style={S.value}>
-                  {report.strategy.is_worth_taking ? "✅ 是" : "⚠️ 谨慎"}
+                  {report.strategy.is_worth_taking ? "✅ 推荐" : "⚠️ 谨慎"}
                 </span>
               </div>
               <div style={S.row}>
