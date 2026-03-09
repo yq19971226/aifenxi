@@ -10,6 +10,14 @@ import {
 
 const POLL_INTERVAL = 30_000;
 
+const DOMAIN_LABEL: Record<string, string> = {
+  market: "行情",
+  derivatives: "衍生品",
+  onchain: "链上",
+  macro: "宏观",
+  auxiliary: "辅助",
+};
+
 function getOfflineExchanges(exchanges: ExchangeStatusItem[]): ExchangeStatusItem[] {
   return exchanges.filter(
     (e) => e.enabled && (e.status === "error" || e.status === "stale")
@@ -77,7 +85,7 @@ export function DataSourceBanner() {
           {missingDomains.length > 0 && (
             <>
               {" \u00B7 \u7F3A\u5931\u4E3B\u57DF\uFF1A"}
-              <span className="font-medium">{missingDomains.join(" / ")}</span>
+              <span className="font-medium">{missingDomains.map((d) => DOMAIN_LABEL[d] || d).join(" / ")}</span>
             </>
           )}
           {offlineExchanges.length > 0 && (
