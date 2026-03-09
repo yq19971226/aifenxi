@@ -112,23 +112,19 @@ export default function AlertsPage() {
 
   // ── 渲染 ──────────────────────────────────────────────────
   const isAtLimit = usedCount >= ruleLimit;
-  const barColor = isAtLimit ? "bg-[#FF3366] shadow-[0_0_8px_#FF3366]" : "bg-[#00FFA3] shadow-[0_0_8px_#00FFA3]";
+  const barColor = isAtLimit ? "bg-red-400" : "bg-emerald-400";
 
   return (
     <PageTransition>
-      <div className="flex flex-col gap-6 p-6 relative">
-        {/* Ambient background glows for the page */}
-        <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-[#0088FF]/10 blur-[150px] -z-20 rounded-full pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#FF3366]/5 blur-[120px] -z-20 rounded-full pointer-events-none" />
-
+      <div className="flex flex-col gap-6 p-6">
         {/* 页面标题 */}
-        <div className="flex items-center justify-between relative z-10 pb-4 border-b border-white/[0.05]">
+        <div className="flex items-center justify-between pb-4 border-b border-white/[0.05]">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] flex items-center gap-3">
-              <span className="flex h-3 w-3 rounded-full bg-[#0088FF] shadow-[0_0_10px_#0088FF] animate-pulse"></span>
+            <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+              <span className="flex h-3 w-3 rounded-full bg-indigo-500 animate-pulse"></span>
               预警管理
             </h1>
-            <p className="mt-1.5 text-sm font-medium text-zinc-400 drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">
+            <p className="mt-1.5 text-sm text-zinc-400">
               自定义监控条件，实时接收市场异动通知
             </p>
           </div>
@@ -137,7 +133,7 @@ export default function AlertsPage() {
               type="button"
               onClick={() => setFormMode({ type: "create" })}
               disabled={isAtLimit}
-              className="px-5 py-2.5 rounded-xl bg-white/[0.05] border border-white/[0.1] text-[#00FFA3] text-sm font-bold shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] drop-shadow-[0_0_8px_rgba(0,255,163,0.3)] hover:bg-[#00FFA3]/10 hover:border-[#00FFA3]/50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="btn-primary text-sm disabled:opacity-40 disabled:cursor-not-allowed"
             >
               + 创建规则
             </button>
@@ -145,17 +141,16 @@ export default function AlertsPage() {
         </div>
 
         {/* 额度使用条 */}
-        <div className="card rounded-2xl p-6 relative overflow-hidden z-10">
-          <div className="absolute right-0 top-0 w-48 h-48 bg-[#0088FF]/10 blur-[60px] -z-10 rounded-full" />
+        <div className="card rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold uppercase tracking-widest text-zinc-400 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">
+            <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">
               规则额度（{levelLabel}）
             </span>
-            <span className="text-sm font-mono font-medium text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
+            <span className="text-sm font-mono font-medium text-white">
               已使用 {usedCount}/{ruleLimit} 条规则
             </span>
           </div>
-          <div className="h-2 rounded-full bg-white/[0.04] overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)]">
+          <div className="h-2 rounded-full bg-white/[0.04] overflow-hidden">
             <motion.div
               className={`h-full rounded-full ${barColor}`}
               initial={{ width: 0 }}
@@ -164,8 +159,8 @@ export default function AlertsPage() {
             />
           </div>
           {isAtLimit && (
-            <p className="mt-3 text-sm font-medium text-[#FF3366] drop-shadow-[0_0_5px_rgba(255,51,102,0.5)] flex items-center gap-1.5">
-              <span className="flex h-1.5 w-1.5 rounded-full bg-[#FF3366] shadow-[0_0_5px_#FF3366]"></span>
+            <p className="mt-3 text-sm font-medium text-red-400 flex items-center gap-1.5">
+              <span className="flex h-1.5 w-1.5 rounded-full bg-red-400"></span>
               已达当前等级上限，升级会员可创建更多规则
             </p>
           )}
@@ -185,7 +180,7 @@ export default function AlertsPage() {
         </AnimatePresence>
 
         {/* Tab 切换 */}
-        <div className="flex items-center gap-1 p-1.5 rounded-xl bg-white/[0.02] border border-white/[0.05] w-fit relative z-10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)]">
+        <div className="flex items-center gap-1 p-1.5 rounded-lg bg-white/[0.02] border border-white/[0.05] w-fit">
           {([
             { key: "rules" as Tab, label: "规则列表" },
             { key: "history" as Tab, label: "触发历史" },
@@ -196,7 +191,7 @@ export default function AlertsPage() {
               onClick={() => setTab(key)}
               className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${
                 tab === key
-                  ? "bg-white/[0.06] text-[#0088FF] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] drop-shadow-[0_0_5px_rgba(0,136,255,0.5)]"
+                  ? "bg-white/[0.06] text-indigo-400"
                   : "text-zinc-400 hover:text-white hover:bg-white/[0.02]"
               }`}
             >

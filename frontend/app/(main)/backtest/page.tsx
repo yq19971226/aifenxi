@@ -28,7 +28,7 @@ function StatCard({ label, value, highlight, negative }: { label: string; value:
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="card rounded-xl p-5">
+    <div className="card rounded-lg p-5">
       <h3 className="text-base font-semibold text-white mb-4">{title}</h3>
       {children}
     </div>
@@ -72,18 +72,15 @@ export default function BacktestPage() {
   const s = summary?.stats;
 
   return (
-    <div className="flex flex-col gap-6 p-6 relative">
-      {/* Background ambient light */}
-      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-[#9333EA]/5 blur-[120px] -z-10 rounded-full pointer-events-none" />
-
-      <h1 className="text-xl font-bold text-white tracking-wide drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] relative z-10">策略回测</h1>
+    <div className="flex flex-col gap-6 p-6">
+      <h1 className="text-xl font-bold text-white tracking-wide">策略回测</h1>
 
       {/* 筛选栏 */}
-      <div className="flex flex-wrap items-center gap-4 relative z-10 p-2 rounded-xl bg-white/[0.02] border border-white/[0.05] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)]">
+      <div className="flex flex-wrap items-center gap-4 p-2 rounded-lg bg-white/[0.02] border border-white/[0.05]">
         <select
           value={symbol}
           onChange={(e) => setSymbol(e.target.value)}
-          className="rounded-lg border border-white/[0.08] bg-black/40 px-4 py-2 text-sm font-medium text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] focus:outline-none focus:ring-1 focus:ring-[#9333EA]/50"
+          className="rounded-lg border border-white/[0.08] bg-black/40 px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
           title="选择币种"
           aria-label="选择币种"
         >
@@ -95,21 +92,21 @@ export default function BacktestPage() {
           ))}
         </select>
 
-        <div className="flex gap-1 rounded-lg bg-black/40 p-1 border border-white/[0.05] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
+        <div className="flex gap-1 rounded-lg bg-black/40 p-1 border border-white/[0.05]">
           {DAYS_OPTIONS.map((d) => (
             <button
               key={d}
               onClick={() => setDays(d)}
               className={`relative rounded-md px-4 py-1.5 text-xs font-bold transition-colors ${
                 days === d
-                  ? "text-[#9333EA] drop-shadow-[0_0_5px_rgba(147,51,234,0.5)]"
+                  ? "text-indigo-400"
                   : "text-zinc-500 hover:text-zinc-300"
               }`}
             >
               {days === d && (
                 <motion.div
                   layoutId="bt-day"
-                  className="absolute inset-0 rounded-md bg-[#9333EA]/10 shadow-[inset_0_1px_0_0_rgba(147,51,234,0.2)]"
+                  className="absolute inset-0 rounded-md bg-indigo-500/10"
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               )}
@@ -121,9 +118,9 @@ export default function BacktestPage() {
 
       {/* 限制提示 */}
       {summary?.is_limited && (
-        <div className="rounded-xl border border-[#FFB800]/20 bg-[#FFB800]/5 px-4 py-3 shadow-[inset_0_1px_0_0_rgba(255,184,0,0.1)] relative z-10">
-          <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#FFB800] shadow-[0_0_8px_rgba(255,184,0,0.8)] rounded-l-xl" />
-          <p className="text-sm font-medium text-[#FFB800] drop-shadow-[0_0_2px_rgba(255,184,0,0.3)] pl-2">
+        <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 px-4 py-3">
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-400 rounded-l-xl" />
+          <p className="text-sm font-medium text-amber-400 pl-2">
             免费用户最多查看 {summary.max_days} 天数据。升级旗舰版会员可查看最长 180 天完整回测。
           </p>
         </div>
@@ -131,11 +128,15 @@ export default function BacktestPage() {
 
       {isLoading ? (
         <Loading />
+      ) : summary && !s ? (
+        <div className="card p-6 text-center">
+          <p className="text-sm font-medium text-red-400">回测数据加载失败</p>
+        </div>
       ) : (
         s && (
           <>
             {/* 统计卡片 */}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 relative z-10">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               <StatCard label="总交易次数" value={s.total_trades} />
               <StatCard
                 label="胜率"
@@ -248,7 +249,7 @@ export default function BacktestPage() {
             )}
 
             {/* 额外统计 */}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 relative z-10">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               <StatCard
                 label="单笔最大盈利"
                 value={`+${s.best_trade_pct.toFixed(2)}%`}
@@ -272,9 +273,8 @@ export default function BacktestPage() {
             </div>
 
             {/* 交易列表 */}
-            <div className="card rounded-2xl p-6 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#0088FF]/5 blur-[60px] -z-10 rounded-full" />
-              <h3 className="text-base font-bold text-white tracking-wide drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] mb-6">历史交易记录</h3>
+            <div className="card rounded-lg p-6">
+              <h3 className="text-base font-semibold text-white mb-6">历史交易记录</h3>
               {tradesLoading ? (
                 <Loading />
               ) : trades?.items.length === 0 ? (
@@ -287,22 +287,22 @@ export default function BacktestPage() {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-white/[0.05]">
-                          <th className="pb-3 text-left text-xs font-bold tracking-widest uppercase text-zinc-500 drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">
+                          <th className="pb-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
                             币种
                           </th>
-                          <th className="pb-3 text-left text-xs font-bold tracking-widest uppercase text-zinc-500 drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">
+                          <th className="pb-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
                             方向
                           </th>
-                          <th className="pb-3 text-right text-xs font-bold tracking-widest uppercase text-zinc-500 drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">
+                          <th className="pb-3 text-right text-xs font-medium uppercase tracking-wider text-zinc-500">
                             入场区间
                           </th>
-                          <th className="pb-3 text-right text-xs font-bold tracking-widest uppercase text-zinc-500 drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">
+                          <th className="pb-3 text-right text-xs font-medium uppercase tracking-wider text-zinc-500">
                             置信度
                           </th>
-                          <th className="pb-3 text-right text-xs font-bold tracking-widest uppercase text-zinc-500 drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">
+                          <th className="pb-3 text-right text-xs font-medium uppercase tracking-wider text-zinc-500">
                             盈亏
                           </th>
-                          <th className="pb-3 text-right text-xs font-bold tracking-widest uppercase text-zinc-500 drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">
+                          <th className="pb-3 text-right text-xs font-medium uppercase tracking-wider text-zinc-500">
                             时间
                           </th>
                         </tr>
@@ -313,14 +313,14 @@ export default function BacktestPage() {
                             key={t.id}
                             className="hover:bg-white/[0.02] transition-colors"
                           >
-                            <td className="py-4 text-sm font-bold text-white font-mono drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">
+                            <td className="py-4 text-sm font-semibold text-white font-mono">
                               {t.symbol}
                             </td>
                             <td className="py-4">
-                              <span className={`inline-flex px-2 py-0.5 rounded-md text-xs font-bold tracking-widest uppercase shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] ${
-                                t.direction === 'bullish' ? 'bg-[#00FFA3]/10 text-[#00FFA3] drop-shadow-[0_0_5px_rgba(0,255,163,0.5)]' :
-                                t.direction === 'bearish' ? 'bg-[#FF3366]/10 text-[#FF3366] drop-shadow-[0_0_5px_rgba(255,51,102,0.5)]' :
-                                'bg-white/[0.08] text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]'
+                              <span className={`inline-flex px-2 py-0.5 rounded-md text-xs font-bold uppercase ${
+                                t.direction === 'bullish' ? 'bg-emerald-400/10 text-emerald-400' :
+                                t.direction === 'bearish' ? 'bg-red-400/10 text-red-400' :
+                                'bg-white/[0.08] text-zinc-300'
                               }`}>
                                 {DIR_LABELS[t.direction] || t.direction}
                               </span>
@@ -330,23 +330,23 @@ export default function BacktestPage() {
                             </td>
                             <td className="py-4 text-right">
                               <div className="inline-flex items-center gap-2">
-                                <div className="h-1.5 w-12 rounded-full bg-white/[0.04] overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)]">
+                                <div className="h-1.5 w-12 rounded-full bg-white/[0.04] overflow-hidden">
                                   <div
-                                    className={`h-full rounded-full shadow-[0_0_8px_currentColor] ${t.confidence >= 0.7 ? "bg-[#00FFA3] text-[#00FFA3]" : t.confidence >= 0.4 ? "bg-[#FFB800] text-[#FFB800]" : "bg-zinc-500 text-zinc-500"}`}
+                                    className={`h-full rounded-full ${t.confidence >= 0.7 ? "bg-emerald-400" : t.confidence >= 0.4 ? "bg-amber-400" : "bg-zinc-500"}`}
                                     style={{ width: `${t.confidence * 100}%` }}
                                   />
                                 </div>
-                                <span className={`text-sm font-bold font-mono ${t.confidence >= 0.7 ? "text-[#00FFA3] drop-shadow-[0_0_5px_rgba(0,255,163,0.5)]" : t.confidence >= 0.4 ? "text-[#FFB800] drop-shadow-[0_0_5px_rgba(255,184,0,0.5)]" : "text-zinc-500"}`}>
+                                <span className={`text-sm font-bold font-mono ${t.confidence >= 0.7 ? "text-emerald-400" : t.confidence >= 0.4 ? "text-amber-400" : "text-zinc-500"}`}>
                                   {(t.confidence * 100).toFixed(0)}%
                                 </span>
                               </div>
                             </td>
                             <td
-                              className={`py-4 text-right text-sm font-mono font-bold drop-shadow-[0_0_5px_currentColor] ${
+                              className={`py-4 text-right text-sm font-mono font-bold ${
                                 t.pnl_pct > 0
-                                  ? "text-[#00FFA3]"
+                                  ? "text-emerald-400"
                                   : t.pnl_pct < 0
-                                  ? "text-[#FF3366]"
+                                  ? "text-red-400"
                                   : "text-zinc-400"
                               }`}
                             >
@@ -404,7 +404,7 @@ export default function BacktestPage() {
 function Loading() {
   return (
     <div className="flex justify-center py-20">
-      <span className="h-6 w-6 animate-spin rounded-full border-2 border-[#9333EA] border-t-transparent drop-shadow-[0_0_8px_rgba(147,51,234,0.5)]" />
+      <span className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
     </div>
   );
 }

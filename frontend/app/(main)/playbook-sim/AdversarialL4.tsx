@@ -32,7 +32,7 @@ export default function AdversarialL4({ sim, latest: _latest, stepStatus }: Prop
       color: "text-indigo-400",
       bg: "bg-indigo-500/10",
       border: "border-indigo-500/20",
-      glow: "shadow-[0_0_12px_rgba(99,102,241,0.15)]",
+      glow: "",
       done: stepStatus.L1 === "done",
       running: stepStatus.L1 === "running",
       failed: stepStatus.L1 === "failed",
@@ -44,7 +44,7 @@ export default function AdversarialL4({ sim, latest: _latest, stepStatus }: Prop
       color: "text-orange-400",
       bg: "bg-orange-500/10",
       border: "border-orange-500/20",
-      glow: "shadow-[0_0_12px_rgba(251,146,60,0.15)]",
+      glow: "",
       done: stepStatus.L2 === "done",
       running: stepStatus.L2 === "running",
       failed: stepStatus.L2 === "failed",
@@ -58,7 +58,7 @@ export default function AdversarialL4({ sim, latest: _latest, stepStatus }: Prop
       color: "text-blue-400",
       bg: "bg-blue-500/10",
       border: "border-blue-500/20",
-      glow: "shadow-[0_0_12px_rgba(96,165,250,0.15)]",
+      glow: "",
       done: stepStatus.L3 === "done",
       running: stepStatus.L3 === "running",
       failed: stepStatus.L3 === "failed",
@@ -72,7 +72,7 @@ export default function AdversarialL4({ sim, latest: _latest, stepStatus }: Prop
       color: "text-amber-400",
       bg: "bg-amber-500/10",
       border: "border-amber-500/20",
-      glow: "shadow-[0_0_12px_rgba(245,158,11,0.15)]",
+      glow: "",
       done: stepStatus.L4 === "done",
       running: stepStatus.L4 === "running",
       failed: stepStatus.L4 === "failed",
@@ -86,7 +86,7 @@ export default function AdversarialL4({ sim, latest: _latest, stepStatus }: Prop
       color: "text-emerald-400",
       bg: "bg-emerald-500/10",
       border: "border-emerald-500/20",
-      glow: "shadow-[0_0_12px_rgba(52,211,153,0.15)]",
+      glow: "",
       done: !!judge?.next_move,
       running: false,
       failed: false,
@@ -157,7 +157,7 @@ export default function AdversarialL4({ sim, latest: _latest, stepStatus }: Prop
             )}
             <button
               onClick={() => setExpanded(expanded === i ? null : i)}
-              className={`w-full flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 border transition-all cursor-pointer ${
+              className={`w-full flex flex-col items-center gap-1.5 rounded-lg px-2 py-3 border transition-all cursor-pointer ${
                 step.done
                   ? `${step.bg} ${step.border} ${step.glow}`
                   : step.running
