@@ -616,3 +616,22 @@ async def feature_flags() -> dict[str, str]:
         "task": await _read("task_feature_enabled", "active"),
         "partner": await _read("partner_feature_enabled", "active"),
     }
+
+
+@app.get("/api/share-card-config", tags=["system"])
+async def share_card_config() -> dict:
+    """返回分享卡片配置（公共端点，无需鉴权）。"""
+    from app.services.config_service import get_config_value
+
+    level_raw = await get_config_value("share_card_brand_level", "1")
+    try:
+        level = max(1, min(3, int(level_raw)))
+    except ValueError:
+        level = 1
+
+    return {
+        "brand_level": level,
+        "brand_name": await get_config_value("share_card_brand_name", "AXIOM"),
+        "domain": await get_config_value("share_card_domain", ""),
+        "description": await get_config_value("share_card_description", "AI 策略分析平台"),
+    }

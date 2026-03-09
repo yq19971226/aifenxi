@@ -1,13 +1,16 @@
 ﻿"use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Info, Zap } from "lucide-react";
+import { Info, Share2, Zap } from "lucide-react";
 
 import type { AnalysisReport as AnalysisReportType } from "@/lib/api/analysis";
 import { ExecutiveSummary } from "./ExecutiveSummary";
 import { AgentConsensusBar } from "./AgentConsensusBar";
 import { KeyFindingsSummary } from "./KeyFindings";
 import { DeepAnalysis } from "./DeepAnalysis";
+import { ShareModal } from "./ShareModal";
+import { useShareCardConfig } from "@/lib/hooks/useShareCardConfig";
 
 interface AnalysisReportProps {
   report: AnalysisReportType;
@@ -15,9 +18,25 @@ interface AnalysisReportProps {
 
 export function AnalysisReport({ report }: AnalysisReportProps) {
   const isBlocked = report.status === "blocked";
+  const [showShare, setShowShare] = useState(false);
+  const { data: shareConfig } = useShareCardConfig();
 
   return (
     <div className="space-y-5">
+      {/* Share button (top-right float) */}
+      {!isBlocked && (
+        <div className="flex justify-end -mb-3">
+          <button
+            type="button"
+            onClick={() => setShowShare(true)}
+            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+          >
+            <Share2 size={14} />
+            分享
+          </button>
+        </div>
+      )}
+
       {/* Layer 1: Executive Summary (always shown — includes StatusBanner for blocked) */}
       <ExecutiveSummary report={report} />
 
@@ -54,7 +73,7 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
             <p className="text-xs font-mono text-zinc-500">
               {report.engine_type && <span>{report.engine_type}</span>}
               {report.engine_type && report.mode_contract_version && (
-                <span className="text-zinc-600"> · </span>
+                <span className="text-zinc-500"> · </span>
               )}
               {report.mode_contract_version && (
                 <span>v{report.mode_contract_version}</span>
@@ -63,6 +82,11 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
           </div>
         )}
       </motion.div>
+
+      {/* Share modal */}
+      {showShare && (
+        <ShareModal report={report} config={shareConfig} onClose={() => setShowShare(false)} />
+      )}
     </div>
   );
 }
