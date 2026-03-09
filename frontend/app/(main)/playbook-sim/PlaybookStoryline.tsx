@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CheckCircle2, Circle, AlertTriangle, XCircle, Clock } from "lucide-react";
 import type { PlaybookMatch, PlaybookStage } from "@/lib/api/playbook-sim";
+import { localizeText } from "@/components/analysis/helpers";
 
 /**
  * 剧本故事线进度组件 — 展示 top1 匹配剧本的阶段验证进度。
@@ -95,7 +96,7 @@ function StageNode({
           {iconMap[state]}
         </button>
         <span className={`text-xs text-center leading-tight w-full px-0.5 line-clamp-2 ${labelStyle[state]}`}>
-          {stage.name || stage.phase}
+          {localizeText(stage.name || stage.phase || "")}
         </span>
         {expanded && (
           <div className="w-full mt-1 p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-xs space-y-1.5">
@@ -110,7 +111,7 @@ function StageNode({
                 <span className="text-zinc-500">阶段特征</span>
                 <ul className="mt-0.5 space-y-0.5">
                   {stage.features.map((f, fi) => (
-                    <li key={fi} className="text-zinc-400 pl-2">· {f}</li>
+                    <li key={fi} className="text-zinc-400 pl-2">· {localizeText(f)}</li>
                   ))}
                 </ul>
               </div>
@@ -120,7 +121,7 @@ function StageNode({
                 <span className="text-zinc-500">关键指标</span>
                 <ul className="mt-0.5 space-y-0.5">
                   {stage.key_indicators.map((k, ki) => (
-                    <li key={ki} className="text-zinc-400 pl-2">· {k}</li>
+                    <li key={ki} className="text-zinc-400 pl-2">· {localizeText(k)}</li>
                   ))}
                 </ul>
               </div>
@@ -134,7 +135,7 @@ function StageNode({
             {stage.failure_signal && (
               <div className="flex items-start gap-1 text-amber-400/80">
                 <AlertTriangle size={11} className="mt-0.5 shrink-0" />
-                <span>失效: {stage.failure_signal}</span>
+                <span>失效: {localizeText(stage.failure_signal)}</span>
               </div>
             )}
           </div>
@@ -229,7 +230,7 @@ export default function PlaybookStoryline({
           <AlertTriangle size={14} className="text-amber-400 mt-0.5 shrink-0" />
           <div>
             <span className="text-xs font-medium text-amber-400">走势偏离预期</span>
-            <p className="text-xs text-zinc-400 mt-0.5">{riskNote}</p>
+            <p className="text-xs text-zinc-400 mt-0.5">{localizeText(riskNote!)}</p>
           </div>
         </div>
       )}
@@ -240,7 +241,7 @@ export default function PlaybookStoryline({
           <XCircle size={14} className="text-red-400 mt-0.5 shrink-0" />
           <div>
             <span className="text-xs font-medium text-red-400">预测失效</span>
-            <p className="text-xs text-zinc-400 mt-0.5">{failureReason}</p>
+            <p className="text-xs text-zinc-400 mt-0.5">{localizeText(failureReason!)}</p>
           </div>
         </div>
       )}

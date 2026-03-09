@@ -16,6 +16,12 @@ interface AnalysisReportProps {
   report: AnalysisReportType;
 }
 
+const ENGINE_LABELS: Record<string, string> = {
+  rule_engine: "规则引擎",
+  llm_orchestrator: "LLM 编排",
+  hybrid: "混合引擎",
+};
+
 export function AnalysisReport({ report }: AnalysisReportProps) {
   const isBlocked = report.status === "blocked";
   const [showShare, setShowShare] = useState(false);
@@ -71,7 +77,7 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
           <div className="flex items-center gap-1.5">
             <Info className="h-3 w-3 text-zinc-500" />
             <p className="text-xs font-mono text-zinc-500">
-              {report.engine_type && <span>{report.engine_type}</span>}
+              {report.engine_type && <span>{ENGINE_LABELS[report.engine_type] || report.engine_type}</span>}
               {report.engine_type && report.mode_contract_version && (
                 <span className="text-zinc-500"> · </span>
               )}

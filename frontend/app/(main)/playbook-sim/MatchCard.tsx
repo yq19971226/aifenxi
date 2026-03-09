@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import type { PlaybookMatch } from "@/lib/api/playbook-sim";
 import { SIGNAL_MAP } from "./playbook-constants";
+import { localizeText } from "@/components/analysis/helpers";
 
 interface Props {
   match: PlaybookMatch;
@@ -29,7 +30,7 @@ export default function MatchCard({ match, rank, expanded, onToggle }: Props) {
           <div className="min-w-0">
             <span className="text-sm font-medium text-white">{match.name}</span>
             {match.strategy_type && (
-              <span className="ml-2 px-1.5 py-0.5 rounded bg-white/[0.04] text-xs font-mono text-zinc-500">{match.strategy_type}</span>
+              <span className="ml-2 px-1.5 py-0.5 rounded bg-white/[0.04] text-xs font-mono text-zinc-500">{localizeText(match.strategy_type)}</span>
             )}
           </div>
         </div>
@@ -85,7 +86,7 @@ export default function MatchCard({ match, rank, expanded, onToggle }: Props) {
                             <span className={`text-xs text-center truncate w-full px-0.5 ${
                               isCurrent ? "text-indigo-400 font-semibold" : isPast ? "text-indigo-400/60" : "text-zinc-600"
                             }`}>
-                              {stage.name || stage.phase}
+                              {localizeText(stage.name || stage.phase || "")}
                             </span>
                           </div>
                           {i < match.stages!.length - 1 && (
@@ -103,7 +104,7 @@ export default function MatchCard({ match, rank, expanded, onToggle }: Props) {
               {match.aftermath && (
                 <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.04]">
                   <span className="text-xs uppercase tracking-widest text-zinc-500">后续走势</span>
-                  <p className="text-xs text-zinc-300 mt-1 leading-relaxed">{match.aftermath}</p>
+                  <p className="text-xs text-zinc-300 mt-1 leading-relaxed">{localizeText(match.aftermath)}</p>
                 </div>
               )}
             </div>

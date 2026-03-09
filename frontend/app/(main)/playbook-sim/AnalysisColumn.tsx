@@ -4,6 +4,7 @@ import { Shield, Clock, Brain, Eye, Activity } from "lucide-react";
 import type { SimResult, PlaybookMatch } from "@/lib/api/playbook-sim";
 import type { PlaybookLatest, PhaseHistory } from "@/lib/api/playbook";
 import CounterStrategyPanel from "./CounterStrategyPanel";
+import { localizeText } from "@/components/analysis/helpers";
 
 interface Props {
   sim: SimResult;
@@ -42,7 +43,7 @@ export default function AnalysisColumn({ sim, activeMatch, latest, phaseHistory 
                 {(sim.llm_prediction.key_observations ?? []).map((obs, i) => (
                   <li key={i} className="flex items-start gap-2">
                     <Eye size={12} className="text-purple-400 mt-0.5 shrink-0" />
-                    <span className="text-xs text-zinc-300 leading-relaxed">{obs}</span>
+                    <span className="text-xs text-zinc-300 leading-relaxed">{localizeText(obs)}</span>
                   </li>
                 ))}
               </ul>
@@ -67,11 +68,11 @@ export default function AnalysisColumn({ sim, activeMatch, latest, phaseHistory 
             <Activity size={14} className="text-indigo-400" />
             <span className="text-sm font-semibold text-white">分析推理</span>
           </div>
-          <p className="text-xs text-zinc-400 leading-relaxed whitespace-pre-wrap">{latest.reasoning}</p>
+          <p className="text-xs text-zinc-400 leading-relaxed whitespace-pre-wrap">{localizeText(latest.reasoning)}</p>
           {latest.next_move && (
             <div className="mt-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.06]">
               <span className="text-xs uppercase tracking-widest text-zinc-500">预判下一步</span>
-              <p className="text-sm font-medium text-emerald-400 mt-1">{latest.next_move}</p>
+              <p className="text-sm font-medium text-emerald-400 mt-1">{localizeText(latest.next_move)}</p>
             </div>
           )}
         </div>
@@ -91,10 +92,10 @@ export default function AnalysisColumn({ sim, activeMatch, latest, phaseHistory 
                     month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit",
                   })}
                 </span>
-                <span className="text-zinc-400">{t.from}</span>
-                <span className="text-zinc-600">&rarr;</span>
-                <span className="text-white font-medium">{t.to}</span>
-                <span className="text-zinc-500 text-sm truncate ml-auto">{t.reason}</span>
+                <span className="text-zinc-400">{localizeText(t.from)}</span>
+                <span className="text-zinc-500">&rarr;</span>
+                <span className="text-white font-medium">{localizeText(t.to)}</span>
+                <span className="text-zinc-500 text-sm truncate ml-auto">{localizeText(t.reason)}</span>
               </div>
             ))}
           </div>
