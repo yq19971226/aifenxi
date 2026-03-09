@@ -102,6 +102,9 @@ const _TEXT_REPLACEMENTS: [RegExp, string][] = [
   [/\bwall\s*\(sell\)/gi, "卖墙"], [/\bwall\s*\(buy\)/gi, "买墙"],
   [/\bsell\s+wall\b/gi, "卖墙"], [/\bbuy\s+wall\b/gi, "买墙"],
   [/\bshort[- ]term\b/gi, "短期"], [/\blong[- ]term\b/gi, "长期"], [/\bmid[- ]term\b/gi, "中期"],
+  [/\bmain_choch\b/gi, "主趋势转变"], [/\bmain_bos\b/gi, "主结构突破"],
+  [/\bliquidity[_ ]grab\b/gi, "流动性猎取"], [/\bliquidity[_ ]sweep\b/gi, "流动性扫盘"],
+  [/\bstop[_ ]hunt\b/gi, "猎杀止损"],
   // ── 方向/信号 ──
   [/\bbullish\b/gi, "看涨"], [/\bbearish\b/gi, "看跌"], [/\bneutral\b/gi, "中性"],
   [/\bsideways\b/gi, "横盘"],
@@ -120,6 +123,11 @@ const _TEXT_REPLACEMENTS: [RegExp, string][] = [
   // ── 订单簿/操纵（单词） ──
   [/\bwall\b/gi, "挂单墙"], [/\bspoofing\b/gi, "幌骗"],
   [/\blayering\b/gi, "分层挂单"], [/\biceberg\b/gi, "冰山单"],
+  // ── 市场结构（SMC） ──
+  [/\bchoch\b/gi, "趋势转变"], [/\bbos\b/gi, "结构突破"],
+  [/\bsweep\b/gi, "扫盘"], [/\bgrab\b/gi, "猎取"],
+  [/\bmitigation\b/gi, "回补"], [/\bimbalance\b/gi, "失衡"],
+  [/\bdisplacement\b/gi, "位移"], [/\binducement\b/gi, "诱导"],
   // ── 供需 ──
   [/\boverbought\b/gi, "超买"], [/\boversold\b/gi, "超卖"],
   [/\bdemand\b/gi, "需求"], [/\bsupply\b/gi, "供给"],
