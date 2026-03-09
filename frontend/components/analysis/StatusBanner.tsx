@@ -31,28 +31,11 @@ export function AnalysisStatusBanner({ report }: { report: AnalysisReportType })
       {dqs && (
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-400">
           <span>
-            周期完整度{" "}
+            数据完整度{" "}
             <span className={`font-mono font-medium ${dqs.interval_completeness >= 0.8 ? "text-emerald-400" : dqs.interval_completeness >= 0.5 ? "text-amber-400" : "text-red-400"}`}>
               {(dqs.interval_completeness * 100).toFixed(0)}%
             </span>
           </span>
-          <span>
-            新鲜度{" "}
-            <span className={`font-mono font-medium ${dqs.freshness >= 0.8 ? "text-emerald-400" : dqs.freshness >= 0.5 ? "text-amber-400" : "text-red-400"}`}>
-              {(dqs.freshness * 100).toFixed(0)}%
-            </span>
-          </span>
-          {dqs.missing_inputs.length > 0 && (
-            <span>缺失 <span className="font-medium text-amber-400">{dqs.missing_inputs.join(", ")}</span></span>
-          )}
-          {Object.keys(dqs.capability_state).length > 0 && (
-            <span>
-              能力{" "}
-              <span className="font-medium text-zinc-300">
-                {Object.entries(dqs.capability_state).filter(([, v]) => v !== "AVAILABLE").map(([k, v]) => `${k}:${v}`).join(", ") || "全部可用"}
-              </span>
-            </span>
-          )}
         </div>
       )}
     </div>
