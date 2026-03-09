@@ -28,6 +28,10 @@ class AdminOrderInfo(BaseModel):
     amount_usd: float
     network: str | None
     status: str
+    provider_status: str | None = None
+    status_reason: str | None = None
+    provider_observed_at: datetime | None = None
+    provider_observation_source: str | None = None
     created_at: datetime
 
 
@@ -101,7 +105,10 @@ async def query_orders(
 
     data_sql = f"""
         SELECT p.id, p.payment_id, u.email AS user_email, p.plan,
-               p.amount_usd, p.network, p.status, p.created_at
+               p.amount_usd, p.network, p.status,
+               p.provider_status, p.status_reason,
+               p.provider_observed_at, p.provider_observation_source,
+               p.created_at
         FROM payments p
         JOIN users u ON u.id = p.user_id
         {where_sql}
@@ -124,6 +131,10 @@ async def query_orders(
             amount_usd=float(row["amount_usd"]),
             network=row["network"],
             status=row["status"],
+            provider_status=row.get("provider_status"),
+            status_reason=row.get("status_reason"),
+            provider_observed_at=row.get("provider_observed_at"),
+            provider_observation_source=row.get("provider_observation_source"),
             created_at=row["created_at"],
         )
         for row in rows

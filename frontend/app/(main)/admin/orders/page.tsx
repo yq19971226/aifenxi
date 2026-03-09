@@ -7,33 +7,9 @@ import {
   type AdminOrderInfo,
   type AdminOrderQueryParams,
 } from "@/lib/api/admin-orders";
+import { AdminOrdersTable } from "@/components/admin/orders/AdminOrdersTable";
 import { EmptyOrders } from "@/components/ui/EmptyState";
 import { useAuth } from "@/lib/auth-context";
-
-// ── Helpers ──────────────────────────────────────────────────
-
-const PLAN_LABEL: Record<number, string> = { 1: "专业", 2: "旗舰" };
-
-const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> = {
-  completed: { bg: "bg-[var(--color-bull)]/15", text: "text-bull", label: "已完成" },
-  pending:   { bg: "bg-amber-400/15",  text: "text-amber-400",  label: "待确认" },
-  failed:    { bg: "bg-[var(--color-bear)]/15",  text: "text-bear",  label: "失败" },
-  expired:   { bg: "bg-zinc-400/15",   text: "text-zinc-400",   label: "已过期" },
-};
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString("zh-CN", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function formatUSD(amount: number): string {
-  return `$${amount.toFixed(2)}`;
-}
 
 // ── Page size options ────────────────────────────────────────
 
@@ -44,6 +20,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
 export default function AdminOrdersPage() {
   const { user } = useAuth();
   if (!user || (user.role !== "admin" && user.role !== "operator")) return null;
+  const isAdmin = user.role === "admin";
   // filter state
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -227,65 +204,13 @@ export default function AdminOrdersPage() {
           {items.length === 0 ? (
             <EmptyOrders />
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/[0.08] text-left text-xs text-zinc-500">
-                    <th className="px-5 py-3 font-medium">订单ID</th>
-                    <th className="px-5 py-3 font-medium">用户邮箱</th>
-                    <th className="px-5 py-3 font-medium">套餐</th>
-                    <th className="px-5 py-3 font-medium">金额</th>
-                    <th className="px-5 py-3 font-medium">支付网络</th>
-                    <th className="px-5 py-3 font-medium">状态</th>
-                    <th className="px-5 py-3 font-medium">创建时间</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((order) => {
-                    const st = STATUS_STYLE[order.status] ?? {
-                      bg: "bg-zinc-400/15",
-                      text: "text-zinc-400",
-                      label: order.status,
-                    };
-                    return (
-                      <tr
-                        key={order.id}
-                        className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors"
-                      >
-                        <td className="px-5 py-3 text-zinc-300 font-mono text-xs">
-                          {order.payment_id}
-                        </td>
-                        <td className="px-5 py-3 text-white">
-                          {order.user_email}
-                        </td>
-                        <td className="px-5 py-3 text-zinc-300">
-                          {PLAN_LABEL[order.plan] ?? `Plan ${order.plan}`}
-                        </td>
-                        <td className="px-5 py-3 text-white font-medium">
-                          {formatUSD(order.amount_usd)}
-                        </td>
-                        <td className="px-5 py-3 text-zinc-400">
-                          {order.network ?? "—"}
-                        </td>
-                        <td className="px-5 py-3">
-                          <span
-                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${st.bg} ${st.text}`}
-                          >
-                            <span
-                              className={`h-1.5 w-1.5 rounded-full ${st.text.replace("text-", "bg-")}`}
-                            />
-                            {st.label}
-                          </span>
-                        </td>
-                        <td className="px-5 py-3 text-zinc-400">
-                          {formatDate(order.created_at)}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <AdminOrdersTable
+              isAdmin={isAdmin}
+              items={items}
+              loading={loading}
+              onError={(message) => setError(message)}
+              onSynced={fetchOrders}
+            />
           )}
         </motion.div>
       )}

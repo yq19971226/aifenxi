@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchCurrentUser } from "@/lib/api/auth";
+import { usePaymentStatusSync } from "@/lib/hooks/usePaymentStatusSync";
 import {
   createPayment,
-  fetchPaymentHistory,
   type PaymentInfo,
   type PaymentNetwork,
   type DurationMonths,
@@ -19,6 +19,7 @@ import {
 } from "@/lib/api/membership";
 import type { UserInfo } from "@/lib/api/auth";
 import { EmptyPayments } from "@/components/ui/EmptyState";
+import { STATUS_STYLES, getPaymentStatusMessage } from "@/lib/payment-status";
 
 // ── Constants ────────────────────────────────────────────────
 
@@ -42,13 +43,6 @@ const LEVEL_GLOW: Record<number, string> = {
 const NETWORKS: PaymentNetwork[] = ["TRC-20", "ERC-20", "BEP-20"];
 
 const PAYMENT_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
-
-const STATUS_STYLES: Record<string, { text: string; bg: string; label: string }> = {
-  pending:   { text: "text-[#F5A623]", bg: "bg-[#F5A623]/20", label: "等待支付" },
-  completed: { text: "text-bull", bg: "bg-[var(--color-bull)]/20", label: "已完成" },
-  failed:    { text: "text-bear", bg: "bg-[var(--color-bear)]/20", label: "失败" },
-  expired:   { text: "text-zinc-400",  bg: "bg-zinc-400/20",  label: "已过期" },
-};
 
 // ── Plan comparison data ─────────────────────────────────────
 
@@ -84,7 +78,7 @@ function CurrentStatusCard({ user }: CurrentStatusCardProps) {
   const color = LEVEL_COLORS[level] ?? "text-zinc-400";
 
   return (
-    <div className="card-surface rounded-xl p-6">
+    <div className="card-surface rounded-lg p-6">
       <p className="text-xs uppercase tracking-widest text-zinc-500">当前会员</p>
       <div className="mt-3 flex items-baseline gap-3">
         <span className={`text-2xl font-bold ${color}`}>{name}</span>
@@ -107,7 +101,7 @@ function PlanComparisonTable({ plansData }: PlanComparisonTableProps) {
   const flagshipPrice = plansData?.plans?.find((p) => p.plan === 2)?.price_monthly ?? 299;
 
   return (
-    <div className="card-surface rounded-xl p-6">
+    <div className="card-surface rounded-lg p-6">
       <p className="text-xs uppercase tracking-widest text-zinc-500">等级权益对比</p>
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-sm">
@@ -165,7 +159,7 @@ function PlanCard({ name, monthlyPrice, totalPrice, durationMonths, color, borde
       type="button"
       onClick={onSelect}
       className={`
-        w-full rounded-xl border p-5 text-left transition-all duration-200
+        w-full rounded-lg border p-5 text-left transition-all duration-200
         backdrop-blur-md bg-white/[0.04]
         ${selected ? `${borderColor} ${glow}` : "border-white/[0.08]"}
         hover:border-white/[0.16]
@@ -242,6 +236,12 @@ function PaymentDisplay({ payment, expiresAt }: PaymentDisplayProps) {
   const countdown = useCountdown(expiresAt);
   const [copied, setCopied] = useState(false);
   const isExpired = countdown === "00:00";
+  const statusStyle = STATUS_STYLES[payment.status] ?? STATUS_STYLES.pending;
+  const statusMessage = getPaymentStatusMessage(
+    payment.status,
+    payment.status_reason,
+    isExpired
+  );
 
   const handleCopy = useCallback(async () => {
     if (!payment.pay_address) return;
@@ -249,25 +249,25 @@ function PaymentDisplay({ payment, expiresAt }: PaymentDisplayProps) {
       await navigator.clipboard.writeText(payment.pay_address);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // clipboard API may fail in some contexts
+    } catch (error: unknown) {
+      console.error("复制支付地址失败", error);
     }
   }, [payment.pay_address]);
 
   return (
-    <div className="card-surface rounded-xl p-6">
+    <div className="card-surface rounded-lg p-6">
       <div className="flex items-center justify-between">
         <p className="text-xs uppercase tracking-widest text-zinc-500">支付信息</p>
         <div className="flex items-center gap-2">
-          {isExpired ? (
-            <span className="rounded bg-[var(--color-bear)]/20 px-2 py-0.5 text-xs font-medium text-bear">
-              已超时
-            </span>
-          ) : (
+          {payment.status === "pending" && !isExpired ? (
             <>
               <span className="text-xs text-zinc-500">剩余时间</span>
               <span className="font-mono text-sm font-bold text-[#F5A623]">{countdown}</span>
             </>
+          ) : (
+            <span className={`rounded px-2 py-0.5 text-xs font-medium ${payment.status === "pending" ? "bg-zinc-400/20 text-zinc-400" : `${statusStyle.bg} ${statusStyle.text}`}`}>
+              {payment.status === "pending" ? "已超时" : statusStyle.label}
+            </span>
           )}
         </div>
       </div>
@@ -300,8 +300,8 @@ function PaymentDisplay({ payment, expiresAt }: PaymentDisplayProps) {
 
         {/* Status */}
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-[#F5A623]" />
-          <span className="text-xs text-zinc-400">等待区块链确认…</span>
+          <span className={`h-2 w-2 rounded-full ${payment.status === "completed" ? "bg-[var(--color-bull)]" : payment.status === "failed" ? "bg-[var(--color-bear)]" : payment.status === "expired" || isExpired ? "bg-zinc-400" : "animate-pulse bg-[#F5A623]"}`} />
+          <span className={`text-xs ${payment.status === "pending" && isExpired ? "text-zinc-400" : statusStyle.text}`}>{statusMessage}</span>
         </div>
       </div>
     </div>
@@ -318,14 +318,14 @@ interface PaymentHistoryProps {
 function PaymentHistory({ payments }: PaymentHistoryProps) {
   if (payments.length === 0) {
     return (
-      <div className="card-surface rounded-xl overflow-hidden">
+      <div className="card-surface rounded-lg overflow-hidden">
         <EmptyPayments />
       </div>
     );
   }
 
   return (
-    <div className="card-surface rounded-xl p-6">
+    <div className="card-surface rounded-lg p-6">
       <p className="text-xs uppercase tracking-widest text-zinc-500">支付历史</p>
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-sm">
@@ -373,6 +373,7 @@ function PaymentHistory({ payments }: PaymentHistoryProps) {
 function FreeTrialCard() {
   const queryClient = useQueryClient();
   const [claiming, setClaiming] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const { data: trial } = useQuery<FreeTrialStatus>({
     queryKey: ["freeTrial"],
@@ -380,22 +381,25 @@ function FreeTrialCard() {
   });
 
   const handleClaim = useCallback(async () => {
+    if (claiming || !trial?.enabled || trial?.claimed) return;
     setClaiming(true);
+    setError(null);
     try {
       await claimFreeTrial();
       queryClient.invalidateQueries({ queryKey: ["freeTrial"] });
       queryClient.invalidateQueries({ queryKey: ["analysis-quota"] });
-    } catch {
-      // ignore
+    } catch (error: unknown) {
+      console.error("领取免费体验失败", error);
+      setError(error instanceof Error ? error.message : "领取免费体验失败");
     } finally {
       setClaiming(false);
     }
-  }, [queryClient]);
+  }, [claiming, queryClient, trial?.claimed, trial?.enabled]);
 
   if (!trial?.enabled) return null;
 
   return (
-    <div className="card-surface rounded-xl p-6 border border-indigo-500/20">
+    <div className="card-surface rounded-lg p-6 border border-indigo-500/20">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-semibold text-white">{"\u514D\u8D39\u4F53\u9A8C"}</p>
@@ -428,6 +432,7 @@ function FreeTrialCard() {
           </span>
         )}
       </div>
+      {error && <p className="mt-3 text-xs text-bear">{error}</p>}
     </div>
   );
 }
@@ -453,6 +458,8 @@ export default function MembershipPage() {
   const [paymentExpiresAt, setPaymentExpiresAt] = useState<number | null>(null);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const completedSyncRef = useRef(false);
 
   const { data: user } = useQuery<UserInfo>({
     queryKey: ["currentUser"],
@@ -464,10 +471,35 @@ export default function MembershipPage() {
     queryFn: fetchPlans,
   });
 
-  const { data: history = [] } = useQuery<PaymentInfo[]>({
-    queryKey: ["paymentHistory"],
-    queryFn: () => fetchPaymentHistory(20),
-  });
+  const { history, currentPayment: syncedCurrentPayment } = usePaymentStatusSync(currentPayment);
+
+  useEffect(() => {
+    if (!currentPayment || !syncedCurrentPayment) {
+      return;
+    }
+    if (
+      currentPayment.payment_id === syncedCurrentPayment.payment_id && (
+        currentPayment.status !== syncedCurrentPayment.status ||
+        currentPayment.status_reason !== syncedCurrentPayment.status_reason ||
+        currentPayment.provider_status !== syncedCurrentPayment.provider_status ||
+        currentPayment.pay_address !== syncedCurrentPayment.pay_address ||
+        currentPayment.pay_amount !== syncedCurrentPayment.pay_amount ||
+        currentPayment.pay_currency !== syncedCurrentPayment.pay_currency
+      )
+    ) {
+      setCurrentPayment(syncedCurrentPayment);
+    }
+  }, [currentPayment, syncedCurrentPayment]);
+
+  useEffect(() => {
+    if (currentPayment?.status === "completed" && !completedSyncRef.current) {
+      completedSyncRef.current = true;
+      void queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+    }
+    if (currentPayment?.status !== "completed") {
+      completedSyncRef.current = false;
+    }
+  }, [currentPayment?.status, queryClient]);
 
   const proPlan = plansData?.plans?.find((p) => p.plan === 1);
   const flagshipPlan = plansData?.plans?.find((p) => p.plan === 2);
@@ -496,13 +528,14 @@ export default function MembershipPage() {
       });
       setCurrentPayment(payment);
       setPaymentExpiresAt(Date.now() + PAYMENT_TIMEOUT_MS);
+      void queryClient.invalidateQueries({ queryKey: ["paymentHistory"] });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "创建支付失败";
       setError(msg);
     } finally {
       setCreating(false);
     }
-  }, [selectedPlan, selectedNetwork, selectedDuration]);
+  }, [queryClient, selectedPlan, selectedNetwork, selectedDuration]);
 
   return (
     <div className="flex flex-col gap-4 p-6">
@@ -519,7 +552,7 @@ export default function MembershipPage() {
       <PlanComparisonTable plansData={plansData} />
 
       {/* Plan selection */}
-      <div className="card-surface rounded-xl p-6">
+      <div className="card-surface rounded-lg p-6">
         <p className="text-xs uppercase tracking-widest text-zinc-500">选择套餐</p>
 
         {/* Duration toggle */}
@@ -619,8 +652,8 @@ export default function MembershipPage() {
       </div>
 
       {/* Payment display */}
-      {currentPayment && paymentExpiresAt && (
-        <PaymentDisplay payment={currentPayment} expiresAt={paymentExpiresAt} />
+      {syncedCurrentPayment && paymentExpiresAt && (
+        <PaymentDisplay payment={syncedCurrentPayment} expiresAt={paymentExpiresAt} />
       )}
 
       {/* Payment history */}

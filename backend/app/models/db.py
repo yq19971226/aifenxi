@@ -210,9 +210,17 @@ class Payment(Base):
         Integer, server_default=text("1"), nullable=False
     )
     network: Mapped[str | None] = mapped_column(String(20))
+    pay_address: Mapped[str | None] = mapped_column(Text)
+    pay_amount: Mapped[float | None] = mapped_column(Numeric(24, 8))
+    pay_currency: Mapped[str | None] = mapped_column(String(30))
     status: Mapped[str] = mapped_column(
         String(20), server_default=text("'pending'")
     )
+    provider_status: Mapped[str | None] = mapped_column(String(40))
+    status_reason: Mapped[str | None] = mapped_column(String(40))
+    provider_payload_json: Mapped[str | None] = mapped_column(Text)
+    provider_observed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    provider_observation_source: Mapped[str | None] = mapped_column(String(20))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("NOW()")
     )

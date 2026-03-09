@@ -67,6 +67,7 @@ const CONFIG_GROUPS: ConfigGroup[] = [
       },
       { key: "nowpayments_api_key", label: "支付网关密钥", help: "NowPayments USDT 支付", isSecret: true, category: "payment" },
       { key: "nowpayments_ipn_secret", label: "支付回调密钥", help: "支付通知验证签名", isSecret: true, category: "payment" },
+      { key: "nowpayments_ipn_callback_url", label: "支付回调地址", help: "NowPayments 回调完整地址（需公网可访问）", isSecret: false, category: "payment" },
       { key: "telegram_bot_token", label: "Telegram 机器人", help: "TG 推送通知的机器人令牌", isSecret: true, category: "notification" },
       { key: "sendgrid_api_key", label: "邮件服务密钥", help: "SendGrid 邮件推送服务", isSecret: true, category: "notification" },
       { key: "sentry_dsn_backend", label: "错误监控地址", help: "Sentry 错误追踪服务地址", isSecret: true, category: "monitoring" },

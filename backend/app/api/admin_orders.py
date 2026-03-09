@@ -10,7 +10,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.deps import UserInfo, require_operator_or_admin
+from app.core.deps import UserInfo, require_admin, require_operator_or_admin
+from app.services.payment import reconcile_payment_status
 from app.services.order_query_service import (
     AdminOrderListResponse,
     query_orders,
@@ -47,3 +48,21 @@ async def list_orders_route(
     except Exception as exc:
         logger.error("list_orders_route error: %s", exc)
         raise HTTPException(status_code=500, detail="查询订单失败")
+
+
+@router.post("/orders/{payment_id}/sync")
+async def sync_order_route(
+    payment_id: str,
+    user: UserInfo = Depends(require_admin),
+    session: AsyncSession = Depends(get_db),
+) -> dict[str, str]:
+    try:
+        await reconcile_payment_status(session, payment_id)
+        return {"status": "ok"}
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except RuntimeError as exc:
+        raise HTTPException(status_code=502, detail=str(exc))
+    except Exception as exc:
+        logger.error("sync_order_route error: %s", exc)
+        raise HTTPException(status_code=500, detail="同步订单状态失败")

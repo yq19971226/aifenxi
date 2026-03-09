@@ -70,6 +70,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         async with AsyncSessionLocal() as session:
             svc = ConfigService(session)
             await svc.load_all_to_cache()
+            try:
+                from app.services.payment import ensure_payment_audit_columns
+
+                await ensure_payment_audit_columns(session)
+            except Exception as exc:
+                import logging
+
+                logging.getLogger(__name__).warning("payments 审计列初始化失败: %s", exc)
             # Sentry 初始化：从配置读取 DSN 和采样率
             sentry_dsn = await svc.get_config("sentry_dsn_backend")
             sentry_rate_str = await svc.get_config("sentry_traces_sample_rate", "0.2")

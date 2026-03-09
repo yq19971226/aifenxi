@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { Trophy, BarChart2, History } from "lucide-react";
+import { Trophy, BarChart2, History, AlertCircle } from "lucide-react";
 import {
   fetchRankings,
   fetchSystemReport,
@@ -43,26 +43,32 @@ export default function LeaderboardPage() {
   const [showHistory, setShowHistory] = useState(false);
   const [historyPage, setHistoryPage] = useState(1);
 
-  const { data: rankingsData, isLoading: rankingsLoading } = useQuery({
+  const { data: rankingsData, isLoading: rankingsLoading, error: rankingsError } = useQuery({
     queryKey: ["leaderboard-rankings", period, mode, page],
     queryFn: () => fetchRankings(period, mode, page),
+    retry: 2,
   });
 
-  const { data: report } = useQuery({
-    queryKey: ["leaderboard-report", period],
-    queryFn: () => fetchSystemReport(period),
+  const { data: report, isLoading: reportLoading, error: reportError } = useQuery({
+    queryKey: ["leaderboard-report", period, mode],
+    queryFn: () => fetchSystemReport(period, mode),
+    retry: 2,
   });
 
-  const { data: myStats } = useQuery({
-    queryKey: ["leaderboard-me", period],
-    queryFn: () => fetchMyStats(period),
+  const { data: myStats, isLoading: myStatsLoading, error: myStatsError } = useQuery({
+    queryKey: ["leaderboard-me", period, mode],
+    queryFn: () => fetchMyStats(period, mode),
+    retry: 2,
   });
 
-  const { data: historyData } = useQuery({
-    queryKey: ["leaderboard-history", period, historyPage],
-    queryFn: () => fetchMyHistory(period, historyPage),
+  const { data: historyData, error: historyError } = useQuery({
+    queryKey: ["leaderboard-history", period, mode, historyPage],
+    queryFn: () => fetchMyHistory(period, mode, historyPage),
     enabled: showHistory,
+    retry: 1,
   });
+
+  const apiError = rankingsError || reportError || myStatsError || historyError;
 
   function handlePeriod(v: string) {
     setPeriod(v);
@@ -73,6 +79,7 @@ export default function LeaderboardPage() {
   function handleMode(v: string) {
     setMode(v);
     setPage(1);
+    setHistoryPage(1);
   }
 
   if (getState("leaderboard") !== "active") {
@@ -126,9 +133,40 @@ export default function LeaderboardPage() {
         </div>
       </div>
 
-      {report && <SystemReportBar report={report} />}
+      {apiError && (
+        <div className="flex items-center gap-2 rounded-lg bg-red-500/[0.06] border border-red-500/20 px-4 py-2.5">
+          <AlertCircle size={14} className="text-red-400 shrink-0" />
+          <p className="text-xs text-red-300">
+            {apiError instanceof Error ? apiError.message : "数据加载失败，请稍后重试"}
+          </p>
+        </div>
+      )}
 
-      {myStats && (
+      {reportLoading ? (
+        <div className="card px-5 py-3 animate-pulse">
+          <div className="flex items-center gap-4">
+            <div className="h-3 w-16 rounded bg-white/[0.06]" />
+            <div className="h-3 w-20 rounded bg-white/[0.06]" />
+            <div className="h-3 w-20 rounded bg-white/[0.06]" />
+          </div>
+        </div>
+      ) : report ? (
+        <SystemReportBar report={report} />
+      ) : null}
+
+      {myStatsLoading ? (
+        <div className="card p-5 animate-pulse">
+          <div className="h-3 w-24 rounded bg-white/[0.06] mb-4" />
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i}>
+                <div className="h-2.5 w-10 rounded bg-white/[0.04] mb-1.5" />
+                <div className="h-4 w-14 rounded bg-white/[0.06]" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : myStats ? (
         <div className="space-y-3">
           <MyStatsCard stats={myStats} rank={rankingsData?.my_rank ?? null} />
           {myStats.total_published > 0 && (
@@ -151,7 +189,7 @@ export default function LeaderboardPage() {
             />
           )}
         </div>
-      )}
+      ) : null}
 
       {rankingsLoading ? (
         <RankingsSkeleton />
