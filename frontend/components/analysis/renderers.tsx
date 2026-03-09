@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 import type { SignalDirection } from "@/lib/api/analysis";
-import { fieldLabel, formatDirection, formatPrice, formatValue, getSignalStyle } from "./helpers";
+import { fieldLabel, formatDirection, formatPrice, formatValue, getSignalStyle, localizeText } from "./helpers";
 
 // ── Direction badge ──────────────────────────────────────────
 
@@ -85,8 +85,9 @@ export function PriceLevels({ levels, type }: { levels: number[]; type: "support
 
 export function ReasoningBlock({ text }: { text: string }) {
   const [expanded, setExpanded] = useState(false);
-  const isLong = text.length > 200;
-  const displayed = isLong && !expanded ? text.slice(0, 200) + "…" : text;
+  const localized = localizeText(text);
+  const isLong = localized.length > 200;
+  const displayed = isLong && !expanded ? localized.slice(0, 200) + "…" : localized;
 
   return (
     <div className="rounded-lg bg-white/[0.03] px-3 py-2.5">

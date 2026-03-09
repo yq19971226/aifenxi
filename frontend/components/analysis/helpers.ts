@@ -95,18 +95,56 @@ export function formatPrice(value: number): string {
 }
 
 const _TEXT_REPLACEMENTS: [RegExp, string][] = [
+  // ── 多词组合（必须在单词之前匹配） ──
+  [/\bextreme fear\b/gi, "极度恐慌"], [/\bextreme greed\b/gi, "极度贪婪"],
+  [/\bopen interest\b/gi, "未平仓合约"], [/\bfunding rate\b/gi, "资金费率"],
+  [/\bnet flow\b/gi, "净流入"], [/\bnetflow\b/gi, "净流入"],
+  [/\bwall\s*\(sell\)/gi, "卖墙"], [/\bwall\s*\(buy\)/gi, "买墙"],
+  [/\bsell\s+wall\b/gi, "卖墙"], [/\bbuy\s+wall\b/gi, "买墙"],
+  [/\bshort[- ]term\b/gi, "短期"], [/\blong[- ]term\b/gi, "长期"], [/\bmid[- ]term\b/gi, "中期"],
+  // ── 方向/信号 ──
   [/\bbullish\b/gi, "看涨"], [/\bbearish\b/gi, "看跌"], [/\bneutral\b/gi, "中性"],
-  [/\bsideways\b/gi, "横盘"], [/\blong\b/gi, "做多"], [/\bshort\b/gi, "做空"],
+  [/\bsideways\b/gi, "横盘"],
+  [/\buptrend\b/gi, "上升趋势"], [/\bdowntrend\b/gi, "下降趋势"],
+  [/\branging\b/gi, "震荡"], [/\bvolatile\b/gi, "高波动"], [/\btrending\b/gi, "趋势"],
+  [/\blong\b/gi, "做多"], [/\bshort\b/gi, "做空"],
+  // ── 价格结构 ──
   [/\bsupport\b/gi, "支撑"], [/\bresistance\b/gi, "阻力"],
+  [/\bbreakout\b/gi, "突破"], [/\bbreakdown\b/gi, "破位"],
+  [/\breversal\b/gi, "反转"], [/\bcontinuation\b/gi, "延续"],
+  [/\bconsolidation\b/gi, "整理"], [/\bpullback\b/gi, "回调"],
+  [/\bbounce\b/gi, "反弹"], [/\bretest\b/gi, "回踩"],
+  // ── 操盘阶段 ──
   [/\baccumulation\b/gi, "吸筹"], [/\bdistribution\b/gi, "派发"],
   [/\bmarkup\b/gi, "拉升"], [/\bmarkdown\b/gi, "下跌"], [/\bescape\b/gi, "出逃"],
+  // ── 订单簿/操纵（单词） ──
+  [/\bwall\b/gi, "挂单墙"], [/\bspoofing\b/gi, "幌骗"],
+  [/\blayering\b/gi, "分层挂单"], [/\biceberg\b/gi, "冰山单"],
+  // ── 供需 ──
+  [/\boverbought\b/gi, "超买"], [/\boversold\b/gi, "超卖"],
   [/\bdemand\b/gi, "需求"], [/\bsupply\b/gi, "供给"],
-  [/\bconfirmed\b/gi, "已确认"], [/\bunconfirmed\b/gi, "未确认"],
+  // ── 状态/验证 ──
+  [/\bunconfirmed\b/gi, "未确认"], [/\bconfirmed\b/gi, "已确认"],
   [/\bcontradicted\b/gi, "矛盾"], [/\bno_data\b/gi, "无数据"],
   [/\bpositive\b/gi, "积极"], [/\bnegative\b/gi, "消极"],
   [/\bnormal\b/gi, "正常"], [/\belevated\b/gi, "偏高"], [/\bextreme\b/gi, "极端"],
   [/\bpartial\b/gi, "部分"], [/\bfull\b/gi, "完全"],
+  // ── 风险等级 ──
   [/\bhigh\b/gi, "高"], [/\bmedium\b/gi, "中"], [/\blow\b/gi, "低"],
+  // ── 动量/量能 ──
+  [/\bmomentum\b/gi, "动量"], [/\bvolume\b/gi, "成交量"],
+  [/\bdivergence\b/gi, "背离"], [/\bconvergence\b/gi, "收敛"],
+  // ── 情绪（单词） ──
+  [/\bfear\b/gi, "恐慌"], [/\bgreed\b/gi, "贪婪"],
+  // ── 其他 ──
+  [/\bunstable\b/gi, "不稳定"], [/\bstable\b/gi, "稳定"],
+  [/\bliquidation\b/gi, "爆仓"], [/\bwhale\b/gi, "巨鲸"],
+  [/\boutflow\b/gi, "流出"], [/\binflow\b/gi, "流入"],
+  [/\bstrong\b/gi, "强"], [/\bweak\b/gi, "弱"],
+  [/\bincreasing\b/gi, "增加"], [/\bdecreasing\b/gi, "减少"],
+  [/\babove\b/gi, "高于"], [/\bbelow\b/gi, "低于"],
+  [/\btrue\b/gi, "是"], [/\bfalse\b/gi, "否"],
+  [/\bnone\b/gi, "无"], [/\bunknown\b/gi, "未知"],
 ];
 
 export function localizeText(text: string): string {

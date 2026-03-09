@@ -20,6 +20,7 @@ import {
   formatPrice,
   getSignalStyle,
   isFallbackReasoning,
+  localizeText,
   modeLabel,
 } from "./helpers";
 import { ConfidenceRing, StrategyCard } from "./StrategyCard";
@@ -114,12 +115,12 @@ function RiskCard({ sections }: { sections: ReportSection[] }) {
         {keyRisks.map((r, i) => (
           <p key={i} className="text-sm text-zinc-300 flex items-start gap-2">
             <span className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${riskLevel === "high" ? "bg-red-400" : "bg-amber-400"}`} />
-            {r}
+            {localizeText(r)}
           </p>
         ))}
         {recommendations.length > 0 && (
           <p className="text-sm text-zinc-400 mt-1">
-            建议: {recommendations[0]}
+            建议: {localizeText(recommendations[0])}
           </p>
         )}
       </div>
@@ -189,7 +190,7 @@ export function ExecutiveSummary({ report }: { report: AnalysisReportType }) {
             )}
             {report.regime_suggestion && (
               <p className="text-xs text-zinc-500 ml-auto max-w-[240px] md:truncate line-clamp-2 md:line-clamp-none" title={report.regime_suggestion}>
-                {report.regime_suggestion}
+                {localizeText(report.regime_suggestion)}
               </p>
             )}
           </div>

@@ -2,7 +2,7 @@
 
 import { AlertTriangle, Target, TrendingDown, TrendingUp } from "lucide-react";
 import type { StrategyData } from "@/lib/types/strategy";
-import { formatDirection, formatPrice, isFallbackReasoning } from "./helpers";
+import { formatDirection, formatPrice, isFallbackReasoning, localizeText } from "./helpers";
 import { ReasoningBlock } from "./renderers";
 
 // ── Confidence ring (SVG arc) ───────────────────────────────
@@ -63,7 +63,7 @@ function StrategyRangeBar({
           className="absolute top-0 h-full w-0.5 bg-red-500/70"
           style={{ left: `${pct(stopLoss)}%` }}
         >
-          <span className="absolute -top-0.5 left-1 text-[10px] font-mono text-red-400 whitespace-nowrap">SL</span>
+          <span className="absolute -top-0.5 left-1 text-xs font-mono text-red-400 whitespace-nowrap">SL</span>
         </div>
         {/* Entry markers */}
         <div
@@ -81,14 +81,14 @@ function StrategyRangeBar({
             className="absolute top-0 h-full w-0.5 bg-emerald-400/60"
             style={{ left: `${pct(t)}%` }}
           >
-            <span className="absolute bottom-0.5 left-1 text-[10px] font-mono text-emerald-400 whitespace-nowrap">
+            <span className="absolute bottom-0.5 left-1 text-xs font-mono text-emerald-400 whitespace-nowrap">
               T{i + 1}
             </span>
           </div>
         ))}
       </div>
       {/* Price labels */}
-      <div className="flex justify-between text-xs font-mono text-zinc-500">
+      <div className="flex justify-between text-xs md:text-sm font-mono text-zinc-500">
         <span>{formatPrice(min)}</span>
         <span>{formatPrice(max)}</span>
       </div>
@@ -156,10 +156,10 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
           {(entryLow || entryHigh) && (
             <div className="rounded-lg bg-white/[0.03] px-3 py-2">
               <p className="text-xs text-zinc-500 mb-1">入场区间</p>
-              <p className="text-xs font-mono font-semibold text-zinc-200">
+              <p className="text-xs md:text-sm font-mono font-semibold text-zinc-200">
                 {entryLow ? formatPrice(entryLow) : "\u2014"}
               </p>
-              <p className="text-xs font-mono font-semibold text-zinc-200">
+              <p className="text-xs md:text-sm font-mono font-semibold text-zinc-200">
                 ~ {entryHigh ? formatPrice(entryHigh) : "\u2014"}
               </p>
             </div>
@@ -168,14 +168,14 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
           {stopLoss && (
             <div className="rounded-lg bg-red-500/[0.04] px-3 py-2">
               <p className="text-xs text-red-400/70 mb-1">止损</p>
-              <p className="text-xs font-mono font-semibold text-red-400">{formatPrice(stopLoss)}</p>
+              <p className="text-xs md:text-sm font-mono font-semibold text-red-400">{formatPrice(stopLoss)}</p>
             </div>
           )}
           {/* 盈亏比 */}
           {strategy.risk_reward_ratio > 0 && (
             <div className="rounded-lg bg-white/[0.03] px-3 py-2">
               <p className="text-xs text-zinc-500 mb-1">盈亏比</p>
-              <p className="text-xs font-mono font-semibold text-zinc-200">
+              <p className="text-xs md:text-sm font-mono font-semibold text-zinc-200">
                 1 : {strategy.risk_reward_ratio.toFixed(1)}
               </p>
             </div>
@@ -188,7 +188,7 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
             <p className="text-xs text-zinc-500 mb-1.5">目标位</p>
             <div className="flex gap-2 flex-wrap">
               {targets.map((t, i) => (
-                <span key={i} className="text-xs font-mono text-emerald-400 bg-emerald-500/10 rounded-md px-2 py-1 border border-emerald-500/10">
+                <span key={i} className="text-xs md:text-sm font-mono text-emerald-400 bg-emerald-500/10 rounded-md px-2 py-1 border border-emerald-500/10">
                   T{i + 1}: {formatPrice(t)}
                 </span>
               ))}
@@ -216,7 +216,7 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
         {/* 分析逻辑 */}
         {reasoning && !isFallbackReasoning(reasoning) && (
           <div className="mt-3">
-            <ReasoningBlock text={reasoning} />
+            <ReasoningBlock text={localizeText(reasoning)} />
           </div>
         )}
       </div>

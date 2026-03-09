@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReportSection } from "@/lib/api/analysis";
+import { localizeText } from "./helpers";
 
 // ── Key findings summary ─────────────────────────────────────
 
@@ -41,7 +42,7 @@ export function KeyFindingsSummary({ sections }: { sections: ReportSection[] }) 
               }`}
             />
             <span className="text-sm text-zinc-300 leading-relaxed">
-              {f.text}
+              {localizeText(f.text)}
               <span className="ml-1.5 text-xs text-zinc-500">{f.source}</span>
             </span>
           </li>

@@ -15,6 +15,7 @@ import {
   getSignalStyle,
   isEmpty,
   isFallbackReasoning,
+  localizeText,
 } from "./helpers";
 import {
   CollapsibleSection,
@@ -24,6 +25,7 @@ import {
   ReasoningBlock,
   SignalRow,
 } from "./renderers";
+import { FvgTable, OrderBlockTable, GenericObjectTable } from "./StructuredTables";
 
 // ── Data pairs renderer ──────────────────────────────────────
 
@@ -107,14 +109,31 @@ export function DataPairs({ data, hideEmpty = true }: { data: Record<string, unk
           }
 
           if (Array.isArray(value)) {
+            // Specialized renderers for known data types
+            if (key === "fvg_list" && value.length > 0 && typeof value[0] === "object") {
+              return <div key={key} className="mt-2"><FvgTable items={value as Record<string, unknown>[]} /></div>;
+            }
+            if (key === "order_blocks" && value.length > 0 && typeof value[0] === "object") {
+              return <div key={key} className="mt-2"><OrderBlockTable items={value as Record<string, unknown>[]} /></div>;
+            }
+
             const hasObjects = value.length > 0 && typeof value[0] === "object" && value[0] !== null;
             if (hasObjects) {
+              // Use pattern-aware renderer for patterns, generic table for everything else
+              const isPattern = value[0] && "pattern_name" in (value[0] as Record<string, unknown>);
+              if (isPattern) {
+                return (
+                  <div key={key} className="mt-2">
+                    <p className="mb-1 text-sm font-medium text-zinc-400">
+                      {fieldLabel(key)} <span className="text-zinc-500">({value.length})</span>
+                    </p>
+                    <ObjectArrayTable items={value as Record<string, unknown>[]} />
+                  </div>
+                );
+              }
               return (
                 <div key={key} className="mt-2">
-                  <p className="mb-1 text-sm font-medium text-zinc-400">
-                    {fieldLabel(key)} <span className="text-zinc-500">({value.length})</span>
-                  </p>
-                  <ObjectArrayTable items={value as Record<string, unknown>[]} />
+                  <GenericObjectTable items={value as Record<string, unknown>[]} label={fieldLabel(key)} />
                 </div>
               );
             }
@@ -192,7 +211,7 @@ export function SectionCard({ section, defaultExpanded = false }: { section: Rep
           )}
           {section.summary && !sectionSignal && (
             <span className="text-xs text-zinc-400 truncate max-w-[260px]">
-              {section.summary}
+              {localizeText(section.summary)}
             </span>
           )}
         </div>
@@ -240,7 +259,7 @@ export function SectionCard({ section, defaultExpanded = false }: { section: Rep
                                       : "bg-zinc-500"
                                 }`}
                               />
-                              {String(f)}
+                              {localizeText(String(f))}
                             </li>
                           ),
                         )}
@@ -270,7 +289,7 @@ export function SectionCard({ section, defaultExpanded = false }: { section: Rep
               )}
               {section.note && (
                 <p className="mt-2 text-xs italic text-zinc-500">
-                  {section.note}
+                  {localizeText(section.note)}
                 </p>
               )}
             </div>

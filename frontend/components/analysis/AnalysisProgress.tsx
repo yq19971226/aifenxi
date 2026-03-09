@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 
 import type { ProgressEvent, ProgressStatus } from "@/lib/api/analysis";
+import { localizeText } from "./helpers";
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -267,7 +268,7 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
                   </div>
                   {step.message && (
                     <p className={`truncate text-sm leading-4 mt-0.5 ${messageTextClass(step.status)}`}>
-                      {step.message}
+                      {localizeText(step.message)}
                     </p>
                   )}
                 </div>
