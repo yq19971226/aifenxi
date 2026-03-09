@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -15,8 +16,10 @@ export interface SymbolOverview {
   entry_high: number | null;
   stop_loss: number | null;
   reasoning: string;
+  targets: number[];
   risk_reward_ratio: number;
   is_worth_taking: boolean;
+  strategy_updated_at: string | null;
 }
 
 export interface DashboardOverviewResponse {
@@ -26,6 +29,5 @@ export interface DashboardOverviewResponse {
 
 export async function fetchDashboardOverview(): Promise<DashboardOverviewResponse> {
   const res = await authFetch(`${API_BASE}/api/dashboard/overview`);
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return handleApiResponse(res, "请求失败");
 }

@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -63,11 +64,7 @@ export async function getStats(
   const res = await authFetch(
     `${API_BASE}/api/performance/stats?${params.toString()}`
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取绩效统计失败" }));
-    throw new Error(err.detail || "获取绩效统计失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取绩效统计失败");
 }
 
 export async function getSnapshotDetail(
@@ -76,11 +73,7 @@ export async function getSnapshotDetail(
   const res = await authFetch(
     `${API_BASE}/api/performance/snapshots/${encodeURIComponent(snapshotId)}`
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取快照详情失败" }));
-    throw new Error(err.detail || "获取快照详情失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取快照详情失败");
 }
 
 export async function getTrend(
@@ -89,13 +82,7 @@ export async function getTrend(
   const res = await authFetch(
     `${API_BASE}/api/performance/trend?days=${days}`
   );
-  if (!res.ok) {
-    const err = await res
-      .json()
-      .catch(() => ({ detail: "获取趋势数据失败" }));
-    throw new Error(err.detail || "获取趋势数据失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取趋势数据失败");
 }
 
 export const performanceApi = {

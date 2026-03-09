@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -38,11 +39,7 @@ export async function createPayment(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(request),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "创建支付失败" }));
-    throw new Error(err.detail || "创建支付失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "创建支付失败");
 }
 
 export async function fetchPaymentHistory(
@@ -51,9 +48,5 @@ export async function fetchPaymentHistory(
   const res = await authFetch(
     `${API_BASE}/api/payment/history?limit=${limit}`
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取支付历史失败" }));
-    throw new Error(err.detail || "获取支付历史失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取支付历史失败");
 }

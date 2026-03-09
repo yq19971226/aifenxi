@@ -1,4 +1,5 @@
 import { authFetch } from "@/lib/api/auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -39,11 +40,7 @@ export interface SystemStatus {
 
 export async function fetchSystemStatus(): Promise<SystemStatus> {
   const res = await authFetch(`${API_BASE}/api/admin/system/status`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取系统状态失败" }));
-    throw new Error(err.detail || "获取系统状态失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取系统状态失败");
 }
 
 export interface SystemVersion {
@@ -53,11 +50,7 @@ export interface SystemVersion {
 
 export async function fetchSystemVersion(): Promise<SystemVersion> {
   const res = await authFetch(`${API_BASE}/api/admin/system/version`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取版本信息失败" }));
-    throw new Error(err.detail || "获取版本信息失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取版本信息失败");
 }
 
 export type DeployEventType = "log" | "done" | "error";

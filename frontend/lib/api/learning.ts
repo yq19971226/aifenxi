@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -83,13 +84,7 @@ export interface CleanupResult {
 
 // ── API calls ────────────────────────────────────────────────
 
-async function handleResponse<T>(res: Response, fallbackMsg: string): Promise<T> {
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: fallbackMsg }));
-    throw new Error(err.detail || fallbackMsg);
-  }
-  return res.json();
-}
+const handleResponse = handleApiResponse;
 
 export async function fetchPerformanceReview(
   days: number = 30,

@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -112,36 +113,31 @@ export interface PartnerListItem {
 export const partnerApi = {
   async getDashboard(): Promise<PartnerDashboard> {
     const res = await authFetch(`${API_BASE}/api/partner/dashboard`);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async getReferralCode(): Promise<ReferralCodeInfo> {
     const res = await authFetch(`${API_BASE}/api/partner/referral-code`);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async getInvitations(limit = 50, offset = 0): Promise<Invitation[]> {
     const res = await authFetch(
       `${API_BASE}/api/partner/invitations?limit=${limit}&offset=${offset}`
     );
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async getCommissions(limit = 50, offset = 0): Promise<CommissionRecord[]> {
     const res = await authFetch(
       `${API_BASE}/api/partner/commissions?limit=${limit}&offset=${offset}`
     );
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async getWallet(): Promise<WalletInfo> {
     const res = await authFetch(`${API_BASE}/api/partner/wallet`);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async upsertWallet(trc20_address: string) {
@@ -150,24 +146,21 @@ export const partnerApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ trc20_address }),
     });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async requestWithdrawal() {
     const res = await authFetch(`${API_BASE}/api/partner/withdraw`, {
       method: "POST",
     });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async getWithdrawals(limit = 20): Promise<WithdrawalRecord[]> {
     const res = await authFetch(
       `${API_BASE}/api/partner/withdrawals?limit=${limit}`
     );
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 };
 
@@ -176,8 +169,7 @@ export const partnerApi = {
 export const adminPartnerApi = {
   async getOverview(): Promise<PartnerOverview> {
     const res = await authFetch(`${API_BASE}/api/admin/partner/overview`);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async getPartnerList(
@@ -187,14 +179,12 @@ export const adminPartnerApi = {
     const res = await authFetch(
       `${API_BASE}/api/admin/partner/list?limit=${limit}&offset=${offset}`
     );
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async getPartnerDetail(userId: string): Promise<PartnerDetail> {
     const res = await authFetch(`${API_BASE}/api/admin/partner/${userId}/detail`);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async updateConfig(payload: PartnerConfigUpdate) {
@@ -203,8 +193,7 @@ export const adminPartnerApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async getWithdrawals(status?: string): Promise<WithdrawalRecord[]> {
@@ -212,8 +201,7 @@ export const adminPartnerApi = {
     const res = await authFetch(
       `${API_BASE}/api/admin/withdrawals${params}`
     );
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async approveWithdrawal(id: string, tx_hash: string) {
@@ -225,8 +213,7 @@ export const adminPartnerApi = {
         body: JSON.stringify({ tx_hash }),
       }
     );
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async rejectWithdrawal(id: string, reason: string) {
@@ -238,7 +225,6 @@ export const adminPartnerApi = {
         body: JSON.stringify({ reason }),
       }
     );
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 };

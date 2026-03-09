@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -28,18 +29,10 @@ export async function fetchConsensusLatest(
     `${API_BASE}/api/consensus/latest?symbol=${symbol}`
   );
   if (res.status === 404) return null;
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: "请求失败" }));
-    throw new Error(body.detail || "请求失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "请求失败");
 }
 
 export async function fetchConsensusWeights(): Promise<Record<string, number>> {
   const res = await authFetch(`${API_BASE}/api/consensus/weights`);
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: "请求失败" }));
-    throw new Error(body.detail || "请求失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "请求失败");
 }

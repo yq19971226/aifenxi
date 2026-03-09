@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -48,11 +49,7 @@ export async function getUsers(
   const qs = query.toString();
   const url = `${API_BASE}/api/admin/users${qs ? `?${qs}` : ""}`;
   const res = await authFetch(url);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "查询用户列表失败" }));
-    throw new Error(err.detail || "查询用户列表失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "查询用户列表失败");
 }
 
 export async function toggleUserActive(
@@ -67,11 +64,7 @@ export async function toggleUserActive(
       body: JSON.stringify({ is_active: isActive }),
     }
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "操作失败" }));
-    throw new Error(err.detail || "操作失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "操作失败");
 }
 
 export async function updateMembership(
@@ -87,9 +80,5 @@ export async function updateMembership(
       body: JSON.stringify({ level, expires_at: expiresAt }),
     }
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "调整会员等级失败" }));
-    throw new Error(err.detail || "调整会员等级失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "调整会员等级失败");
 }

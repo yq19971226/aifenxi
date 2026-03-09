@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -34,11 +35,7 @@ export interface TestPushResult {
 
 export async function fetchPushSettings(): Promise<PushSettings> {
   const res = await authFetch(`${API_BASE}/api/push/settings`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取推送设置失败" }));
-    throw new Error(err.detail || "获取推送设置失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取推送设置失败");
 }
 
 export async function updatePushSettings(
@@ -49,11 +46,7 @@ export async function updatePushSettings(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(settings),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "更新推送设置失败" }));
-    throw new Error(err.detail || "更新推送设置失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "更新推送设置失败");
 }
 
 export async function testPush(channel: PushChannel): Promise<TestPushResult> {
@@ -62,9 +55,5 @@ export async function testPush(channel: PushChannel): Promise<TestPushResult> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ channel }),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "测试推送失败" }));
-    throw new Error(err.detail || "测试推送失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "测试推送失败");
 }

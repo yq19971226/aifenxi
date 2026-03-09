@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -80,11 +81,7 @@ export interface KlineProgressResponse {
 
 export async function listAllSymbols(): Promise<SymbolConfig[]> {
   const res = await authFetch(`${API_BASE}/api/symbols/admin/all`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取交易对列表失败" }));
-    throw new Error(err.detail || "获取交易对列表失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取交易对列表失败");
 }
 
 export async function addSymbol(data: SymbolCreateRequest): Promise<SymbolConfig> {
@@ -93,11 +90,7 @@ export async function addSymbol(data: SymbolCreateRequest): Promise<SymbolConfig
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "添加交易对失败" }));
-    throw new Error(err.detail || "添加交易对失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "添加交易对失败");
 }
 
 export async function updateSymbol(
@@ -109,21 +102,14 @@ export async function updateSymbol(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "更新交易对失败" }));
-    throw new Error(err.detail || "更新交易对失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "更新交易对失败");
 }
 
 export async function deleteSymbol(symbol: string): Promise<void> {
   const res = await authFetch(`${API_BASE}/api/symbols/${symbol}`, {
     method: "DELETE",
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "删除交易对失败" }));
-    throw new Error(err.detail || "删除交易对失败");
-  }
+  await handleApiResponse<void>(res, "删除交易对失败");
 }
 
 export async function fetchKlineProgress(
@@ -135,9 +121,5 @@ export async function fetchKlineProgress(
   const url = `${API_BASE}/api/system/kline-progress?symbols=${encodeURIComponent(symbolParam)}&intervals=${encodeURIComponent(intervalParam)}`;
 
   const res = await authFetch(url);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取K线进度失败" }));
-    throw new Error(err.detail || "获取K线进度失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取K线进度失败");
 }

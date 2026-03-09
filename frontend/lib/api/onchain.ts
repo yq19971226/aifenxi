@@ -1,6 +1,7 @@
 /** 链上数据 API — 前端调用。 */
 
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -32,11 +33,7 @@ export interface PlanCapabilities {
 
 export async function fetchOnchainCapabilities(): Promise<PlanCapabilities> {
   const res = await authFetch(`${API_BASE}/api/onchain/capabilities`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取能力失败" }));
-    throw new Error(err.detail || "获取能力失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取能力失败");
 }
 
 export async function fetchOnchainData(

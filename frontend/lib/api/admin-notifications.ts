@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -46,9 +47,5 @@ export async function getNotifications(
   const qs = query.toString();
   const url = `${API_BASE}/api/admin/notifications${qs ? `?${qs}` : ""}`;
   const res = await authFetch(url);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "查询通知历史失败" }));
-    throw new Error(err.detail || "查询通知历史失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "查询通知历史失败");
 }

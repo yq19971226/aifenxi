@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -35,29 +36,17 @@ export interface FreeTrialStatus {
 
 export async function fetchFreeTrialStatus(): Promise<FreeTrialStatus> {
   const res = await authFetch(`${API_BASE}/api/membership/free-trial`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取体验状态失败" }));
-    throw new Error(err.detail || "获取体验状态失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取体验状态失败");
 }
 
 export async function claimFreeTrial(): Promise<FreeTrialStatus> {
   const res = await authFetch(`${API_BASE}/api/membership/free-trial/claim`, {
     method: "POST",
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "领取体验失败" }));
-    throw new Error(err.detail || "领取体验失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "领取体验失败");
 }
 
 export async function fetchPlans(): Promise<PlansResponse> {
   const res = await authFetch(`${API_BASE}/api/membership/plans`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取套餐信息失败" }));
-    throw new Error(err.detail || "获取套餐信息失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取套餐信息失败");
 }

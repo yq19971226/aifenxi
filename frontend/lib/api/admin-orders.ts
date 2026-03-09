@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -48,10 +49,5 @@ export async function getAdminOrders(
 
   const res = await authFetch(url);
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "查询订单失败" }));
-    throw new Error(err.detail || "查询订单失败");
-  }
-
-  return res.json();
+  return handleApiResponse(res, "查询订单失败");
 }

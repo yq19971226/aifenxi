@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -23,14 +24,6 @@ export interface AdminPredictionList {
   page_size: number;
 }
 
-async function handleRes<T>(res: Response, msg: string): Promise<T> {
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: msg }));
-    throw new Error(err.detail || msg);
-  }
-  return res.json();
-}
-
 export async function fetchAdminPredictions(params: {
   symbol?: string;
   playbook?: string;
@@ -45,7 +38,7 @@ export async function fetchAdminPredictions(params: {
   sp.set("page", String(params.page || 1));
   sp.set("page_size", String(params.page_size || 20));
   const res = await authFetch(`${API_BASE}/api/admin/playbook-sim/predictions?${sp}`);
-  return handleRes(res, "获取预测列表失败");
+  return handleApiResponse(res, "获取预测列表失败");
 }
 
 export async function togglePublish(
@@ -60,7 +53,7 @@ export async function togglePublish(
       body: JSON.stringify({ published }),
     }
   );
-  return handleRes(res, "操作失败");
+  return handleApiResponse(res, "操作失败");
 }
 
 export async function deletePrediction(
@@ -70,7 +63,7 @@ export async function deletePrediction(
     `${API_BASE}/api/admin/playbook-sim/predictions/${id}`,
     { method: "DELETE" }
   );
-  return handleRes(res, "删除失败");
+  return handleApiResponse(res, "删除失败");
 }
 
 export async function batchPublish(
@@ -84,5 +77,5 @@ export async function batchPublish(
       body: JSON.stringify(ids),
     }
   );
-  return handleRes(res, "批量发布失败");
+  return handleApiResponse(res, "批量发布失败");
 }

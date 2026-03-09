@@ -1,5 +1,6 @@
 import { authFetch } from "./auth";
 import type { AnnouncementDisplayMode } from "./announcements";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -98,10 +99,6 @@ export interface AdminAnnouncementDeliveriesResponse {
   page_size: number;
 }
 
-async function readError(res: Response, fallback: string): Promise<Error> {
-  const err = await res.json().catch(() => ({ detail: fallback }));
-  return new Error(err.detail || fallback);
-}
 
 function buildQuery(params: Record<string, string | number | undefined>) {
   const query = new URLSearchParams();
@@ -125,10 +122,7 @@ export async function getAdminAnnouncements(
     page_size: params.page_size,
   });
   const res = await authFetch(`${API_BASE}/api/admin/announcements${qs}`);
-  if (!res.ok) {
-    throw await readError(res, "查询公告列表失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "查询公告列表失败");
 }
 
 export async function createAdminAnnouncement(
@@ -147,10 +141,7 @@ export async function createAdminAnnouncement(
       ends_at: payload.ends_at || null,
     }),
   });
-  if (!res.ok) {
-    throw await readError(res, "创建公告草稿失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "创建公告草稿失败");
 }
 
 export async function updateAdminAnnouncement(
@@ -165,10 +156,7 @@ export async function updateAdminAnnouncement(
       body: JSON.stringify(payload),
     }
   );
-  if (!res.ok) {
-    throw await readError(res, "更新公告失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "更新公告失败");
 }
 
 export async function scheduleAdminAnnouncement(
@@ -183,10 +171,7 @@ export async function scheduleAdminAnnouncement(
       body: JSON.stringify({ scheduled_at: scheduledAt }),
     }
   );
-  if (!res.ok) {
-    throw await readError(res, "公告排期失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "公告排期失败");
 }
 
 export async function unscheduleAdminAnnouncement(
@@ -198,10 +183,7 @@ export async function unscheduleAdminAnnouncement(
       method: "POST",
     }
   );
-  if (!res.ok) {
-    throw await readError(res, "取消公告排期失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "取消公告排期失败");
 }
 
 export async function publishAdminAnnouncement(
@@ -213,10 +195,7 @@ export async function publishAdminAnnouncement(
       method: "POST",
     }
   );
-  if (!res.ok) {
-    throw await readError(res, "发布公告失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "发布公告失败");
 }
 
 export async function archiveAdminAnnouncement(
@@ -228,10 +207,7 @@ export async function archiveAdminAnnouncement(
       method: "POST",
     }
   );
-  if (!res.ok) {
-    throw await readError(res, "归档公告失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "归档公告失败");
 }
 
 export async function getAnnouncementDeliveries(
@@ -243,8 +219,5 @@ export async function getAnnouncementDeliveries(
   const res = await authFetch(
     `${API_BASE}/api/admin/announcements/${encodeURIComponent(announcementId)}/deliveries${qs}`
   );
-  if (!res.ok) {
-    throw await readError(res, "查询公告投递记录失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "查询公告投递记录失败");
 }

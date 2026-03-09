@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -63,13 +64,6 @@ export interface BacktestTradesResult {
   page_size: number;
 }
 
-async function handleRes<T>(res: Response, msg: string): Promise<T> {
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: msg }));
-    throw new Error(err.detail || msg);
-  }
-  return res.json();
-}
 
 export async function fetchBacktestSummary(params: {
   days?: number;
@@ -79,7 +73,7 @@ export async function fetchBacktestSummary(params: {
   if (params.days) sp.set("days", String(params.days));
   if (params.symbol) sp.set("symbol", params.symbol);
   const res = await authFetch(`${API_BASE}/api/backtest/summary?${sp}`);
-  return handleRes(res, "获取回测数据失败");
+  return handleApiResponse(res, "获取回测数据失败");
 }
 
 export async function fetchBacktestTrades(params: {
@@ -94,5 +88,5 @@ export async function fetchBacktestTrades(params: {
   sp.set("page", String(params.page || 1));
   sp.set("page_size", String(params.page_size || 20));
   const res = await authFetch(`${API_BASE}/api/backtest/trades?${sp}`);
-  return handleRes(res, "获取回测交易列表失败");
+  return handleApiResponse(res, "获取回测交易列表失败");
 }

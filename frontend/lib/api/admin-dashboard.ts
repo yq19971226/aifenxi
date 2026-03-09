@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -24,11 +25,7 @@ export interface DashboardStats {
 
 export async function fetchDashboardStats(): Promise<DashboardStats> {
   const res = await authFetch(`${API}/api/admin/dashboard`);
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: "请求失败" }));
-    throw new Error(body.detail ?? "获取仪表盘数据失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取仪表盘数据失败");
 }
 
 
@@ -42,9 +39,5 @@ export interface LLMCostSummary {
 
 export async function fetchLLMCost(): Promise<LLMCostSummary> {
   const res = await authFetch(`${API}/api/admin/dashboard/llm-cost`);
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: "请求失败" }));
-    throw new Error(body.detail ?? "获取 LLM 成本数据失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取 LLM 成本数据失败");
 }

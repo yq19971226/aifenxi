@@ -1,3 +1,4 @@
+import { handleApiResponse } from "./helpers";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
 const TOKEN_KEY = "axiom_access_token";
@@ -113,11 +114,7 @@ export async function register(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "注册失败" }));
-    throw new Error(err.detail || "注册失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "注册失败");
 }
 
 export async function login(
@@ -162,9 +159,5 @@ export async function refreshAccessToken(): Promise<string> {
 
 export async function fetchCurrentUser(): Promise<UserInfo> {
   const res = await authFetch(`${API_BASE}/api/auth/me`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取用户信息失败" }));
-    throw new Error(err.detail || "获取用户信息失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取用户信息失败");
 }

@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -66,16 +67,14 @@ export interface TaskStats {
 export const tasksApi = {
   async getHome(): Promise<TaskHome> {
     const res = await authFetch(`${API_BASE}/api/tasks`);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async generatePromo(): Promise<PromoData> {
     const res = await authFetch(`${API_BASE}/api/tasks/generate-promo`, {
       method: "POST",
     });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async submit(data: {
@@ -88,22 +87,19 @@ export const tasksApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async getMySubmissions(limit = 30): Promise<TaskSubmission[]> {
     const res = await authFetch(
       `${API_BASE}/api/tasks/my-submissions?limit=${limit}`
     );
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async getMyBonus(): Promise<Record<string, number>> {
     const res = await authFetch(`${API_BASE}/api/tasks/my-bonus`);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 };
 
@@ -112,8 +108,7 @@ export const tasksApi = {
 export const adminTasksApi = {
   async listTemplates(): Promise<TaskTemplate[]> {
     const res = await authFetch(`${API_BASE}/api/admin/tasks/templates`);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async createTemplate(data: Partial<TaskTemplate>) {
@@ -122,8 +117,7 @@ export const adminTasksApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async updateTemplate(id: string, data: Partial<TaskTemplate>) {
@@ -132,16 +126,14 @@ export const adminTasksApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async deleteTemplate(id: string) {
     const res = await authFetch(`${API_BASE}/api/admin/tasks/templates/${id}`, {
       method: "DELETE",
     });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async listSubmissions(status?: string): Promise<TaskSubmission[]> {
@@ -149,8 +141,7 @@ export const adminTasksApi = {
     const res = await authFetch(
       `${API_BASE}/api/admin/tasks/submissions${params}`
     );
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async approveSubmission(id: string) {
@@ -158,8 +149,7 @@ export const adminTasksApi = {
       `${API_BASE}/api/admin/tasks/submissions/${id}/approve`,
       { method: "POST" }
     );
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async rejectSubmission(id: string, reason: string) {
@@ -171,13 +161,11 @@ export const adminTasksApi = {
         body: JSON.stringify({ reason }),
       }
     );
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 
   async getStats(): Promise<TaskStats> {
     const res = await authFetch(`${API_BASE}/api/admin/tasks/stats`);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return handleApiResponse(res, "请求失败");
   },
 };

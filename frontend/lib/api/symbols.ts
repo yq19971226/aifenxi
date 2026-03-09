@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -12,11 +13,7 @@ export interface SymbolConfig {
 
 export async function listSymbols(): Promise<SymbolConfig[]> {
   const res = await authFetch(`${API_BASE}/api/symbols/`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取交易对列表失败" }));
-    throw new Error(err.detail || "获取交易对列表失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取交易对列表失败");
 }
 
 export const symbolsApi = { listSymbols };

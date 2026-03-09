@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -87,20 +88,12 @@ export async function createRule(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(rule),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "创建预警规则失败" }));
-    throw new Error(err.detail || "创建预警规则失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "创建预警规则失败");
 }
 
 export async function listRules(): Promise<AlertRuleResponse[]> {
   const res = await authFetch(`${API_BASE}/api/alerts/rules`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取预警规则失败" }));
-    throw new Error(err.detail || "获取预警规则失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取预警规则失败");
 }
 
 export async function updateRule(
@@ -112,32 +105,21 @@ export async function updateRule(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(update),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "更新预警规则失败" }));
-    throw new Error(err.detail || "更新预警规则失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "更新预警规则失败");
 }
 
 export async function deleteRule(ruleId: string): Promise<void> {
   const res = await authFetch(`${API_BASE}/api/alerts/rules/${ruleId}`, {
     method: "DELETE",
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "删除预警规则失败" }));
-    throw new Error(err.detail || "删除预警规则失败");
-  }
+  await handleApiResponse<void>(res, "删除预警规则失败");
 }
 
 export async function listTriggers(
   limit: number = 100
 ): Promise<AlertTriggerResponse[]> {
   const res = await authFetch(`${API_BASE}/api/alerts/triggers?limit=${limit}`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取触发历史失败" }));
-    throw new Error(err.detail || "获取触发历史失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取触发历史失败");
 }
 
 export const alertsApi = {

@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -65,11 +66,7 @@ export async function fetchActiveAnnouncements(
   const url = `${API_BASE}/api/announcements/active?${params.toString()}`;
 
   const res = await authFetch(url);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取公告失败" }));
-    throw new Error(err.detail || "获取公告失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取公告失败");
 }
 
 export async function fetchAnnouncementHistory(
@@ -83,11 +80,7 @@ export async function fetchAnnouncementHistory(
   const url = `${API_BASE}/api/announcements/history?${params.toString()}`;
 
   const res = await authFetch(url);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取公告历史失败" }));
-    throw new Error(err.detail || "获取公告历史失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取公告历史失败");
 }
 
 export async function postAnnouncementEvent(
@@ -103,9 +96,5 @@ export async function postAnnouncementEvent(
       snooze_until: payload.snooze_until ?? null,
     }),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "回写公告事件失败" }));
-    throw new Error(err.detail || "回写公告事件失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "回写公告事件失败");
 }

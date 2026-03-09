@@ -5,6 +5,8 @@
  */
 
 import { authFetch, authHeaders } from "./auth";
+import type { StrategyData } from "@/lib/types/strategy";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -54,7 +56,7 @@ export interface AnalysisReport {
   signal: SignalDirection;
   confidence: number;
   sections: ReportSection[];
-  strategy: Record<string, unknown> | null;
+  strategy: StrategyData | null;
   is_partial: boolean;
   cached: boolean;
   cached_at: string | null;
@@ -202,10 +204,7 @@ export async function fetchMarketRegime(
   const res = await fetch(
     `${API_BASE}/api/market/regime?symbol=${encodeURIComponent(symbol)}&interval=${interval}`,
   );
-  if (!res.ok) {
-    throw new Error("市场状态检测失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "市场状态检测失败");
 }
 
 // ── 配额查询 ────────────────────────────────────────────────
@@ -215,9 +214,5 @@ export async function fetchMarketRegime(
  */
 export async function fetchAnalysisQuota(): Promise<AnalysisQuotaResponse> {
   const res = await authFetch(`${API_BASE}/api/analysis/quota`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取配额失败" }));
-    throw new Error(err.detail || "获取配额失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取配额失败");
 }

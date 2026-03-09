@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -20,11 +21,7 @@ export interface CreateOperatorBody {
 
 export async function getOperators(): Promise<OperatorInfo[]> {
   const res = await authFetch(`${API_BASE}/api/operators`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取运营员列表失败" }));
-    throw new Error(err.detail || "获取运营员列表失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取运营员列表失败");
 }
 
 export async function createOperator(
@@ -35,11 +32,7 @@ export async function createOperator(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "创建运营员失败" }));
-    throw new Error(err.detail || "创建运营员失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "创建运营员失败");
 }
 
 export async function activateOperator(id: string): Promise<OperatorInfo> {
@@ -47,11 +40,7 @@ export async function activateOperator(id: string): Promise<OperatorInfo> {
     `${API_BASE}/api/operators/${encodeURIComponent(id)}/activate`,
     { method: "PUT" }
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "启用运营员失败" }));
-    throw new Error(err.detail || "启用运营员失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "启用运营员失败");
 }
 
 export async function deactivateOperator(id: string): Promise<OperatorInfo> {
@@ -59,9 +48,5 @@ export async function deactivateOperator(id: string): Promise<OperatorInfo> {
     `${API_BASE}/api/operators/${encodeURIComponent(id)}/deactivate`,
     { method: "PUT" }
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "停用运营员失败" }));
-    throw new Error(err.detail || "停用运营员失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "停用运营员失败");
 }

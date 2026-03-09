@@ -1,4 +1,5 @@
 import { authFetch } from "./auth";
+import { handleApiResponse } from "./helpers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -116,11 +117,7 @@ export interface CollectorGroup {
 
 export async function getDataSourceStatus(): Promise<DataSourceStatusSnapshot> {
   const res = await fetch(`${API_BASE}/api/datasources/status`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取数据源状态失败" }));
-    throw new Error(err.detail || "获取数据源状态失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取数据源状态失败");
 }
 
 // ── 管理员 API ───────────────────────────────────────────────
@@ -130,20 +127,12 @@ export async function listDataSourceGroups(): Promise<{
   completeness_score: number;
 }> {
   const res = await authFetch(`${API_BASE}/api/admin/datasources`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取数据源列表失败" }));
-    throw new Error(err.detail || "获取数据源列表失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取数据源列表失败");
 }
 
 export async function getDataSourceHealth(): Promise<HealthSummary> {
   const res = await authFetch(`${API_BASE}/api/admin/datasources/health`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取健康状态失败" }));
-    throw new Error(err.detail || "获取健康状态失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取健康状态失败");
 }
 
 export async function getDataSourceDetail(
@@ -152,11 +141,7 @@ export async function getDataSourceDetail(
   const res = await authFetch(
     `${API_BASE}/api/admin/datasources/${encodeURIComponent(sourceId)}`
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取数据源详情失败" }));
-    throw new Error(err.detail || "获取数据源详情失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取数据源详情失败");
 }
 
 export async function toggleCombo(enabled: boolean): Promise<OperationResult> {
@@ -165,11 +150,7 @@ export async function toggleCombo(enabled: boolean): Promise<OperationResult> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ enabled }),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "操作失败" }));
-    throw new Error(err.detail || "操作失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "操作失败");
 }
 
 export async function toggleExchange(
@@ -184,11 +165,7 @@ export async function toggleExchange(
       body: JSON.stringify({ enabled }),
     }
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "操作失败" }));
-    throw new Error(err.detail || "操作失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "操作失败");
 }
 
 export async function toggleCoinGlass(
@@ -202,11 +179,7 @@ export async function toggleCoinGlass(
       body: JSON.stringify({ enabled }),
     }
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "操作失败" }));
-    throw new Error(err.detail || "操作失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "操作失败");
 }
 
 export async function toggleCoinGecko(
@@ -220,11 +193,7 @@ export async function toggleCoinGecko(
       body: JSON.stringify({ enabled }),
     }
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "操作失败" }));
-    throw new Error(err.detail || "操作失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "操作失败");
 }
 
 export async function getCoinGeckoUsage(): Promise<{
@@ -235,11 +204,7 @@ export async function getCoinGeckoUsage(): Promise<{
   usage_pct: number;
 }> {
   const res = await authFetch(`${API_BASE}/api/coingecko/usage`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取额度失败" }));
-    throw new Error(err.detail || "获取额度失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取额度失败");
 }
 
 export async function updateCoinGeckoTier(
@@ -250,11 +215,7 @@ export async function updateCoinGeckoTier(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ tier }),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "切换套餐失败" }));
-    throw new Error(err.detail || "切换套餐失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "切换套餐失败");
 }
 
 export async function getSourceMetrics(
@@ -263,11 +224,7 @@ export async function getSourceMetrics(
   const res = await authFetch(
     `${API_BASE}/api/admin/datasources/${encodeURIComponent(sourceId)}/metrics`
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "获取指标失败" }));
-    throw new Error(err.detail || "获取指标失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "获取指标失败");
 }
 
 export async function toggleGroup(
@@ -282,11 +239,7 @@ export async function toggleGroup(
       body: JSON.stringify({ enabled }),
     }
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "操作失败" }));
-    throw new Error(err.detail || "操作失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "操作失败");
 }
 
 export async function toggleCollector(
@@ -302,11 +255,7 @@ export async function toggleCollector(
       body: JSON.stringify({ enabled }),
     }
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "操作失败" }));
-    throw new Error(err.detail || "操作失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "操作失败");
 }
 
 export async function testDatasourceConnection(
@@ -316,11 +265,7 @@ export async function testDatasourceConnection(
     `${API_BASE}/api/admin/datasources/${encodeURIComponent(sourceId)}/test`,
     { method: "POST" }
   );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "测试失败" }));
-    throw new Error(err.detail || "测试失败");
-  }
-  return res.json();
+  return handleApiResponse(res, "测试失败");
 }
 
 export const datasourcesApi = {
