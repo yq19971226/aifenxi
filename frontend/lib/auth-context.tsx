@@ -43,7 +43,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(!__cachedReady);
 
   useEffect(() => {
-    if (__cachedReady && __cachedUser) {
+    if (__cachedReady) {
       setUser(__cachedUser);
       setLoading(false);
       return;

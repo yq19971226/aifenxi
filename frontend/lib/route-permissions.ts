@@ -1,9 +1,9 @@
 /**
  * 路由权限真相源 — AuthGuard、TopNav、AdminSidebar 共用此配置。
  *
- * 规则（按 requirements.md 冻结决策）：
+ * 规则：
  * 1. `/admin/*` 默认 admin-only
- * 2. 唯一冻结放宽白名单：`/admin/orders` → admin + operator
+ * 2. 放宽白名单：`/admin/orders`、`/admin/users` → admin + operator（只读）
  * 3. 其他需要额外保护的非 admin 路径在 EXTRA_PROTECTED 中声明
  */
 

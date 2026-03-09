@@ -93,7 +93,7 @@ export default function AdminSetupPage() {
     return "active";
   }
 
-  if (!user || (user.role !== "admin" && user.role !== "operator")) {
+  if (!user || user.role !== "admin") {
     return (
       <div className="p-6">
         <p className="text-sm text-zinc-500">无权限访问</p>
