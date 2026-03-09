@@ -19,6 +19,7 @@ import {
 } from "@/lib/api/announcements";
 import { Button } from "@/components/ui/Button";
 
+const EMPTY_LIST: ActiveAnnouncement[] = [];
 const SNOOZE_MS = 24 * 60 * 60 * 1000;
 
 function nowIso() {
@@ -65,15 +66,15 @@ function AnnouncementCard({
   onAction,
 }: AnnouncementCardProps) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#121217]/95 shadow-modal backdrop-blur-xl">
+    <div className="overflow-hidden rounded-lg border border-white/[0.08] bg-[#121217]/95 shadow-modal backdrop-blur-xl">
       <div className="border-b border-white/[0.06] px-4 py-3 md:px-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-zinc-500">
               <Megaphone size={13} className="text-indigo-400" />
               <span>站内公告</span>
               {announcement.published_at ? (
-                <span className="text-zinc-600 normal-case tracking-normal">
+                <span className="text-zinc-500 normal-case tracking-normal">
                   {formatPublishTime(announcement.published_at)}
                 </span>
               ) : null}
@@ -170,7 +171,7 @@ export function AnnouncementRuntime() {
   const [hiddenIds, setHiddenIds] = useState<string[]>([]);
   const [actioningId, setActioningId] = useState<string | null>(null);
 
-  const { data = [] } = useQuery({
+  const { data = EMPTY_LIST } = useQuery({
     queryKey: ["announcements", "active", pathname],
     queryFn: () => fetchActiveAnnouncements(pathname),
     staleTime: 30_000,
@@ -198,7 +199,10 @@ export function AnnouncementRuntime() {
 
   useEffect(() => {
     const activeIds = new Set(data.map((item) => item.id));
-    setHiddenIds((prev) => prev.filter((id) => activeIds.has(id)));
+    setHiddenIds((prev) => {
+      const next = prev.filter((id) => activeIds.has(id));
+      return next.length === prev.length ? prev : next;
+    });
   }, [data]);
 
   useEffect(() => {

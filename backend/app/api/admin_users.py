@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.deps import UserInfo, require_admin
+from app.core.deps import UserInfo, require_admin, require_operator_or_admin
 from app.services.user_service import (
     AdminUserInfo,
     AdminUserListResponse,
@@ -52,10 +52,10 @@ async def list_users_route(
     is_active: bool | None = Query(None, description="启用状态"),
     page: int = Query(1, ge=1, description="页码"),
     page_size: int = Query(20, ge=10, le=50, description="每页条数"),
-    user: UserInfo = Depends(require_admin),
+    user: UserInfo = Depends(require_operator_or_admin),
     session: AsyncSession = Depends(get_db),
 ) -> AdminUserListResponse:
-    """分页查询全平台用户。"""
+    """分页查询全平台用户。运营员可只读访问。"""
     try:
         return await query_users(
             session,

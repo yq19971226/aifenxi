@@ -21,6 +21,7 @@ export const ROLE_LEVEL: Record<UserRole, number> = {
  */
 const ADMIN_WHITELIST: Record<string, UserRole[]> = {
   "/admin/orders": ["admin", "operator"],
+  "/admin/users": ["admin", "operator"],
 };
 
 /**

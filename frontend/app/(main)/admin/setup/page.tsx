@@ -42,6 +42,7 @@ async function updateFlag(configKey: string, value: string): Promise<void> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ value, description: `功能开关: ${configKey}`, is_secret: false }),
   });
+  if (res.ok) return;
   if (res.status === 404) {
     // Config doesn't exist yet, create it
     const createRes = await authFetch(`${API_BASE}/api/admin/configs`, {
@@ -55,8 +56,10 @@ async function updateFlag(configKey: string, value: string): Promise<void> {
         is_secret: false,
       }),
     });
-    if (!createRes.ok) throw new Error("Failed to save");
+    if (!createRes.ok) throw new Error(`创建失败 (${createRes.status})`);
+    return;
   }
+  throw new Error(`保存失败 (${res.status})`);
 }
 
 export default function AdminSetupPage() {
@@ -69,10 +72,13 @@ export default function AdminSetupPage() {
     queryFn: fetchFlags,
   });
 
+  const [saveError, setSaveError] = useState<string | null>(null);
+
   const mutation = useMutation({
     mutationFn: ({ configKey, value }: { configKey: string; value: string }) =>
       updateFlag(configKey, value),
-    onMutate: ({ configKey }) => setSaving(configKey),
+    onMutate: ({ configKey }) => { setSaving(configKey); setSaveError(null); },
+    onError: (err: Error) => setSaveError(err.message),
     onSettled: () => {
       setSaving(null);
       queryClient.invalidateQueries({ queryKey: ["feature-flags"] });
@@ -114,6 +120,12 @@ export default function AdminSetupPage() {
         <p className="text-xs text-zinc-500">
           控制前台功能的可见性。「开启」正常显示，「维护中」显示维护页面，「隐藏」完全不可见。
         </p>
+
+        {saveError && (
+          <div className="rounded-lg border border-red-500/20 bg-red-500/[0.06] px-4 py-3 text-xs text-red-300">
+            {saveError}
+          </div>
+        )}
 
         {isLoading ? (
           <div className="flex items-center gap-2 py-8 justify-center text-zinc-500 text-sm">

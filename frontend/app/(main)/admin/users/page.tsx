@@ -48,7 +48,8 @@ function formatDate(iso: string): string {
 
 export default function AdminUsersPage() {
   const { user } = useAuth();
-  if (!user || user.role !== "admin") return null;
+  if (!user || (user.role !== "admin" && user.role !== "operator")) return null;
+  const isAdmin = user.role === "admin";
   const [data, setData] = useState<AdminUserListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -273,7 +274,7 @@ export default function AdminUsersPage() {
                     <th className="px-5 py-3 font-medium">到期时间</th>
                     <th className="px-5 py-3 font-medium">状态</th>
                     <th className="px-5 py-3 font-medium">注册时间</th>
-                    <th className="px-5 py-3 font-medium text-right">操作</th>
+                    {isAdmin && <th className="px-5 py-3 font-medium text-right">操作</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -337,53 +338,55 @@ export default function AdminUsersPage() {
                       <td className="px-5 py-3 text-zinc-400">
                         {formatDate(u.created_at)}
                       </td>
-                      <td className="px-5 py-3 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          {editingId === u.id ? (
-                            <>
-                              <button
-                                onClick={() => handleSaveMembership(u.id)}
-                                disabled={saving}
-                                className="rounded-lg px-3 py-1 text-xs font-medium bg-[var(--color-accent)]/15 text-accent hover:bg-[var(--color-accent)]/25 transition-colors disabled:opacity-50"
-                              >
-                                {saving ? "保存中" : "保存"}
-                              </button>
-                              <button
-                                onClick={cancelEdit}
-                                className="rounded-lg px-3 py-1 text-xs font-medium bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] transition-colors"
-                              >
-                                取消
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button
-                                onClick={() => startEdit(u)}
-                                className="rounded-lg px-3 py-1 text-xs font-medium bg-[var(--color-accent)]/15 text-accent hover:bg-[var(--color-accent)]/25 transition-colors"
-                              >
-                                调整等级
-                              </button>
-                              {u.role !== "admin" && (
+                      {isAdmin && (
+                        <td className="px-5 py-3 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            {editingId === u.id ? (
+                              <>
                                 <button
-                                  onClick={() => handleToggle(u)}
-                                  disabled={togglingId === u.id}
-                                  className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
-                                    u.is_active
-                                      ? "bg-[var(--color-bear)]/15 text-bear hover:bg-[var(--color-bear)]/25"
-                                      : "bg-[var(--color-bull)]/15 text-bull hover:bg-[var(--color-bull)]/25"
-                                  }`}
+                                  onClick={() => handleSaveMembership(u.id)}
+                                  disabled={saving}
+                                  className="rounded-lg px-3 py-1 text-xs font-medium bg-[var(--color-accent)]/15 text-accent hover:bg-[var(--color-accent)]/25 transition-colors disabled:opacity-50"
                                 >
-                                  {togglingId === u.id
-                                    ? "处理中"
-                                    : u.is_active
-                                      ? "停用"
-                                      : "启用"}
+                                  {saving ? "保存中" : "保存"}
                                 </button>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </td>
+                                <button
+                                  onClick={cancelEdit}
+                                  className="rounded-lg px-3 py-1 text-xs font-medium bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] transition-colors"
+                                >
+                                  取消
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => startEdit(u)}
+                                  className="rounded-lg px-3 py-1 text-xs font-medium bg-[var(--color-accent)]/15 text-accent hover:bg-[var(--color-accent)]/25 transition-colors"
+                                >
+                                  调整等级
+                                </button>
+                                {u.role !== "admin" && (
+                                  <button
+                                    onClick={() => handleToggle(u)}
+                                    disabled={togglingId === u.id}
+                                    className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
+                                      u.is_active
+                                        ? "bg-[var(--color-bear)]/15 text-bear hover:bg-[var(--color-bear)]/25"
+                                        : "bg-[var(--color-bull)]/15 text-bull hover:bg-[var(--color-bull)]/25"
+                                    }`}
+                                  >
+                                    {togglingId === u.id
+                                      ? "处理中"
+                                      : u.is_active
+                                        ? "停用"
+                                        : "启用"}
+                                  </button>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
