@@ -10,6 +10,7 @@ import type { SimResult } from "@/lib/api/playbook-sim";
 import type { PlaybookLatest } from "@/lib/api/playbook";
 import type { StepStatuses } from "./playbook-constants";
 import { DealerDetailPanel, DefenseDetailPanel, JudgeDetailPanel } from "./L4DetailPanels";
+import { localizeText } from "@/components/analysis/helpers";
 
 interface Props {
   sim: SimResult;
@@ -36,7 +37,7 @@ export default function AdversarialL4({ sim, latest: _latest, stepStatus }: Prop
       done: stepStatus.L1 === "done",
       running: stepStatus.L1 === "running",
       failed: stepStatus.L1 === "failed",
-      detail: sim.top_matches?.length > 0 ? sim.top_matches[0]?.name : (stepStatus.L1 === "running" ? "匹配中..." : "无匹配"),
+      detail: sim.top_matches?.length > 0 ? localizeText(sim.top_matches[0]?.name ?? "") : (stepStatus.L1 === "running" ? "匹配中..." : "无匹配"),
     },
     {
       icon: <Swords size={16} />,
@@ -49,7 +50,7 @@ export default function AdversarialL4({ sim, latest: _latest, stepStatus }: Prop
       running: stepStatus.L2 === "running",
       failed: stepStatus.L2 === "failed",
       detail: dealer?.dealer_plan
-        ? dealer.dealer_plan.slice(0, 20) + (dealer.dealer_plan.length > 20 ? "..." : "")
+        ? (() => { const t = localizeText(dealer.dealer_plan); return t.slice(0, 20) + (t.length > 20 ? "..." : ""); })()
         : (stepStatus.L2 === "running" ? "推演中..." : "待推演"),
     },
     {
@@ -63,7 +64,7 @@ export default function AdversarialL4({ sim, latest: _latest, stepStatus }: Prop
       running: stepStatus.L3 === "running",
       failed: stepStatus.L3 === "failed",
       detail: defense?.defense_summary
-        ? defense.defense_summary.slice(0, 20) + (defense.defense_summary.length > 20 ? "..." : "")
+        ? (() => { const t = localizeText(defense.defense_summary); return t.slice(0, 20) + (t.length > 20 ? "..." : ""); })()
         : (stepStatus.L3 === "running" ? "反制中..." : "待反制"),
     },
     {
@@ -91,7 +92,7 @@ export default function AdversarialL4({ sim, latest: _latest, stepStatus }: Prop
       running: false,
       failed: false,
       detail: judge?.next_move
-        ? judge.next_move.slice(0, 20) + (judge.next_move.length > 20 ? "..." : "")
+        ? (() => { const t = localizeText(judge.next_move); return t.slice(0, 20) + (t.length > 20 ? "..." : ""); })()
         : "待生成",
     },
   ];
