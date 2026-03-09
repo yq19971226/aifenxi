@@ -4,14 +4,16 @@ import { motion } from "framer-motion";
 import {
   AlertTriangle,
   ArrowRightLeft,
+  Ban,
   Database,
   Minus,
   Shield,
   TrendingDown,
   TrendingUp,
+  Trophy,
 } from "lucide-react";
 
-import type { AnalysisReport as AnalysisReportType, ReportSection } from "@/lib/api/analysis";
+import type { AnalysisMode, AnalysisReport as AnalysisReportType, ReportSection } from "@/lib/api/analysis";
 import type { StrategyData } from "@/lib/types/strategy";
 import {
   formatCachedTime,
@@ -26,6 +28,41 @@ import type { AccentType } from "./AccentBorderCard";
 import { AnalysisStatusBanner } from "./StatusBanner";
 import { PositionCalculator } from "@/components/trade/PositionCalculator";
 import { fromStrategy } from "@/lib/utils/position-sizing";
+
+// ── Publish status badge ─────────────────────────────────────
+
+function PublishStatusBadge({ mode, strategy }: { mode: AnalysisMode; strategy: StrategyData }) {
+  const isEligibleMode = mode === "intraday" || mode === "trend";
+  const isNeutral = strategy.direction === "neutral";
+  const isFallback = strategy.is_fallback;
+
+  const eligible = isEligibleMode && !isNeutral && !isFallback;
+
+  let reason = "";
+  if (!isEligibleMode) reason = "仅日内/趋势模式参与排行";
+  else if (isNeutral) reason = "中性方向不计入排行";
+  else if (isFallback) reason = "回退策略不计入排行";
+
+  return (
+    <div className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs ${
+      eligible
+        ? "bg-amber-500/[0.06] border border-amber-500/15 text-amber-400"
+        : "bg-zinc-500/[0.06] border border-white/[0.06] text-zinc-500"
+    }`}>
+      {eligible ? (
+        <>
+          <Trophy size={13} className="shrink-0" />
+          <span>策略已提交排行榜 · 结算后自动计入排名</span>
+        </>
+      ) : (
+        <>
+          <Ban size={13} className="shrink-0" />
+          <span>不参与排行 · {reason}</span>
+        </>
+      )}
+    </div>
+  );
+}
 
 // ── Action advice banner (compact — details already in StrategyCard) ──
 
@@ -159,10 +196,22 @@ export function ExecutiveSummary({ report }: { report: AnalysisReportType }) {
         )}
       </motion.div>
 
-      {/* Strategy card */}
+      {/* Scalping mode warning */}
+      {report.mode === "scalping" && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05, duration: 0.3 }}>
+          <AccentBorderCard type="risk-medium" title="实时短线提示" icon={AlertTriangle}>
+            <p className="text-sm text-zinc-400">
+              实时短线分析基于技术指标快速判断，假信号较多，仅供辅助参考，请结合自身经验与盘面情况自行决策。
+            </p>
+          </AccentBorderCard>
+        </motion.div>
+      )}
+
+      {/* Strategy card + publish status */}
       {report.strategy && (
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-2">
           <StrategyCard strategy={report.strategy} />
+          <PublishStatusBadge mode={report.mode} strategy={report.strategy} />
         </motion.div>
       )}
 

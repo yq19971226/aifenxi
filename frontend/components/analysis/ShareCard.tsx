@@ -205,6 +205,18 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
             </div>
           )}
 
+          {/* ── Scalping warning ── */}
+          {report.mode === "scalping" && (
+            <div style={{ margin: "0 20px 14px", background: "#fff7ed", border: "1px solid #fed7aa", borderLeft: "3px solid #f59e0b", borderRadius: 8, padding: "12px 16px" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#9a3412", marginBottom: 4 }}>
+                ⚡ 实时短线提示
+              </div>
+              <div style={{ fontSize: 11, color: "#78716c", lineHeight: 1.6 }}>
+                实时短线分析基于技术指标快速判断，假信号较多，仅供辅助参考，请结合自身经验与盘面情况自行决策。
+              </div>
+            </div>
+          )}
+
           {/* ── Disclaimer ── */}
           <div style={{ margin: "0 20px 14px", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 8, padding: "12px 16px" }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#92400e", marginBottom: 4 }}>
