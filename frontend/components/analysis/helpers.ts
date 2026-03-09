@@ -181,7 +181,7 @@ export function formatDirection(dir: string): string {
   if (dir === "sideways") return "横盘";
   if (dir === "long") return "做多";
   if (dir === "short") return "做空";
-  return dir;
+  return localizeText(dir);
 }
 
 // ── Section icon ───────────────────────────────────────────

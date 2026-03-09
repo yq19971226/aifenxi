@@ -2,6 +2,7 @@
 
 import { Brain, Target, Swords, Shield, ChevronRight, Activity } from "lucide-react";
 import type { AnalysisReport as AnalysisReportType } from "@/lib/api/analysis";
+import { localizeText } from "@/components/analysis/helpers";
 
 export function AdversarialFlow({ report }: { report: AnalysisReportType }) {
   const adversarialSection = report.sections.find(
@@ -22,9 +23,9 @@ export function AdversarialFlow({ report }: { report: AnalysisReportType }) {
         <span className="text-sm font-semibold text-zinc-200">{"AI 对抗流程"}</span>
       </div>
       
-      <div className="flex items-center gap-2">
+      <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
         {steps.map((step, i) => (
-          <div key={i} className="flex items-center gap-2 flex-1">
+          <div key={i} className="flex items-center gap-2 sm:flex-1">
             <div
               className={`flex items-center justify-center gap-2 rounded-lg p-2.5 ${
                 step.done ? `${step.bgColor} border ${step.border}` : "bg-white/[0.02] border border-white/[0.05]"
@@ -32,7 +33,7 @@ export function AdversarialFlow({ report }: { report: AnalysisReportType }) {
             >
               <span className={step.done ? step.color : "text-zinc-500"}>{step.icon}</span>
               <span
-                className={`text-sm font-medium truncate ${
+                className={`text-xs sm:text-sm font-medium truncate ${
                   step.done ? step.color : "text-zinc-500"
                 }`}
               >
@@ -42,7 +43,7 @@ export function AdversarialFlow({ report }: { report: AnalysisReportType }) {
             {i < steps.length - 1 && (
               <ChevronRight
                 size={14}
-                className={step.done ? "text-zinc-500 shrink-0" : "text-zinc-700 shrink-0"}
+                className={`hidden sm:block ${step.done ? "text-zinc-500 shrink-0" : "text-zinc-700 shrink-0"}`}
               />
             )}
           </div>
@@ -58,7 +59,7 @@ export function AdversarialFlow({ report }: { report: AnalysisReportType }) {
             </span>
           </div>
           <p className="text-sm text-zinc-300 leading-relaxed">
-            {String(adversarialSection.data.dealer_intent || adversarialSection.data.summary || "庄家AI已完成反向推演")}
+            {localizeText(String(adversarialSection.data.dealer_intent || adversarialSection.data.summary || "庄家AI已完成反向推演"))}
           </p>
         </div>
       )}

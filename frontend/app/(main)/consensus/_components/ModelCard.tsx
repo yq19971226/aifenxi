@@ -3,6 +3,7 @@
 import type { ModelVote } from "@/lib/api/consensus";
 import { mapConfidenceLabel } from "@/lib/utils/confidence";
 import { MODEL_COLORS, MODEL_NAMES, SIGNAL_LABELS, SIGNAL_COLORS } from "./consensus-config";
+import { localizeText } from "@/components/analysis/helpers";
 
 export function ModelCard({ vote }: { vote: ModelVote }) {
   const colors = MODEL_COLORS[vote.model_key] ?? MODEL_COLORS.deepseek;
@@ -37,7 +38,7 @@ export function ModelCard({ vote }: { vote: ModelVote }) {
       
       {vote.reasoning && (
         <p className="mt-3 text-sm leading-relaxed text-zinc-400 line-clamp-3">
-          {vote.reasoning}
+          {localizeText(vote.reasoning)}
         </p>
       )}
       
@@ -49,7 +50,7 @@ export function ModelCard({ vote }: { vote: ModelVote }) {
                 <span
                   className={`mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full ${colors.bg}`}
                 />
-                <span className="line-clamp-2 leading-relaxed">{f}</span>
+                <span className="line-clamp-2 leading-relaxed">{localizeText(f)}</span>
               </li>
             ))}
           </ul>
