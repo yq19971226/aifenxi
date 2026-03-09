@@ -10,6 +10,7 @@ import {
   type OperatorInfo,
 } from "@/lib/api/operators";
 import { EmptyOperators } from "@/components/ui/EmptyState";
+import { useAuth } from "@/lib/auth-context";
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -26,6 +27,8 @@ function formatDate(iso: string): string {
 // ── Main Page ────────────────────────────────────────────────
 
 export default function OperatorsPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const [operators, setOperators] = useState<OperatorInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -115,7 +118,7 @@ export default function OperatorsPage() {
       {/* ── Create Form ─────────────────────────────────── */}
       <motion.form
         onSubmit={handleCreate}
-        className="card-surface rounded-xl p-5 flex flex-wrap items-end gap-4"
+        className="card-surface rounded-lg p-5 flex flex-wrap items-end gap-4"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.05 }}
@@ -184,7 +187,7 @@ export default function OperatorsPage() {
       <AnimatePresence>
         {error && !loading && (
           <motion.div
-            className="backdrop-blur-md bg-white/[0.04] border border-[var(--color-bear)]/30 rounded-xl p-6 text-center"
+            className="backdrop-blur-md bg-white/[0.04] border border-[var(--color-bear)]/30 rounded-lg p-6 text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -197,7 +200,7 @@ export default function OperatorsPage() {
       {/* ── Operator List ────────────────────────────────── */}
       {!loading && !error && (
         <motion.div
-          className="card-surface rounded-xl overflow-hidden"
+          className="card-surface rounded-lg overflow-hidden"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.1 }}

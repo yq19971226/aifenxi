@@ -23,6 +23,7 @@ import {
   RefreshCw,
   Timer,
 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -179,6 +180,8 @@ async function fetchDefenseStatus(symbol: string): Promise<DefenseStatus> {
 // ── 页面组件 ──────────────────────────────────────────────
 
 export default function AdminMonitorPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const [monitorSymbol, setMonitorSymbol] = useState("BTCUSDT");
 
   const { data: health } = useQuery({
@@ -226,7 +229,7 @@ export default function AdminMonitorPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.06]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/[0.06]">
             <Cpu className="text-zinc-400" size={22} />
           </div>
           <div>
@@ -253,7 +256,7 @@ export default function AdminMonitorPage() {
       {/* 系统状态卡片 */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         {/* 后端健康 */}
-        <div className="rounded-xl border border-white/[0.06] bg-[#0F1422] p-4">
+        <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-4">
           <div className="flex items-center gap-2 text-zinc-500">
             <Wifi size={14} />
             <span className="text-xs">后端服务</span>
@@ -274,7 +277,7 @@ export default function AdminMonitorPage() {
         </div>
 
         {/* 智能体总数 */}
-        <div className="rounded-xl border border-white/[0.06] bg-[#0F1422] p-4">
+        <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-4">
           <div className="flex items-center gap-2 text-zinc-500">
             <Brain size={14} />
             <span className="text-xs">智能体</span>
@@ -284,7 +287,7 @@ export default function AdminMonitorPage() {
         </div>
 
         {/* 反思状态 */}
-        <div className="rounded-xl border border-white/[0.06] bg-[#0F1422] p-4">
+        <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-4">
           <div className="flex items-center gap-2 text-zinc-500">
             <Lightbulb size={14} />
             <span className="text-xs">反思注入</span>
@@ -305,7 +308,7 @@ export default function AdminMonitorPage() {
         </div>
 
         {/* 防御等级 */}
-        <div className="rounded-xl border border-white/[0.06] bg-[#0F1422] p-4">
+        <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-4">
           <div className="flex items-center gap-2 text-zinc-500">
             <Shield size={14} />
             <span className="text-xs">防御等级</span>
@@ -326,7 +329,7 @@ export default function AdminMonitorPage() {
       </div>
 
       {/* K 线采集调度器 */}
-      <div className="rounded-2xl border border-white/[0.06] bg-[#0F1422] p-5">
+      <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="mb-1 text-sm font-semibold text-white">K 线数据采集</h2>
@@ -349,7 +352,7 @@ export default function AdminMonitorPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <div className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-3">
+          <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-3">
             <div className="flex items-center gap-1.5 text-zinc-500">
               <RefreshCw size={12} />
               <span className="text-xs">已完成轮次</span>
@@ -358,7 +361,7 @@ export default function AdminMonitorPage() {
               {klineScheduler?.rounds_completed ?? 0}
             </p>
           </div>
-          <div className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-3">
+          <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-3">
             <div className="flex items-center gap-1.5 text-zinc-500">
               <Database size={12} />
               <span className="text-xs">采集任务</span>
@@ -372,7 +375,7 @@ export default function AdminMonitorPage() {
               )}
             </p>
           </div>
-          <div className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-3">
+          <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-3">
             <div className="flex items-center gap-1.5 text-zinc-500">
               <Timer size={12} />
               <span className="text-xs">上轮耗时</span>
@@ -381,7 +384,7 @@ export default function AdminMonitorPage() {
               {klineScheduler?.last_elapsed_s ?? 0}s
             </p>
           </div>
-          <div className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-3">
+          <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-3">
             <div className="flex items-center gap-1.5 text-zinc-500">
               <Clock size={12} />
               <span className="text-xs">上次采集</span>
@@ -423,7 +426,7 @@ export default function AdminMonitorPage() {
       </div>
 
       {/* 智能体列表 */}
-      <div className="rounded-2xl border border-white/[0.06] bg-[#0F1422] p-5">
+      <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5">
         <h2 className="mb-1 text-sm font-semibold text-white">AI 智能体一览</h2>
         <p className="mb-4 text-xs text-zinc-500">系统内置 {AGENTS.length} 个 AI 智能体，从不同维度分析市场并给出综合建议</p>
         <div className="overflow-x-auto">
@@ -494,7 +497,7 @@ export default function AdminMonitorPage() {
       </div>
 
       {/* 分析模式说明 */}
-      <div className="rounded-2xl border border-white/[0.06] bg-[#0F1422] p-5">
+      <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5">
         <h2 className="mb-1 text-sm font-semibold text-white">分析模式</h2>
         <p className="mb-4 text-xs text-zinc-500">系统会根据市场情况自动选择合适的分析模式，调度不同数量的智能体</p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -543,7 +546,7 @@ function ModeCard({
   color: string;
 }) {
   return (
-    <div className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-4">
+    <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-4">
       <div className="flex items-center justify-between">
         <span className={`text-sm font-semibold ${color}`}>{mode}</span>
         <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-xs text-zinc-400">

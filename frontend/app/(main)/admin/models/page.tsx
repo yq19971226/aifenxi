@@ -30,6 +30,7 @@ import {
   type AvailableModel,
   type ModelAssignment,
 } from "@/lib/api/admin-models";
+import { useAuth } from "@/lib/auth-context";
 
 /* ── 图标映射 ─────────────────────────────────────────────── */
 
@@ -118,7 +119,7 @@ function ModelSelect({
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-50 mt-1 w-[320px] rounded-xl border border-white/[0.08] bg-[#0F1422] p-2 shadow-2xl">
+          <div className="absolute right-0 z-50 mt-1 w-[320px] rounded-lg border border-white/[0.08] bg-[#0F1422] p-2 shadow-2xl">
             {models.map((m) => (
               <button
                 key={m.model_key}
@@ -165,6 +166,8 @@ function ModelSelect({
 /* ── 页面主体 ─────────────────────────────────────────────── */
 
 export default function AdminModelsPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const [models, setModels] = useState<AvailableModel[]>([]);
   const [assignments, setAssignments] = useState<ModelAssignment[]>([]);
   const [pendingChanges, setPendingChanges] = useState<Record<string, string>>({});
@@ -251,7 +254,7 @@ export default function AdminModelsPage() {
         <div className="h-8 w-48 animate-pulse rounded-lg bg-white/[0.06]" />
         <div className="space-y-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-16 animate-pulse rounded-xl bg-white/[0.04]" />
+            <div key={i} className="h-16 animate-pulse rounded-lg bg-white/[0.04]" />
           ))}
         </div>
       </div>
@@ -263,7 +266,7 @@ export default function AdminModelsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.06]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/[0.06]">
             <Cpu className="text-zinc-400" size={22} />
           </div>
           <div>
@@ -321,7 +324,7 @@ export default function AdminModelsPage() {
       {Object.entries(grouped).map(([phase, items]) => {
         const phaseColor = PHASE_COLORS[phase] || PHASE_COLORS["核心"];
         return (
-          <div key={phase} className="rounded-2xl border border-white/[0.06] bg-[#0F1422] p-5">
+          <div key={phase} className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5">
             <div className="mb-4 flex items-center gap-2">
               <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${phaseColor.bg} ${phaseColor.text}`}>
                 {phase}
@@ -336,7 +339,7 @@ export default function AdminModelsPage() {
                 return (
                   <div
                     key={item.agent_id}
-                    className={`flex items-center justify-between rounded-xl px-4 py-3 transition-colors ${
+                    className={`flex items-center justify-between rounded-lg px-4 py-3 transition-colors ${
                       hasPending
                         ? "bg-amber-500/5 border border-amber-500/20"
                         : "bg-white/[0.02] border border-transparent"
@@ -382,13 +385,13 @@ export default function AdminModelsPage() {
       })}
 
       {/* 模型说明卡片 */}
-      <div className="rounded-2xl border border-white/[0.06] bg-[#0F1422] p-5">
+      <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5">
         <h2 className="mb-4 text-sm font-semibold text-white">可用模型一览</h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {models.map((m) => (
             <div
               key={m.model_key}
-              className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-4"
+              className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-4"
             >
               <div className="flex items-center justify-between mb-2">
                 <span className={`text-sm font-medium ${MODEL_COLORS[m.model_key] || "text-zinc-300"}`}>

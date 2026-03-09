@@ -10,10 +10,13 @@ import {
   Filter,
   ExternalLink,
 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 type StatusFilter = "" | "pending" | "completed" | "rejected";
 
 export default function WithdrawalsPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<StatusFilter>("pending");
   const [approveId, setApproveId] = useState<string | null>(null);
@@ -87,7 +90,7 @@ export default function WithdrawalsPage() {
               return (
                 <div
                   key={w.id}
-                  className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
+                  className="rounded-lg border border-white/10 bg-white/[0.03] p-4"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">

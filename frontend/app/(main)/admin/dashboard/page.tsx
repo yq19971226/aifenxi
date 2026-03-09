@@ -26,6 +26,7 @@ import { SkeletonStatCard, Skeleton } from "@/components/ui/Skeleton";
 import { SystemHealthGrid } from "@/components/admin/SystemHealthGrid";
 import { AdminUserTable } from "@/components/admin/AdminUserTable";
 import { ApiCallChart } from "@/components/admin/ApiCallChart";
+import { useAuth } from "@/lib/auth-context";
 
 /* ── 系统体检项定义 ──────────────────────────────────────────── */
 
@@ -366,6 +367,8 @@ function QuickActions() {
 /* ── 页面主体 ──────────────────────────────────────────────── */
 
 export default function AdminDashboardPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [llmCost, setLLMCost] = useState<LLMCostSummary | null>(null);
   const [configs, setConfigs] = useState<SystemConfig[]>([]);

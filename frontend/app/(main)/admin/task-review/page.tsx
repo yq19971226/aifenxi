@@ -11,10 +11,13 @@ import {
   Image as ImageIcon,
   Filter,
 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 type StatusFilter = "" | "pending" | "approved" | "rejected";
 
 export default function TaskReviewPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<StatusFilter>("pending");
   const [rejectId, setRejectId] = useState<string | null>(null);
@@ -99,7 +102,7 @@ export default function TaskReviewPage() {
             {submissions.map((s: TaskSubmission) => (
               <div
                 key={s.id}
-                className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
+                className="rounded-lg border border-white/10 bg-white/[0.03] p-4"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">

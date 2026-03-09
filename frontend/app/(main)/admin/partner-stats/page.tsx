@@ -4,8 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { adminPartnerApi, type PartnerListItem } from "@/lib/api/partner";
 import { Users, DollarSign, ArrowDownToLine, Clock, TrendingUp } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 export default function PartnerStatsPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const { data: overview } = useQuery({
     queryKey: ["admin-partner-overview"],
     queryFn: adminPartnerApi.getOverview,
@@ -31,7 +34,7 @@ export default function PartnerStatsPage() {
               { label: "待审提现", value: overview.pending_withdrawals, icon: Clock, color: "text-orange-400" },
               { label: "已提现总额", value: `$${overview.total_withdrawn.toFixed(2)}`, icon: ArrowDownToLine, color: "text-zinc-400" },
             ].map((s) => (
-              <div key={s.label} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <div key={s.label} className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <s.icon size={14} className="text-zinc-500" />
                   <span className="text-xs text-zinc-500">{s.label}</span>
@@ -50,7 +53,7 @@ export default function PartnerStatsPage() {
           ) : partners.length === 0 ? (
             <div className="py-12 text-center text-zinc-500">暂无活跃合伙人</div>
           ) : (
-            <div className="overflow-hidden rounded-xl border border-white/10">
+            <div className="overflow-hidden rounded-lg border border-white/10">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/10 bg-white/[0.03]">

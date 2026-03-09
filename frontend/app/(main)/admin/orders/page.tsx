@@ -8,6 +8,7 @@ import {
   type AdminOrderQueryParams,
 } from "@/lib/api/admin-orders";
 import { EmptyOrders } from "@/components/ui/EmptyState";
+import { useAuth } from "@/lib/auth-context";
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -41,6 +42,8 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
 // ── Main Page ────────────────────────────────────────────────
 
 export default function AdminOrdersPage() {
+  const { user } = useAuth();
+  if (!user || (user.role !== "admin" && user.role !== "operator")) return null;
   // filter state
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -117,7 +120,7 @@ export default function AdminOrdersPage() {
 
       {/* ── Filter Bar ──────────────────────────────────── */}
       <motion.div
-        className="card-surface rounded-xl p-4 flex flex-wrap items-end gap-4"
+        className="card-surface rounded-lg p-4 flex flex-wrap items-end gap-4"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.05 }}
@@ -203,7 +206,7 @@ export default function AdminOrdersPage() {
       <AnimatePresence>
         {error && !loading && (
           <motion.div
-            className="backdrop-blur-md bg-white/[0.04] border border-[var(--color-bear)]/30 rounded-xl p-6 text-center"
+            className="backdrop-blur-md bg-white/[0.04] border border-[var(--color-bear)]/30 rounded-lg p-6 text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -216,7 +219,7 @@ export default function AdminOrdersPage() {
       {/* ── Orders Table ─────────────────────────────────── */}
       {!loading && !error && (
         <motion.div
-          className="card-surface rounded-xl overflow-hidden"
+          className="card-surface rounded-lg overflow-hidden"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.1 }}

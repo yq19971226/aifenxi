@@ -3,7 +3,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { fetchCurrentUser, type UserInfo } from "@/lib/api/auth";
 import {
   fetchConfigs,
   createConfig,
@@ -23,6 +22,7 @@ import {
   ShieldCheck,
   Wifi,
 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 // ── API Key 定义 ─────────────────────────────────────────────
 
@@ -206,7 +206,7 @@ function ApiKeyCard({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-xl border p-5 transition-colors ${
+      className={`rounded-lg border p-5 transition-colors ${
         isConfigured
           ? "border-emerald-500/20 bg-emerald-500/5"
           : def.required
@@ -357,6 +357,8 @@ function ApiKeyCard({
 // ── 主页面 ────────────────────────────────────────────────────
 
 export default function ApiKeysPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const queryClient = useQueryClient();
   const [editValues, setEditValues] = useState<Record<string, string>>({});
   const [initialized, setInitialized] = useState(false);
@@ -371,18 +373,13 @@ export default function ApiKeysPage() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const { data: user, isLoading: userLoading } = useQuery<UserInfo>({
-    queryKey: ["currentUser"],
-    queryFn: fetchCurrentUser,
-  });
-
   const {
     data: configs = [],
     isLoading: configsLoading,
   } = useQuery<SystemConfig[]>({
     queryKey: ["adminConfigs"],
     queryFn: () => fetchConfigs(),
-    enabled: !!user?.is_admin,
+    enabled: true,
   });
 
   const configMap = useMemo(() => {
@@ -482,21 +479,10 @@ export default function ApiKeysPage() {
   const requiredConfigured = API_KEYS.filter((k) => k.required && configMap.has(k.key)).length;
   const requiredTotal = API_KEYS.filter((k) => k.required).length;
 
-  if (userLoading || configsLoading) {
+  if (configsLoading) {
     return (
       <div className="min-h-screen bg-[var(--bg-primary)] text-white p-6 flex items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
-      </div>
-    );
-  }
-
-  if (!user?.is_admin) {
-    return (
-      <div className="min-h-screen bg-[var(--bg-primary)] text-white p-6">
-        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-6 text-center">
-          <ShieldCheck className="h-8 w-8 mx-auto mb-2 text-red-400" />
-          <p className="text-sm text-red-400">权限不足 — 仅管理员可访问</p>
-        </div>
       </div>
     );
   }
@@ -515,7 +501,7 @@ export default function ApiKeysPage() {
       </div>
 
       {/* 进度条 */}
-      <div className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <div className="mb-6 rounded-lg border border-zinc-800 bg-zinc-900 p-5">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm text-zinc-300 font-medium">配置进度</span>
           <span className="text-sm text-white font-bold">{configuredCount}/{API_KEYS.length}</span>
@@ -584,7 +570,7 @@ export default function ApiKeysPage() {
       </div>
 
       {/* 底部说明 */}
-      <div className="mt-8 rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+      <div className="mt-8 rounded-lg border border-zinc-800 bg-zinc-900 p-5">
         <h3 className="text-sm font-semibold text-zinc-300 mb-3">常见问题</h3>
         <div className="space-y-3 text-xs text-zinc-400">
           <div>

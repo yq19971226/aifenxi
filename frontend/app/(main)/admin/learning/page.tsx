@@ -3,7 +3,6 @@
 import { useState, useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { fetchCurrentUser, type UserInfo } from "@/lib/api/auth";
 import {
   fetchPerformanceReview,
   recalculateWeights,
@@ -18,6 +17,7 @@ import {
   type CalibrationParams,
   type DbTableStat,
 } from "@/lib/api/learning";
+import { useAuth } from "@/lib/auth-context";
 
 // ── Tab 定义 ──────────────────────────────────────────────────
 
@@ -640,7 +640,7 @@ function StatCard({
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="card-surface rounded-xl p-5">
+    <div className="card-surface rounded-lg p-5">
       <p className="text-xs uppercase tracking-widest text-zinc-500 mb-3">{title}</p>
       {children}
     </div>
@@ -662,23 +662,9 @@ function ErrorMsg({ msg }: { msg: string }) {
 // ── 主页面 ──────────────────────────────────────────────────
 
 export default function LearningPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const [activeTab, setActiveTab] = useState<TabId>("perf");
-
-  const { data: user } = useQuery<UserInfo>({
-    queryKey: ["currentUser"],
-    queryFn: fetchCurrentUser,
-  });
-
-  if (!user?.is_admin) {
-    return (
-      <div className="flex flex-col gap-4 p-6">
-        <h1 className="text-xl font-semibold text-zinc-200">自主学习</h1>
-        <div className="card-surface rounded-xl p-6 text-center">
-          <p className="text-sm text-bear">权限不足 — 仅管理员可访问</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-4 p-6">

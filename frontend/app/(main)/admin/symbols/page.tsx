@@ -3,7 +3,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { fetchCurrentUser, type UserInfo } from "@/lib/api/auth";
 import {
   listAllSymbols,
   addSymbol,
@@ -14,6 +13,7 @@ import {
   type SymbolCreateRequest,
   type KlineProgressResponse,
 } from "@/lib/api/admin-symbols";
+import { useAuth } from "@/lib/auth-context";
 
 // ── Add Symbol Dialog ────────────────────────────────────────
 
@@ -65,7 +65,7 @@ function AddSymbolDialog({ onClose, onDone }: AddSymbolDialogProps) {
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="w-full max-w-md backdrop-blur-md bg-bg-primary border border-white/[0.08] rounded-xl p-6"
+        className="w-full max-w-md backdrop-blur-md bg-bg-primary border border-white/[0.08] rounded-lg p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="text-sm font-semibold text-zinc-200">添加交易对</h3>
@@ -225,15 +225,12 @@ function SymbolRow({ config, onToggle, onDelete, toggling }: SymbolRowProps) {
 // ── Main Page ────────────────────────────────────────────────
 
 export default function AdminSymbolsPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const queryClient = useQueryClient();
   const [showAdd, setShowAdd] = useState(false);
   const [toggling, setToggling] = useState<string | null>(null);
   const [issuesOnly, setIssuesOnly] = useState(false);
-
-  const { data: user } = useQuery<UserInfo>({
-    queryKey: ["currentUser"],
-    queryFn: fetchCurrentUser,
-  });
 
   const {
     data: symbols = [],
@@ -242,7 +239,7 @@ export default function AdminSymbolsPage() {
   } = useQuery<SymbolConfig[]>({
     queryKey: ["adminSymbols"],
     queryFn: listAllSymbols,
-    enabled: !!user?.is_admin,
+    enabled: true,
   });
 
   const enabledSymbols = symbols.filter((s) => s.enabled).map((s) => s.symbol).sort();
@@ -254,7 +251,7 @@ export default function AdminSymbolsPage() {
   } = useQuery<KlineProgressResponse>({
     queryKey: ["kline-progress", enabledSymbols],
     queryFn: () => fetchKlineProgress(enabledSymbols),
-    enabled: !!user?.is_admin && enabledSymbols.length > 0,
+    enabled: true && enabledSymbols.length > 0,
     refetchInterval: 15000,
   });
 
@@ -313,17 +310,6 @@ export default function AdminSymbolsPage() {
     );
   }, [klineProgress]);
 
-  if (!user?.is_admin) {
-    return (
-      <div className="flex flex-col gap-4 p-6">
-        <h1 className="text-xl font-semibold text-zinc-200">币种管理</h1>
-        <div className="card-surface rounded-xl p-6 text-center">
-          <p className="text-sm text-bear">权限不足 — 仅管理员可访问</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-4 p-6">
       {/* Header */}
@@ -344,7 +330,7 @@ export default function AdminSymbolsPage() {
       </div>
 
       {/* Table */}
-      <div className="card-surface rounded-xl p-6">
+      <div className="card-surface rounded-lg p-6">
         {isLoading ? (
           <div className="flex justify-center py-8">
             <span className="h-5 w-5 animate-spin rounded-full border-2 border-accent border-t-transparent" />
@@ -383,7 +369,7 @@ export default function AdminSymbolsPage() {
         )}
       </div>
 
-      <div className="card-surface rounded-xl p-6">
+      <div className="card-surface rounded-lg p-6">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-zinc-200">K线采集联动进度</h2>
           <label className="flex cursor-pointer items-center gap-2 text-xs text-zinc-500">
@@ -417,7 +403,7 @@ export default function AdminSymbolsPage() {
               <p className="mt-2">
                 总体: {klineProgress.progress_pct.toFixed(1)}% ({klineProgress.ready_slots}/{klineProgress.total_slots})
               </p>
-              <p className="mt-1 text-[11px] text-zinc-500">异常槽位: {issueSlots}</p>
+              <p className="mt-1 text-xs text-zinc-500">异常槽位: {issueSlots}</p>
               <div className="mt-2 h-1.5 w-full overflow-hidden rounded bg-white/[0.08]">
                 <div
                   className="h-full bg-[var(--color-accent)] transition-all"
@@ -436,7 +422,7 @@ export default function AdminSymbolsPage() {
                 </summary>
                 <div className="mt-2 space-y-1">
                   {s.intervals.map((itv) => (
-                    <div key={`${s.symbol}-${itv.interval}`} className="grid grid-cols-9 gap-2 rounded border border-white/[0.04] px-2 py-1 text-[11px] text-zinc-500">
+                    <div key={`${s.symbol}-${itv.interval}`} className="grid grid-cols-9 gap-2 rounded border border-white/[0.04] px-2 py-1 text-xs text-zinc-500">
                       <span className="font-mono text-zinc-300">{itv.interval}</span>
                       <span>K:{itv.kline_count}</span>
                       <span>KT:{formatTtl(itv.kline_ttl)}</span>

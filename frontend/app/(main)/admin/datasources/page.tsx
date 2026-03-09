@@ -36,6 +36,7 @@ import {
   type RateHistoryPoint,
 } from "@/lib/api/datasources";
 import { RateHistoryChart } from "@/components/cards/RateHistoryChart";
+import { useAuth } from "@/lib/auth-context";
 
 // ── 辅助组件 ─────────────────────────────────────────────────
 
@@ -284,6 +285,8 @@ const PRIMARY_SOURCE_META: Record<
 // ── 主页面 ────────────────────────────────────────────────────
 
 export default function AdminDataSourcesPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const [snapshot, setSnapshot] = useState<DataSourceStatusSnapshot | null>(null);
   const [health, setHealth] = useState<HealthSummary | null>(null);
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
@@ -500,7 +503,7 @@ export default function AdminDataSourcesPage() {
       )}
 
       <div className="space-y-6">
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <h2 className="text-base font-semibold text-white">四大主数据源</h2>
@@ -540,7 +543,7 @@ export default function AdminDataSourcesPage() {
                   </div>
                   <p className="mt-2 text-xs text-zinc-500">{source.detail}</p>
                   {source.enabled && source.status !== "enabled" && (
-                    <p className="mt-2 text-[11px] text-zinc-600">
+                    <p className="mt-2 text-xs text-zinc-500">
                       测试连接只验证 API 可达；主卡片状态取决于首轮采集与缓存落地。
                     </p>
                   )}
@@ -588,7 +591,7 @@ export default function AdminDataSourcesPage() {
         </div>
 
         {/* ── CoinGlass_Source 卡片 ── */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3">
@@ -659,7 +662,7 @@ export default function AdminDataSourcesPage() {
         </div>
 
         {/* ── CoinGecko_Source 卡片 ── */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3">
@@ -761,7 +764,7 @@ export default function AdminDataSourcesPage() {
         </div>
 
         {/* ── Exchange_Direct_Combo 卡片 ── */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6">
           <div className="flex items-start justify-between mb-5">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/20">
@@ -957,7 +960,7 @@ export default function AdminDataSourcesPage() {
           const meta = GROUP_META[group.group_id];
           if (!meta) return null;
           return (
-            <div key={group.group_id} className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+            <div key={group.group_id} className="rounded-lg border border-zinc-800 bg-zinc-900 p-6">
               <div className="flex items-start justify-between mb-5">
                 <div className="flex items-center gap-3">
                   <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${meta.bgColor}`}>
@@ -1085,7 +1088,7 @@ export default function AdminDataSourcesPage() {
         })}
 
         {/* ── 状态颜色说明 ── */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-5">
           <h3 className="mb-3 text-sm font-semibold text-zinc-300">状态颜色说明</h3>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {[
@@ -1115,7 +1118,7 @@ export default function AdminDataSourcesPage() {
         </div>
 
         {/* ── 熔断器说明 ── */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-5">
           <h3 className="mb-3 text-sm font-semibold text-zinc-300">熔断器说明</h3>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 text-xs text-zinc-400">
             <div className="rounded-lg bg-zinc-800/50 p-3">

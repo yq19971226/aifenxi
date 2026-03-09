@@ -10,6 +10,7 @@ import {
   type AdminUserListResponse,
 } from "@/lib/api/admin-users";
 import { EmptyUsers } from "@/components/ui/EmptyState";
+import { useAuth } from "@/lib/auth-context";
 
 // ── Constants ────────────────────────────────────────────────
 
@@ -46,6 +47,8 @@ function formatDate(iso: string): string {
 // ── Main Page ────────────────────────────────────────────────
 
 export default function AdminUsersPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const [data, setData] = useState<AdminUserListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -161,7 +164,7 @@ export default function AdminUsersPage() {
       {/* ── Filters ──────────────────────────────────────── */}
       <motion.form
         onSubmit={handleSearch}
-        className="card-surface rounded-xl p-5 flex flex-wrap items-end gap-4"
+        className="card-surface rounded-lg p-5 flex flex-wrap items-end gap-4"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.05 }}
@@ -239,7 +242,7 @@ export default function AdminUsersPage() {
       <AnimatePresence>
         {error && !loading && (
           <motion.div
-            className="backdrop-blur-md bg-white/[0.04] border border-[var(--color-bear)]/30 rounded-xl p-6 text-center"
+            className="backdrop-blur-md bg-white/[0.04] border border-[var(--color-bear)]/30 rounded-lg p-6 text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -252,7 +255,7 @@ export default function AdminUsersPage() {
       {/* ── User Table ───────────────────────────────────── */}
       {!loading && data && (
         <motion.div
-          className="card-surface rounded-xl overflow-hidden"
+          className="card-surface rounded-lg overflow-hidden"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.1 }}

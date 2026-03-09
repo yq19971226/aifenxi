@@ -9,8 +9,11 @@ import {
   batchPublish,
   type AdminPredictionList,
 } from "@/lib/api/admin-playbook-sim";
+import { useAuth } from "@/lib/auth-context";
 
 export default function PlaybookReviewPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const qc = useQueryClient();
   const [page, setPage] = useState(1);
   const [filterPublished, setFilterPublished] = useState<
@@ -126,7 +129,7 @@ export default function PlaybookReviewPage() {
       ) : data?.items.length === 0 ? (
         <p className="text-sm text-zinc-500 text-center py-12">暂无预测记录</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-white/[0.02]">
+        <div className="overflow-x-auto rounded-lg border border-white/[0.08] bg-white/[0.02]">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/[0.08]">

@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { adminTasksApi, type TaskTemplate } from "@/lib/api/tasks";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 const EMPTY_FORM = {
   title: "",
@@ -21,6 +22,8 @@ const EMPTY_FORM = {
 };
 
 export default function TaskTemplatesPage() {
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return null;
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<Partial<TaskTemplate> | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -89,7 +92,7 @@ export default function TaskTemplatesPage() {
 
         {/* Edit Form */}
         {editing && (
-          <div className="rounded-xl border border-accent/30 bg-white/[0.03] p-5 space-y-3">
+          <div className="rounded-lg border border-accent/30 bg-white/[0.03] p-5 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-white">
                 {editingId ? "编辑模板" : "新建模板"}
@@ -206,7 +209,7 @@ export default function TaskTemplatesPage() {
             {templates.map((t: TaskTemplate) => (
               <div
                 key={t.id}
-                className={`flex items-center justify-between rounded-xl border p-4 ${
+                className={`flex items-center justify-between rounded-lg border p-4 ${
                   t.is_active
                     ? "border-white/10 bg-white/[0.03]"
                     : "border-white/5 bg-white/[0.01] opacity-50"

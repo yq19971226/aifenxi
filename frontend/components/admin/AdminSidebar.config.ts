@@ -45,7 +45,7 @@ export const ADMIN_MENU_GROUPS: AdminMenuGroup[] = [
     label: "系统配置",
     items: [
       { label: "快速设置", href: "/admin/setup", icon: Settings },
-      { label: "参数设置", href: "/settings/configs", icon: SlidersHorizontal }, // 注意：此路径在 /admin 布局外，点击会跳出
+      { label: "参数设置", href: "/admin/configs", icon: SlidersHorizontal },
       { label: "API 密钥", href: "/admin/api-keys", icon: Key },
       { label: "数据源管理", href: "/admin/datasources", icon: Database },
       { label: "模型分工", href: "/admin/models", icon: Brain },
