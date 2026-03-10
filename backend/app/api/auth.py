@@ -136,7 +136,14 @@ async def send_register_code(
     await _ensure_registration_enabled(request_locale)
     from app.core.redis import get_redis_pool
 
-    redis = get_redis_pool()
+    try:
+        redis = get_redis_pool()
+    except Exception as exc:
+        logger.exception("send_register_code Redis 不可用: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="验证码服务暂时不可用，请稍后重试",
+        )
     redis_key = f"{_REGISTER_CODE_PREFIX}{email}"
     cooldown_key = f"{_REGISTER_COOLDOWN_PREFIX}{email}"
     email_window_key = f"{_REGISTER_EMAIL_WINDOW_PREFIX}{email}"
@@ -349,8 +356,11 @@ async def register(
         access_tok = create_access_token(user_id, email)
         refresh_tok = create_refresh_token(user_id)
 
-        redis = get_redis_pool()
-        await redis.delete(register_code_key)
+        try:
+            redis = get_redis_pool()
+            await redis.delete(register_code_key)
+        except Exception as redis_exc:
+            logger.warning("注册成功后删除验证码 Redis 键失败（可忽略）: %s", redis_exc)
 
         return RegisterResponse(
             user_id=user_id,
@@ -368,8 +378,16 @@ async def register(
             error_key="auth.email_already_registered",
             locale=request_locale,
         )
+    except RuntimeError as exc:
+        if "邀请码" in str(exc) or "referral" in str(exc).lower():
+            logger.warning("register referral code generation failed: %s", exc)
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="暂时无法完成注册，请稍后重试",
+            )
+        raise
     except Exception as exc:
-        logger.error("register failed: %s", exc)
+        logger.exception("register failed: %s", exc)
         raise HTTPException(status_code=500, detail="注册失败，请稍后重试")
 
 
