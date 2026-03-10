@@ -29,24 +29,25 @@ export function StrategyPriceSection({
   strategy: StrategyData;
   isFallback: boolean;
 }) {
+  const dir = strategy.direction ?? "neutral";
   return (
     <div className="p-4 space-y-3">
       <div className="flex items-center gap-2">
-        {strategy.direction === "long" ? (
+        {dir === "long" ? (
           <TrendingUp className="h-4 w-4 text-emerald-400" />
-        ) : strategy.direction === "short" ? (
+        ) : dir === "short" ? (
           <TrendingDown className="h-4 w-4 text-red-400" />
         ) : null}
         <span
           className={`text-sm font-bold ${
-            strategy.direction === "long"
+            dir === "long"
               ? "text-emerald-400"
-              : strategy.direction === "short"
+              : dir === "short"
                 ? "text-red-400"
                 : "text-zinc-400"
           }`}
         >
-          {formatDirection(strategy.direction)}
+          {formatDirection(dir)}
         </span>
         {isFallback && (
           <span className="text-xs text-amber-400/70">(基于价格估算)</span>
@@ -86,11 +87,11 @@ export function StrategyPriceSection({
             </div>
           </div>
         )}
-        {strategy.risk_reward_ratio > 0 && (
+        {(strategy.risk_reward_ratio ?? 0) > 0 && (
           <div className="rounded-lg bg-white/[0.03] px-3 py-2">
             <p className="text-xs text-zinc-500 mb-1">盈亏比</p>
             <p className="text-sm font-mono font-semibold text-zinc-200">
-              1 : {strategy.risk_reward_ratio.toFixed(1)}
+              1 : {(strategy.risk_reward_ratio ?? 0).toFixed(1)}
             </p>
           </div>
         )}

@@ -158,7 +158,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
             </div>
           </div>
 
-          {/* ── Section 2: 策略摘要（安全分享，不含具体点位） ── */}
+          {/* ── Section 2: 策略摘要（含进场/止损/止盈点位） ── */}
           {report.strategy && isLlmDegraded ? (
             <div style={S.sectionBox("#f59e0b")}>
               <div style={{ fontSize: 13, fontWeight: 700, color: "#9a3412", marginBottom: 4 }}>
@@ -174,11 +174,37 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                 <span style={S.label}>策略类型</span>
                 <span style={S.value}>{report.strategy.is_fallback ? "估算策略" : "标准策略"}</span>
               </div>
-              {report.strategy.risk_reward_ratio > 0 && (
+              {(report.strategy.entry_low != null || report.strategy.entry_high != null) && (
+                <div style={S.row}>
+                  <span style={S.label}>进场点位</span>
+                  <span style={S.value}>
+                    {report.strategy.entry_low != null ? report.strategy.entry_low.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
+                    {" ~ "}
+                    {report.strategy.entry_high != null ? report.strategy.entry_high.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
+                  </span>
+                </div>
+              )}
+              {report.strategy.stop_loss != null && (
+                <div style={S.row}>
+                  <span style={S.label}>止损</span>
+                  <span style={{ ...S.value, color: "#dc2626", fontWeight: 700 }}>
+                    {report.strategy.stop_loss.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+              )}
+              {report.strategy.targets && report.strategy.targets.length > 0 && (
+                <div style={S.row}>
+                  <span style={S.label}>止盈/目标位</span>
+                  <span style={{ ...S.value, color: "#16a34a", fontWeight: 600 }}>
+                    {report.strategy.targets.slice(0, 3).map((t, i) => `T${i + 1}:${t.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`).join(" ")}
+                  </span>
+                </div>
+              )}
+              {(report.strategy.risk_reward_ratio ?? 0) > 0 && (
                 <div style={S.row}>
                   <span style={S.label}>盈亏比 📊</span>
                   <span style={{ ...S.value, color: "#6366f1", fontWeight: 700 }}>
-                    {report.strategy.risk_reward_ratio.toFixed(2)}
+                    {(report.strategy.risk_reward_ratio ?? 0).toFixed(2)}
                   </span>
                 </div>
               )}

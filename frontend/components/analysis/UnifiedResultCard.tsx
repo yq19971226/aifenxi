@@ -142,21 +142,23 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
       {!isBlocked && (
         <>
           {/* 2. Strategy prices */}
-          {strategy && (
-            <>
-              <Divider />
-              {isLlmDegraded ? (
-                <div className="p-4">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                    <span className="text-xs font-medium text-yellow-400">策略生成异常</span>
-                  </div>
-                  <p className="mt-1.5 text-sm text-zinc-400">智能体返回了降级响应，请重试分析。</p>
+          <Divider />
+          {strategy ? (
+            isLlmDegraded ? (
+              <div className="p-4">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                  <span className="text-xs font-medium text-yellow-400">策略生成异常</span>
                 </div>
-              ) : (
-                <StrategyPriceSection strategy={strategy} isFallback={isFallback} />
-              )}
-            </>
+                <p className="mt-1.5 text-sm text-zinc-400">智能体返回了降级响应，请重试分析。</p>
+              </div>
+            ) : (
+              <StrategyPriceSection strategy={strategy} isFallback={isFallback} />
+            )
+          ) : (
+            <div className="p-4">
+              <p className="text-sm text-zinc-500">策略建议未生成或数据不完整，可点击「重试」重新分析。</p>
+            </div>
           )}
 
           {/* Scalping warning */}
