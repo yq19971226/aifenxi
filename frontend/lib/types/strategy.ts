@@ -5,17 +5,17 @@
  */
 
 export interface StrategyData {
-  symbol: string;
+  symbol?: string;
   direction: "long" | "short" | "neutral";
-  entry_low: number;
-  entry_high: number;
-  stop_loss: number;
-  targets: number[];
-  confidence: number;
-  valid_until: string;
-  reasoning: string;
-  risk_reward_ratio: number;
-  is_worth_taking: boolean;
-  snapped_fields: string[];
-  is_fallback: boolean;
+  entry_low?: number | null;
+  entry_high?: number | null;
+  stop_loss?: number | null;
+  targets?: number[];
+  confidence?: number;
+  valid_until?: string | null;
+  reasoning?: string;
+  risk_reward_ratio?: number;
+  is_worth_taking?: boolean;
+  snapped_fields?: string[];
+  is_fallback?: boolean;
 }

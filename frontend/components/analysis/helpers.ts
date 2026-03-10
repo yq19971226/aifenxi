@@ -179,7 +179,8 @@ const _TEXT_REPLACEMENTS: [RegExp, string][] = [
   [/\bnone\b/gi, "无"], [/\bunknown\b/gi, "未知"],
 ];
 
-export function localizeText(text: string): string {
+export function localizeText(text: string | null | undefined): string {
+  if (text == null || typeof text !== "string") return "";
   let result = text;
   for (const [pattern, replacement] of _TEXT_REPLACEMENTS) {
     result = result.replace(pattern, replacement);

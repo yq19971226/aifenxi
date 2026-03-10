@@ -118,7 +118,7 @@ export function StrategyHistory({
               return (
                 <tr key={item.id} className="hover:bg-white/[0.02] transition-colors">
                   <td className="px-4 py-3 text-sm font-medium text-white">
-                    {item.symbol.replace("USDT", "")}
+                    {(item.symbol ?? "").replace("USDT", "")}
                   </td>
                   <td className="px-4 py-3 text-xs md:text-sm">
                     <span className={directionCls(item.direction)}>

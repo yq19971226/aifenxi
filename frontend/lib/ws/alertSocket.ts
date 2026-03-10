@@ -39,10 +39,10 @@ export class AlertSocket {
     const token = getAccessToken();
     if (!token) return null;
     const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
-    // Convert http(s) to ws(s)
+    // 与页面同源：HTTPS 用 wss，否则用 ws；无 API_BASE 时用当前 host，避免 Mixed Content
     const wsBase = apiBase
       ? apiBase.replace(/^http/, "ws")
-      : `ws://${window.location.hostname}:8000`;
+      : `${typeof window !== "undefined" && window.location.protocol === "https:" ? "wss" : "ws"}://${typeof window !== "undefined" ? window.location.host : "localhost:8000"}`;
     return `${wsBase}/ws/alerts?token=${token}&locale=${this.locale}`;
   }
 

@@ -429,6 +429,7 @@ class LearningService:
 
     async def get_db_stats(self) -> list[dict]:
         """获取各主要表的行数统计。"""
+        # audit_logs 由 v18_audit_logs.sql 创建，已有库需在服务器上手动执行该迁移
         tables = [
             "strategies", "strategy_snapshots", "perf_checkpoints",
             "agent_reports", "klines", "memberships", "payments",

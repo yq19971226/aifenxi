@@ -353,9 +353,7 @@ export default function BacktestPage() {
                               {tr.pnl_pct.toFixed(2)}%
                             </td>
                             <td className="py-4 text-right text-sm font-medium text-zinc-500">
-                              {tr.created_at
-                                ?.slice(0, 16)
-                                .replace("T", " ") || ""}
+                              {(tr.created_at != null ? String(tr.created_at).slice(0, 16) : "").replace("T", " ") || ""}
                             </td>
                           </tr>
                         ))}

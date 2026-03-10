@@ -106,16 +106,11 @@ interface HealthData {
 async function fetchHealth(): Promise<HealthData> {
   try {
     const url = API_BASE ? `${API_BASE}/health` : "/health";
-    fetch('http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'389b23'},body:JSON.stringify({sessionId:'389b23',runId:'run1',hypothesisId:'H1',location:'admin/monitor/page.tsx:fetchHealth:start',message:'health fetch starting',data:{apiBase:API_BASE || '(same-origin)',url},timestamp:Date.now()})}).catch(()=>{});
     const res = await fetch(url, { headers: authHeaders() });
-    fetch('http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'389b23'},body:JSON.stringify({sessionId:'389b23',runId:'run1',hypothesisId:'H2',location:'admin/monitor/page.tsx:fetchHealth:response',message:'health fetch response received',data:{ok:res.ok,status:res.status,url:res.url},timestamp:Date.now()})}).catch(()=>{});
     if (!res.ok) throw new Error(`health_status_${res.status}`);
     const data = await res.json();
-    fetch('http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'389b23'},body:JSON.stringify({sessionId:'389b23',runId:'run1',hypothesisId:'H3',location:'admin/monitor/page.tsx:fetchHealth:success',message:'health payload parsed',data:{status:data?.status ?? null,env:data?.env ?? null},timestamp:Date.now()})}).catch(()=>{});
     return data;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "unknown";
-    fetch('http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'389b23'},body:JSON.stringify({sessionId:'389b23',runId:'run1',hypothesisId:'H4',location:'admin/monitor/page.tsx:fetchHealth:catch',message:'health fetch failed',data:{apiBase:API_BASE || '(same-origin)',error:message},timestamp:Date.now()})}).catch(()=>{});
+  } catch {
     return { status: "error", env: "unknown" };
   }
 }
@@ -330,7 +325,7 @@ export default function AdminMonitorPage() {
             </span>
           </div>
           <p className="mt-1 text-xs text-zinc-500">
-            环境: {health?.env || "—"}
+            环境: {health?.status === "ok" && health?.env && health.env !== "unknown" ? health.env : "—"}
           </p>
         </div>
 

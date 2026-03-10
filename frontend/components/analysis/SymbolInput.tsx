@@ -49,7 +49,7 @@ export function SymbolInput({
                 disabled={running}
                 className="px-2 py-1 rounded bg-white/[0.05] hover:bg-white/[0.1] text-xs font-mono text-zinc-300 transition-colors"
               >
-                {s.replace("USDT", "")}
+                {(s ?? "").replace("USDT", "")}
               </button>
             ))}
           </div>

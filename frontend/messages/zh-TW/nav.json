@@ -37,6 +37,7 @@
     "roleOperator": "運營",
     "roleUser": "使用者",
     "announcements": "公告管理",
+    "guide": "使用指南",
     "logout": "登出"
   },
   "breadcrumb": {

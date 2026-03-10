@@ -212,9 +212,6 @@ export function AnnouncementRuntime() {
     )
       .filter(([, count]) => count > 1)
       .map(([key, count]) => ({ key, count }));
-    // #region agent log
-    fetch('http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'389b23'},body:JSON.stringify({sessionId:'389b23',runId:'run1',hypothesisId:'H1',location:'frontend/components/announcements/AnnouncementRuntime.tsx:data',message:'announcement runtime received active items',data:{pathname,total:data.length,visible:visibleAnnouncements.length,banners:banners.length,hasModal:Boolean(activeModal),duplicateKeys,items:summary},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
   }, [activeModal, banners.length, data, pathname, visibleAnnouncements.length]);
 
   useEffect(() => {

@@ -52,7 +52,7 @@ export function OpportunityRank({ symbols }: { symbols: SymbolOverview[] }) {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-white">
-                      {item.display_name || item.symbol.replace("USDT", "")}
+                      {item.display_name || (item.symbol ?? "").replace("USDT", "")}
                     </span>
                     <span className="text-xs text-zinc-500 font-mono">{item.symbol}</span>
                     <ExternalLink size={10} className="text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -120,7 +120,7 @@ export function RiskRadar({ symbols }: { symbols: SymbolOverview[] }) {
                   <div className="flex items-center gap-2.5">
                     <span className={`h-2 w-2 rounded-full ${cfg.dot}`} />
                     <span className="text-sm text-white font-medium">
-                      {item.display_name || item.symbol.replace("USDT", "")}/USDT
+                      {item.display_name || (item.symbol ?? "").replace("USDT", "")}/USDT
                     </span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">

@@ -55,7 +55,7 @@ export function DirectionBadge({
       {badge}
       {worthIcon && (
         <span
-          className={`h-1.5 w-1.5 rounded-full ${worthIcon.replace("text-", "bg-")}`}
+          className={`h-1.5 w-1.5 rounded-full ${(worthIcon ?? "").replace("text-", "bg-")}`}
           title={isWorthTaking ? "值得交易" : "谨慎观望"}
         />
       )}
@@ -74,7 +74,7 @@ export function AlertBadge({ level }: { level: string }) {
   const { color, label } = config[level] || config.none;
   return (
     <span className={`inline-flex items-center gap-1 text-sm font-medium ${color}`}>
-      <span className={`h-2 w-2 rounded-full ${color.replace("text-", "bg-")}`} />
+      <span className={`h-2 w-2 rounded-full ${(color ?? "").replace("text-", "bg-")}`} />
       {label}
     </span>
   );

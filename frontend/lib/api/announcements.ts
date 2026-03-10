@@ -65,13 +65,7 @@ export async function fetchActiveAnnouncements(
 ): Promise<ActiveAnnouncement[]> {
   const params = new URLSearchParams({ pathname });
   const url = `${API_BASE}/api/announcements/active?${params.toString()}`;
-  // #region agent log
-  fetch('http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'389b23'},body:JSON.stringify({sessionId:'389b23',runId:'run1',hypothesisId:'H3',location:'frontend/lib/api/announcements.ts:fetchActiveAnnouncements:start',message:'active announcements request starting',data:{apiBase:API_BASE || '(same-origin)',pathname,url},timestamp:Date.now()})}).catch(()=>{});
-  // #endregion
   const res = await authFetch(url);
-  // #region agent log
-  fetch('http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'389b23'},body:JSON.stringify({sessionId:'389b23',runId:'run1',hypothesisId:'H3',location:'frontend/lib/api/announcements.ts:fetchActiveAnnouncements:response',message:'active announcements response received',data:{status:res.status,ok:res.ok,finalUrl:res.url},timestamp:Date.now()})}).catch(()=>{});
-  // #endregion
   return handleApiResponse(res, "获取公告失败");
 }
 

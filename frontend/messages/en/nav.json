@@ -37,6 +37,7 @@
     "roleOperator": "Operator",
     "roleUser": "User",
     "announcements": "Announcements",
+    "guide": "User Guide",
     "logout": "Log Out"
   },
   "breadcrumb": {

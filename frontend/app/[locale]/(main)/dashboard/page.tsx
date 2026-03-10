@@ -241,7 +241,7 @@ export default function DashboardPage() {
                         <td className="px-3 md:px-4 py-4">
                           <div className="flex items-center gap-2">
                             <span className="text-base md:text-lg font-medium text-white">
-                              {item.display_name || item.symbol.replace("USDT", "")}
+                              {item.display_name || (item.symbol ?? "").replace("USDT", "")}
                             </span>
                             <span className="text-xs text-zinc-500 font-mono">
                               {item.symbol}

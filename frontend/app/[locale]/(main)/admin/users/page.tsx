@@ -247,12 +247,6 @@ export default function AdminUsersPage() {
   const [editExpires, setEditExpires] = useState("");
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'389b23'},body:JSON.stringify({sessionId:'389b23',runId:'run1',hypothesisId:'H1',location:'admin/users/page.tsx:init',message:'admin users labels initialized',data:{roleKeys:Object.keys(ROLE_LABEL),levelKeys:Object.keys(LEVEL_LABEL)},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
-  }, []);
-
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError(null);

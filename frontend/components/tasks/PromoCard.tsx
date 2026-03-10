@@ -120,7 +120,7 @@ export default function PromoCard({ data }: PromoCardProps) {
         <div style={{ marginBottom: 20, position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ fontSize: 28, fontWeight: 800, color: "#fafafa", letterSpacing: "-0.02em" }}>
-              {data.symbol.replace("USDT", "")}
+              {(data.symbol ?? "").replace("USDT", "")}
             </span>
             <span style={{ fontSize: 11, color: "#71717a", fontWeight: 500 }}>/ USDT</span>
             <span

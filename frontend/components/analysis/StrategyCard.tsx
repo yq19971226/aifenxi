@@ -172,11 +172,11 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
             </div>
           )}
           {/* 盈亏比 */}
-          {strategy.risk_reward_ratio > 0 && (
+          {(strategy.risk_reward_ratio ?? 0) > 0 && (
             <div className="rounded-lg bg-white/[0.03] px-3 py-2">
               <p className="text-xs text-zinc-500 mb-1">盈亏比</p>
               <p className="text-xs md:text-sm font-mono font-semibold text-zinc-200">
-                1 : {strategy.risk_reward_ratio.toFixed(1)}
+                1 : {(strategy.risk_reward_ratio ?? 0).toFixed(1)}
               </p>
             </div>
           )}

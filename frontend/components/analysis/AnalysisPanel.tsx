@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { RefreshCw } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { AnalysisProgress } from "@/components/analysis/AnalysisProgress";
 import { AnalysisReport } from "@/components/analysis/AnalysisReport";
@@ -39,6 +39,7 @@ interface AnalysisPanelProps {
 export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
   const queryClient = useQueryClient();
   const locale = useLocale();
+  const t = useTranslations("common");
 
   const [symbol, setSymbol] = useState(externalSymbol);
   useEffect(() => { setSymbol(externalSymbol); }, [externalSymbol]);
@@ -84,6 +85,7 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
   });
 
   const { user } = useAuth();
+  const tCommon = useTranslations("common");
   const adminLevel = effectiveLevel(user);
   const userLevel = Math.max(adminLevel, quota?.level ?? 0);
 
@@ -141,7 +143,14 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
               shouldStop = true;
               break;
             case "error":
-              setError(event.message);
+              const msg = event.message ?? "";
+              setError(
+                /401|未授权|unauthorized/i.test(msg)
+                  ? tCommon("messages.unauthorized")
+                  : /network|fetch|网络|连接/i.test(msg) || msg === "network error"
+                    ? tCommon("messages.networkError")
+                    : msg || tCommon("messages.networkError"),
+              );
               shouldStop = true;
               break;
           }
@@ -152,8 +161,14 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
         }
       } catch (err: unknown) {
         if (!abortRef.current && !(err instanceof DOMException && err.name === "AbortError")) {
-          const message =
+          const raw =
             err instanceof Error ? err.message : "\u8FDE\u63A5\u4E2D\u65AD\uFF0C\u8BF7\u91CD\u8BD5";
+          const message =
+            /401|未授权|unauthorized/i.test(raw)
+              ? tCommon("messages.unauthorized")
+              : /network|fetch|网络|连接/i.test(raw) || raw === "network error"
+                ? tCommon("messages.networkError")
+                : raw;
           setError(message);
         }
       } finally {

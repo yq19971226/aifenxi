@@ -324,7 +324,7 @@ export default function PlaybookReviewPage() {
                         : "—"}
                     </td>
                     <td className="px-3 py-2.5 align-top text-right text-xs text-zinc-500">
-                      {item.created_at?.slice(0, 16).replace("T", " ") || "—"}
+                      {(item.created_at != null ? String(item.created_at).slice(0, 16) : "").replace("T", " ") || "—"}
                     </td>
                     <td className="px-3 py-2.5 align-top text-center">
                       <div className="flex items-center justify-center gap-1">
