@@ -95,9 +95,11 @@ export function calculatePosition(
 // ── Adapters ─────────────────────────────────────────────────
 
 export function fromStrategy(s: StrategyData): PositionInput {
+  const low = s.entry_low ?? 0;
+  const high = s.entry_high ?? 0;
   return {
-    entryPrice: (s.entry_low + s.entry_high) / 2,
-    stopLoss: s.stop_loss,
+    entryPrice: (low + high) / 2,
+    stopLoss: s.stop_loss ?? 0,
     targets: s.targets ?? [],
     direction: s.direction,
   };
