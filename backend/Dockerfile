@@ -17,7 +17,8 @@ WORKDIR /app
 # Copy installed packages from builder
 COPY --from=builder /install /usr/local
 
-# Copy application code
+# Copy application code（先显式复制 leaderboard 确保进镜像，避免缓存导致缺失）
+COPY --chown=omnimind:omnimind app/api/leaderboard.py app/api/
 COPY --chown=omnimind:omnimind . .
 
 USER omnimind

@@ -51,10 +51,7 @@ from app.api.announcements import user_router as announcements_user_router, admi
 from app.api.admin_system import router as admin_system_router
 from app.api.webhooks_resend import router as webhooks_resend_router
 from app.api.dashboard_overview import router as dashboard_overview_router
-try:
-    from app.api.leaderboard import router as leaderboard_router
-except ModuleNotFoundError:
-    leaderboard_router = None  # 兼容旧镜像或构建未包含该模块
+from app.api.leaderboard import router as leaderboard_router
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.redis import init_redis, close_redis
@@ -293,8 +290,7 @@ app.include_router(announcements_admin_router)
 app.include_router(admin_system_router)
 app.include_router(webhooks_resend_router)
 app.include_router(dashboard_overview_router)
-if leaderboard_router is not None:
-    app.include_router(leaderboard_router)
+app.include_router(leaderboard_router)
 
 
 @app.get("/health", tags=["system"])
