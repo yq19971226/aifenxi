@@ -186,12 +186,14 @@ services:
       target: production
       args:
         - API_PROXY_URL=http://backend:8000
+        - NEXT_PUBLIC_API_URL=${PUBLIC_API_URL:-}
+        - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-ws://localhost:8000}
     ports:
       - "3000:3000"
     environment:
       - API_PROXY_URL=http://backend:8000
-      - NEXT_PUBLIC_API_URL=
-      - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+      - NEXT_PUBLIC_API_URL=${PUBLIC_API_URL:-}
+      - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-ws://localhost:8000}
       - NODE_ENV=production
     depends_on:
       backend:
