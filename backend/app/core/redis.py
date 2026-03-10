@@ -37,15 +37,15 @@ async def init_redis() -> None:
         await _redis_pool.ping()
         logger.info("Redis connection pool initialized")
     except Exception as exc:
-        logger.warning("Redis 连接失败，回退到 fakeredis: %s", exc)
+        logger.warning("Redis 连接失败，尝试 fakeredis 回退: %s", exc)
         try:
             import fakeredis.aioredis as fakeasync
             _redis_pool = fakeasync.FakeRedis(decode_responses=True)
             await _redis_pool.ping()
             logger.info("fakeredis 初始化成功（仅开发环境）")
         except ImportError:
-            logger.error("Redis 不可用且 fakeredis 未安装，无法启动")
-            raise
+            logger.error("Redis 不可用且未安装 fakeredis，生产环境请确保 Redis 可连接")
+            raise exc from exc
 
 
 async def close_redis() -> None:
