@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { ModuleErrorBoundary } from "@/components/layout/ModuleErrorBoundary";
 import { fetchDashboardOverview, fetchDashboardSignals } from "@/lib/api/dashboard";
@@ -31,6 +31,7 @@ import { useOnlineCount } from "@/lib/hooks/useOnlineCount";
 
 function NewUserBanner() {
   const t = useTranslations('dashboard');
+  const locale = useLocale();
   const [dismissed, setDismissed] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("axiom_guide_dismissed") === "1";
@@ -55,7 +56,7 @@ function NewUserBanner() {
       <BookOpen size={16} className="shrink-0 text-blue-400" />
       <p className="flex-1 text-sm text-blue-300/80">
         {t('guideBanner')}{" "}
-        <Link href="/guide" className="underline underline-offset-2 hover:text-blue-200 transition-colors">
+        <Link href={`/${locale}/guide`} className="underline underline-offset-2 hover:text-blue-200 transition-colors">
           {t('guideBannerLink')}
         </Link>
       </p>

@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { motion, useInView } from "framer-motion";
 import {
   ArrowRight,
@@ -70,6 +70,7 @@ function SectionHeading({
 
 function LandingNav() {
   const t = useTranslations("landing.nav");
+  const locale = useLocale();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-black/60 backdrop-blur-xl">
@@ -97,13 +98,13 @@ function LandingNav() {
         <div className="flex items-center gap-3">
           <LanguageSwitcher />
           <Link
-            href="/login"
+            href={`/${locale}/login`}
             className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
           >
             {t("login")}
           </Link>
           <Link
-            href="/login?tab=register"
+            href={`/${locale}/login?tab=register`}
             className="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-1.5 text-sm font-medium text-white transition-all hover:bg-blue-500"
           >
             {t("register")}
@@ -216,6 +217,7 @@ function LiveDashboardMockup() {
 
 function HeroSection() {
   const t = useTranslations("landing.hero");
+  const locale = useLocale();
   const { count: onlineCount, enabled: onlineEnabled } = usePublicOnlineCount();
 
   return (
@@ -263,7 +265,7 @@ function HeroSection() {
               className="mt-8 flex flex-col sm:flex-row items-start gap-4"
             >
               <Link
-                href="/login"
+                href={`/${locale}/login`}
                 className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-all hover:bg-blue-500 hover:shadow-[0_0_24px_rgba(37,99,235,0.3)] active:scale-[0.98]"
               >
                 {t("cta")}
@@ -535,6 +537,7 @@ function DataSection() {
 
 function CTASection() {
   const t = useTranslations("landing.cta");
+  const locale = useLocale();
 
   return (
     <section className="py-24 sm:py-32 border-t border-white/[0.04]">
@@ -548,7 +551,7 @@ function CTASection() {
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/login"
+              href={`/${locale}/login`}
               className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-all hover:bg-blue-500 hover:shadow-[0_0_24px_rgba(37,99,235,0.3)] active:scale-[0.98]"
             >
               {t("button")}
@@ -556,14 +559,14 @@ function CTASection() {
             </Link>
             <span className="flex items-center gap-3 text-sm">
               <Link
-                href="/login"
+                href={`/${locale}/login`}
                 className="text-zinc-500 hover:text-zinc-300 transition-colors"
               >
                 {t("login")}
               </Link>
               <span className="text-zinc-800">|</span>
               <Link
-                href="/guide"
+                href={`/${locale}/guide`}
                 className="text-zinc-500 hover:text-zinc-300 transition-colors"
               >
                 {t("guide")}
@@ -578,6 +581,7 @@ function CTASection() {
 
 function LandingFooter() {
   const t = useTranslations("landing.footer");
+  const locale = useLocale();
   const year = new Date().getFullYear();
 
   return (
@@ -605,12 +609,12 @@ function LandingFooter() {
             </h4>
             <ul className="space-y-2.5">
               <li>
-                <Link href="/login" className="text-sm text-zinc-600 hover:text-zinc-400 transition-colors">
+                <Link href={`/${locale}/login`} className="text-sm text-zinc-600 hover:text-zinc-400 transition-colors">
                   {t("login")}
                 </Link>
               </li>
               <li>
-                <Link href="/login?tab=register" className="text-sm text-zinc-600 hover:text-zinc-400 transition-colors">
+                <Link href={`/${locale}/login?tab=register`} className="text-sm text-zinc-600 hover:text-zinc-400 transition-colors">
                   {t("register")}
                 </Link>
               </li>
@@ -624,7 +628,7 @@ function LandingFooter() {
             </h4>
             <ul className="space-y-2.5">
               <li>
-                <Link href="/guide" className="text-sm text-zinc-600 hover:text-zinc-400 transition-colors">
+                <Link href={`/${locale}/guide`} className="text-sm text-zinc-600 hover:text-zinc-400 transition-colors">
                   {t("guide")}
                 </Link>
               </li>
@@ -634,7 +638,7 @@ function LandingFooter() {
                 </a>
               </li>
               <li>
-                <Link href="/guide#faq" className="text-sm text-zinc-600 hover:text-zinc-400 transition-colors">
+                <Link href={`/${locale}/guide#faq`} className="text-sm text-zinc-600 hover:text-zinc-400 transition-colors">
                   {t("faq")}
                 </Link>
               </li>

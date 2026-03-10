@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { LogoMark } from "@/components/ui/Logo";
 import {
   LayoutDashboard,
@@ -139,6 +139,7 @@ export function TopNav() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const t = useTranslations('nav');
+  const locale = useLocale();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -540,7 +541,7 @@ export function TopNav() {
                   </div>
                 </Link>
                 <Link
-                  href="/guide"
+                  href={`/${locale}/guide`}
                   onClick={() => setShowUserMenu(false)}
                 >
                   <div className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-zinc-400 transition-colors hover:text-zinc-200 hover:bg-white/[0.04]">

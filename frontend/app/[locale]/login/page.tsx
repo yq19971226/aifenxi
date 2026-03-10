@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect, useMemo, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { sendRegisterCode } from "@/lib/api/auth";
@@ -187,6 +187,7 @@ function LoginPageInner() {
   const { user, loading, login, register } = useAuth();
   const router = useRouter();
   const t = useTranslations('login');
+  const locale = useLocale();
 
   const [tab, setTab] = useState<TabType>("login");
   const [email, setEmail] = useState("");
@@ -857,7 +858,7 @@ function LoginPageInner() {
           <div className="mt-8 text-center space-y-2">
             <p className="text-sm text-zinc-700">{t('legal')}</p>
             <Link
-              href="/guide"
+              href={`/${locale}/guide`}
               className="inline-block text-sm text-zinc-600 hover:text-zinc-400 transition-colors"
             >
               {t('guideLink')}
