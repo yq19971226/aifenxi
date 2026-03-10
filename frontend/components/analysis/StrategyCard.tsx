@@ -144,7 +144,7 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
             {symbol && <p className="text-xs text-zinc-500">{symbol}</p>}
           </div>
         </div>
-        {confidence !== null && confidence > 0 && (
+        {confidence != null && confidence > 0 && (
           <ConfidenceRing value={confidence} color={dirColor} />
         )}
       </div>
