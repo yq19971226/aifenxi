@@ -5,6 +5,8 @@ WORKDIR /app
 
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
+# 确保 next-intl 在构建环境中可用（避免 CI/镜像缓存导致类型缺失）
+RUN npm install next-intl --no-save
 
 # ---- Build stage ----
 FROM node:20-alpine AS builder

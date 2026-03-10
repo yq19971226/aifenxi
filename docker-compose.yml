@@ -74,8 +74,9 @@ services:
   redis:
     image: redis:7-alpine
     command: redis-server --maxmemory 512mb --maxmemory-policy volatile-lru
-    ports:
-      - "6379:6379"
+    # 生产环境不暴露到主机，避免与宝塔 Redis 冲突；容器间用 redis:6379 访问
+    # ports:
+    #   - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
