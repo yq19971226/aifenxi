@@ -163,6 +163,7 @@ const _TEXT_REPLACEMENTS: [RegExp, string][] = [
   [/\bpartial\b/gi, "部分"], [/\bfull\b/gi, "完全"],
   // ── 风险等级 ──
   [/\bhigh\b/gi, "高"], [/\bmoderate\b/gi, "中等"], [/\bmedium\b/gi, "中"], [/\blow\b/gi, "低"],
+  [/\bconservative\b/gi, "保守"], [/\baggressive\b/gi, "激进"],
   // ── 动量/量能 ──
   [/\bmomentum\b/gi, "动量"], [/\bvolume\b/gi, "成交量"],
   [/\bdivergence\b/gi, "背离"], [/\bconvergence\b/gi, "收敛"],

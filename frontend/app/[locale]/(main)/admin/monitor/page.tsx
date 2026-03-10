@@ -325,7 +325,12 @@ export default function AdminMonitorPage() {
             </span>
           </div>
           <p className="mt-1 text-xs text-zinc-500">
-            环境: {health?.status === "ok" && health?.env && health.env !== "unknown" ? health.env : "—"}
+            环境: {health?.status === "ok" && health?.env && String(health.env).toLowerCase() !== "unknown"
+              ? health.env
+              : "—"}
+            {health?.status !== "ok" && (
+              <span className="ml-1 text-zinc-600">(无法连接)</span>
+            )}
           </p>
         </div>
 

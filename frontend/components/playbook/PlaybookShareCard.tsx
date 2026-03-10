@@ -27,8 +27,9 @@ function adoptionLabel(a: string): { text: string; color: string; emoji: string 
 }
 
 function riskLabel(r: string): { text: string; color: string } {
-  if (r === "high" || r === "极高") return { text: "高风险", color: "#dc2626" };
-  if (r === "moderate" || r === "medium" || r === "中等" || r === "中") return { text: "中风险", color: "#f59e0b" };
+  const s = (r ?? "").toLowerCase();
+  if (s === "high" || s === "极高" || s === "aggressive" || s === "激进") return { text: "高风险", color: "#dc2626" };
+  if (s === "moderate" || s === "medium" || s === "中等" || s === "中") return { text: "中风险", color: "#f59e0b" };
   return { text: "低风险", color: "#16a34a" };
 }
 

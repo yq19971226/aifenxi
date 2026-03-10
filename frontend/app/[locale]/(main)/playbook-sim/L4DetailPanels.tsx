@@ -52,8 +52,9 @@ export function DealerDetailPanel({ dealer }: { dealer: DealerPrediction }) {
 
 export function DefenseDetailPanel({ defense }: { defense: DefenseStrategy }) {
   const t = useTranslations("playbook-sim");
-  const riskColor = defense.risk_level === "high" || defense.risk_level === "极高"
-    ? "text-red-400" : defense.risk_level === "moderate" || defense.risk_level === "medium" || defense.risk_level === "中等"
+  const r = (defense.risk_level ?? "").toLowerCase();
+  const riskColor = /^(high|极高|aggressive|激进)$/.test(r)
+    ? "text-red-400" : /^(medium|moderate|中等|中)$/.test(r)
     ? "text-amber-400" : "text-emerald-400";
 
   return (

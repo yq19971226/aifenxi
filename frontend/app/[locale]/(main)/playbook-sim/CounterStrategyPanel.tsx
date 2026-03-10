@@ -16,8 +16,8 @@ interface CounterStrategy {
 
 export default function CounterStrategyPanel({ cs }: { cs: CounterStrategy }) {
   const t = useTranslations("playbook-sim");
-  const isHighRisk = cs.risk_level === "high" || cs.risk_level === "极高";
-  const isMedRisk = cs.risk_level === "medium" || cs.risk_level === "moderate" || cs.risk_level === "中等";
+  const isHighRisk = /^(high|极高|aggressive|激进)$/i.test(cs.risk_level ?? "");
+  const isMedRisk = /^(medium|moderate|中等|中)$/i.test(cs.risk_level ?? "");
 
   return (
     <div className="space-y-3">
