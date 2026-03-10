@@ -90,6 +90,29 @@ async def _collect_for_symbol(symbol: str) -> dict[str, int]:
                 errors += 1
                 logger.error("cg_collect_oi_failed", extra={"symbol": symbol, "error": str(exc)})
 
+            # 1.25 稳定币/币本位保证金 OI 采集
+            try:
+                stablecoin_oi = await oi_monitor.collect_oi_stablecoin_margin(symbol)
+                if stablecoin_oi:
+                    await set_with_ttl(
+                        f"cg_oi_stablecoin:{symbol}",
+                        [s.model_dump(mode="json") for s in stablecoin_oi[-20:]],
+                        ttl_seconds=600,
+                    )
+                    success += 1
+
+                coin_margin_oi = await oi_monitor.collect_oi_coin_margin(symbol)
+                if coin_margin_oi:
+                    await set_with_ttl(
+                        f"cg_oi_coin:{symbol}",
+                        [s.model_dump(mode="json") for s in coin_margin_oi[-20:]],
+                        ttl_seconds=600,
+                    )
+                    success += 1
+            except Exception as exc:
+                errors += 1
+                logger.error("cg_collect_margin_oi_failed", extra={"symbol": symbol, "error": str(exc)})
+
             # 1.5 净持仓采集 → cg_net_position
             try:
                 net_pos = await oi_monitor.collect_net_position(symbol)

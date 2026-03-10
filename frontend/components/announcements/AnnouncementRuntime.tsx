@@ -198,6 +198,26 @@ export function AnnouncementRuntime() {
   );
 
   useEffect(() => {
+    const summary = data.slice(0, 5).map((item) => ({
+      id: item.id,
+      key: item.announcement_key,
+      version: item.version,
+      mode: item.display_mode,
+    }));
+    const duplicateKeys = Array.from(
+      data.reduce((acc, item) => {
+        acc.set(item.announcement_key, (acc.get(item.announcement_key) || 0) + 1);
+        return acc;
+      }, new Map<string, number>()).entries()
+    )
+      .filter(([, count]) => count > 1)
+      .map(([key, count]) => ({ key, count }));
+    // #region agent log
+    fetch('http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'389b23'},body:JSON.stringify({sessionId:'389b23',runId:'run1',hypothesisId:'H1',location:'frontend/components/announcements/AnnouncementRuntime.tsx:data',message:'announcement runtime received active items',data:{pathname,total:data.length,visible:visibleAnnouncements.length,banners:banners.length,hasModal:Boolean(activeModal),duplicateKeys,items:summary},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+  }, [activeModal, banners.length, data, pathname, visibleAnnouncements.length]);
+
+  useEffect(() => {
     const activeIds = new Set(data.map((item) => item.id));
     setHiddenIds((prev) => {
       const next = prev.filter((id) => activeIds.has(id));
@@ -283,7 +303,7 @@ export function AnnouncementRuntime() {
   return (
     <>
       {banners.length > 0 ? (
-        <div className="mx-auto w-full max-w-[1400px] px-3 pt-3 md:px-6">
+        <div className="sticky top-14 z-30 mx-auto w-full max-w-[1400px] px-3 pt-3 md:px-6">
           <div className="space-y-3">
             <AnimatePresence initial={false}>
               {banners.map((announcement) => (

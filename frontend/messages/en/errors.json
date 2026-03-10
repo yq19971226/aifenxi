@@ -1,0 +1,50 @@
+{
+  "http": {
+    "400": "Bad request",
+    "401": "Unauthorized, please login",
+    "403": "Access forbidden",
+    "404": "Resource not found",
+    "408": "Request timeout, please retry",
+    "429": "Too many requests, please try again later",
+    "500": "Internal server error",
+    "502": "Bad gateway",
+    "503": "Service unavailable",
+    "504": "Gateway timeout"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "minLength": "Minimum {min} characters required",
+    "maxLength": "Maximum {max} characters allowed",
+    "pattern": "Invalid format",
+    "number": "Please enter a valid number",
+    "integer": "Please enter an integer",
+    "positive": "Please enter a positive number",
+    "range": "Value should be between {min} and {max}",
+    "url": "Please enter a valid URL",
+    "date": "Please enter a valid date",
+    "password": "Password strength insufficient"
+  },
+  "auth": {
+    "loginFailed": "Login failed, please check username and password",
+    "sessionExpired": "Session expired, please login again",
+    "tokenInvalid": "Invalid token",
+    "permissionDenied": "Permission denied",
+    "accountLocked": "Account locked",
+    "accountNotFound": "Account not found"
+  },
+  "api": {
+    "networkError": "Network connection failed, please check your connection",
+    "timeout": "Request timeout, please retry",
+    "serverError": "Server error, please try again later",
+    "unknownError": "Unknown error",
+    "dataParseError": "Data parsing failed",
+    "rateLimitExceeded": "Rate limit exceeded"
+  },
+  "form": {
+    "submitFailed": "Submit failed, please retry",
+    "invalidData": "Invalid data format",
+    "duplicateEntry": "Data already exists",
+    "saveFailed": "Save failed"
+  }
+}

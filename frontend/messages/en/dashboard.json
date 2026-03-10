@@ -1,0 +1,27 @@
+{
+  "title": "Multi-Symbol Overview",
+  "subtitle": "AI monitoring {count} symbols in real-time, click to expand for details",
+  "autoRefresh": "Auto-refresh every 30s",
+  "guideBanner": "First time here? Check out the guide to get started in 2 minutes.",
+  "guideBannerLink": "View Guide",
+  "onlineLabel": "online",
+  "error": {
+    "loadFailed": "Load Failed",
+    "fetchFailed": "Failed to fetch overview data, will retry in 30s"
+  },
+  "table": {
+    "symbol": "Symbol",
+    "price": "Latest Price",
+    "aiJudgment": "AI Signal",
+    "confidence": "Confidence",
+    "defenseStatus": "Defense Status",
+    "onchainData": "On-chain Data",
+    "noData": "No symbol data available, please add symbols in admin panel"
+  },
+  "legend": {
+    "safe": "Safe = No anomalies detected",
+    "caution": "Caution = Market maker activity signs",
+    "danger": "Danger = Market maker manipulation confirmed",
+    "critical": "Critical = High manipulation risk"
+  }
+}

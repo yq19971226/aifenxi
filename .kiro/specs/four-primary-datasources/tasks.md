@@ -20,13 +20,13 @@
   - [x] 1.4 为 `omnimind-system` 和 `omnimind-v2-enhancements` 增加历史阶段说明
   - [x] 1.5 清理旧文档中误导性的主架构表述，防止继续被引用为当前主真相源
 
-- [ ] 2. 主能力矩阵对齐
-  - [ ] 2.1 定义 `Primary Capability Matrix` 字段与维护位置
+- [x] 2. 主能力矩阵对齐
+  - [x] 2.1 定义 `Primary Capability Matrix` 字段与维护位置
   - [x] 2.2 为 `market / derivatives / onchain / macro` 四域补 owner 映射
   - [x] 2.3 为每项核心能力补 cache_key / api / consumer / fallback 说明
-  - [ ] 2.4 统一 capability status 与 freshness 输出协议
+  - [x] 2.4 统一 capability status 与 freshness 输出协议
 
-- [ ] 3. 后台一等展示收口
+- [x] 3. 后台一等展示收口
   - [x] 3.1 后台数据源主视图收敛为四个主源
   - [x] 3.2 旧源改为 `辅助 / 已停用 / 可恢复`
   - [x] 3.3 公开状态接口改为域级状态与 freshness 语义

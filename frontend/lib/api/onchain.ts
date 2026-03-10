@@ -33,7 +33,7 @@ export interface PlanCapabilities {
 
 export async function fetchOnchainCapabilities(): Promise<PlanCapabilities> {
   const res = await authFetch(`${API_BASE}/api/onchain/capabilities`);
-  return handleApiResponse(res, "获取能力失败");
+  return handleApiResponse(res, "Failed to fetch capabilities");
 }
 
 export async function fetchOnchainData(
@@ -50,7 +50,7 @@ export async function fetchOnchainData(
     if (data.error === "upgrade_required") {
       throw new Error(data.message);
     }
-    throw new Error(data.detail || "获取链上数据失败");
+    throw new Error(data.detail || "Failed to fetch on-chain data");
   }
 
   return data;

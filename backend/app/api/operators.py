@@ -47,7 +47,11 @@ async def list_operators_route(
     try:
         return await list_operators(session)
     except Exception as exc:
-        logger.error("list_operators_route error: %s", exc)
+        logger.exception(
+            "list_operators_route failed admin_user_id=%s admin_email=%s",
+            user.id,
+            user.email,
+        )
         raise HTTPException(status_code=500, detail="获取运营员列表失败")
 
 
@@ -59,11 +63,31 @@ async def create_operator_route(
 ) -> OperatorInfo:
     """创建运营员账户。"""
     try:
-        return await create_operator(session, body.email, body.password)
+        operator = await create_operator(session, body.email, body.password)
+        logger.info(
+            "create_operator_route succeeded admin_user_id=%s admin_email=%s target_email=%s operator_id=%s",
+            user.id,
+            user.email,
+            body.email,
+            operator.id,
+        )
+        return operator
     except ValueError as exc:
+        logger.warning(
+            "create_operator_route rejected admin_user_id=%s admin_email=%s target_email=%s detail=%s",
+            user.id,
+            user.email,
+            body.email,
+            str(exc),
+        )
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
     except Exception as exc:
-        logger.error("create_operator_route error: %s", exc)
+        logger.exception(
+            "create_operator_route failed admin_user_id=%s admin_email=%s target_email=%s",
+            user.id,
+            user.email,
+            body.email,
+        )
         raise HTTPException(status_code=500, detail="创建运营员失败")
 
 
@@ -75,11 +99,31 @@ async def activate_operator_route(
 ) -> OperatorInfo:
     """启用运营员账户。"""
     try:
-        return await activate_operator(session, operator_id)
+        operator = await activate_operator(session, operator_id)
+        logger.info(
+            "activate_operator_route succeeded admin_user_id=%s admin_email=%s operator_id=%s target_email=%s",
+            user.id,
+            user.email,
+            operator_id,
+            operator.email,
+        )
+        return operator
     except ValueError as exc:
+        logger.warning(
+            "activate_operator_route rejected admin_user_id=%s admin_email=%s operator_id=%s detail=%s",
+            user.id,
+            user.email,
+            operator_id,
+            str(exc),
+        )
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
     except Exception as exc:
-        logger.error("activate_operator_route error: %s", exc)
+        logger.exception(
+            "activate_operator_route failed admin_user_id=%s admin_email=%s operator_id=%s",
+            user.id,
+            user.email,
+            operator_id,
+        )
         raise HTTPException(status_code=500, detail="启用运营员失败")
 
 
@@ -91,9 +135,29 @@ async def deactivate_operator_route(
 ) -> OperatorInfo:
     """停用运营员账户。"""
     try:
-        return await deactivate_operator(session, operator_id)
+        operator = await deactivate_operator(session, operator_id)
+        logger.info(
+            "deactivate_operator_route succeeded admin_user_id=%s admin_email=%s operator_id=%s target_email=%s",
+            user.id,
+            user.email,
+            operator_id,
+            operator.email,
+        )
+        return operator
     except ValueError as exc:
+        logger.warning(
+            "deactivate_operator_route rejected admin_user_id=%s admin_email=%s operator_id=%s detail=%s",
+            user.id,
+            user.email,
+            operator_id,
+            str(exc),
+        )
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
     except Exception as exc:
-        logger.error("deactivate_operator_route error: %s", exc)
+        logger.exception(
+            "deactivate_operator_route failed admin_user_id=%s admin_email=%s operator_id=%s",
+            user.id,
+            user.email,
+            operator_id,
+        )
         raise HTTPException(status_code=500, detail="停用运营员失败")

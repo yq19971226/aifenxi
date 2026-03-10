@@ -1,6 +1,7 @@
 """合伙人系统核心服务 — 邀请码、佣金、钱包、提现。"""
 
 import re
+import uuid
 from datetime import datetime, timezone
 
 import structlog
@@ -98,7 +99,7 @@ async def get_dashboard(session: AsyncSession, user_id: str) -> dict:
 
     return {
         "referral_code": referral_code,
-        "referral_link": f"{brand_url}/?ref={referral_code}" if brand_url else "",
+        "referral_link": f"{brand_url}/login?ref={referral_code}" if brand_url else "",
         "balance": balance,
         "frozen": frozen,
         "total_invitations": total_invitations,
@@ -200,7 +201,7 @@ async def grant_commission(
     user_id: str,
     payment_id: str,
     amount_usd: float,
-) -> None:
+) -> dict | None:
     """检查被邀请关系，发放佣金给邀请人。
 
     在 payment webhook 中支付成功后调用。
@@ -221,6 +222,15 @@ async def grant_commission(
     if enabled.lower() != "true":
         return
 
+    # 幂等：同一笔支付不重复发佣金
+    dup = await session.execute(
+        text("SELECT 1 FROM commissions WHERE payment_id = :pid AND partner_id = :partner_id"),
+        {"pid": payment_id, "partner_id": partner_id},
+    )
+    if dup.first() is not None:
+        logger.info("commission_skipped_duplicate", payment_id=payment_id, partner_id=partner_id)
+        return
+
     # 读取分成比例
     _rate_str = await get_config_value("partner_commission_rate", "0.10")
     rate = float(_rate_str) if _rate_str else 0.10
@@ -229,17 +239,19 @@ async def grant_commission(
         return
 
     # 写入佣金记录
+    commission_id = str(uuid.uuid4())
     await session.execute(
         text(
             """
             INSERT INTO commissions
-                (partner_id, referee_id, payment_id, payment_amount_usd,
+                (id, partner_id, referee_id, payment_id, payment_amount_usd,
                  commission_rate, commission_amount, status)
-            VALUES (:partner_id, :referee_id, :payment_id, :amount,
+            VALUES (:id, :partner_id, :referee_id, :payment_id, :amount,
                     :rate, :commission, 'confirmed')
             """
         ),
         {
+            "id": commission_id,
             "partner_id": partner_id,
             "referee_id": user_id,
             "payment_id": payment_id,
@@ -250,10 +262,6 @@ async def grant_commission(
     )
     await session.flush()
 
-    # 更新 Redis 可提现余额
-    redis = get_redis_pool()
-    await redis.incrbyfloat(f"partner_balance:{partner_id}", commission)
-
     logger.info(
         "commission_granted",
         partner_id=partner_id,
@@ -262,6 +270,14 @@ async def grant_commission(
         commission=commission,
         rate=rate,
     )
+
+    return {"partner_id": partner_id, "commission": commission}
+
+
+async def sync_commission_to_redis(partner_id: str, commission: float) -> None:
+    """在 DB 事务提交后调用，将佣金同步到 Redis 余额。"""
+    redis = get_redis_pool()
+    await redis.incrbyfloat(f"partner_balance:{partner_id}", commission)
 
 
 # ── 钱包管理 ─────────────────────────────────────────────────
@@ -312,7 +328,7 @@ async def upsert_wallet(session: AsyncSession, user_id: str, trc20_address: str)
                 remaining_hours = round((cooldown_hours * 3600 - elapsed) / 3600, 1)
                 raise ValueError(f"地址修改冷却中，请 {remaining_hours} 小时后再试")
 
-    # Upsert
+    # Upsert（is_verified 基于格式校验；完整的链上验证需独立流程）
     await session.execute(
         text(
             f"""
@@ -339,11 +355,26 @@ async def request_withdrawal(session: AsyncSession, user_id: str) -> dict:
     if not wallet:
         raise ValueError("请先绑定 TRC20 地址")
 
-    # 检查余额
+    # 检查余额（原子检查+冻结，防并发超扣）
     redis = get_redis_pool()
-    balance = await _redis_get_float(redis, f"partner_balance:{user_id}")
     min_amount = float(await get_config_value("partner_min_withdrawal", "50"))
-    if balance < min_amount:
+    balance_key = f"partner_balance:{user_id}"
+    frozen_key = f"partner_frozen:{user_id}"
+
+    freeze_lua = """
+    local bal = tonumber(redis.call('GET', KEYS[1]) or '0')
+    local min_amt = tonumber(ARGV[1])
+    if bal < min_amt then
+        return {0, tostring(bal)}
+    end
+    redis.call('SET', KEYS[1], '0')
+    redis.call('INCRBYFLOAT', KEYS[2], tostring(bal))
+    return {1, tostring(bal)}
+    """
+    result = await redis.eval(freeze_lua, 2, balance_key, frozen_key, str(min_amount))
+    ok, balance_str = int(result[0]), result[1]
+    balance = float(balance_str)
+    if not ok:
         raise ValueError(f"可提现余额不足，最低 {min_amount} USDT")
 
     # 检查冷却期
@@ -364,15 +395,7 @@ async def request_withdrawal(session: AsyncSession, user_id: str) -> dict:
         if elapsed_days < cooldown_days:
             raise ValueError(f"距上次提现不足 {cooldown_days} 天")
 
-    # 冻结余额
-    await _redis_transfer(
-        redis,
-        from_key=f"partner_balance:{user_id}",
-        to_key=f"partner_frozen:{user_id}",
-        amount=balance,
-    )
-
-    # 创建提现记录
+    # 创建提现记录（余额已在上方 Lua 脚本中原子冻结）
     result = await insert_returning(
         session,
         """
@@ -633,7 +656,7 @@ async def get_referral_code(session: AsyncSession, user_id: str) -> dict:
     brand_url = await get_config_value("site_brand_url", "")
     return {
         "referral_code": code,
-        "referral_link": f"{brand_url}/?ref={code}" if brand_url and code else "",
+        "referral_link": f"{brand_url}/login?ref={code}" if brand_url and code else "",
     }
 
 

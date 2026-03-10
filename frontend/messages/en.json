@@ -1,0 +1,207 @@
+{
+  "common": {
+    "buttons": {
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "add": "Add",
+      "search": "Search",
+      "filter": "Filter",
+      "export": "Export",
+      "import": "Import",
+      "refresh": "Refresh",
+      "close": "Close",
+      "submit": "Submit",
+      "reset": "Reset",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous",
+      "finish": "Finish",
+      "loading": "Loading...",
+      "viewDetails": "View Details",
+      "download": "Download"
+    },
+    "labels": {
+      "status": "Status",
+      "type": "Type",
+      "time": "Time",
+      "date": "Date",
+      "name": "Name",
+      "description": "Description",
+      "action": "Action",
+      "total": "Total",
+      "count": "Count",
+      "price": "Price",
+      "volume": "Volume",
+      "change": "Change",
+      "high": "High",
+      "low": "Low",
+      "open": "Open",
+      "close": "Close",
+      "symbol": "Symbol",
+      "value": "Value",
+      "percentage": "Percentage",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "messages": {
+      "success": "Operation successful",
+      "error": "Operation failed",
+      "loading": "Loading...",
+      "noData": "No data available",
+      "confirmDelete": "Confirm deletion?",
+      "deleteSuccess": "Deleted successfully",
+      "saveSuccess": "Saved successfully",
+      "updateSuccess": "Updated successfully",
+      "createSuccess": "Created successfully",
+      "networkError": "Network error, please try again later",
+      "unauthorized": "Unauthorized, please login first",
+      "forbidden": "Access forbidden",
+      "notFound": "Content not found",
+      "serverError": "Server error, please try again later"
+    },
+    "time": {
+      "now": "Just now",
+      "minutesAgo": "{count} minutes ago",
+      "hoursAgo": "{count} hours ago",
+      "daysAgo": "{count} days ago",
+      "weeksAgo": "{count} weeks ago",
+      "monthsAgo": "{count} months ago",
+      "yearsAgo": "{count} years ago"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {current}",
+      "total": "Total {total} items",
+      "pageSize": "{size} items per page"
+    }
+  },
+  "nav": {
+    "main": {
+      "dashboard": "Dashboard",
+      "onchain": "On-Chain Data",
+      "consensus": "Consensus Analysis",
+      "cases": "Historical Cases",
+      "performance": "Performance",
+      "alerts": "Alert Rules",
+      "settings": "Settings",
+      "admin": "Admin"
+    },
+    "settings": {
+      "profile": "Profile",
+      "membership": "Membership",
+      "push": "Notifications",
+      "configs": "System Config",
+      "security": "Security"
+    },
+    "admin": {
+      "users": "User Management",
+      "orders": "Order Management",
+      "operators": "Operator Management",
+      "notifications": "Notification Logs",
+      "configs": "Config Management"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "onchain": "On-Chain",
+      "consensus": "Consensus",
+      "cases": "Cases",
+      "performance": "Performance",
+      "alerts": "Alerts",
+      "settings": "Settings",
+      "admin": "Admin"
+    }
+  },
+  "errors": {
+    "http": {
+      "400": "Bad request",
+      "401": "Unauthorized, please login",
+      "403": "Access forbidden",
+      "404": "Resource not found",
+      "408": "Request timeout, please retry",
+      "429": "Too many requests, please try again later",
+      "500": "Internal server error",
+      "502": "Bad gateway",
+      "503": "Service unavailable",
+      "504": "Gateway timeout"
+    },
+    "validation": {
+      "required": "This field is required",
+      "email": "Please enter a valid email address",
+      "minLength": "Minimum {min} characters required",
+      "maxLength": "Maximum {max} characters allowed",
+      "pattern": "Invalid format",
+      "number": "Please enter a valid number",
+      "integer": "Please enter an integer",
+      "positive": "Please enter a positive number",
+      "range": "Value should be between {min} and {max}",
+      "url": "Please enter a valid URL",
+      "date": "Please enter a valid date",
+      "password": "Password strength insufficient"
+    },
+    "auth": {
+      "loginFailed": "Login failed, please check username and password",
+      "sessionExpired": "Session expired, please login again",
+      "tokenInvalid": "Invalid token",
+      "permissionDenied": "Permission denied",
+      "accountLocked": "Account locked",
+      "accountNotFound": "Account not found"
+    },
+    "api": {
+      "networkError": "Network connection failed, please check your connection",
+      "timeout": "Request timeout, please retry",
+      "serverError": "Server error, please try again later",
+      "unknownError": "Unknown error",
+      "dataParseError": "Data parsing failed",
+      "rateLimitExceeded": "Rate limit exceeded"
+    },
+    "form": {
+      "submitFailed": "Submit failed, please retry",
+      "invalidData": "Invalid data format",
+      "duplicateEntry": "Data already exists",
+      "saveFailed": "Save failed"
+    }
+  },
+  "metadata": {
+    "site": {
+      "title": "AXIOM Insight - Market Maker AI Analysis Platform",
+      "description": "Multi-agent collaborative analysis of market maker behavior, cutting through noise",
+      "og_title": "AXIOM Insight - Market Maker AI Analysis Platform",
+      "og_description": "AI-powered multi-agent analysis of market maker behavior — multi-dimensional insights for trading decisions"
+    },
+    "dashboard": {
+      "title": "Dashboard - AXIOM Insight",
+      "description": "Multi-asset AI analysis overview, real-time market signal monitoring"
+    },
+    "consensus": {
+      "title": "Consensus Analysis - AXIOM Insight",
+      "description": "Multi-agent consensus analysis with AI adversarial reasoning for precise levels"
+    },
+    "alerts": {
+      "title": "Alert Rules - AXIOM Insight",
+      "description": "Custom price alerts and risk monitoring rules"
+    },
+    "performance": {
+      "title": "Strategy Performance - AXIOM Insight",
+      "description": "AI strategy historical performance and win rate statistics"
+    },
+    "playbook": {
+      "title": "Playbook Simulation - AXIOM Insight",
+      "description": "Market maker playbook matching and counter-strategy simulation"
+    },
+    "settings": {
+      "title": "Settings - AXIOM Insight",
+      "description": "Account settings and preference management"
+    },
+    "login": {
+      "title": "Login - AXIOM Insight",
+      "description": "Login to AXIOM Insight market maker AI analysis platform"
+    }
+  }
+}

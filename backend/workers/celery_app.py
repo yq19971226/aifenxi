@@ -31,6 +31,7 @@ celery_app = Celery(
         "workers.playbook_verify_worker",
         "workers.cryptoquant_worker",
         "workers.fred_worker",
+        "workers.snapshot_cleanup_worker",
     ],
 )
 
@@ -127,6 +128,22 @@ celery_app.conf.update(
         "collect-fred-every-6h": {
             "task": "workers.fred_worker.collect_fred_data",
             "schedule": 21600.0,  # 6 小时（宏观数据更新频率低）
+        },
+        "cleanup-old-snapshots-daily": {
+            "task": "workers.snapshot_cleanup_worker.cleanup_old_snapshots_task",
+            "schedule": 86400.0,  # 24 小时（每天一次）
+        },
+        "collect-calendar-events-daily": {
+            "task": "calendar_worker.collect_events",
+            "schedule": 86400.0,  # 24 小时（每天一次）
+        },
+        "collect-high-impact-events-every-6h": {
+            "task": "calendar_worker.collect_high_impact_events",
+            "schedule": 21600.0,  # 6 小时
+        },
+        "cleanup-old-calendar-events-daily": {
+            "task": "calendar_worker.cleanup_old_events",
+            "schedule": 86400.0,  # 24 小时（每天一次）
         },
     },
 )

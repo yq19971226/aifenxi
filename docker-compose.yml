@@ -42,6 +42,12 @@ services:
       - ./backend/migrations/v_coinglass.sql:/docker-entrypoint-initdb.d/14_v_coinglass.sql
       - ./backend/migrations/v3_leaderboard.sql:/docker-entrypoint-initdb.d/15_v3_leaderboard.sql
       - ./backend/migrations/add_playbook_lifecycle_fields.sql:/docker-entrypoint-initdb.d/16_add_playbook_lifecycle.sql
+      - ./backend/migrations/v12_payment_provider_audit.sql:/docker-entrypoint-initdb.d/17_v12_payment_provider_audit.sql
+      - ./backend/migrations/v13_i18n_user_preferences.sql:/docker-entrypoint-initdb.d/18_v13_i18n_user_preferences.sql
+      - ./backend/migrations/v14_commission_idempotent.sql:/docker-entrypoint-initdb.d/19_v14_commission_idempotent.sql
+      - ./backend/migrations/v15_email_normalize.sql:/docker-entrypoint-initdb.d/20_v15_email_normalize.sql
+      - ./backend/migrations/v16_resend_config.sql:/docker-entrypoint-initdb.d/21_v16_resend_config.sql
+      - ./backend/migrations/v17_email_suppression.sql:/docker-entrypoint-initdb.d/22_v17_email_suppression.sql
       - ./backend/migrations/seed_cases_2025.sql:/docker-entrypoint-initdb.d/99_seed_cases_2025.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U omnimind"]
@@ -99,7 +105,7 @@ services:
     environment:
       - HTTP_PROXY=${HTTP_PROXY:-}
       - HTTPS_PROXY=${HTTPS_PROXY:-}
-      - NO_PROXY=postgres,redis,localhost,127.0.0.1
+      - NO_PROXY=postgres,redis,localhost,127.0.0.1,host.docker.internal
       - DEPLOY_AGENT_URL=${DEPLOY_AGENT_URL:-http://host.docker.internal:9321}
       - DEPLOY_AGENT_TOKEN=${DEPLOY_AGENT_TOKEN:-}
     ports:

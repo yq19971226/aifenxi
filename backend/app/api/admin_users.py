@@ -7,7 +7,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -15,6 +15,7 @@ from app.core.deps import UserInfo, require_admin, require_operator_or_admin
 from app.services.user_service import (
     AdminUserInfo,
     AdminUserListResponse,
+    create_user,
     query_users,
     toggle_user_active,
     update_membership,
@@ -34,6 +35,16 @@ class ToggleActiveRequest(BaseModel):
     is_active: bool
 
 
+class CreateUserBody(BaseModel):
+    """创建用户请求体。"""
+
+    email: EmailStr
+    password: str
+    role: str = "user"
+    membership_level: int = 0
+    expires_at: str | None = None
+
+
 class UpdateMembershipBody(BaseModel):
     """调整会员等级请求体。"""
 
@@ -42,6 +53,47 @@ class UpdateMembershipBody(BaseModel):
 
 
 # ── 路由 ──────────────────────────────────────────────────────
+
+
+@router.post("", response_model=AdminUserInfo, status_code=status.HTTP_201_CREATED)
+async def create_user_route(
+    body: CreateUserBody,
+    admin: UserInfo = Depends(require_admin),
+    session: AsyncSession = Depends(get_db),
+) -> AdminUserInfo:
+    """管理员手动创建用户账户。"""
+    if len(body.password) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="密码长度至少 8 位",
+        )
+
+    from datetime import datetime
+
+    expires_at = None
+    if body.expires_at:
+        try:
+            expires_at = datetime.fromisoformat(body.expires_at)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="expires_at 格式无效，请使用 ISO 格式",
+            )
+
+    try:
+        return await create_user(
+            session,
+            email=body.email,
+            password=body.password,
+            role=body.role,
+            membership_level=body.membership_level,
+            expires_at=expires_at,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except Exception as exc:
+        logger.error("create_user_route error: %s", exc)
+        raise HTTPException(status_code=500, detail="创建用户失败")
 
 
 @router.get("", response_model=AdminUserListResponse)

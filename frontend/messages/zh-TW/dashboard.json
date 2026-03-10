@@ -1,0 +1,27 @@
+{
+  "title": "多幣種概覽",
+  "subtitle": "AI 實時監控 {count} 個幣種，點擊展開查看詳情",
+  "autoRefresh": "30s 自動刷新",
+  "guideBanner": "第一次用？花兩分鐘看看使用指南，快速上手。",
+  "guideBannerLink": "查看指南",
+  "onlineLabel": "人在線",
+  "error": {
+    "loadFailed": "加載失敗",
+    "fetchFailed": "獲取概覽數據失敗，30s 後自動重試"
+  },
+  "table": {
+    "symbol": "幣種",
+    "price": "最新價",
+    "aiJudgment": "AI 判斷",
+    "confidence": "置信度",
+    "defenseStatus": "防禦狀態",
+    "onchainData": "鏈上數據",
+    "noData": "暫無幣種數據，請在後台「幣種管理」中添加"
+  },
+  "legend": {
+    "safe": "安全 = 無異常檢測",
+    "caution": "警惕 = 莊家活動跡象",
+    "danger": "危險 = 莊家操盤確認",
+    "critical": "極危 = 高度操控風險"
+  }
+}

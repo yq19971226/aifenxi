@@ -1,0 +1,148 @@
+{
+  "title": "Leaderboard",
+  "subtitle": "View strategy performance rankings",
+  "header": {
+    "title": "Strategy Leaderboard",
+    "subtitle": "Ranked by Profit Factor · Data tracked since feature launch",
+    "performance": "Performance"
+  },
+  "periods": {
+    "7d": "7 Days",
+    "30d": "30 Days",
+    "90d": "90 Days"
+  },
+  "modes": {
+    "all": "All",
+    "intraday": "Intraday",
+    "trend": "Trend"
+  },
+  "tabs": {
+    "rankings": "Rankings",
+    "history": "My History"
+  },
+  "rankings": {
+    "title": "Strategy Rankings",
+    "empty": "No ranking data available",
+    "columns": {
+      "rank": "Rank",
+      "user": "User",
+      "pnl": "PnL",
+      "winRate": "Win Rate",
+      "trades": "Trades",
+      "period": "Period"
+    },
+    "myRank": "My Rank",
+    "notFound": "Not found"
+  },
+  "systemReport": {
+    "title": "System Report",
+    "totalUsers": "Total Users",
+    "activeUsers": "Active Users",
+    "totalTrades": "Total Trades",
+    "avgPnl": "Avg PnL",
+    "avgWinRate": "Avg Win Rate"
+  },
+  "myStats": {
+    "title": "My Stats",
+    "currentRank": "Current Rank",
+    "totalPnl": "Total PnL",
+    "winRate": "Win Rate",
+    "totalTrades": "Total Trades",
+    "bestPeriod": "Best Period",
+    "recentPerformance": "Recent Performance"
+  },
+  "history": {
+    "title": "Strategy History",
+    "empty": "No history records",
+    "expand": "View strategy details",
+    "collapse": "Collapse strategy details",
+    "columns": {
+      "date": "Date",
+      "symbol": "Symbol",
+      "direction": "Direction",
+      "entry": "Entry",
+      "exit": "Exit",
+      "pnl": "PnL",
+      "status": "Status"
+    },
+    "status": {
+      "win": "Profit",
+      "loss": "Loss",
+      "breakeven": "Breakeven"
+    }
+  },
+  "pagination": {
+    "prev": "Previous",
+    "next": "Next",
+    "page": "Page {current} of {total}"
+  },
+  "error": {
+    "loadFailed": "Failed to load ranking data",
+    "noData": "No data available"
+  },
+  "comp": {
+    "systemPerf": "System Performance",
+    "winRate": "Win Rate",
+    "profitFactor": "Profit Factor",
+    "settled": "Settled",
+    "totalSettled": "Total Settled",
+    "totalWins": "Total Wins",
+    "noRankData": "No ranking data yet",
+    "noRankDataDesc": "Strategies will automatically join rankings after analysis. Data tracked since feature launch.",
+    "rank": "Rank",
+    "trader": "Trader",
+    "winLoss": "W/L",
+    "avgPnl": "Avg PnL",
+    "me": "(Me)",
+    "onBoard": "ranked",
+    "pageInfo": "Page {page} / {totalPages}",
+    "totalInfo": "({total} {label} total)",
+    "loading": "Loading leaderboard..."
+  },
+  "stats": {
+    "myRecord": "My Record",
+    "rank": "Rank",
+    "notRanked": "Not Ranked",
+    "published": "Published",
+    "pending": "Pending",
+    "winLoss": "W/L",
+    "avgPnl": "Avg PnL",
+    "profitFactor": "Profit Factor",
+    "minSettledHint": "At least 3 settled strategies required to rank (current: {count})"
+  },
+  "strategyHistory": {
+    "noRecords": "No published strategy records",
+    "symbol": "Symbol",
+    "direction": "Direction",
+    "entryPrice": "Entry Price",
+    "stopLoss": "Stop Loss",
+    "status": "Status",
+    "pnl": "PnL",
+    "mode": "Mode",
+    "time": "Time",
+    "long": "Long",
+    "short": "Short",
+    "neutral": "Neutral",
+    "records": "records"
+  },
+  "statusLabels": {
+    "pending": "Pending",
+    "win": "Profit",
+    "loss": "Loss",
+    "expired": "Expired"
+  },
+  "modeLabels": {
+    "intraday": "Intraday",
+    "trend": "Trend",
+    "scalping": "Scalping"
+  },
+  "rules": {
+    "title": "Leaderboard Rules",
+    "rule1": "Ranking metric is Profit Factor (total profit ÷ total loss), higher is better",
+    "rule2": "Only Intraday and Trend mode strategies are ranked; Scalping mode is excluded",
+    "rule3": "Fallback strategies (auto-generated when data is insufficient) and neutral direction strategies are excluded",
+    "rule4": "De-duplication per user per symbol: only the first entry within 24h (Intraday) / 7d (Trend) is kept",
+    "rule5": "At least 3 settled strategies are required to be ranked",
+    "rule6": "Anonymous IDs are hashed from user IDs and cannot be reverse-engineered"
+  }
+}

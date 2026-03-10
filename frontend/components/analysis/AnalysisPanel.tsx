@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { RefreshCw } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useLocale } from "next-intl";
 
 import { AnalysisProgress } from "@/components/analysis/AnalysisProgress";
 import { AnalysisReport } from "@/components/analysis/AnalysisReport";
@@ -37,6 +38,7 @@ interface AnalysisPanelProps {
 
 export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
   const queryClient = useQueryClient();
+  const locale = useLocale();
 
   const [symbol, setSymbol] = useState(externalSymbol);
   useEffect(() => { setSymbol(externalSymbol); }, [externalSymbol]);
@@ -49,7 +51,15 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
   const [startTime, setStartTime] = useState<number | undefined>(undefined);
 
   const abortRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const reportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    return () => {
+      abortRef.current = true;
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   const { data: symbolList } = useQuery({
     queryKey: ["symbols"],
@@ -97,6 +107,9 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
       if (!forceRefresh && isQuotaExhausted) return;
 
       abortRef.current = false;
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
       setRunning(true);
       setProgressSteps([]);
       setReport(null);
@@ -104,7 +117,7 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
       setStartTime(Date.now());
 
       try {
-        for await (const event of runAnalysis(symbol, mode, forceRefresh)) {
+        for await (const event of runAnalysis(symbol, mode, forceRefresh, locale, controller.signal)) {
           if (abortRef.current) break;
           let shouldStop = false;
 
@@ -138,7 +151,7 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
           }
         }
       } catch (err: unknown) {
-        if (!abortRef.current) {
+        if (!abortRef.current && !(err instanceof DOMException && err.name === "AbortError")) {
           const message =
             err instanceof Error ? err.message : "\u8FDE\u63A5\u4E2D\u65AD\uFF0C\u8BF7\u91CD\u8BD5";
           setError(message);
@@ -153,7 +166,7 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
         }, 300);
       }
     },
-    [running, symbol, mode, isModeLocked, isQuotaExhausted, queryClient],
+    [running, symbol, mode, locale, isModeLocked, isQuotaExhausted, queryClient],
   );
 
   const handleRetry = useCallback(() => {
@@ -254,7 +267,10 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
               重新分析
             </button>
           )}
-          <AnalysisReport report={report} />
+          <AnalysisReport
+            key={`${report.symbol}-${report.mode}-${report.timestamp}`}
+            report={report}
+          />
         </motion.div>
       )}
     </motion.div>

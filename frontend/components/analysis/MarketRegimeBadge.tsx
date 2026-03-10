@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { AlertTriangle, ArrowRightLeft, TrendingUp } from "lucide-react";
 
 import type { MarketRegime } from "@/lib/api/analysis";
-import { localizeText } from "./helpers";
+import { formatPrice, localizeText } from "./helpers";
 
 export function MarketRegimeBadge({ regime }: { regime: MarketRegime }) {
   return (
@@ -48,7 +48,7 @@ export function MarketRegimeBadge({ regime }: { regime: MarketRegime }) {
         <p className="text-sm text-zinc-400 leading-relaxed">{localizeText(regime.suggestion)}</p>
         {regime.support !== null && regime.resistance !== null && regime.regime === "ranging" && (
           <p className="text-xs font-mono text-zinc-500 mt-1">
-            支撑 {regime.support.toLocaleString()} ~ 阻力 {regime.resistance.toLocaleString()}
+            支撑 {formatPrice(regime.support)} ~ 阻力 {formatPrice(regime.resistance)}
           </p>
         )}
       </div>

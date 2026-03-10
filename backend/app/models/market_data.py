@@ -103,6 +103,10 @@ class CoinGlassData(BaseModel):
 
     # OI（持仓量）
     oi_snapshots: list[dict] = []          # cg_oi:{symbol}
+    # 稳定币保证金 OI
+    stablecoin_margin_oi_snapshots: list[dict] = []  # cg_oi_stablecoin:{symbol}
+    # 币本位保证金 OI
+    coin_margin_oi_snapshots: list[dict] = []        # cg_oi_coin:{symbol}
     # CVD（累计成交量差）
     cvd_snapshots: list[dict] = []         # cg_cvd:{symbol}
     # 期货净流入/流出
@@ -136,3 +140,4 @@ class MarketData(BaseModel):
     derivatives: Optional[DerivativesData] = None
     coinglass: Optional[CoinGlassData] = None
     coingecko: Optional[CoinGeckoData] = None
+    locale: str = "zh-CN"

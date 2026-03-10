@@ -1,0 +1,53 @@
+{
+  "main": {
+    "dashboard": "儀表板",
+    "onchain": "鏈上資料",
+    "consensus": "共識分析",
+    "cases": "歷史案例",
+    "performance": "效能分析",
+    "alerts": "預警規則",
+    "settings": "使用者設定",
+    "admin": "後台管理",
+    "playbook": "劇本",
+    "leaderboard": "排行榜",
+    "growth": "活動"
+  },
+  "settings": {
+    "profile": "個人資料",
+    "membership": "會員中心",
+    "push": "郵件通知",
+    "configs": "系統配置",
+    "security": "安全設定",
+    "tasks": "任務中心",
+    "partner": "合夥人"
+  },
+  "admin": {
+    "users": "使用者管理",
+    "orders": "訂單管理",
+    "operators": "營運管理",
+    "notifications": "通知日誌",
+    "configs": "配置管理"
+  },
+  "common": {
+    "menu": "選單",
+    "more": "更多",
+    "maintenance": "維護中",
+    "notifications": "通知",
+    "roleAdmin": "管理員",
+    "roleOperator": "運營",
+    "roleUser": "使用者",
+    "announcements": "公告管理",
+    "logout": "登出"
+  },
+  "breadcrumb": {
+    "home": "首頁",
+    "dashboard": "儀表板",
+    "onchain": "鏈上資料",
+    "consensus": "共識分析",
+    "cases": "歷史案例",
+    "performance": "效能分析",
+    "alerts": "預警規則",
+    "settings": "設定",
+    "admin": "管理"
+  }
+}

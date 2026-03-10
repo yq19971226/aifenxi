@@ -40,20 +40,31 @@ DEFAULT_SYMBOL: str = "BTCUSDT"  # 免费用户默认订阅
 # ── 连接信息类型 ──────────────────────────────────────────────
 
 class _PriceConnection:
-    """价格频道连接信息，包含 WebSocket 和订阅的 symbol 集合。"""
+    """价格频道连接信息，包含 WebSocket、订阅的 symbol 集合和语言偏好。"""
 
-    __slots__ = ("ws", "symbols")
+    __slots__ = ("ws", "symbols", "locale")
 
-    def __init__(self, ws: WebSocket, symbols: set[str] | None = None) -> None:
+    def __init__(self, ws: WebSocket, symbols: set[str] | None = None, locale: str = "zh-CN") -> None:
         self.ws: WebSocket = ws
         self.symbols: set[str] = symbols if symbols is not None else {DEFAULT_SYMBOL}
+        self.locale: str = locale
+
+
+class _AlertConnection:
+    """预警频道连接信息，包含 WebSocket 和语言偏好。"""
+
+    __slots__ = ("ws", "locale")
+
+    def __init__(self, ws: WebSocket, locale: str = "zh-CN") -> None:
+        self.ws: WebSocket = ws
+        self.locale: str = locale
 
 
 # ── 进程内连接池 ──────────────────────────────────────────────
 # price 频道：跟踪每个用户订阅的 symbol 列表
 _price_connections: dict[str, _PriceConnection] = {}
-# alerts 频道：简单的 user_id → WebSocket 映射
-_alert_connections: dict[str, WebSocket] = {}
+# alerts 频道：user_id → _AlertConnection 映射
+_alert_connections: dict[str, _AlertConnection] = {}
 # 兼容旧接口的 _connections 引用（用于 get_online_count 回退）
 _connections: dict[str, dict[str, Any]] = {
     "price": _price_connections,  # type: ignore[dict-item]
@@ -115,11 +126,21 @@ async def _unregister_online(channel: str, user_id: str) -> None:
 
 
 async def get_online_count(channel: str) -> int:
-    """获取指定频道在线用户数。"""
+    """获取指定频道在线用户数，自动清理超时条目。"""
     try:
         redis = get_redis_pool()
         key = REDIS_KEY_WS_ONLINE.format(channel=channel)
-        return await redis.hlen(key)
+        all_entries = await redis.hgetall(key)
+        if not all_entries:
+            return 0
+        now = int(time.time())
+        stale_ids = [
+            uid for uid, ts in all_entries.items()
+            if now - int(ts) > REDIS_ONLINE_TTL
+        ]
+        if stale_ids:
+            await redis.hdel(key, *stale_ids)
+        return len(all_entries) - len(stale_ids)
     except Exception as exc:
         logger.warning("Failed to get online count: %s", exc)
         return len(_connections.get(channel, {}))
@@ -151,7 +172,7 @@ async def _heartbeat_loop(ws: WebSocket, channel: str, user_id: str) -> None:
 
 # ── 连接管理 ─────────────────────────────────────────────────
 
-async def _add_connection(channel: str, user_id: str, ws: WebSocket) -> None:
+async def _add_connection(channel: str, user_id: str, ws: WebSocket, locale: str = "zh-CN") -> None:
     """添加连接到进程内池 + Redis 在线状态。"""
     if channel == "price":
         old = _price_connections.get(user_id)
@@ -160,17 +181,17 @@ async def _add_connection(channel: str, user_id: str, ws: WebSocket) -> None:
                 await old.ws.close(code=status.WS_1000_NORMAL_CLOSURE)
             except Exception:
                 pass
-        _price_connections[user_id] = _PriceConnection(ws)
+        _price_connections[user_id] = _PriceConnection(ws, locale=locale)
     else:
-        old_ws = _alert_connections.get(user_id)
-        if old_ws is not None:
+        old_conn = _alert_connections.get(user_id)
+        if old_conn is not None:
             try:
-                await old_ws.close(code=status.WS_1000_NORMAL_CLOSURE)
+                await old_conn.ws.close(code=status.WS_1000_NORMAL_CLOSURE)
             except Exception:
                 pass
-        _alert_connections[user_id] = ws
+        _alert_connections[user_id] = _AlertConnection(ws, locale=locale)
     await _register_online(channel, user_id)
-    logger.info("WS connected: user=%s channel=%s", user_id, channel)
+    logger.info("WS connected: user=%s channel=%s locale=%s", user_id, channel, locale)
 
 
 async def _remove_connection(channel: str, user_id: str) -> None:
@@ -237,7 +258,8 @@ async def _broadcast_price(data: dict[str, Any], symbol: str | None = None) -> N
         if symbol is not None and symbol.upper() not in conn.symbols:
             continue
         try:
-            await conn.ws.send_json(data)
+            msg = {**data, "locale": conn.locale}
+            await conn.ws.send_json(msg)
         except Exception:
             dead.append(user_id)
     for user_id in dead:
@@ -247,9 +269,10 @@ async def _broadcast_price(data: dict[str, Any], symbol: str | None = None) -> N
 async def _broadcast_alerts(data: dict[str, Any]) -> None:
     """预警频道广播 — 发送给所有连接。"""
     dead: list[str] = []
-    for user_id, ws in _alert_connections.items():
+    for user_id, conn in _alert_connections.items():
         try:
-            await ws.send_json(data)
+            msg = {**data, "locale": conn.locale}
+            await conn.ws.send_json(msg)
         except Exception:
             dead.append(user_id)
     for user_id in dead:
@@ -263,12 +286,12 @@ async def broadcast_to_user(channel: str, user_id: str, data: dict[str, Any]) ->
             conn = _price_connections.get(user_id)
             if conn is None:
                 return False
-            await conn.ws.send_json(data)
+            await conn.ws.send_json({**data, "locale": conn.locale})
         else:
-            ws = _alert_connections.get(user_id)
-            if ws is None:
+            conn = _alert_connections.get(user_id)
+            if conn is None:
                 return False
-            await ws.send_json(data)
+            await conn.ws.send_json({**data, "locale": conn.locale})
         return True
     except Exception:
         await _remove_connection(channel, user_id)
@@ -496,11 +519,16 @@ async def _handle_ws(
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
             return
 
-    # 3. 接受连接
-    await websocket.accept()
-    await _add_connection(channel, user_id, websocket)
+    # 3. 读取 locale 参数
+    locale = websocket.query_params.get("locale", "zh-CN")
+    if locale not in ("zh-CN", "zh-TW", "en"):
+        locale = "zh-CN"
 
-    # 4. 对 price 频道，发送当前订阅状态
+    # 4. 接受连接
+    await websocket.accept()
+    await _add_connection(channel, user_id, websocket, locale=locale)
+
+    # 5. 对 price 频道，发送当前订阅状态
     if channel == "price":
         subs = get_user_subscriptions(user_id)
         try:
@@ -511,7 +539,7 @@ async def _handle_ws(
         except Exception:
             pass
 
-    # 5. 启动心跳
+    # 6. 启动心跳
     heartbeat_task = asyncio.create_task(
         _heartbeat_loop(websocket, channel, user_id)
     )

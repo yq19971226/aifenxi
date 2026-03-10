@@ -12,6 +12,7 @@ import {
   Receipt,
   Bell,
   BellRing,
+  Megaphone,
   FileCheck,
   ClipboardCheck,
   FileText,
@@ -19,74 +20,77 @@ import {
   PieChart,
   GraduationCap,
   Server,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 
 export interface AdminMenuItem {
-  label: string;
+  labelKey: string;
   href: string;
   icon: LucideIcon;
 }
 
 export interface AdminMenuGroup {
-  label: string;
+  labelKey: string;
   items: AdminMenuItem[];
 }
 
 export const ADMIN_MENU_GROUPS: AdminMenuGroup[] = [
   {
-    label: "概览",
+    labelKey: "overview",
     items: [
-      { label: "后台总览", href: "/admin/dashboard", icon: LayoutDashboard },
-      { label: "系统监控", href: "/admin/monitor", icon: Activity },
+      { labelKey: "dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+      { labelKey: "monitor", href: "/admin/monitor", icon: Activity },
     ],
   },
   {
-    label: "系统配置",
+    labelKey: "config",
     items: [
-      { label: "快速设置", href: "/admin/setup", icon: Settings },
-      { label: "参数设置", href: "/admin/configs", icon: SlidersHorizontal },
-      { label: "API 密钥", href: "/admin/api-keys", icon: Key },
-      { label: "数据源管理", href: "/admin/datasources", icon: Database },
-      { label: "模型分工", href: "/admin/models", icon: Brain },
-      { label: "币种管理", href: "/admin/symbols", icon: Coins },
+      { labelKey: "setup", href: "/admin/setup", icon: Settings },
+      { labelKey: "configs", href: "/admin/configs", icon: SlidersHorizontal },
+      { labelKey: "maintenance", href: "/admin/maintenance", icon: Wrench },
+      { labelKey: "apiKeys", href: "/admin/api-keys", icon: Key },
+      { labelKey: "datasources", href: "/admin/datasources", icon: Database },
+      { labelKey: "models", href: "/admin/models", icon: Brain },
+      { labelKey: "symbols", href: "/admin/symbols", icon: Coins },
     ],
   },
   {
-    label: "用户运营",
+    labelKey: "users",
     items: [
-      { label: "用户管理", href: "/admin/users", icon: Users },
-      { label: "运营员管理", href: "/admin/operators", icon: UserCog },
-      { label: "平台订单", href: "/admin/orders", icon: Receipt },
-      { label: "通知管理", href: "/admin/notifications", icon: Bell },
-      { label: "公告管理", href: "/admin/announcements", icon: BellRing },
+      { labelKey: "users", href: "/admin/users", icon: Users },
+      { labelKey: "operators", href: "/admin/operators", icon: UserCog },
+      { labelKey: "orders", href: "/admin/orders", icon: Receipt },
+      { labelKey: "notifications", href: "/admin/notifications", icon: Bell },
+      { labelKey: "push", href: "/admin/push", icon: BellRing },
+      { labelKey: "announcements", href: "/admin/announcements", icon: Megaphone },
     ],
   },
   {
-    label: "内容审核",
+    labelKey: "review",
     items: [
-      { label: "剧本审核", href: "/admin/playbook-review", icon: FileCheck },
-      { label: "任务审核", href: "/admin/task-review", icon: ClipboardCheck },
-      { label: "任务模板", href: "/admin/task-templates", icon: FileText },
+      { labelKey: "playbookReview", href: "/admin/playbook-review", icon: FileCheck },
+      { labelKey: "taskReview", href: "/admin/task-review", icon: ClipboardCheck },
+      { labelKey: "taskTemplates", href: "/admin/task-templates", icon: FileText },
     ],
   },
   {
-    label: "财务",
+    labelKey: "finance",
     items: [
-      { label: "提现审核", href: "/admin/withdrawals", icon: Wallet },
-      { label: "合伙人统计", href: "/admin/partner-stats", icon: PieChart },
+      { labelKey: "withdrawals", href: "/admin/withdrawals", icon: Wallet },
+      { labelKey: "partnerStats", href: "/admin/partner-stats", icon: PieChart },
     ],
   },
   {
-    label: "AI",
+    labelKey: "ai",
     items: [
-      { label: "自主学习", href: "/admin/learning", icon: GraduationCap },
+      { labelKey: "learning", href: "/admin/learning", icon: GraduationCap },
     ],
   },
   {
-    label: "系统",
+    labelKey: "system",
     items: [
-      { label: "系统管理", href: "/admin/system", icon: Server },
+      { labelKey: "systemMgmt", href: "/admin/system", icon: Server },
     ],
   },
 ];

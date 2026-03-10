@@ -1,0 +1,586 @@
+{
+  "sidebar": {
+    "groups": {
+      "overview": "Overview",
+      "config": "Configuration",
+      "users": "User Operations",
+      "review": "Content Review",
+      "finance": "Finance",
+      "ai": "AI",
+      "system": "System"
+    },
+    "items": {
+      "dashboard": "Dashboard",
+      "monitor": "System Monitor",
+      "setup": "Quick Setup",
+      "configs": "Parameters",
+      "maintenance": "Maintenance",
+      "apiKeys": "API Keys",
+      "datasources": "Data Sources",
+      "models": "Model Assignment",
+      "symbols": "Symbols",
+      "users": "User Management",
+      "operators": "Operators",
+      "orders": "Orders",
+      "notifications": "Notifications",
+      "push": "Push Management",
+      "announcements": "Announcements",
+      "playbookReview": "Playbook Review",
+      "taskReview": "Task Review",
+      "taskTemplates": "Task Templates",
+      "withdrawals": "Withdrawals",
+      "partnerStats": "Partner Stats",
+      "learning": "AI Learning",
+      "systemMgmt": "System Management"
+    },
+    "mobileMenu": "Admin Menu"
+  },
+  "operators": {
+    "title": "Operator Management",
+    "noAccess": "No permission to access operator management",
+    "fetchFailed": "Failed to fetch operator list",
+    "email": "Email",
+    "initialPassword": "Initial password (min 8 characters)",
+    "createButton": "Create Operator",
+    "creating": "Processing…",
+    "passwordMinLength": "Password must be at least 8 characters",
+    "createFailed": "Failed to create operator",
+    "operationFailed": "Operation failed",
+    "createdAt": "Created At",
+    "status": "Status",
+    "action": "Action",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "processing": "Processing…"
+  },
+  "permissionDenied": "Access denied",
+  "maintenance": {
+    "title": "Maintenance Mode",
+    "subtitle": "Control maintenance status of feature modules. Features in maintenance will show a maintenance notice to users.",
+    "configDescription": "Feature flag: {configKey}",
+    "errors": {
+      "fetchFailed": "Fetch failed",
+      "createFailed": "Create failed",
+      "saveFailed": "Save failed"
+    },
+    "loading": "Loading...",
+    "restore": "Restore",
+    "maintenance": "Maintenance",
+    "globalSwitch": {
+      "maintenanceCount": "{count} feature(s) in maintenance",
+      "allRunning": "All features running normally",
+      "restoreHint": "Click \"Restore\" to restore all features",
+      "maintenanceHint": "Click \"Maintenance\" to put all features in maintenance",
+      "restoreAll": "Restore",
+      "maintenanceAll": "Maintenance"
+    },
+    "features": {
+      "playbook": "Playbook Sim",
+      "leaderboard": "Leaderboard",
+      "task": "Task Center",
+      "partner": "Partner",
+      "push": "Push Settings",
+      "alerts": "Price Alerts",
+      "online_count": "Online Count"
+    },
+    "paths": {
+      "playbook": "/playbook-sim",
+      "leaderboard": "/leaderboard",
+      "task": "/tasks",
+      "partner": "/partner",
+      "push": "/settings/push",
+      "alerts": "/alerts",
+      "online_count": ""
+    }
+  },
+  "push": {
+    "title": "Push Management",
+    "subtitle": "Manage push notification feature availability",
+    "noPermission": "Access denied",
+    "loading": "Loading...",
+    "errors": {
+      "fetchFailed": "Fetch failed",
+      "createFailed": "Create failed",
+      "saveFailed": "Save failed"
+    },
+    "states": {
+      "active": "Active",
+      "maintenance": "Maintenance",
+      "hidden": "Hidden"
+    },
+    "toggle": {
+      "label": "Push Notifications",
+      "hint": "/settings/push — User push channels and event subscriptions"
+    },
+    "statusSection": {
+      "title": "Status Legend",
+      "activeDesc": "Users can access push settings and configure channels",
+      "maintenanceDesc": "Push settings show maintenance notice, users cannot edit",
+      "hiddenDesc": "Push settings entry is completely hidden in navigation"
+    },
+    "featureFlagDescription": "Feature flag: {configKey}"
+  },
+  "orders": {
+    "title": "Platform Orders",
+    "search": "Search",
+    "searchPlaceholder": "Email / Order ID",
+    "status": "Status",
+    "statusAll": "All",
+    "statusPending": "Pending",
+    "statusCompleted": "Completed",
+    "statusFailed": "Failed",
+    "planType": "Plan Type",
+    "planAll": "All",
+    "planPro": "Pro",
+    "planFlagship": "Flagship",
+    "pageSize": "Per Page",
+    "rows": "rows",
+    "paginationSummary": "{total} total · Page {page} of {totalPages}",
+    "prevPage": "Previous",
+    "nextPage": "Next",
+    "errorFetchFailed": "Failed to fetch orders",
+    "emptyTitle": "No orders yet"
+  },
+  "announcements": {
+    "noAccess": "No permission to manage announcements",
+    "title": "Announcement Management",
+    "subtitle": "Simple mode: title + content + publish; expand for advanced settings",
+    "createButton": "New Announcement",
+    "editor": {
+      "createDraft": "New Announcement Draft",
+      "createNewVersion": "Create New Version Draft",
+      "editAnnouncement": "Edit Announcement",
+      "createSubtitle": "Simple mode: just fill in title and content, then publish; other rules are in advanced settings",
+      "saveDraft": "Save Draft",
+      "saveNewVersion": "Save as New Version Draft",
+      "save": "Save",
+      "publishDirect": "Publish Now",
+      "publishNewVersion": "Save & Publish New Version",
+      "saveAndPublish": "Save & Publish",
+      "collapse": "Collapse",
+      "simpleHint": "Simple mode: just fill in title and content.",
+      "collapseAdvanced": "Collapse Advanced",
+      "expandAdvanced": "Expand Advanced",
+      "labelTitle": "Title",
+      "labelContent": "Content",
+      "labelDisplayMode": "Display Mode",
+      "labelSummary": "Summary",
+      "labelKey": "Announcement Key (auto-generated if empty)",
+      "labelPriority": "Priority",
+      "labelStrongAck": "Strong Acknowledge",
+      "labelAllowSnooze": "Allow Snooze",
+      "labelActionText": "Action Text",
+      "labelActionHref": "Action URL",
+      "labelTargetRoles": "Target Roles",
+      "labelTargetLevels": "Target Membership Levels",
+      "labelTargetPaths": "Target Path Prefixes",
+      "labelStartsAt": "Start Time",
+      "labelEndsAt": "End Time",
+      "defaultHint": "Default flow: title, content, publish. Expand for advanced rules.",
+      "cancel": "Cancel",
+      "saving": "Saving",
+      "publishing": "Publishing"
+    }
+  },
+  "users": {
+    "title": "User Management",
+    "createUser": "Create User",
+    "createUserTitle": "Create User",
+    "searchEmail": "Search Email",
+    "searchPlaceholder": "Enter email keyword",
+    "role": "Role",
+    "membershipLevel": "Membership Level",
+    "expiresAt": "Expires At",
+    "all": "All",
+    "search": "Search",
+    "email": "Email",
+    "password": "Password (min 8 characters)",
+    "passwordMinLength": "Password must be at least 8 characters",
+    "enterEmail": "Please enter email",
+    "createFailed": "Failed to create user",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "levels": {
+      "free": "Free",
+      "pro": "Pro",
+      "flagship": "Flagship"
+    },
+    "roles": {
+      "admin": "Admin",
+      "operator": "Operator",
+      "user": "User"
+    },
+    "table": {
+      "email": "Email",
+      "role": "Role",
+      "membershipLevel": "Membership Level",
+      "expiresAt": "Expires At",
+      "status": "Status",
+      "createdAt": "Created At",
+      "action": "Action"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "actions": {
+      "save": "Save",
+      "saving": "Saving",
+      "adjustLevel": "Adjust Level",
+      "disable": "Disable",
+      "enable": "Enable",
+      "processing": "Processing"
+    },
+    "errors": {
+      "fetchFailed": "Failed to fetch user list",
+      "operationFailed": "Operation failed",
+      "updateMembershipFailed": "Failed to update membership"
+    },
+    "pagination": {
+      "summary": "{total} total, Page {page}/{totalPages}",
+      "prevPage": "Previous",
+      "nextPage": "Next"
+    },
+    "emptyTitle": "No users yet"
+  },
+  "apiKeys": {
+    "title": "API Key Management",
+    "subtitle": "Enter API keys for each service here. Once configured, the system will automatically start collecting data.",
+    "progress": "Configuration Progress",
+    "coreConfigured": "✓ Core keys configured",
+    "coreConfiguredPartial": "Core keys {configured}/{total}, configure required items first",
+    "dataSourcesOptional": "Other data sources can be added anytime",
+    "groups": {
+      "core": "Core (Required)",
+      "data": "Data Sources (Optional)",
+      "notif": "Push Notifications (Optional)",
+      "pay": "Payment (Optional)"
+    },
+    "status": {
+      "configured": "Configured",
+      "verifiedUnsaved": "Verified, not saved",
+      "notConfigured": "Not configured",
+      "required": "Required"
+    },
+    "howToGet": "How to get:",
+    "goToRegister": "Go to {provider} to register",
+    "placeholder": {
+      "configured": "Configured (enter new value to overwrite)",
+      "empty": "Paste your API Key…"
+    },
+    "show": "Show",
+    "hide": "Hide",
+    "test": "Test Connection",
+    "testing": "Testing",
+    "save": "Save",
+    "saving": "Saving",
+    "saved": "Saved",
+    "verifiedUnsavedHint": "Connection verified but not saved yet. Please click \"Save\" to persist.",
+    "faq": {
+      "title": "FAQ",
+      "q1": "Q: Must I fill in all keys to use the system?",
+      "a1": "No. Only the AI Analysis Key is required. Other data sources can be enabled as needed. Unconfigured sources are automatically skipped.",
+      "q2": "Q: Do I need to restart after adding a key?",
+      "a2": "No. Changes take effect immediately after saving. The next collection cycle will use the new key.",
+      "q3": "Q: Are keys stored securely?",
+      "a3": "All API keys are encrypted in the database. The frontend only shows masked values (e.g. sk-****abc), never plain text.",
+      "q4": "Q: Are free data sources sufficient?",
+      "a4": "Free sources (Binance + Alternative.me + BlockBeats + CryptoPanic + CoinGecko Demo) cover K-line, futures, fear index, news, and fundamentals. Paid sources (CoinGlass, GlassNode, CoinGecko Pro) add derivatives, on-chain depth, and community sentiment."
+    },
+    "toast": {
+      "testSuccess": "{name} connection test succeeded",
+      "testFail": "{name} connection test failed: {message}",
+      "testError": "{name} test failed: {message}",
+      "saveSuccess": "{name} saved successfully",
+      "saveFail": "Save failed"
+    },
+    "testFailed": "Test failed",
+    "keys": {
+      "dmx_api_key": {
+        "name": "AI Analysis Key",
+        "description": "Core key for all AI agents. Without it, the system cannot perform any analysis.",
+        "howToGet": "Register → Top up → Copy API Key",
+        "cost": "Pay-as-you-go"
+      },
+      "cryptopanic_api_token": {
+        "name": "News Data Key",
+        "description": "Global crypto news for NewsAnalystAgent.",
+        "howToGet": "Register → API page → Copy Auth Token",
+        "cost": "Free"
+      },
+      "coinglass_api_key": {
+        "name": "Futures Data Key",
+        "description": "Market liquidation heatmap, funding rates, MVRV metrics.",
+        "howToGet": "Register → Open API page → Create API Key",
+        "cost": "Startup $29/month"
+      },
+      "alphanode_api_key": {
+        "name": "CoinGlass Proxy Key",
+        "description": "CoinGlass REST proxy channel key for proxy > official dual-channel.",
+        "howToGet": "Obtain proxy access key from AlphaNode",
+        "cost": "Per proxy agreement"
+      },
+      "cryptoquant_api_key": {
+        "name": "On-chain Primary Key",
+        "description": "CryptoQuant on-chain data for exchange flows, reserves, addresses, MVRV.",
+        "howToGet": "Register → API page → Create or copy API Key",
+        "cost": "Professional $109/month"
+      },
+      "fred_api_key": {
+        "name": "Macro Primary Key",
+        "description": "FRED macro data for CPI, unemployment, fed funds rate, GDP.",
+        "howToGet": "FRED account → API Keys page → Generate Key",
+        "cost": "Free"
+      },
+      "glassnode_api_key": {
+        "name": "On-chain Data Key",
+        "description": "MVRV, NVT, S2F, active addresses, exchange flows.",
+        "howToGet": "Register → Choose plan → API Management → Copy Key",
+        "cost": "Free tier available, premium metrics paid"
+      },
+      "coingecko_api_key": {
+        "name": "Fundamentals Data Key",
+        "description": "Market cap, community sentiment, developer activity, macro, trends.",
+        "howToGet": "Register → Developer Dashboard → Copy API Key",
+        "cost": "Demo free, Basic $35/month"
+      },
+      "telegram_bot_token": {
+        "name": "Telegram Bot",
+        "description": "Receive alert push notifications via Telegram.",
+        "howToGet": "Search @BotFather in Telegram → /newbot → Copy Token",
+        "cost": "Free"
+      },
+      "resend_api_key": {
+        "name": "Email Service Key",
+        "description": "Receive alert push via email (recommended over SendGrid).",
+        "howToGet": "Register → API Keys → Create API Key",
+        "cost": "Free 3000 emails/month"
+      },
+      "sendgrid_api_key": {
+        "name": "Email Service Key (Alternative)",
+        "description": "Receive alert push via email (optional if Resend is configured).",
+        "howToGet": "Register → Settings → API Keys → Create API Key",
+        "cost": "Free tier available"
+      },
+      "nowpayments_api_key": {
+        "name": "Payment Gateway Key",
+        "description": "Accept USDT crypto payments for membership subscriptions.",
+        "howToGet": "Register merchant → Store Settings → API Keys",
+        "cost": "Per-transaction fee"
+      }
+    }
+  },
+  "monitor": {
+    "title": "System Monitor",
+    "subtitle": "{count} AI agents · Multi-dimensional market analysis",
+    "monitorSymbol": "Monitor Symbol",
+    "backendService": "Backend Service",
+    "statusOk": "OK",
+    "statusError": "Error",
+    "env": "Environment",
+    "agentsLabel": "Agents",
+    "agentsCount": "5 core + 3 enhance + 2 adversarial",
+    "reflection": "Reflection",
+    "reflectionActive": "Active",
+    "reflectionPending": "Pending",
+    "defenseLevel": "Defense Level",
+    "collusionDetected": "Collusion detected",
+    "onlineUsers": "Online Users",
+    "websocketSubtitle": "WebSocket real-time (30s refresh)",
+    "live": "Live",
+    "totalConnections": "Total Connections",
+    "priceChannel": "Price Channel",
+    "alertChannel": "Alert Channel",
+    "klineScheduler": "K-line Data Collection",
+    "klineSchedulerDesc": "Auto-fetch K-line data from Binance and cache, every {seconds}s per cycle",
+    "running": "Running",
+    "stopped": "Stopped",
+    "completedRounds": "Completed Rounds",
+    "collectTasks": "Collect Tasks",
+    "failed": "Failed",
+    "lastRoundTime": "Last Round Time",
+    "lastCollect": "Last Collect",
+    "collectSymbols": "Collect Symbols",
+    "collectIntervals": "Collect Intervals",
+    "agentsList": "AI Agents Overview",
+    "agentsListDesc": "{count} built-in AI agents analyzing the market from different dimensions",
+    "agentHeader": "Agent",
+    "layer": "Layer",
+    "aiModel": "AI Model",
+    "analysisFrequency": "Analysis Frequency",
+    "custom": "Custom",
+    "analysisModes": "Analysis Modes",
+    "analysisModesDesc": "System auto-selects analysis mode based on market conditions and dispatches agents accordingly",
+    "agentsCountLabel": "{count} agents",
+    "agents": {
+      "technical": { "name": "Technical Analysis", "desc": "Candlestick patterns, indicators, support/resistance" },
+      "onchain": { "name": "On-chain Data", "desc": "Fund flows, exchange inflows/outflows, miner reserves" },
+      "sentiment": { "name": "Sentiment Analysis", "desc": "Fear-greed index, social heat, traffic trends" },
+      "orderbook": { "name": "Order Book", "desc": "Bid/ask depth, large orders, limit prices" },
+      "risk": { "name": "Risk Assessment", "desc": "Position risk, stop-loss advice, risk-reward ratio" },
+      "news_analyst": { "name": "News Analysis", "desc": "Global crypto news, regulatory impact" },
+      "calendar": { "name": "Calendar Events", "desc": "Token unlocks, listings, halving impact" },
+      "reflection": { "name": "Reflection", "desc": "Historical accuracy review, continuous improvement" },
+      "adversarial": { "name": "Adversarial Simulation", "desc": "Market maker perspective, counter-strategy" },
+      "collusion_detector": { "name": "Collusion Detection", "desc": "Wash trading, pump coordination, manipulation" }
+    },
+    "phases": {
+      "core": "Core",
+      "enhance": "Enhance",
+      "adversarial": "Adversarial"
+    },
+    "modes": {
+      "scalping": "Scalping",
+      "intraday": "Intraday",
+      "trend": "Trend",
+      "offline": "Offline"
+    },
+    "modeLabels": {
+      "scalping": "Second-level decisions for short-term trading",
+      "intraday": "Minute-level analysis for intraday swings",
+      "trend": "Full-dimensional analysis for medium/long-term"
+    },
+    "agentNames": {
+      "technical": "Technical Analysis",
+      "onchain": "On-chain Data",
+      "risk": "Risk Assessment",
+      "orderbook": "Order Book",
+      "news_analyst": "News Analysis",
+      "calendar": "Calendar Events",
+      "adversarial": "Adversarial Simulation",
+      "collusion_detector": "Collusion Detection",
+      "reflection": "Reflection"
+    },
+    "modelLabels": {
+      "deepseek": "DeepSeek V3 General",
+      "grok": "Grok-4 Standard"
+    }
+  },
+  "setup": {
+    "title": "System Settings",
+    "subtitle": "Manage feature flags and system configuration",
+    "featureToggles": "Feature Toggles",
+    "featureTogglesHint": "Control frontend visibility. \"Active\" shows normally, \"Maintenance\" shows maintenance page, \"Hidden\" is completely invisible.",
+    "loading": "Loading...",
+    "configDescription": "Feature flag: {configKey}",
+    "errors": {
+      "createFailed": "Create failed ({status})",
+      "saveFailed": "Save failed ({status})"
+    },
+    "states": {
+      "active": "Active",
+      "maintenance": "Maintenance",
+      "hidden": "Hidden"
+    },
+    "features": {
+      "playbook": {
+        "label": "Playbook Sim",
+        "desc": "/playbook-sim — AI adversarial playbook simulation"
+      },
+      "leaderboard": {
+        "label": "Leaderboard",
+        "desc": "/leaderboard — Strategy leaderboard"
+      },
+      "task": {
+        "label": "Task Center",
+        "desc": "/tasks — Promotion task system"
+      },
+      "partner": {
+        "label": "Partner",
+        "desc": "/partner — Partner referral system"
+      },
+      "push": {
+        "label": "Push Settings",
+        "desc": "/settings/push — Push channels and event subscriptions"
+      },
+      "alerts": {
+        "label": "Price Alerts",
+        "desc": "/alerts — User custom price alerts"
+      },
+      "online_count": {
+        "label": "Online Count Display",
+        "desc": "Show online user count on landing page and dashboard"
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Operations Overview",
+    "configHealth": {
+      "title": "Config Health Check",
+      "failCount": "{count} issue(s)",
+      "allOk": "All OK",
+      "pendingCount": "{count} pending",
+      "items": {
+        "aiKey": {
+          "label": "AI Analysis Engine",
+          "ok": "Configured, AI analysis works",
+          "fail": "AI key not configured, all analysis unavailable"
+        },
+        "newsKey": {
+          "label": "News Data",
+          "ok": "CryptoPanic connected",
+          "warn": "CryptoPanic not configured, using BlockBeats (free) only"
+        },
+        "onchainKey": {
+          "label": "On-chain Data",
+          "ok": "GlassNode connected, MVRV/NVT etc. available",
+          "warn": "GlassNode not configured, on-chain analysis uses free sources only (Fear & Greed)"
+        },
+        "params": {
+          "label": "System Parameters",
+          "ok": "Default params initialized",
+          "warn": "Some default params missing, init via parameter settings"
+        },
+        "push": {
+          "label": "Push Notifications",
+          "ok": "Push channels configured",
+          "warn": "No push channels configured, alerts cannot be delivered"
+        }
+      }
+    },
+    "kpi": {
+      "totalUsers": "Total Users",
+      "todayNew": "Today +{count}",
+      "newUsers7d": "7d New",
+      "totalRevenue": "Total Revenue",
+      "revenue30d": "30d {amount}",
+      "pendingPayments": "Pending Payments",
+      "strategies24h": "Strategies 24h",
+      "totalStrategies": "Total {count}",
+      "consensus24h": "Consensus 24h",
+      "totalConsensus": "Total {count}",
+      "onlineUsers": "Online Users",
+      "onlineBreakdown": "Price {price} / Alerts {alerts}"
+    },
+    "tierBar": {
+      "title": "Membership Distribution",
+      "count": "{count} users",
+      "free": "Free",
+      "pro": "Pro",
+      "flagship": "Flagship"
+    },
+    "llmCost": {
+      "title": "Today's AI Cost",
+      "totalCost": "Total Cost",
+      "tokens": "Tokens",
+      "calls": "Calls",
+      "loading": "Loading AI cost data…"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "userMgmt": { "label": "User Management", "desc": "Search / Ban / Adjust tier" },
+      "apiKeys": { "label": "API Keys", "desc": "Manage third-party keys" },
+      "datasources": { "label": "Data Sources", "desc": "Toggle data sources" },
+      "monitor": { "label": "System Monitor", "desc": "Agents / Orchestrator" },
+      "models": { "label": "Model Assignment", "desc": "Switch model mapping" },
+      "configs": { "label": "Parameters", "desc": "Runtime parameters" }
+    },
+    "activity": {
+      "title": "System Activity",
+      "agentReports": "Agent Reports",
+      "agentReports24h": "24h +{count}",
+      "alertRules": "Alert Rules",
+      "activeRules": "Active {count}"
+    }
+  }
+}

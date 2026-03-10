@@ -1,0 +1,132 @@
+{
+  "title": "预警管理",
+  "subtitle": "自定义监控条件，实时接收市场异动通知",
+  "createButton": "+ 创建规则",
+  "tabs": {
+    "rules": "规则列表",
+    "history": "触发历史"
+  },
+  "quota": {
+    "label": "规则额度（{level}）",
+    "used": "已使用 {used}/{limit} 条规则",
+    "limitReached": "已达当前等级上限，升级会员可创建更多规则"
+  },
+  "levels": {
+    "free": "免费",
+    "pro": "专业",
+    "flagship": "旗舰"
+  },
+  "form": {
+    "createTitle": "创建预警规则",
+    "editTitle": "编辑预警规则",
+    "ruleName": "规则名称",
+    "ruleNamePlaceholder": "例：BTC 跌破 60000",
+    "symbol": "交易对",
+    "symbolPlaceholder": "BTCUSDT",
+    "conditions": "预警条件",
+    "conditionGroup": "条件组",
+    "subConditionGroup": "子条件组",
+    "notifyChannels": "通知渠道",
+    "submitCreate": "创建规则",
+    "submitEdit": "保存修改",
+    "submitting": "提交中...",
+    "cancel": "取消"
+  },
+  "metrics": {
+    "price": "价格",
+    "rsi": "RSI",
+    "macd": "MACD",
+    "ema": "EMA",
+    "bb_upper": "布林带上轨",
+    "bb_lower": "布林带下轨",
+    "exchange_netflow": "交易所净流入",
+    "whale_change_24h": "巨鲸持仓变化",
+    "fear_greed_index": "恐慌贪婪指数",
+    "mvrv": "MVRV",
+    "funding_rate": "资金费率"
+  },
+  "operators": {
+    "gt": "大于 (>)",
+    "lt": "小于 (<)",
+    "gte": "大于等于",
+    "lte": "小于等于",
+    "cross_above": "穿越上方",
+    "cross_below": "穿越下方"
+  },
+  "operatorsShort": {
+    "gt": ">",
+    "lt": "<",
+    "gte": "≥",
+    "lte": "≤",
+    "cross_above": "↑穿越",
+    "cross_below": "↓穿越"
+  },
+  "logic": {
+    "and": "AND（全部满足）",
+    "or": "OR（任一满足）",
+    "andShort": "且",
+    "orShort": "或"
+  },
+  "channels": {
+    "websocket": "WebSocket 推送",
+    "telegram": "Telegram",
+    "email": "邮件",
+    "websocketShort": "WS",
+    "telegramShort": "TG",
+    "emailShort": "邮件"
+  },
+  "actions": {
+    "addCondition": "添加条件",
+    "addSubGroup": "添加子条件组",
+    "removeSubGroup": "移除子组",
+    "removeCondition": "删除条件",
+    "edit": "编辑",
+    "delete": "删除",
+    "toggleOn": "启用",
+    "toggleOff": "禁用"
+  },
+  "list": {
+    "empty": "暂无预警规则",
+    "emptyHint": "创建您的第一个预警规则",
+    "lastTriggered": "上次触发",
+    "neverTriggered": "未触发",
+    "enabled": "已启用",
+    "disabled": "已禁用"
+  },
+  "delete": {
+    "confirmTitle": "确认删除",
+    "confirmMessage": "确定删除规则 \"{name}\" 吗？此操作不可撤销。",
+    "confirmButton": "删除",
+    "cancelButton": "取消"
+  },
+  "history": {
+    "title": "触发历史",
+    "empty": "暂无触发记录",
+    "table": {
+      "ruleName": "规则名称",
+      "metric": "指标",
+      "triggeredValue": "触发值",
+      "channel": "渠道",
+      "status": "状态",
+      "time": "时间"
+    },
+    "status": {
+      "sent": "已发送",
+      "failed": "失败"
+    }
+  },
+  "validation": {
+    "nameRequired": "请输入规则名称",
+    "symbolRequired": "请输入交易对",
+    "conditionsRequired": "至少需要一个条件",
+    "channelsRequired": "至少选择一个通知渠道",
+    "thresholdPlaceholder": "阈值"
+  },
+  "error": {
+    "loadFailed": "加载预警规则失败",
+    "createFailed": "创建规则失败",
+    "updateFailed": "更新规则失败",
+    "deleteFailed": "删除规则失败",
+    "submitFailed": "提交失败"
+  }
+}

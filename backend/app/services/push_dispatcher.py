@@ -16,6 +16,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.redis import get_redis_pool, set_with_ttl, get_json, publish_stream
 from app.core.sql_compat import jsonb_contains
+from app.services.notification.i18n_templates import (
+    get_telegram_template,
+    get_title_template,
+    get_short_template,
+    localize_variables,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -25,130 +31,17 @@ EventType = Literal[
     "strategy_update",
     "price_alert",
     "playbook_switch",
+    "playbook_completed",
+    "playbook_failed",
     "risk_alert",
     "defense_alert",
     "high_confidence_signal",
     "strategy_settlement",
 ]
 
-# 内置模板（支持 {{var}} 变量替换）
-_BUILTIN_TEMPLATES: dict[EventType, dict[str, str]] = {
-    "strategy_update": {
-        "title": "[Axiom] {{symbol}} 策略更新",
-        "telegram": (
-            "📊 <b>策略更新</b> {{direction_label}}\n"
-            "━━━━━━━━━━━━━━━\n"
-            "💎 标的: {{symbol}}\n"
-            "🎯 入场区间: {{entry_low}} ~ {{entry_high}}\n"
-            "🛑 止损: {{stop_loss}}\n"
-            "🏁 目标: {{targets_str}}\n"
-            "📈 置信度: {{confidence_pct}}\n"
-            "━━━━━━━━━━━━━━━"
-        ),
-        "short": "{{symbol}} {{direction_label}} 置信度{{confidence_pct}}",
-    },
-    "price_alert": {
-        "title": "[Axiom] {{symbol}} 价格预警",
-        "telegram": (
-            "⚡ <b>价格预警</b>\n"
-            "━━━━━━━━━━━━━━━\n"
-            "💎 {{symbol}}\n"
-            "💰 当前价格: {{current_price}}\n"
-            "📌 触发条件: {{trigger}}\n"
-            "━━━━━━━━━━━━━━━"
-        ),
-        "short": "{{symbol}} 价格 {{current_price}} {{trigger}}",
-    },
-    "playbook_switch": {
-        "title": "[Axiom] {{symbol}} 剧本切换",
-        "telegram": (
-            "🎭 <b>剧本切换</b>\n"
-            "━━━━━━━━━━━━━━━\n"
-            "💎 标的: {{symbol}}\n"
-            "📖 当前剧本: {{matched_playbook}}\n"
-            "📊 概率: {{probability_pct}}\n"
-            "📍 阶段: {{stage_description}}\n"
-            "➡️ 预判: {{next_move}}\n"
-            "━━━━━━━━━━━━━━━"
-        ),
-        "short": "{{symbol}} 剧本: {{matched_playbook}} ({{probability_pct}})",
-    },
-    "playbook_completed": {
-        "title": "[Axiom] {{symbol}} 剧本验证完成",
-        "telegram": (
-            "✅ <b>剧本验证完成</b>\n"
-            "━━━━━━━━━━━━━━━\n"
-            "💎 标的: {{symbol}}\n"
-            "📖 剧本: {{matched_playbook}}\n"
-            "📊 阶段验证: {{stage_match_ratio}}\n"
-            "━━━━━━━━━━━━━━━"
-        ),
-        "short": "{{symbol}} 剧本{{matched_playbook}}验证完成 ({{stage_match_ratio}})",
-    },
-    "playbook_failed": {
-        "title": "[Axiom] {{symbol}} 剧本预测失效",
-        "telegram": (
-            "❌ <b>剧本预测失效</b>\n"
-            "━━━━━━━━━━━━━━━\n"
-            "💎 标的: {{symbol}}\n"
-            "📖 剧本: {{matched_playbook}}\n"
-            "⚠️ 失效原因: {{failure_reason}}\n"
-            "━━━━━━━━━━━━━━━"
-        ),
-        "short": "{{symbol}} 剧本{{matched_playbook}}失效: {{failure_reason}}",
-    },
-    "risk_alert": {
-        "title": "[Axiom] {{symbol}} 风险预警",
-        "telegram": (
-            "{{severity_emoji}} <b>风险预警</b>\n"
-            "━━━━━━━━━━━━━━━\n"
-            "📌 类型: {{alert_type}}\n"
-            "💎 标的: {{symbol}}\n"
-            "⚡ 严重度: {{severity}}\n"
-            "📝 {{message}}\n"
-            "━━━━━━━━━━━━━━━"
-        ),
-        "short": "{{symbol}} {{severity}} {{alert_type}}",
-    },
-    "defense_alert": {
-        "title": "[Axiom] {{symbol}} 防御预警",
-        "telegram": (
-            "🛡 <b>防御预警</b>\n"
-            "━━━━━━━━━━━━━━━\n"
-            "💎 标的: {{symbol}}\n"
-            "⚠️ 等级: {{alert_level}}\n"
-            "📝 {{message}}\n"
-            "━━━━━━━━━━━━━━━"
-        ),
-        "short": "{{symbol}} 防御等级 {{alert_level}}",
-    },
-    "high_confidence_signal": {
-        "title": "[Axiom] {{symbol}} 高置信信号",
-        "telegram": (
-            "🔥 <b>高置信信号</b>\n"
-            "━━━━━━━━━━━━━━━\n"
-            "💎 标的: {{symbol}}\n"
-            "📊 方向: {{signal_label}}\n"
-            "📈 置信度: {{confidence_pct}}\n"
-            "🔍 模式: {{mode}}\n"
-            "━━━━━━━━━━━━━━━"
-        ),
-        "short": "{{symbol}} {{signal_label}} 置信度{{confidence_pct}}",
-    },
-    "strategy_settlement": {
-        "title": "[Axiom] {{symbol}} 策略结算",
-        "telegram": (
-            "{{result_emoji}} <b>策略结算</b>\n"
-            "━━━━━━━━━━━━━━━\n"
-            "💎 标的: {{symbol}}\n"
-            "📌 结算类型: {{settlement_type}}\n"
-            "💰 结算价: {{settlement_price}}\n"
-            "📊 盈亏: {{pnl_pct}}%\n"
-            "━━━━━━━━━━━━━━━"
-        ),
-        "short": "{{symbol}} {{settlement_type}} 盈亏{{pnl_pct}}%",
-    },
-}
+
+# 注：内置模板已迁移至 app/services/notification/i18n_templates.py（三语言版本）
+# get_template() 优先查 DB 自定义模板，回退到 i18n_templates 模块
 
 
 def render_template(template: str, variables: dict[str, Any]) -> str:
@@ -164,8 +57,9 @@ async def get_template(
     session: AsyncSession,
     event_type: EventType,
     channel: str,
+    locale: str = "zh-CN",
 ) -> str:
-    """获取模板 — 优先从数据库读取自定义模板，否则返回内置模板。"""
+    """获取模板 — 优先从数据库读取自定义模板，否则返回 i18n 内置模板。"""
     try:
         result = await session.execute(
             text("""
@@ -181,8 +75,11 @@ async def get_template(
     except Exception:
         pass  # 表可能不存在，回退到内置模板
 
-    builtin = _BUILTIN_TEMPLATES.get(event_type, {})
-    return builtin.get(channel, builtin.get("short", "{{symbol}} — {{event_type}}"))
+    if channel == "telegram":
+        return get_telegram_template(event_type, locale)
+    if channel == "title":
+        return get_title_template(event_type, locale)
+    return get_short_template(event_type, locale)
 
 
 # ── F3: 频率控制 ─────────────────────────────────────────────
@@ -194,6 +91,8 @@ _EVENT_COOLDOWNS: dict[str, int] = {
     "strategy_update": 600,    # 10分钟
     "price_alert": 300,        # 5分钟
     "playbook_switch": 1800,   # 30分钟
+    "playbook_completed": 600,
+    "playbook_failed": 600,
     "risk_alert": 120,         # 2分钟（紧急）
     "defense_alert": 120,      # 2分钟（紧急）
     "high_confidence_signal": 900,  # 15分钟
@@ -241,6 +140,21 @@ def _compute_data_hash(data: dict) -> str:
 
 
 # ── F2: 统一分发器 ───────────────────────────────────────────
+
+
+async def _get_user_locale(session: AsyncSession, user_id: str) -> str:
+    """从 user_preferences 读取用户语言偏好，默认 zh-CN。"""
+    try:
+        result = await session.execute(
+            text("SELECT locale FROM user_preferences WHERE user_id = :uid LIMIT 1"),
+            {"uid": user_id},
+        )
+        row = result.scalar()
+        if row:
+            return str(row)
+    except Exception:
+        pass
+    return "zh-CN"
 
 
 async def dispatch(
@@ -304,15 +218,18 @@ async def dispatch(
         logger.info("用户未启用该事件推送", extra={"user_id": user_id, "event": event_type})
         return {"skipped": True, "reason": "event_disabled"}
 
-    # 预处理变量
-    variables = _prepare_variables(event_type, data)
+    # 读取用户语言偏好
+    locale = await _get_user_locale(session, user_id)
+
+    # 预处理变量（本地化标签）
+    variables = _prepare_variables(event_type, data, locale)
 
     # WebSocket（始终推送）
     results["websocket"] = await _push_websocket(event_type, data)
 
     # Telegram
     if settings_row["tg_enabled"] and settings_row["tg_chat_id"]:
-        tpl = await get_template(session, event_type, "telegram")
+        tpl = await get_template(session, event_type, "telegram", locale)
         msg = render_template(tpl, variables)
         results["telegram"] = await _push_telegram(settings_row["tg_chat_id"], msg)
 
@@ -325,9 +242,9 @@ async def dispatch(
             )
             email_row = user_result.mappings().first()
             if email_row and email_row["email"]:
-                title_tpl = await get_template(session, event_type, "title")
+                title_tpl = await get_template(session, event_type, "title", locale)
                 subject = render_template(title_tpl, variables)
-                tpl = await get_template(session, event_type, "telegram")
+                tpl = await get_template(session, event_type, "telegram", locale)
                 body_text = render_template(tpl, variables)
                 results["email"] = await _push_email(email_row["email"], subject, body_text)
         except Exception as exc:
@@ -344,16 +261,13 @@ async def dispatch(
     return results
 
 
-def _prepare_variables(event_type: str, data: dict) -> dict[str, Any]:
-    """预处理模板变量。"""
+def _prepare_variables(event_type: str, data: dict, locale: str = "zh-CN") -> dict[str, Any]:
+    """预处理模板变量（含本地化标签）。"""
     variables = dict(data)
     variables["event_type"] = event_type
 
-    # 方向标签
-    direction = data.get("direction", "neutral")
-    variables["direction_label"] = {
-        "bullish": "🟢 多头", "bearish": "🔴 空头"
-    }.get(direction, "⚪ 观望")
+    # 本地化方向 / 严重度标签
+    variables = localize_variables(variables, locale)
 
     # 置信度百分比
     confidence = data.get("confidence", 0)
@@ -374,6 +288,17 @@ def _prepare_variables(event_type: str, data: dict) -> dict[str, Any]:
     variables["severity_emoji"] = {
         "high": "🔴", "medium": "🟡", "low": "🟢"
     }.get(severity, "⚠️")
+
+    market_structure_label = data.get("market_structure_label")
+    if not market_structure_label:
+        market_structure_type = data.get("market_structure_type")
+        if market_structure_type:
+            market_structure_label = localize_variables(
+                {"market_structure_type": market_structure_type},
+                locale,
+            ).get("market_structure_label")
+    if market_structure_label:
+        variables["market_structure_label"] = market_structure_label
 
     return variables
 
@@ -404,7 +329,7 @@ async def _push_telegram(chat_id: str, message: str) -> bool:
 
 
 async def _push_email(to_email: str, subject: str, body: str) -> bool:
-    """通过 SendGrid 发送邮件。"""
+    """通过邮件服务（Resend/SendGrid）发送邮件。"""
     try:
         from app.services.notification.email import send_raw_email
         # 将纯文本包装为简单 HTML
@@ -413,6 +338,75 @@ async def _push_email(to_email: str, subject: str, body: str) -> bool:
     except Exception as exc:
         logger.error("邮件推送失败: %s", exc)
         return False
+
+
+async def _dispatch_per_user(
+    session: AsyncSession,
+    user_id: str,
+    event_type: EventType,
+    data: dict[str, Any],
+) -> dict[str, bool]:
+    """单用户分发（仅 Telegram + Email），不发布 WebSocket stream。
+
+    由 broadcast() 调用，避免 N 个用户产生 N 条重复 stream 消息。
+    """
+    symbol = data.get("symbol", "UNKNOWN")
+    results: dict[str, bool] = {}
+
+    allowed = await _check_cooldown(user_id, event_type, symbol)
+    if not allowed:
+        return {"skipped": True, "reason": "cooldown"}
+
+    try:
+        result = await session.execute(
+            text("""
+                SELECT email_enabled, tg_enabled, tg_chat_id, events
+                FROM push_settings
+                WHERE user_id = :user_id
+            """),
+            {"user_id": user_id},
+        )
+        settings_row = result.mappings().first()
+    except Exception as exc:
+        logger.error("查询推送设置失败: %s", exc)
+        return {"error": True}
+
+    if not settings_row:
+        await _set_cooldown(user_id, event_type, symbol)
+        return {"skipped": True, "reason": "no_settings"}
+
+    db_events: list = settings_row["events"] or []
+    event_db_key = {"risk_warning": "risk_alert"}.get(event_type, event_type)
+    if event_db_key not in db_events:
+        return {"skipped": True, "reason": "event_disabled"}
+
+    locale = await _get_user_locale(session, user_id)
+    variables = _prepare_variables(event_type, data, locale)
+
+    if settings_row["tg_enabled"] and settings_row["tg_chat_id"]:
+        tpl = await get_template(session, event_type, "telegram", locale)
+        msg = render_template(tpl, variables)
+        results["telegram"] = await _push_telegram(settings_row["tg_chat_id"], msg)
+
+    if settings_row["email_enabled"]:
+        try:
+            user_result = await session.execute(
+                text("SELECT email FROM users WHERE id = :uid"),
+                {"uid": user_id},
+            )
+            email_row = user_result.mappings().first()
+            if email_row and email_row["email"]:
+                title_tpl = await get_template(session, event_type, "title", locale)
+                subject = render_template(title_tpl, variables)
+                tpl = await get_template(session, event_type, "telegram", locale)
+                body_text = render_template(tpl, variables)
+                results["email"] = await _push_email(email_row["email"], subject, body_text)
+        except Exception as exc:
+            logger.error("邮件推送查询失败: %s", exc)
+            results["email"] = False
+
+    await _set_cooldown(user_id, event_type, symbol)
+    return results
 
 
 # ── 批量分发（给所有启用用户） ────────────────────────────────
@@ -444,11 +438,13 @@ async def broadcast(
         logger.error("广播查询用户失败: %s", exc)
         return {"total": 0, "sent": 0, "skipped": 0, "error": 1}
 
+    ws_published = await _push_websocket(event_type, data)
+
     sent = 0
     skipped = 0
     for uid in user_ids:
         try:
-            res = await dispatch(session, uid, event_type, data)
+            res = await _dispatch_per_user(session, uid, event_type, data)
             if res.get("skipped"):
                 skipped += 1
             else:
@@ -456,7 +452,7 @@ async def broadcast(
         except Exception:
             skipped += 1
 
-    return {"total": len(user_ids), "sent": sent, "skipped": skipped}
+    return {"total": len(user_ids), "sent": sent, "skipped": skipped, "ws": ws_published}
 
 
 async def dispatch_fire_and_forget(

@@ -1,0 +1,62 @@
+{
+  "title": "公告中心",
+  "subtitle": "查看你收到的站內公告與最近互動記錄",
+  "refreshing": "刷新中...",
+  "totalRecords": "共 {total} 條記錄",
+  "empty": {
+    "title": "暫無公告歷史",
+    "description": "你收到並互動過的公告會顯示在這裡"
+  },
+  "events": {
+    "confirmed": "已確認",
+    "clicked": "已點擊",
+    "closed": "已關閉",
+    "snoozed": "已延後",
+    "delivered": "已送達",
+    "failed": "發送失敗",
+    "none": "未互動"
+  },
+  "card": {
+    "archived": "已歸檔",
+    "published": "已發布",
+    "publishedAt": "發布時間",
+    "archivedAt": "歸檔時間",
+    "lastAction": "最近動作",
+    "confirmedAt": "確認時間",
+    "backHome": "返回首頁"
+  },
+  "table": {
+    "columns": {
+      "title": "標題",
+      "type": "類型",
+      "priority": "優先級",
+      "createdAt": "創建時間",
+      "lastEvent": "最後狀態",
+      "actions": "操作"
+    },
+    "actions": {
+      "view": "查看"
+    }
+  },
+  "types": {
+    "info": "信息",
+    "warning": "警告",
+    "error": "錯誤",
+    "maintenance": "維護",
+    "feature": "功能更新"
+  },
+  "priorities": {
+    "low": "低",
+    "normal": "普通",
+    "high": "高",
+    "urgent": "緊急"
+  },
+  "pagination": {
+    "prev": "上一頁",
+    "next": "下一頁",
+    "page": "第 {current} / {total} 頁"
+  },
+  "error": {
+    "loadFailed": "公告數據加載失敗"
+  }
+}

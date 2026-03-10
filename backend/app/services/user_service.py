@@ -1,16 +1,19 @@
-"""用户管理业务逻辑 — 查询、启停用、调整会员等级。
+"""用户管理业务逻辑 — 查询、创建、启停用、调整会员等级。
 
 Service 层包含业务逻辑，使用 sqlalchemy text() 参数化查询。
 返回 pydantic 模型，支持分页搜索和筛选。
 """
 
 import logging
+import secrets
+import uuid
 from datetime import datetime
 
 from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import hash_password
 from app.core.sql_compat import update_returning
 
 logger = logging.getLogger(__name__)
@@ -48,6 +51,92 @@ class UpdateMembershipRequest(BaseModel):
 
 
 # ── 服务函数 ──────────────────────────────────────────────────
+
+
+async def _generate_unique_referral_code(session: AsyncSession, length: int = 8) -> str:
+    alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    for _ in range(10):
+        code = "".join(secrets.choice(alphabet) for _ in range(length))
+        existing = await session.execute(
+            text("SELECT 1 FROM users WHERE referral_code = :code"),
+            {"code": code},
+        )
+        if existing.first() is None:
+            return code
+    raise RuntimeError("无法生成唯一邀请码，请重试")
+
+
+async def create_user(
+    session: AsyncSession,
+    email: str,
+    password: str,
+    role: str = "user",
+    membership_level: int = 0,
+    expires_at: datetime | None = None,
+) -> AdminUserInfo:
+    """管理员创建新用户。"""
+    if role not in ("user", "operator", "admin"):
+        raise ValueError("角色必须为 user / operator / admin")
+    if membership_level not in (0, 1, 2):
+        raise ValueError("会员等级必须为 0(免费)、1(专业) 或 2(旗舰)")
+
+    normalized_email = email.strip().lower()
+    existing = await session.execute(
+        text("SELECT 1 FROM users WHERE LOWER(email) = :email"),
+        {"email": normalized_email},
+    )
+    if existing.first() is not None:
+        raise ValueError("该邮箱已注册")
+
+    hashed = hash_password(password)
+    user_id = str(uuid.uuid4())
+    referral_code = await _generate_unique_referral_code(session)
+    is_admin = role == "admin"
+
+    await session.execute(
+        text(
+            "INSERT INTO users (id, email, password_hash, role, is_admin, referral_code) "
+            "VALUES (:id, :email, :password_hash, :role, :is_admin, :referral_code)"
+        ),
+        {
+            "id": user_id,
+            "email": normalized_email,
+            "password_hash": hashed,
+            "role": role,
+            "is_admin": is_admin,
+            "referral_code": referral_code,
+        },
+    )
+
+    await session.execute(
+        text(
+            "INSERT INTO memberships (id, user_id, level, expires_at) "
+            "VALUES (:id, :user_id, :level, :expires_at)"
+        ),
+        {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "level": membership_level,
+            "expires_at": expires_at,
+        },
+    )
+
+    await session.execute(
+        text("INSERT INTO push_settings (id, user_id) VALUES (:id, :user_id)"),
+        {"id": str(uuid.uuid4()), "user_id": user_id},
+    )
+
+    await session.flush()
+
+    return AdminUserInfo(
+        id=user_id,
+        email=normalized_email,
+        role=role,
+        is_active=True,
+        membership_level=membership_level,
+        expires_at=expires_at,
+        created_at=datetime.utcnow(),
+    )
 
 
 async def query_users(

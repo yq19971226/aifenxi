@@ -1,0 +1,86 @@
+{
+  "loading": "Loading...",
+  "tabs": {
+    "login": "Log In",
+    "register": "Sign Up"
+  },
+  "fields": {
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "referralCode": "Referral Code",
+    "referralCodeOptional": "Referral Code (optional)",
+    "registerEmail": "Registered Email",
+    "verificationCode": "Verification Code",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password"
+  },
+  "placeholders": {
+    "password": "Enter password",
+    "minLength": "At least 8 characters",
+    "verificationCode": "Enter 6-digit verification code",
+    "confirmPassword": "Re-enter password",
+    "confirmNewPassword": "Re-enter new password"
+  },
+  "buttons": {
+    "login": "Log In",
+    "register": "Create Account",
+    "sendCode": "Send Code",
+    "sendingCode": "Sending...",
+    "resetPassword": "Reset Password"
+  },
+  "forgot": {
+    "link": "Forgot password?",
+    "backToLogin": "Back to login",
+    "title": "Reset Password",
+    "promptSend": "Enter your email and we'll send a verification code",
+    "promptCode": "Enter the code sent to your email"
+  },
+  "strength": {
+    "weak": "Weak",
+    "fair": "Fair",
+    "good": "Good",
+    "strong": "Strong"
+  },
+  "errors": {
+    "networkError": "Cannot connect to server, please check your network",
+    "loginFailed": "Login failed",
+    "registerFailed": "Registration failed",
+    "registrationDisabled": "New user registration is currently disabled",
+    "passwordMismatch": "Passwords do not match",
+    "passwordMinLength": "Password must be at least 8 characters",
+    "emailRequired": "Please enter your email first",
+    "verificationCodeRequired": "Please enter the verification code",
+    "referralRequired": "Please enter a referral code",
+    "registerCodeSendFailed": "Failed to send registration code",
+    "sendFailed": "Failed to send",
+    "resetFailed": "Reset failed",
+    "serverUnavailable": "Cannot connect to server"
+  },
+  "success": {
+    "registerCodeSent": "Registration code sent to your email. Please complete sign up within 10 minutes",
+    "codeSent": "Verification code sent to your email, valid for 10 minutes",
+    "passwordReset": "Password reset successful, please log in"
+  },
+  "features": {
+    "heroTitle1": "Institutional-grade",
+    "heroTitle2": "market intelligence.",
+    "heroSubtitle1": "Multi-agent adversarial consensus engine.",
+    "heroSubtitle2": "See through the noise. Trade the script.",
+    "agentsTitle": "10 AI Agents",
+    "agentsDesc": "Multi-model adversarial consensus, beyond a single perspective",
+    "defenseTitle": "Market Maker Defense",
+    "defenseDesc": "Reverse-engineer market maker tactics, detect manipulation risk",
+    "modesTitle": "Three Analysis Modes",
+    "modesDesc": "Scalping / Intraday / Trend",
+    "precisionTitle": "Non-Round Precision Levels",
+    "precisionDesc": "Refined entry/stop levels that avoid round numbers"
+  },
+  "stats": {
+    "agents": "AI Agents",
+    "models": "Consensus Models",
+    "timeframes": "Timeframes"
+  },
+  "legal": "By continuing you agree to AXIOM Insight's Terms of Service and Privacy Policy",
+  "guideLink": "New here? Check out the User Guide →"
+}

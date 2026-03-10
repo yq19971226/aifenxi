@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { useTranslations, useLocale } from "next-intl";
 import {
   createChart,
   type IChartApi,
@@ -43,6 +44,8 @@ function toLineData(points: TrendDataPoint[]): LineData[] {
 // ── Component ────────────────────────────────────────────────
 
 export function WinRateTrend({ data }: WinRateTrendProps) {
+  const t = useTranslations('performance.winRateTrend');
+  const locale = useLocale();
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Area"> | null>(null);
@@ -68,6 +71,24 @@ export function WinRateTrend({ data }: WinRateTrendProps) {
       timeScale: { borderColor: "rgba(255,255,255,0.1)" },
       width: containerRef.current.clientWidth,
       height: CHART_HEIGHT,
+      localization: {
+        locale: locale,
+        timeFormatter: (timestamp: number) => {
+          return new Intl.DateTimeFormat(locale, {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          }).format(timestamp * 1000);
+        },
+        priceFormatter: (price: number) => {
+          return new Intl.NumberFormat(locale, {
+            style: 'percent',
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+          }).format(price / 100);
+        },
+      },
     });
 
     const series = chart.addAreaSeries({
@@ -77,7 +98,6 @@ export function WinRateTrend({ data }: WinRateTrendProps) {
       bottomColor: AREA_BOTTOM_COLOR,
       priceLineVisible: false,
       lastValueVisible: true,
-      priceFormat: { type: "custom", formatter: (v: number) => `${v.toFixed(1)}%` },
     });
 
     chartRef.current = chart;
@@ -96,7 +116,7 @@ export function WinRateTrend({ data }: WinRateTrendProps) {
       chartRef.current = null;
       seriesRef.current = null;
     };
-  }, []);
+  }, [locale]);
 
   // ── Update data ──
   useEffect(() => {
@@ -108,13 +128,13 @@ export function WinRateTrend({ data }: WinRateTrendProps) {
 
   return (
     <motion.div
-      className="rounded-xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-md p-4"
+      className="card p-4"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
       <p className="mb-3 text-xs font-medium uppercase tracking-widest text-zinc-500">
-        胜率趋势（最近30天）
+        {t('title')}
       </p>
 
       {data.length === 0 ? (

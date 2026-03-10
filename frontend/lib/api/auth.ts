@@ -13,6 +13,7 @@ export interface UserInfo {
   is_active: boolean;
   is_admin: boolean;
   role: "admin" | "operator" | "user";
+  membership_expires_at?: string | null;
 }
 
 export interface TokenResponse {
@@ -30,6 +31,9 @@ interface RegisterResponse {
   user_id: string;
   email: string;
   message: string;
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
 }
 
 // ── Token helpers ────────────────────────────────────────────
@@ -105,16 +109,28 @@ export async function authFetch(
 export async function register(
   email: string,
   password: string,
+  code: string,
   referralCode?: string
 ): Promise<RegisterResponse> {
-  const body: Record<string, string> = { email, password };
+  const body: Record<string, string> = { email, password, code };
   if (referralCode) body.referral_code = referralCode;
   const res = await fetch(`${API_BASE}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  return handleApiResponse(res, "注册失败");
+  const data = await handleApiResponse<RegisterResponse>(res, "注册失败");
+  saveTokens(data.access_token, data.refresh_token);
+  return data;
+}
+
+export async function sendRegisterCode(email: string): Promise<{ message: string }> {
+  const res = await fetch(`${API_BASE}/api/auth/send-register-code`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  return handleApiResponse<{ message: string }>(res, "发送失败");
 }
 
 export async function login(

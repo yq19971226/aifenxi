@@ -1,0 +1,56 @@
+{
+  "site": {
+    "title": "AXIOM洞察 - 莊家行為 AI 多維分析平台",
+    "description": "多智能體協同分析莊家行為，穿透市場噪音，從技術面、鏈上數據、合約市場、市場情緒等維度提供綜合判斷參考",
+    "og_title": "AXIOM洞察 - 莊家行為 AI 多維分析平台",
+    "og_description": "多 AI 智能體協同分析莊家行為，穿透市場噪音，洞察主力動向，為你的交易決策提供多維參考"
+  },
+  "dashboard": {
+    "title": "概覽 - AXIOM洞察",
+    "description": "多幣種 AI 分析概覽，即時監控市場信號"
+  },
+  "consensus": {
+    "title": "綜合分析 - AXIOM洞察",
+    "description": "多智能體共識分析，AI 多維度精準研判"
+  },
+  "alerts": {
+    "title": "預警規則 - AXIOM洞察",
+    "description": "自訂價格預警和風險監控規則"
+  },
+  "performance": {
+    "title": "策略績效 - AXIOM洞察",
+    "description": "AI 策略歷史表現和勝率統計"
+  },
+  "playbook": {
+    "title": "劇本推演 - AXIOM洞察",
+    "description": "莊家操盤劇本推演與反制策略模擬"
+  },
+  "backtest": {
+    "title": "回測 - AXIOM洞察",
+    "description": "策略歷史回測和驗證"
+  },
+  "leaderboard": {
+    "title": "排行榜 - AXIOM洞察",
+    "description": "策略績效排行和社群信號"
+  },
+  "settings": {
+    "title": "設置 - AXIOM洞察",
+    "description": "帳戶設置和偏好管理"
+  },
+  "partner": {
+    "title": "合夥人 - AXIOM洞察",
+    "description": "合夥人計劃和推薦獎勵"
+  },
+  "tasks": {
+    "title": "任務中心 - AXIOM洞察",
+    "description": "每日任務和獎勵"
+  },
+  "login": {
+    "title": "登入 - AXIOM洞察",
+    "description": "登入 AXIOM洞察 莊家行為 AI 多維分析平台"
+  },
+  "guide": {
+    "title": "使用指南 - AXIOM洞察",
+    "description": "從註冊到實戰，手把手教你用 AXIOM洞察 分析莊家行為"
+  }
+}

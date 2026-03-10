@@ -31,6 +31,7 @@ class UserInfo(BaseModel):
     is_active: bool
     is_admin: bool = False
     role: str = "user"
+    membership_expires_at: str | None = None
 
     @property
     def user_id(self) -> str:
@@ -69,7 +70,10 @@ async def get_current_user(
             text(
                 """
                 SELECT u.id, u.email, u.is_active, u.is_admin,
-                       COALESCE(u.role, 'user') AS role,
+                       CASE
+                           WHEN COALESCE(u.is_admin, FALSE) THEN 'admin'
+                           ELSE COALESCE(u.role, 'user')
+                       END AS role,
                        COALESCE(m.level, 0) AS membership_level,
                        m.expires_at AS membership_expires_at
                 FROM users u
@@ -107,6 +111,18 @@ async def get_current_user(
         except Exception:
             pass  # 解析失败时保持原等级
 
+    # 将 expires_at 转为 ISO 字符串传给前端
+    raw_expires = row["membership_expires_at"]
+    expires_iso: str | None = None
+    if membership_level > 0 and raw_expires is not None:
+        try:
+            ea = raw_expires
+            if isinstance(ea, str):
+                ea = datetime.fromisoformat(ea)
+            expires_iso = ea.isoformat()
+        except Exception:
+            pass
+
     return UserInfo(
         id=str(row["id"]),
         email=row["email"],
@@ -114,6 +130,7 @@ async def get_current_user(
         is_active=row["is_active"],
         is_admin=row["is_admin"],
         role=row["role"],
+        membership_expires_at=expires_iso,
     )
 
 
@@ -142,7 +159,8 @@ def require_role(allowed_roles: list[str]) -> Callable:
     """
 
     async def _check(user: UserInfo = Depends(get_current_user)) -> UserInfo:
-        if user.role not in allowed_roles:
+        effective_role = "admin" if user.is_admin else user.role
+        if effective_role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="权限不足",

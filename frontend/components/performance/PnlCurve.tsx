@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { useTranslations, useLocale } from "next-intl";
 import {
   createChart,
   type IChartApi,
@@ -42,6 +43,8 @@ function toBaselineData(points: TrendDataPoint[]): BaselineData[] {
 // ── Component ────────────────────────────────────────────────
 
 export function PnlCurve({ data }: PnlCurveProps) {
+  const t = useTranslations('performance.pnlCurve');
+  const locale = useLocale();
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Baseline"> | null>(null);
@@ -67,6 +70,24 @@ export function PnlCurve({ data }: PnlCurveProps) {
       timeScale: { borderColor: "rgba(255,255,255,0.1)" },
       width: containerRef.current.clientWidth,
       height: CHART_HEIGHT,
+      localization: {
+        locale: locale,
+        timeFormatter: (timestamp: number) => {
+          return new Intl.DateTimeFormat(locale, {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          }).format(timestamp * 1000);
+        },
+        priceFormatter: (price: number) => {
+          return new Intl.NumberFormat(locale, {
+            style: 'percent',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(price / 100);
+        },
+      },
     });
 
     const series = chart.addBaselineSeries({
@@ -80,7 +101,6 @@ export function PnlCurve({ data }: PnlCurveProps) {
       lineWidth: 2,
       priceLineVisible: false,
       lastValueVisible: true,
-      priceFormat: { type: "custom", formatter: (v: number) => `${v.toFixed(2)}%` },
     });
 
     chartRef.current = chart;
@@ -99,7 +119,7 @@ export function PnlCurve({ data }: PnlCurveProps) {
       chartRef.current = null;
       seriesRef.current = null;
     };
-  }, []);
+  }, [locale]);
 
   // ── Update data ──
   useEffect(() => {
@@ -111,13 +131,13 @@ export function PnlCurve({ data }: PnlCurveProps) {
 
   return (
     <motion.div
-      className="rounded-xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-md p-4"
+      className="card p-4"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1 }}
     >
       <p className="mb-3 text-xs font-medium uppercase tracking-widest text-zinc-500">
-        累计盈亏曲线
+        {t('title')}
       </p>
 
       {data.length === 0 ? (

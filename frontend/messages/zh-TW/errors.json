@@ -1,0 +1,50 @@
+{
+  "http": {
+    "400": "請求參數錯誤",
+    "401": "未授權，請先登入",
+    "403": "無權限存取此資源",
+    "404": "請求的資源不存在",
+    "408": "請求逾時，請重試",
+    "429": "請求過於頻繁，請稍後再試",
+    "500": "伺服器內部錯誤",
+    "502": "閘道錯誤",
+    "503": "服務暫時不可用",
+    "504": "閘道逾時"
+  },
+  "validation": {
+    "required": "此欄位為必填項",
+    "email": "請輸入有效的電子郵件地址",
+    "minLength": "至少需要 {min} 個字元",
+    "maxLength": "最多允許 {max} 個字元",
+    "pattern": "格式不正確",
+    "number": "請輸入有效的數字",
+    "integer": "請輸入整數",
+    "positive": "請輸入正數",
+    "range": "數值應在 {min} 到 {max} 之間",
+    "url": "請輸入有效的 URL",
+    "date": "請輸入有效的日期",
+    "password": "密碼強度不足"
+  },
+  "auth": {
+    "loginFailed": "登入失敗，請檢查使用者名稱和密碼",
+    "sessionExpired": "工作階段已過期，請重新登入",
+    "tokenInvalid": "令牌無效",
+    "permissionDenied": "權限不足",
+    "accountLocked": "帳戶已被鎖定",
+    "accountNotFound": "帳戶不存在"
+  },
+  "api": {
+    "networkError": "網路連線失敗，請檢查網路",
+    "timeout": "請求逾時，請重試",
+    "serverError": "伺服器錯誤，請稍後重試",
+    "unknownError": "未知錯誤",
+    "dataParseError": "資料解析失敗",
+    "rateLimitExceeded": "請求頻率超限"
+  },
+  "form": {
+    "submitFailed": "提交失敗，請重試",
+    "invalidData": "資料格式不正確",
+    "duplicateEntry": "資料已存在",
+    "saveFailed": "儲存失敗"
+  }
+}

@@ -7,7 +7,7 @@ interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
   w?: string;
   /** Height — accepts any CSS value. Defaults to "1rem" */
   h?: string;
-  /** Border radius — "full" for pill, "xl" for rounded-xl, default "lg" */
+  /** Border radius — "full" for pill, default "lg" */
   rounded?: "full" | "xl" | "lg" | "md" | "sm";
 }
 
@@ -46,7 +46,7 @@ export function Skeleton({
 /** 统计卡片骨架 — 用于 admin dashboard 等 */
 export function SkeletonStatCard() {
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-bg-elevated/80 p-5">
+    <div className="rounded-lg border border-white/[0.06] bg-bg-elevated/80 p-5">
       <div className="mb-3 flex items-center justify-between">
         <Skeleton w="4rem" h="0.75rem" />
         <Skeleton w="2rem" h="2rem" rounded="lg" />
@@ -60,7 +60,7 @@ export function SkeletonStatCard() {
 /** 通用卡片骨架 — 用于 card 风格区域 */
 export function SkeletonCard({ lines = 3 }: { lines?: number }) {
   return (
-    <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-6 backdrop-blur-md">
+    <div className="rounded-lg border border-white/[0.08] bg-white/[0.04] p-6 backdrop-blur-md">
       <Skeleton w="40%" h="0.75rem" className="mb-4" />
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
@@ -77,7 +77,7 @@ export function SkeletonCard({ lines = 3 }: { lines?: number }) {
 /** 表格骨架 — 用于数据表格 */
 export function SkeletonTable({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {
   return (
-    <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-6 backdrop-blur-md">
+    <div className="rounded-lg border border-white/[0.08] bg-white/[0.04] p-6 backdrop-blur-md">
       {/* Header */}
       <div className="mb-4 flex gap-4">
         {Array.from({ length: cols }).map((_, i) => (
@@ -99,7 +99,7 @@ export function SkeletonTable({ rows = 5, cols = 4 }: { rows?: number; cols?: nu
 /** 图表区域骨架 */
 export function SkeletonChart({ height = "16rem" }: { height?: string }) {
   return (
-    <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-6 backdrop-blur-md">
+    <div className="rounded-lg border border-white/[0.08] bg-white/[0.04] p-6 backdrop-blur-md">
       <Skeleton w="30%" h="0.75rem" className="mb-4" />
       <Skeleton w="100%" h={height} rounded="lg" />
     </div>

@@ -215,6 +215,7 @@ class AnalysisOrchestrator:
         symbol: str,
         mode: AnalysisMode,
         force_refresh: bool = False,
+        locale: str = "zh-CN",
     ) -> AsyncGenerator[str, None]:
         """执行分析流程，yield SSE 事件字符串。"""
 
@@ -349,7 +350,7 @@ class AnalysisOrchestrator:
             _partial_ctx: dict = {}
             try:
                 report = await asyncio.wait_for(
-                    self._dispatch_mode(symbol, mode, _partial_ctx=_partial_ctx),
+                    self._dispatch_mode(symbol, mode, _partial_ctx=_partial_ctx, locale=locale),
                     timeout=total_timeout,
                 )
             except asyncio.TimeoutError:
@@ -404,9 +405,21 @@ class AnalysisOrchestrator:
             yield _sse(CompleteEvent(report=report))
 
             # 8-9. 后置任务改为后台执行，避免阻塞 SSE 结束
-            asyncio.create_task(
+            def _post_task_done(t: asyncio.Task) -> None:
+                if t.cancelled():
+                    return
+                exc = t.exception()
+                if exc:
+                    logger.error(
+                        "run_post_complete_tasks failed: %s",
+                        exc,
+                        exc_info=exc,
+                    )
+
+            _bg = asyncio.create_task(
                 run_post_complete_tasks(user_id, symbol, mode, report)
             )
+            _bg.add_done_callback(_post_task_done)
         finally:
             if lock_acquired:
                 # 释放锁
@@ -422,6 +435,7 @@ class AnalysisOrchestrator:
     async def _dispatch_mode(
         self, symbol: str, mode: AnalysisMode,
         _partial_ctx: dict | None = None,
+        locale: str = "zh-CN",
     ) -> AnalysisReport:
         """模式分发 — 完整执行链。
 
@@ -443,6 +457,7 @@ class AnalysisOrchestrator:
 
         # ── 1. 采集 run_local_context ────────────────────────────
         market_data = await self._collect_market_data(symbol, mode)
+        market_data.locale = locale
 
         # ── 2. 数据质量快照 ──────────────────────────────────────
         dq_snapshot = await self._build_data_quality_snapshot(market_data, contract)

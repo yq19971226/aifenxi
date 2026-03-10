@@ -5,6 +5,7 @@ import { PositionSummary } from "@/components/trade/PositionSummary";
 import { OnchainSection } from "@/components/dashboard/OnchainSection";
 import { fromSymbolOverview } from "@/lib/utils/position-sizing";
 import { formatPrice } from "@/lib/utils/format";
+import { useDateFormatter, useNumberFormatter } from "@/lib/i18n/formatters";
 import type { SymbolOverview } from "@/lib/api/dashboard";
 import type { PlanCapabilities } from "@/lib/api/onchain";
 import { localizeText } from "@/components/analysis/helpers";
@@ -15,6 +16,9 @@ interface ExpandedDetailProps {
 }
 
 export function ExpandedDetail({ item, capabilities = null }: ExpandedDetailProps) {
+  const { formatDateTime } = useDateFormatter();
+  const { formatNumber } = useNumberFormatter();
+  
   return (
     <tr>
       <td colSpan={100} className="px-0 py-0">
@@ -61,15 +65,15 @@ export function ExpandedDetail({ item, capabilities = null }: ExpandedDetailProp
                       <div className="flex justify-between items-center">
                         <span className="text-zinc-500">{"风险回报比"}</span>
                         <span className="font-mono text-zinc-200 bg-white/[0.04] px-2 py-0.5 rounded">
-                          1:{item.risk_reward_ratio.toFixed(1)}
+                          1:{formatNumber(item.risk_reward_ratio, 1)}
                         </span>
                       </div>
                     )}
                     {item.strategy_updated_at && (
                       <div className="flex justify-between items-center">
-                        <span className="text-zinc-500 flex items-center gap-1"><Clock size={10} />{"有效至"}</span>
+                        <span className="text-zinc-500 flex items-center gap-1"><Clock size={10} />{"策略更新"}</span>
                         <span className="text-zinc-400">
-                          {new Date(item.strategy_updated_at).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                          {formatDateTime(item.strategy_updated_at)}
                         </span>
                       </div>
                     )}
@@ -130,7 +134,7 @@ export function ExpandedDetail({ item, capabilities = null }: ExpandedDetailProp
               </div>
             </div>
 
-            {/* 链上数据 */}
+            {/* On-chain data section */}
             <div className="mt-4">
               <OnchainSection symbol={item.symbol} capabilities={capabilities} />
             </div>

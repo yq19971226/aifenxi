@@ -1,0 +1,200 @@
+{
+  "meta": {
+    "title": "User Guide - AXIOM Insight",
+    "description": "From registration to live trading — a step-by-step guide to using AXIOM Insight"
+  },
+  "nav": {
+    "title": "User Guide",
+    "backHome": "Back to Home"
+  },
+  "toc": {
+    "quickStart": "Quick Start",
+    "dashboard": "Dashboard",
+    "consensus": "Consensus Analysis",
+    "playbook": "Playbook Simulation",
+    "leaderboard": "Leaderboard",
+    "performance": "Performance & Backtest",
+    "alerts": "Alert System",
+    "push": "Push Notifications",
+    "membership": "Membership & Payment",
+    "faq": "FAQ"
+  },
+  "quickStart": {
+    "title": "Quick Start",
+    "intro": "Three steps to your first analysis — the whole process takes less than two minutes.",
+    "step1": {
+      "title": "Create an Account",
+      "desc": "Open the site and click \"Sign Up Free\" in the top right. Just enter your email and set a password. If a friend gave you a referral code, enter it for extra benefits."
+    },
+    "step2": {
+      "title": "Get to Know the Interface",
+      "desc": "After logging in, you'll see the Dashboard — your home screen. The top navigation bar lets you switch between Consensus Analysis, Playbook Simulation, and other features. Click the AXIOM Insight logo anytime to return to the Dashboard."
+    },
+    "step3": {
+      "title": "Run Your First Analysis",
+      "desc": "Click \"Consensus Analysis\" in the nav bar, pick an asset you're interested in (e.g., BTC), choose an analysis mode (pick \"Trend\" if you're not sure), then hit the analyze button. After a few seconds, you'll get a full analysis report."
+    },
+    "tip": "The report will tell you the directional guidance (bullish / bearish / sideways) and key price levels directly — no need to interpret indicators yourself."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "intro": "The Dashboard is the first page you see every day. The latest status of all your tracked assets is right here.",
+    "signals": {
+      "title": "Signal Timeline",
+      "desc": "The top of the page shows the latest analysis signals in chronological order. Each signal shows the direction (bullish/bearish/neutral) and the asset. Scan quickly to see if anything noteworthy happened today."
+    },
+    "opportunities": {
+      "title": "Opportunity Ranking",
+      "desc": "Assets that multiple AI models are simultaneously positive about are ranked higher. This doesn't guarantee gains, but it means the AI consensus is currently more optimistic about these assets."
+    },
+    "risk": {
+      "title": "Risk Radar",
+      "desc": "If an asset shows abnormal signals (e.g., massive fund outflows, sharp sentiment deterioration), the Risk Radar highlights it in red. Red doesn't mean sell immediately — it means pay extra attention."
+    },
+    "tip": "Dashboard data updates automatically. If you only have two minutes, a quick glance at the Dashboard is enough."
+  },
+  "consensus": {
+    "title": "Consensus Analysis",
+    "intro": "This is the core feature of AXIOM Insight. Pick an asset, and multiple AIs analyze it simultaneously to produce a combined report.",
+    "howTo": {
+      "title": "How to Use",
+      "steps": [
+        "Select the asset you want to analyze at the top",
+        "Choose an analysis mode: Scalping (minutes), Intraday (hours), or Trend (daily)",
+        "Click the analyze button and wait a few seconds",
+        "Read the analysis report"
+      ]
+    },
+    "readReport": {
+      "title": "How to Read the Report",
+      "direction": "**Direction**: The most prominent part of the report shows the AI consensus — bullish, bearish, or sideways. This is a weighted result from all AI models.",
+      "keyLevels": "**Key Prices**: The report marks important price levels, like potential support (where a drop might stop) and resistance (where a rise might stall).",
+      "weights": "**Model Weights**: Each AI model's influence isn't fixed. The system automatically adjusts based on past accuracy — models with better track records carry more weight.",
+      "divergence": "**Divergence Alert**: If the AIs disagree, the report says so clearly. For example, 3 bullish and 2 bearish means the direction is uncertain — you may want to be more cautious."
+    },
+    "modes": {
+      "title": "Which Mode to Choose",
+      "scalping": "**Scalping**: You plan to trade within minutes to half an hour. Requires constant screen watching.",
+      "intraday": "**Intraday**: You plan to buy and sell within the same day. Check in a few times during the day.",
+      "trend": "**Trend**: You want to understand the big picture, possibly holding for days to weeks. Check once every few days. Choose this if you're unsure."
+    },
+    "tip": "The analysis report is a reference, not an instruction. If the report says bullish but your gut says otherwise, it's perfectly fine to skip. AI isn't infallible — the final decision is always yours."
+  },
+  "playbook": {
+    "title": "Playbook Simulation",
+    "intro": "Playbook Simulation offers a different perspective: if you were a market maker with massive capital, what would you do right now?",
+    "what": {
+      "title": "What Is This",
+      "desc": "Big money (market makers, institutions, whales) operates differently from retail traders. Playbook Simulation analyzes the current phase from their perspective — are they quietly accumulating? Shaking out weak hands? Already distributing? Knowing what the other side might be doing helps you avoid obvious traps."
+    },
+    "plaza": {
+      "title": "Plaza",
+      "desc": "The Plaza shows the latest simulation results across multiple assets. Browse to see which assets the system identifies as being in interesting phases."
+    },
+    "posCalc": {
+      "title": "Position Calculator",
+      "desc": "Not sure how much to buy? Enter your capital, the maximum loss you can tolerate, and your stop-loss price. The system calculates a reasonable position size so you don't risk too much on one trade."
+    },
+    "tip": "Playbook conclusions don't mean market makers are definitely doing this — nobody can be 100% certain of their intent. Treat it as 'one more angle to consider.'"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "intro": "The Leaderboard shows the system's historical strategy performance across different timeframes and modes.",
+    "periods": {
+      "title": "Time Periods",
+      "desc": "Switch between 7-day, 30-day, and 90-day performance. Longer periods are more reliable but may not reflect recent market shifts."
+    },
+    "myStats": {
+      "title": "My Stats",
+      "desc": "If you've been using the system consistently, you can see your own accuracy and ranking here. Don't obsess over rankings — what matters more is whether you're improving."
+    },
+    "tip": "Past performance doesn't guarantee future results. The Leaderboard helps you understand historical patterns, but markets always change."
+  },
+  "performance": {
+    "title": "Performance & Backtest",
+    "intro": "Want to know how accurate the system really is? Performance stats and backtest data have the answers.",
+    "stats": {
+      "title": "Performance Stats",
+      "desc": "Check the system's historical win rate, profit/loss ratio, and accuracy trends for each AI model. Not all models are equally accurate — you can see which ones are currently performing better."
+    },
+    "backtest": {
+      "title": "Historical Backtest",
+      "desc": "Backtesting simulates: if you had followed the system's suggestions during a past period, what would have happened? Note this is an 'if' — actual trading involves slippage, emotions, and other factors."
+    },
+    "tip": "Backtest data is for reference only. Real trading results will always differ. Don't become overconfident because of good backtest numbers."
+  },
+  "alerts": {
+    "title": "Alert System",
+    "badge": "Coming Soon",
+    "intro": "The alert system is currently under development and expected to launch soon.",
+    "planned": {
+      "title": "Planned Features",
+      "items": [
+        "Price alerts: get notified when an asset hits your target price",
+        "Anomaly detection: alerts when unusual fund flows or market changes are detected",
+        "Strategy change alerts: notifications when AI analysis direction shifts significantly"
+      ]
+    },
+    "feedback": "Have ideas or requests for the alert system? We'd love to hear from you."
+  },
+  "push": {
+    "title": "Push Notifications",
+    "badge": "Coming Soon",
+    "intro": "Push notification support is under development, with multiple channels planned.",
+    "planned": {
+      "title": "Planned Channels",
+      "items": [
+        "Telegram bot notifications",
+        "Email notifications",
+        "WebSocket real-time push (in-app notifications)"
+      ]
+    },
+    "feedback": "Have suggestions for notification channels? Tell us what you use most."
+  },
+  "membership": {
+    "title": "Membership & Payment",
+    "intro": "Basic features are free upon registration. Upgrade to unlock more analysis modes and higher frequency.",
+    "free": {
+      "title": "What's Free",
+      "desc": "After registration, you can use basic analysis features including Trend mode consensus analysis. The free tier has daily analysis limits, but it's enough to experience and understand the system."
+    },
+    "upgrade": {
+      "title": "Upgrading",
+      "desc": "Upgrading unlocks all three analysis modes (Scalping, Intraday, Trend), significantly increases analysis frequency, and enables Leaderboard, performance tracking, and other premium features. Check Settings → Membership for plans and pricing."
+    },
+    "payment": {
+      "title": "How to Pay",
+      "desc": "We currently accept USDT on three chains: TRC-20, ERC-20, and BEP-20. After selecting a plan, the system generates a payment address. Transfer the amount and the system auto-confirms and activates your membership. Contact us if you encounter any issues."
+    },
+    "tip": "Try the free version for a few days first. Upgrade when you're sure it's useful for you."
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "items": [
+      {
+        "q": "How accurate is the system?",
+        "a": "The analysis is based on multiple AI models' combined judgment and has meaningful reference value, but it's not 100% accurate. Historical accuracy is available on the Performance page. Use it as an auxiliary tool, not your sole basis for decisions."
+      },
+      {
+        "q": "I don't understand technical analysis at all. Can I still use this?",
+        "a": "Absolutely. Analysis conclusions are presented in plain language — the system tells you the directional guidance and key prices directly. No need to understand the underlying indicators."
+      },
+      {
+        "q": "What's the difference between free and paid?",
+        "a": "Free includes Trend mode analysis with daily limits. Paid unlocks all three modes (Scalping/Intraday/Trend), much higher frequency, plus Leaderboard and performance tracking."
+      },
+      {
+        "q": "How long after payment until activation?",
+        "a": "After USDT transfer confirmation, the system activates automatically — usually within minutes. If it takes more than 30 minutes, contact us."
+      },
+      {
+        "q": "Can I cancel anytime?",
+        "a": "Memberships are purchased for a time period (monthly/annual) and end automatically when expired. There is no auto-renewal. You choose whether to renew before expiry."
+      },
+      {
+        "q": "Can I treat the analysis as investment advice?",
+        "a": "No. The system provides analysis references, not investment advice. Crypto markets carry extremely high risk. Make independent decisions based on your own situation — never rely on any single tool as your sole basis."
+      }
+    ]
+  }
+}

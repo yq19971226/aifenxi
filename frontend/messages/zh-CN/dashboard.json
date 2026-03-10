@@ -1,0 +1,27 @@
+{
+  "title": "多币种概览",
+  "subtitle": "AI 实时监控 {count} 个币种，点击展开查看详情",
+  "autoRefresh": "30s 自动刷新",
+  "guideBanner": "第一次用？花两分钟看看使用指南，快速上手。",
+  "guideBannerLink": "查看指南",
+  "onlineLabel": "人在线",
+  "error": {
+    "loadFailed": "加载失败",
+    "fetchFailed": "获取概览数据失败，30s 后自动重试"
+  },
+  "table": {
+    "symbol": "币种",
+    "price": "最新价",
+    "aiJudgment": "AI 判断",
+    "confidence": "置信度",
+    "defenseStatus": "防御状态",
+    "onchainData": "链上数据",
+    "noData": "暂无币种数据，请在后台「币种管理」中添加"
+  },
+  "legend": {
+    "safe": "安全 = 无异常检测",
+    "caution": "警惕 = 庄家活动迹象",
+    "danger": "危险 = 庄家操盘确认",
+    "critical": "极危 = 高度操控风险"
+  }
+}

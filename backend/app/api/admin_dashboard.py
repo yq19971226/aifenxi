@@ -47,6 +47,11 @@ class DashboardStats(BaseModel):
     total_alert_rules: int = 0
     active_alert_rules: int = 0
 
+    # 在线状态
+    online_ws_total: int = 0
+    online_ws_price: int = 0
+    online_ws_alerts: int = 0
+
 
 @router.get("", response_model=DashboardStats)
 async def get_dashboard_stats(
@@ -156,6 +161,17 @@ async def get_dashboard_stats(
         except Exception:
             # alert_rules 表可能不存在
             logger.debug("alert_rules 表查询失败，跳过")
+
+        # ── 在线状态统计 ──────────────────────────────────
+        try:
+            from app.api.ws import get_online_count
+            price_online = await get_online_count("price")
+            alerts_online = await get_online_count("alerts")
+            stats.online_ws_price = price_online
+            stats.online_ws_alerts = alerts_online
+            stats.online_ws_total = price_online + alerts_online
+        except Exception:
+            logger.debug("在线状态统计失败，跳过")
 
     except Exception as exc:
         logger.error("获取仪表盘统计失败: %s", exc)

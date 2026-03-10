@@ -13,6 +13,10 @@ export interface AdminOrderInfo {
   amount_usd: number;
   network: string | null;
   status: string;
+  provider_status: string | null;
+  status_reason: string | null;
+  provider_observed_at: string | null;
+  provider_observation_source: string | null;
   created_at: string;
 }
 
@@ -50,4 +54,14 @@ export async function getAdminOrders(
   const res = await authFetch(url);
 
   return handleApiResponse(res, "查询订单失败");
+}
+
+export async function syncAdminOrderStatus(
+  paymentId: string
+): Promise<{ status: string }> {
+  const res = await authFetch(`${API_BASE}/api/admin/orders/${paymentId}/sync`, {
+    method: "POST",
+  });
+
+  return handleApiResponse(res, "同步订单状态失败");
 }

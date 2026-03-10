@@ -1,0 +1,56 @@
+{
+  "site": {
+    "title": "AXIOM Insight - Market Maker AI Analysis Platform",
+    "description": "Multi-agent collaborative analysis of market maker behavior, cutting through noise with technicals, on-chain data, derivatives, and sentiment",
+    "og_title": "AXIOM Insight - Market Maker AI Analysis Platform",
+    "og_description": "AI-powered multi-agent analysis of market maker behavior — multi-dimensional insights to support your trading decisions"
+  },
+  "dashboard": {
+    "title": "Dashboard - AXIOM Insight",
+    "description": "Multi-asset AI analysis overview, real-time market signal monitoring"
+  },
+  "consensus": {
+    "title": "Consensus Analysis - AXIOM Insight",
+    "description": "Multi-agent consensus analysis with AI multi-dimensional research"
+  },
+  "alerts": {
+    "title": "Alert Rules - AXIOM Insight",
+    "description": "Custom price alerts and risk monitoring rules"
+  },
+  "performance": {
+    "title": "Strategy Performance - AXIOM Insight",
+    "description": "AI strategy historical performance and win rate statistics"
+  },
+  "playbook": {
+    "title": "Playbook Simulation - AXIOM Insight",
+    "description": "Market maker playbook simulation and counter-strategy reasoning"
+  },
+  "backtest": {
+    "title": "Backtest - AXIOM Insight",
+    "description": "Strategy historical backtesting and validation"
+  },
+  "leaderboard": {
+    "title": "Leaderboard - AXIOM Insight",
+    "description": "Strategy performance rankings and community signals"
+  },
+  "settings": {
+    "title": "Settings - AXIOM Insight",
+    "description": "Account settings and preference management"
+  },
+  "partner": {
+    "title": "Partner - AXIOM Insight",
+    "description": "Partner program and referral rewards"
+  },
+  "tasks": {
+    "title": "Task Center - AXIOM Insight",
+    "description": "Daily tasks and rewards"
+  },
+  "login": {
+    "title": "Login - AXIOM Insight",
+    "description": "Login to AXIOM Insight market maker AI analysis platform"
+  },
+  "guide": {
+    "title": "User Guide - AXIOM Insight",
+    "description": "Step-by-step guide to using AXIOM Insight for market maker behavior analysis"
+  }
+}

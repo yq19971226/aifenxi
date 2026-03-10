@@ -1,0 +1,74 @@
+{
+  "title": "Comprehensive Analysis",
+  "subtitle": "Multi-agent parallel analysis + AI adversarial reasoning → Precise positioning",
+  "modes": {
+    "scalping": {
+      "label": "Scalping",
+      "desc": "Quickly capture short-term opportunities, suitable for minute-level operations"
+    },
+    "intraday": {
+      "label": "Intraday",
+      "desc": "{count} AI parallel analysis, multi-dimensional cross-validation"
+    },
+    "trend": {
+      "label": "Trend",
+      "desc": "{count} AI panoramic analysis + AI adversarial reasoning"
+    },
+    "locked": "Requires {tier}"
+  },
+  "actions": {
+    "startAnalysis": "Start Analysis",
+    "analyzing": "Analyzing...",
+    "retry": "Retry",
+    "cancel": "Cancel Analysis",
+    "refresh": "Cached result, click to re-analyze"
+  },
+  "quota": {
+    "label": "Daily Quota",
+    "exhausted": "Daily quota exhausted, resets at UTC 00:00 tomorrow"
+  },
+  "signals": {
+    "bullish": "Bullish",
+    "bearish": "Bearish",
+    "neutral": "Neutral"
+  },
+  "summary": {
+    "consensusSignal": "Consensus Signal",
+    "consensusConfidence": "Consensus Confidence",
+    "lastUpdate": "Last Update",
+    "confidence": "Confidence"
+  },
+  "modelCard": {
+    "confidence": "Confidence"
+  },
+  "divergence": {
+    "title": "Divergence",
+    "highConsensus": "High Consensus",
+    "someDisagreement": "Some Disagreement",
+    "severeDisagreement": "Severe Disagreement"
+  },
+  "weights": {
+    "title": "Weight Distribution",
+    "models": "Models"
+  },
+  "minority": {
+    "title": "Minority Warnings"
+  },
+  "empty": {
+    "message": "Select analysis mode, click 'Start Analysis' to get AI report"
+  },
+  "flow": {
+    "coreAnalysis": "Core AI Analysis",
+    "crossValidation": "Multi-dim Cross Validation",
+    "multiModelConsensus": "Multi-model Consensus",
+    "makerAI": "Maker AI Counter",
+    "collusionDetection": "Collusion Detection",
+    "aiManipulation": "AI Manipulation Detection",
+    "refinedPositions": "Refined Positions",
+    "strategyAdvice": "Strategy Advice",
+    "adversarialFlow": "AI Adversarial Flow",
+    "analysisFlow": "AI Analysis Flow",
+    "makerPerspective": "Maker AI Perspective",
+    "makerCompleted": "Maker AI has completed counter-simulation"
+  }
+}

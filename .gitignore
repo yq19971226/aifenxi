@@ -39,8 +39,9 @@ htmlcov/
 # Scripts with potential secrets
 backend/scripts/seed_admin.py
 
-# Build
+# Build & deploy logs
 *.log
+logs/
 
 # SQLite dev database
 test.db

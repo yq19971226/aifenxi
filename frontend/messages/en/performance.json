@@ -1,0 +1,61 @@
+{
+  "title": "Strategy Performance",
+  "subtitle": "Track historical strategy performance and evaluate system accuracy",
+  "filter": {
+    "symbol": "Symbol",
+    "symbolPlaceholder": "All",
+    "timeRange": "Time Range",
+    "direction": "Direction",
+    "all": "All",
+    "long": "Long",
+    "short": "Short"
+  },
+  "pnlCurve": {
+    "title": "Cumulative PnL Curve",
+    "empty": "No data available"
+  },
+  "winRateTrend": {
+    "title": "Win Rate Trend (Last 30 Days)"
+  },
+  "metrics": {
+    "totalPnl": "Total PnL",
+    "winRate": "Win Rate",
+    "sharpeRatio": "Sharpe Ratio",
+    "maxDrawdown": "Max Drawdown",
+    "totalTrades": "Total Trades",
+    "avgProfit": "Avg Profit",
+    "avgLoss": "Avg Loss",
+    "profitFactor": "Profit Factor",
+    "roi": "ROI"
+  },
+  "timeRange": {
+    "7d": "7 Days",
+    "30d": "30 Days",
+    "90d": "90 Days",
+    "1y": "1 Year",
+    "all": "All Time"
+  },
+  "table": {
+    "date": "Date",
+    "symbol": "Symbol",
+    "side": "Side",
+    "entryPrice": "Entry Price",
+    "exitPrice": "Exit Price",
+    "pnl": "PnL",
+    "pnlPercent": "PnL %",
+    "duration": "Duration"
+  },
+  "side": {
+    "long": "Long",
+    "short": "Short"
+  },
+  "export": {
+    "button": "Export Report",
+    "csv": "Export CSV",
+    "pdf": "Export PDF"
+  },
+  "error": {
+    "loadFailed": "Failed to load performance data",
+    "exportFailed": "Export failed"
+  }
+}

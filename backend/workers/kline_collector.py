@@ -68,7 +68,7 @@ async def _cache_klines_to_redis(symbol: str, interval: str, klines: list[KlineD
     # 同时缓存最新价格（从最后一根 K 线取 close，存为纯数值）
     if klines:
         price_key = f"latest_price:{symbol}"
-        await set_with_ttl(price_key, klines[-1].close, ttl_seconds=60)
+        await set_with_ttl(price_key, klines[-1].close, ttl_seconds=600)
 
 
 async def _run_collect(symbols: list[str], intervals: list[str]) -> dict:

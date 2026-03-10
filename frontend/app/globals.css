@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  /* ── Background Layers (Dribbble Premium Dark/Neon) ── */
+  /* Background */
   --bg-primary:       #06080A;    
   --bg-secondary:     #0A0D12;    
   --bg-elevated:      #11141A;    
@@ -11,13 +11,13 @@
   --bg-card:          rgba(17, 20, 26, 0.7);    
   --bg-card-hover:    rgba(22, 26, 34, 0.9);    
 
-  /* ── Borders ── */
+  /* Borders */
   --border-subtle:    rgba(255, 255, 255, 0.02);  
   --border-default:   rgba(255, 255, 255, 0.05);  
   --border-hover:     rgba(255, 255, 255, 0.1);  
   --border-active:    rgba(255, 255, 255, 0.15);  
 
-  /* ── Signal Colors (Refined) ── */
+  /* Signals */
   --color-bull:       #34d399;
   --color-bull-muted: rgba(52, 211, 153, 0.10);
   --color-bear:       #f87171;
@@ -25,39 +25,38 @@
   --color-warn:       #fbbf24;
   --color-warn-muted: rgba(251, 191, 36, 0.10);
 
-  /* ── Accent ── */
+  /* Accent */
   --color-accent:       #FFFFFF;  
   --color-accent-hover: #E2E8F0;  
   --color-accent-muted: rgba(255, 255, 255, 0.1);
   --color-accent-subtle:rgba(255, 255, 255, 0.05);
 
-  /* ── Text Hierarchy ── */
+  /* Text */
   --color-text:          #FFFFFF;   
   --color-text-secondary:#94A0B8;   
   --color-text-muted:    #64748B;   
   --color-text-ghost:    #475569;   
 
-  /* ── Typography ── */
+  /* Typography */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", "Roboto Mono", ui-monospace, monospace;
 
-  /* ── Semantic Info Color ── */
   --color-info:       #60a5fa;
   --color-info-muted: rgba(96, 165, 250, 0.12);
 
-  /* ── Radius ── */
+  /* Radius */
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 24px;
   --radius-xl: 32px;
 
-  /* ── Shadows ── */
+  /* Shadows */
   --shadow-card:     0 12px 32px -12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 20px rgba(255,255,255,0.01);
   --shadow-hover:    0 16px 40px -12px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
   --shadow-dropdown: 0 16px 48px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08);
   --shadow-modal:    0 24px 64px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.1);
 
-  /* ── Transitions ── */
+  /* Motion */
   --transition-fast:   150ms cubic-bezier(0.16, 1, 0.3, 1);
   --transition-normal: 250ms cubic-bezier(0.16, 1, 0.3, 1);
   --transition-slow:   400ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -69,11 +68,8 @@
   }
 
   html {
-    font-size: 15px;
+    font-size: 16px;
     -webkit-text-size-adjust: 100%;
-  }
-  @media (min-width: 768px) {
-    html { font-size: 16px; }
   }
   @media (min-width: 1280px) {
     html { font-size: 17px; }
@@ -99,7 +95,6 @@
   }
 }
 
-/* ── Scrollbar ── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -116,7 +111,6 @@
 }
 
 @layer components {
-  /* ── Cards ── */
   .card {
     background: var(--bg-card);
     backdrop-filter: blur(24px);
@@ -148,9 +142,7 @@
   }
 
   .card-surface {
-    background: rgba(17, 20, 26, 0.4);
-    backdrop-filter: blur(32px);
-    -webkit-backdrop-filter: blur(32px);
+    background: rgba(17, 20, 26, 0.6);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-lg);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
@@ -171,7 +163,6 @@
     transform: translateY(-2px);
   }
 
-  /* ── Badges ── */
   .badge {
     display: inline-flex;
     align-items: center;
@@ -205,7 +196,6 @@
     border-color: rgba(255,255,255,0.08);
   }
 
-  /* ── Inputs ── */
   .input {
     background-color: rgba(0,0,0,0.2);
     border: 1px solid var(--border-default);
@@ -230,7 +220,6 @@
     cursor: not-allowed;
   }
 
-  /* ── Buttons ── */
   .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -375,7 +364,6 @@
     100% { background-position: -200% 0; }
   }
 
-  /* ── Breathing status dot ── */
   .pulse-dot {
     width: 6px;
     height: 6px;
@@ -391,7 +379,6 @@
     50% { opacity: 0.5; transform: scale(0.85); }
   }
 
-  /* ── Page ambient glow (apply to page wrapper) ── */
   .ambient-glow {
     position: relative;
   }
@@ -408,13 +395,11 @@
     z-index: 0;
   }
 
-  /* ── Focus ring ── */
   .focus-ring:focus-visible {
     outline: none;
     box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px rgba(99,102,241,0.4);
   }
 
-  /* ── Fade-in on scroll (use with IntersectionObserver) ── */
   .reveal {
     opacity: 0;
     transform: translateY(12px);

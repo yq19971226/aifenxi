@@ -1,0 +1,50 @@
+{
+  "http": {
+    "400": "请求参数错误",
+    "401": "未授权，请先登录",
+    "403": "无权限访问此资源",
+    "404": "请求的资源不存在",
+    "408": "请求超时，请重试",
+    "429": "请求过于频繁，请稍后再试",
+    "500": "服务器内部错误",
+    "502": "网关错误",
+    "503": "服务暂时不可用",
+    "504": "网关超时"
+  },
+  "validation": {
+    "required": "此字段为必填项",
+    "email": "请输入有效的邮箱地址",
+    "minLength": "至少需要 {min} 个字符",
+    "maxLength": "最多允许 {max} 个字符",
+    "pattern": "格式不正确",
+    "number": "请输入有效的数字",
+    "integer": "请输入整数",
+    "positive": "请输入正数",
+    "range": "数值应在 {min} 到 {max} 之间",
+    "url": "请输入有效的 URL",
+    "date": "请输入有效的日期",
+    "password": "密码强度不足"
+  },
+  "auth": {
+    "loginFailed": "登录失败，请检查用户名和密码",
+    "sessionExpired": "会话已过期，请重新登录",
+    "tokenInvalid": "令牌无效",
+    "permissionDenied": "权限不足",
+    "accountLocked": "账户已被锁定",
+    "accountNotFound": "账户不存在"
+  },
+  "api": {
+    "networkError": "网络连接失败，请检查网络",
+    "timeout": "请求超时，请重试",
+    "serverError": "服务器错误，请稍后重试",
+    "unknownError": "未知错误",
+    "dataParseError": "数据解析失败",
+    "rateLimitExceeded": "请求频率超限"
+  },
+  "form": {
+    "submitFailed": "提交失败，请重试",
+    "invalidData": "数据格式不正确",
+    "duplicateEntry": "数据已存在",
+    "saveFailed": "保存失败"
+  }
+}

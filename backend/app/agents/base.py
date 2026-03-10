@@ -23,6 +23,8 @@ class AgentReport(BaseModel):
     reasoning: str
     key_findings: list[str] = Field(default_factory=list)
     raw_data: dict = Field(default_factory=dict)
+    content_locale: str = ""
+    language_mismatch: bool = False
 
 
 class BaseAgent(ABC):

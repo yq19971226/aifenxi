@@ -9,9 +9,10 @@
 import logging
 from typing import Any, Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
+from app.core.deps import UserInfo, get_current_user, require_admin
 from app.core.redis import get_json, set_with_ttl
 
 logger = logging.getLogger(__name__)
@@ -53,6 +54,7 @@ class DefenseSummary(BaseModel):
 @router.get("/latest", response_model=Optional[DefenseSummary])
 async def get_latest_defense(
     symbol: str = Query(default="BTCUSDT", description="交易对"),
+    _user: UserInfo = Depends(get_current_user),
 ):
     """获取最新对抗推演 + 合谋检测摘要。
 
@@ -107,6 +109,7 @@ async def get_latest_defense(
 @router.get("/alert-level", response_model=DefenseAlertLevel)
 async def get_alert_level(
     symbol: str = Query(default="BTCUSDT", description="交易对"),
+    _user: UserInfo = Depends(get_current_user),
 ):
     """获取当前防御警戒等级 — 轻量接口供 Dashboard 轮询。"""
     symbol = symbol.upper()
@@ -166,6 +169,7 @@ async def get_alert_level(
 @router.post("/scan")
 async def trigger_defense_scan(
     symbol: str = Query(default="BTCUSDT", description="交易对"),
+    _admin: UserInfo = Depends(require_admin),
 ):
     """手动触发一次防御扫描。
 

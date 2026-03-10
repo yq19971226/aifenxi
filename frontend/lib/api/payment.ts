@@ -19,6 +19,8 @@ export interface PaymentInfo {
   pay_address: string | null;
   pay_amount: number | null;
   pay_currency: string | null;
+  provider_status: string | null;
+  status_reason: string | null;
 }
 
 export type DurationMonths = 1 | 3 | 12;
@@ -49,4 +51,13 @@ export async function fetchPaymentHistory(
     `${API_BASE}/api/payment/history?limit=${limit}`
   );
   return handleApiResponse(res, "获取支付历史失败");
+}
+
+export async function syncPaymentStatus(
+  paymentId: string
+): Promise<PaymentInfo> {
+  const res = await authFetch(`${API_BASE}/api/payment/${paymentId}/sync`, {
+    method: "POST",
+  });
+  return handleApiResponse(res, "同步支付状态失败");
 }

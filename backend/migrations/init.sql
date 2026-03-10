@@ -93,7 +93,15 @@ CREATE TABLE IF NOT EXISTS payments (
     plan            INTEGER         NOT NULL,
     amount_usd      NUMERIC(10,2)   NOT NULL,
     network         VARCHAR(20),
+    pay_address     TEXT,
+    pay_amount      NUMERIC(24,8),
+    pay_currency    VARCHAR(30),
     status          VARCHAR(20)     DEFAULT 'pending',
+    provider_status VARCHAR(40),
+    status_reason   VARCHAR(40),
+    provider_payload_json TEXT,
+    provider_observed_at TIMESTAMPTZ,
+    provider_observation_source VARCHAR(20),
     created_at      TIMESTAMPTZ     DEFAULT NOW(),
     updated_at      TIMESTAMPTZ     DEFAULT NOW()
 );

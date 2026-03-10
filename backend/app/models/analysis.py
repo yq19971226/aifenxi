@@ -55,6 +55,7 @@ class AnalysisRequest(BaseModel):
     symbol: str
     mode: AnalysisMode
     force_refresh: bool = False
+    locale: str = "zh-CN"
 
 
 class QuotaInfo(BaseModel):

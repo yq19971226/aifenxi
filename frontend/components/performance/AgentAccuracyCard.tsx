@@ -19,7 +19,7 @@ const AGENT_LABELS: Record<string, string> = {
   risk: "风险预警",
 };
 
-const BAR_COLOR = "var(--color-accent)";
+const BAR_COLOR = "rgb(99,102,241)";
 const BAR_BG = "rgba(255,255,255,0.06)";
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -29,9 +29,9 @@ function agentLabel(agentId: string): string {
 }
 
 function accuracyColor(accuracy: number): string {
-  if (accuracy >= 70) return "text-bull";
-  if (accuracy >= 50) return "text-accent";
-  return "text-bear";
+  if (accuracy >= 70) return "text-emerald-400";
+  if (accuracy >= 50) return "text-indigo-400";
+  return "text-red-400";
 }
 
 interface RankedAgent {
@@ -55,7 +55,7 @@ export function AgentAccuracyCard({ byAgent }: AgentAccuracyCardProps) {
 
   return (
     <motion.div
-      className="rounded-xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-md p-4"
+      className="card p-4"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.15 }}

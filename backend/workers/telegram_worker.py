@@ -97,23 +97,23 @@ async def _query_kill_zone_recipients(risk_score: float) -> list[dict[str, str]]
         return []
 
     if risk_score >= 70:
-        tier_filter = "('pro', 'flagship')"
+        min_level = 1  # pro(1) + flagship(2)
     else:
-        tier_filter = "('flagship',)"
+        min_level = 2  # flagship(2) only
 
     sql = sqlalchemy.text(f"""
         SELECT ps.tg_chat_id
         FROM push_settings ps
-        JOIN users u ON u.id = ps.user_id
+        JOIN memberships m ON m.user_id = ps.user_id
         WHERE ps.tg_enabled = TRUE
           AND ps.tg_chat_id IS NOT NULL
           AND ps.events @> :event_json
-          AND u.membership_tier IN {tier_filter}
+          AND m.level >= :min_level
     """)
     recipients: list[dict[str, str]] = []
     try:
         async with worker_session() as session:
-            result = await session.execute(sql, {"event_json": json.dumps(["kill_zone_warning"])})
+            result = await session.execute(sql, {"event_json": json.dumps(["kill_zone_warning"]), "min_level": min_level})
             rows = result.fetchall()
             for row in rows:
                 recipients.append({"tg_chat_id": row[0]})

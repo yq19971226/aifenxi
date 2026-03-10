@@ -1,0 +1,501 @@
+{
+  "push": {
+    "title": "郵件通知",
+    "subtitle": "管理郵件通知渠道和事件訂閱，自定義你的通知偏好",
+    "channels": {
+      "title": "通知渠道",
+      "email": {
+        "label": "郵件推送",
+        "description": "通過 SendGrid 發送策略郵件"
+      },
+      "telegram": {
+        "label": "Telegram",
+        "description": "通過 Bot 推送到 TG 群組"
+      },
+      "websocket": {
+        "label": "WebSocket",
+        "description": "瀏覽器實時彈窗通知"
+      },
+      "testButton": "發送測試消息",
+      "testButtonSending": "發送中..."
+    },
+    "events": {
+      "title": "事件訂閱",
+      "strategy_update": {
+        "label": "策略更新",
+        "description": "新策略生成或方向變化時通知"
+      },
+      "price_alert": {
+        "label": "價格預警",
+        "description": "觸及關鍵支撐/阻力位時通知"
+      },
+      "playbook_switch": {
+        "label": "劇本切換",
+        "description": "莊家操盤劇本發生變化時通知"
+      },
+      "risk_warning": {
+        "label": "風險預警",
+        "description": "鏈上異常信號觸發時通知"
+      },
+      "defense_alert": {
+        "label": "防禦預警",
+        "description": "莊家AI推演/合謀檢測觸發中等以上警報時通知"
+      },
+      "high_confidence_signal": {
+        "label": "高置信信號",
+        "description": "分析置信度超過70%時推送信號方向"
+      },
+      "strategy_settlement": {
+        "label": "策略結算",
+        "description": "策略觸達止損/目標/超時結算時通知"
+      }
+    },
+    "status": {
+      "saving": "保存中...",
+      "saveFailed": "保存失敗",
+      "testSent": "測試消息已發送",
+      "testFailed": "測試失敗"
+    }
+  },
+  "membership": {
+    "title": "會員中心",
+    "currentStatus": {
+      "title": "當前會員",
+      "levels": {
+        "0": "免費",
+        "1": "專業",
+        "2": "旗艦"
+      },
+      "expiresAt": "到期時間：{date}",
+      "daysLeft": "（還剩 {count} 天）"
+    },
+    "freeTrial": {
+      "title": "免費體驗",
+      "claim": "立即領取",
+      "claiming": "領取中...",
+      "claimed": "次可用",
+      "used": "已使用",
+      "remaining": "剩餘 {count} 次日內博弈分析體驗",
+      "exhausted": "體驗次數已用完，升級解鎖更多",
+      "description": "免費領取 {count} 次日內博弈分析體驗"
+    },
+    "planComparison": {
+      "title": "等級權益對比",
+      "feature": "功能",
+      "free": "免費",
+      "pro": "專業",
+      "flagship": "旗艦",
+      "features": {
+        "scalping": "實時短線分析",
+        "intraday": "日內博弈分析",
+        "trend": "趨勢佈局分析",
+        "onchain": "鏈上數據",
+        "consensus": "多智能體共識",
+        "playbook": "劇本推演",
+        "defense": "對抗防禦",
+        "backtest": "策略回測",
+        "push": "策略推送",
+        "api": "API 訪問"
+      },
+      "values": {
+        "locked": "鎖定",
+        "delayed": "延遲15分鐘",
+        "realtime": "實時",
+        "basic": "基礎",
+        "complete": "完整",
+        "email": "郵件",
+        "emailTelegram": "郵件+TG",
+        "days": "{count}天",
+        "timesPerDay": "{count}次/天",
+        "freeTrialOnce": "免費體驗1次"
+      }
+    },
+    "planSelection": {
+      "title": "選擇套餐",
+      "duration": {
+        "monthly": "月付",
+        "quarterly": "季付",
+        "yearly": "年付",
+        "discount": {
+          "quarterly": "9折",
+          "yearly": "7折"
+        }
+      },
+      "plans": {
+        "pro": "專業",
+        "flagship": "旗艦"
+      },
+      "selected": "已選擇",
+      "save": "省 {percent}%",
+      "perMonth": "/月",
+      "perQuarter": "/季",
+      "perYear": "/年"
+    },
+    "payment": {
+      "network": "支付網絡",
+      "createButton": "支付 ${amount}",
+      "creating": "創建中…",
+      "info": {
+        "title": "支付信息",
+        "amount": "支付金額",
+        "address": "支付地址",
+        "copy": "複製",
+        "copied": "已複製",
+        "timeRemaining": "剩餘時間",
+        "expired": "已超時"
+      },
+      "status": {
+        "pending": "待支付",
+        "completed": "已完成",
+        "failed": "失敗",
+        "expired": "已過期",
+        "confirming": "確認中"
+      }
+    },
+    "history": {
+      "title": "支付歷史",
+      "columns": {
+        "date": "日期",
+        "plan": "套餐",
+        "amount": "金額",
+        "network": "網絡",
+        "status": "狀態"
+      }
+    }
+  },
+  "configs": {
+    "title": "參數設置",
+    "subtitle": "管理系統運行所需的各項參數和密鑰",
+    "permissionDenied": "權限不足 — 僅管理員可訪問參數設置",
+    "batchInit": {
+      "title": "一鍵初始化默認配置",
+      "description": "自動填入 {count} 項推薦默認值（會員限制、風險閾值等），已有的不會被覆蓋",
+      "button": "一鍵初始化",
+      "buttonRunning": "寫入中...",
+      "buttonDone": "✓ 已完成",
+      "resultSuccess": "完成：寫入 {created} 項，跳過 {skipped} 項（已存在）"
+    },
+    "groups": {
+      "keys": {
+        "icon": "🔑",
+        "title": "密鑰與接入"
+      },
+      "membership": {
+        "icon": "👥",
+        "title": "會員與配額"
+      },
+      "analysis": {
+        "icon": "📊",
+        "title": "分析與信號"
+      },
+      "risk": {
+        "icon": "⚠️",
+        "title": "風險與監控"
+      },
+      "site": {
+        "icon": "🌐",
+        "title": "站點與註冊"
+      }
+    },
+    "configItem": {
+      "configured": "已配置",
+      "encrypted": "加密",
+      "delete": "刪除此配置",
+      "placeholder": "請輸入",
+      "defaultValue": "默認: {value}",
+      "show": "顯示",
+      "hide": "隱藏"
+    },
+    "groupCard": {
+      "configuredCount": "{current}/{total} 已配置",
+      "save": "保存",
+      "saving": "保存中...",
+      "saved": "✓ 已保存"
+    },
+    "quotaMatrix": {
+      "title": "配額矩陣總覽",
+      "readonly": "只讀",
+      "modeHeader": "分析模式",
+      "modes": {
+        "scalping": "實時短線",
+        "intraday": "日內博弈",
+        "trend": "趨勢佈局"
+      },
+      "tiers": {
+        "free": "免費版",
+        "pro": "專業版",
+        "flagship": "旗艦版"
+      },
+      "locked": "鎖定",
+      "timesPerDay": "次/天",
+      "freeTrial": "免費體驗",
+      "times": "次"
+    },
+    "coinglassTier": {
+      "title": "CoinGlass 套餐能力",
+      "rateLimit": "限頻",
+      "interval": "間隔",
+      "features": {
+        "oi": "OI 持倉量",
+        "fundingRate": "資金費率",
+        "liquidation": "爆倉數據",
+        "netPosition": "淨持倉",
+        "longShortRatio": "大戶多空比",
+        "heatmapModel1": "熱力圖 Model1",
+        "cvd": "CVD / Netflow",
+        "orderbook": "聚合訂���簿 / 大單",
+        "options": "期權 (MaxPain/Info)",
+        "heatmapModel23": "熱力圖 Model2/3",
+        "websocket": "WebSocket 實時推送"
+      }
+    },
+    "deleteConfirm": {
+      "message": "確認刪除「{name}」？刪除後需要重新配置。",
+      "cancel": "取消",
+      "confirm": "確認刪除",
+      "deleting": "刪除中..."
+    },
+    "auditLog": {
+      "title": "操作記錄",
+      "columns": {
+        "time": "時間",
+        "action": "操作",
+        "configKey": "配置項",
+        "oldValue": "舊值",
+        "newValue": "新值"
+      },
+      "actions": {
+        "create": "創建",
+        "update": "更新",
+        "delete": "刪除"
+      },
+      "pagination": {
+        "page": "第 {current} / {total} 頁（共 {count} 條）",
+        "prev": "上一頁",
+        "next": "下一頁"
+      }
+    },
+    "status": {
+      "loading": "加載中...",
+      "loadFailed": "加載配置失敗",
+      "saveFailed": "保存失敗",
+      "deleteFailed": "刪除失敗"
+    },
+    "presets": {
+      "dmx_api_key": {
+        "label": "AI 分析密鑰",
+        "help": "用於調用 AI 模型分析市場數據"
+      },
+      "dmx_base_url": {
+        "label": "AI 服務地址",
+        "help": "AI 分析服務的接口地址"
+      },
+      "glassnode_api_key": {
+        "label": "鏈上數據密鑰",
+        "help": "GlassNode 鏈上指標（MVRV/NVT/活躍地址等）"
+      },
+      "coingecko_api_key": {
+        "label": "基本面數據密鑰",
+        "help": "CoinGecko 市值/社區/開發者/趨勢數據"
+      },
+      "coinglass_api_key": {
+        "label": "CoinGlass 密鑰",
+        "help": "CoinGlass 衍生品數據 API Key"
+      },
+      "alphanode_api_key": {
+        "label": "CoinGlass 代理密鑰",
+        "help": "AlphaNode 代理通道訪問 Key（CoinGlass REST proxy）"
+      },
+      "cryptoquant_api_key": {
+        "label": "CryptoQuant 主源密鑰",
+        "help": "CryptoQuant 鏈上主數據源 API Key"
+      },
+      "fred_api_key": {
+        "label": "FRED 主源密鑰",
+        "help": "FRED 宏觀主數據源 API Key"
+      },
+      "coinglass_tier": {
+        "label": "CoinGlass 套餐",
+        "help": "當前訂閱的套餐等級，決定可用端點、限頻和採集頻率",
+        "options": {
+          "hobbyist": "Hobbyist — 30次/分 · 5分鐘間隔 · 基礎OI/FR",
+          "startup": "Startup — 80次/分 · 2分鐘間隔 · +淨持倉/大戶比",
+          "standard": "Standard — 300次/分 · 1分鐘間隔 · +CVD/訂單簿/期權/WS",
+          "professional": "Professional — 1200次/分 · 30秒間隔 · 全部端點"
+        }
+      },
+      "nowpayments_api_key": {
+        "label": "支付網關密鑰",
+        "help": "NowPayments USDT 支付"
+      },
+      "nowpayments_ipn_secret": {
+        "label": "支付回調密鑰",
+        "help": "支付通知驗證簽名"
+      },
+      "nowpayments_ipn_callback_url": {
+        "label": "支付回調地址",
+        "help": "NowPayments 回調完整地址（需公網可訪問）"
+      },
+      "telegram_bot_token": {
+        "label": "Telegram 機器人",
+        "help": "TG 推送通知的機器人令牌"
+      },
+      "resend_api_key": {
+        "label": "Resend 郵件密鑰",
+        "help": "Resend 郵件服務 API Key（優先於 SendGrid）"
+      },
+      "sendgrid_api_key": {
+        "label": "SendGrid 郵件密鑰",
+        "help": "SendGrid 郵件推送服務（備選）"
+      },
+      "sentry_dsn_backend": {
+        "label": "錯誤監控地址",
+        "help": "Sentry 錯誤追蹤服務地址"
+      },
+      "plan_price_pro": {
+        "label": "專業版月價",
+        "help": "專業版每月價格（USD）"
+      },
+      "plan_price_flagship": {
+        "label": "旗艦版月價",
+        "help": "旗艦版每月價格（USD）"
+      },
+      "plan_discount_quarterly": {
+        "label": "季度折扣",
+        "help": "季度訂閱折扣比例（0.9 = 9折）"
+      },
+      "plan_discount_yearly": {
+        "label": "年度折扣",
+        "help": "年度訂閱折扣比例（0.7 = 7折）"
+      },
+      "free_trial_intraday_count": {
+        "label": "免費體驗次數",
+        "help": "免費用戶可領取的日內博弈體驗次數（0=關閉）"
+      },
+      "analysis_daily_limit_free_scalping": {
+        "label": "免費-實時短線",
+        "help": "免費用戶每天實時短線分析次數"
+      },
+      "analysis_daily_limit_pro_scalping": {
+        "label": "專業-實時短線",
+        "help": "專業用戶每天實時短線分析次數"
+      },
+      "analysis_daily_limit_flagship_scalping": {
+        "label": "旗艦-實時短線",
+        "help": "旗艦用戶每天實時短線分析次數"
+      },
+      "analysis_daily_limit_pro_intraday": {
+        "label": "專業-日內博弈",
+        "help": "專業用戶每天日內博弈分析次數"
+      },
+      "analysis_daily_limit_flagship_intraday": {
+        "label": "旗艦-日內博弈",
+        "help": "旗艦用戶每天日內博弈分析次數"
+      },
+      "analysis_daily_limit_flagship_trend": {
+        "label": "旗艦-趨勢佈局",
+        "help": "旗艦用戶每天趨勢佈局分析次數"
+      },
+      "query_limit_free": {
+        "label": "免費查詢次數",
+        "help": "免費用戶每天最多查詢幾次"
+      },
+      "perf_days_free": {
+        "label": "免費績效天數",
+        "help": "免費用戶可查看最近幾天的績效"
+      },
+      "new_user_bonus_credits": {
+        "label": "新用戶贈送次數",
+        "help": "新註冊用戶贈送的分析體驗次數"
+      },
+      "new_user_bonus_enabled": {
+        "label": "贈送開關",
+        "help": "是否啟用新用戶贈送（true/false）"
+      },
+      "playbook_sim_min_level": {
+        "label": "劇本推演最低等級",
+        "help": "最低會員等級（0=免費, 1=專業, 2=旗艦）"
+      },
+      "backtest_free_days": {
+        "label": "免費回測天數",
+        "help": "免費用戶可查看的回測數據天數"
+      },
+      "consensus_signal_threshold": {
+        "label": "信號閾值",
+        "help": "加權分數超過此值才判定為 bullish/bearish（0.1~0.8）"
+      },
+      "consensus_min_agreement": {
+        "label": "最小一致數",
+        "help": "至少幾個模型方向一致才可判定（1~4）"
+      },
+      "signal_push_threshold": {
+        "label": "高置信推送閾值",
+        "help": "分析置信度超過此閾值時推送信號（0.5~0.9）"
+      },
+      "risk_threshold_exchange_inflow_btc": {
+        "label": "交易所流入預警",
+        "help": "BTC 流入交易所超過此值觸發預警"
+      },
+      "risk_threshold_whale_transfer_usd": {
+        "label": "鯨魚轉賬預警",
+        "help": "大額轉賬超過此值觸發預警"
+      },
+      "risk_threshold_mvrv_high": {
+        "label": "MVRV 高位預警",
+        "help": "MVRV 超過此值表示市場過熱"
+      },
+      "risk_threshold_mvrv_low": {
+        "label": "MVRV 低位預警",
+        "help": "MVRV 低於此值表示市場低估"
+      },
+      "risk_threshold_fear_greed_panic": {
+        "label": "恐慌指數預警",
+        "help": "恐貪指數低於此值觸發恐慌預警"
+      },
+      "risk_threshold_fear_greed_greed": {
+        "label": "貪婪指數預警",
+        "help": "恐貪指數高於此值觸發貪婪預警"
+      },
+      "risk_threshold_funding_rate": {
+        "label": "資金費率預警",
+        "help": "費率絕對值超過此值觸發預警"
+      },
+      "risk_threshold_liquidation_1h": {
+        "label": "爆倉量預警",
+        "help": "1小時爆倉量超過此值觸發預警"
+      },
+      "risk_threshold_long_short_imbalance": {
+        "label": "多空比失衡預警",
+        "help": "多空比偏離超過此值觸發預警"
+      },
+      "sentry_traces_sample_rate": {
+        "label": "監控採樣率",
+        "help": "性能監控的採樣比例（0-1）"
+      },
+      "site_brand_name": {
+        "label": "品牌名稱",
+        "help": "用於推廣文案、邀請頁等"
+      },
+      "site_brand_url": {
+        "label": "品牌官網域名",
+        "help": "用於拼接邀請鏈接，如 https://app.example.com"
+      },
+      "register_feature_enabled": {
+        "label": "允許新用戶註冊",
+        "help": "關閉後前台註冊入口不可用，註冊驗證碼與註冊介面都會被攔截（true/false）"
+      },
+      "register_referral_required": {
+        "label": "強制邀請碼註冊",
+        "help": "開啟後用戶必須填寫有效邀請碼才能註冊（true/false）"
+      },
+      "partner_commission_rate": {
+        "label": "合夥人分成比例",
+        "help": "合夥人推薦訂單分成比例（0.10 = 10%）"
+      },
+      "partner_min_withdrawal": {
+        "label": "最低提現金額",
+        "help": "合夥人最低提現金額"
+      }
+    }
+  }
+}

@@ -16,7 +16,7 @@ from app.data.fred_client import FredClient, SERIES_WHITELIST
 
 logger = logging.getLogger(__name__)
 
-_CACHE_TTL = 25200  # 7小时（> 6小时采集间隔，防止数据过期）
+_CACHE_TTL = 43200  # 12小时（2x 采集间隔，容忍一次完整周期失败）
 
 
 class FredCollector:

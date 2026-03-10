@@ -8,7 +8,7 @@ from uuid import uuid4
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.sql_compat import insert_returning, jsonb_cast, update_returning
+from app.core.sql_compat import insert_returning, jsonb_func_cast, update_returning
 
 logger = logging.getLogger(__name__)
 
@@ -282,7 +282,7 @@ async def _append_audit_log(
                 announcement_id, announcement_key, version, action, actor_user_id, change_summary_json
             )
             VALUES (
-                :announcement_id, :announcement_key, :version, :action, :actor_user_id, {jsonb_cast(':change_summary_json')}
+                :announcement_id, :announcement_key, :version, :action, :actor_user_id, {jsonb_func_cast(':change_summary_json')}
             )
             """
         ),
@@ -582,8 +582,8 @@ async def _insert_draft(
         VALUES (
             :announcement_key, :version, :title, :summary, :content_md,
             :display_mode, :priority, 'draft', :strong_ack_required, :allow_snooze,
-            :action_text, :action_href, {jsonb_cast(':target_roles_json')},
-            {jsonb_cast(':target_membership_levels_json')}, {jsonb_cast(':target_path_prefixes_json')},
+            :action_text, :action_href, {jsonb_func_cast(':target_roles_json')},
+            {jsonb_func_cast(':target_membership_levels_json')}, {jsonb_func_cast(':target_path_prefixes_json')},
             :starts_at, :ends_at, :created_by
         )
         RETURNING *
@@ -672,9 +672,9 @@ async def update_announcement(
                 allow_snooze = :allow_snooze,
                 action_text = :action_text,
                 action_href = :action_href,
-                target_roles_json = {jsonb_cast(':target_roles_json')},
-                target_membership_levels_json = {jsonb_cast(':target_membership_levels_json')},
-                target_path_prefixes_json = {jsonb_cast(':target_path_prefixes_json')},
+                target_roles_json = {jsonb_func_cast(':target_roles_json')},
+                target_membership_levels_json = {jsonb_func_cast(':target_membership_levels_json')},
+                target_path_prefixes_json = {jsonb_func_cast(':target_path_prefixes_json')},
                 starts_at = :starts_at,
                 ends_at = :ends_at
             WHERE id = :announcement_id
@@ -786,7 +786,7 @@ async def record_announcement_event(
             )
             VALUES (
                 :announcement_id, :announcement_key, :announcement_version,
-                :user_id, :event_type, :pathname, {jsonb_cast(':metadata_json')}, :occurred_at
+                :user_id, :event_type, :pathname, {jsonb_func_cast(':metadata_json')}, :occurred_at
             )
             """
         ),

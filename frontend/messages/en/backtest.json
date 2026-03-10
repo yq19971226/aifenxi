@@ -1,0 +1,52 @@
+{
+  "title": "Strategy Backtest",
+  "subtitle": "View historical strategy performance and backtest results",
+  "filter": {
+    "allSymbols": "All Symbols",
+    "selectSymbol": "Select Symbol",
+    "days": "{d}D"
+  },
+  "limited": "Free users can view up to {max} days of data. Upgrade to Flagship for up to 180 days of full backtest.",
+  "directions": {
+    "bullish": "Bullish",
+    "bearish": "Bearish",
+    "neutral": "Neutral"
+  },
+  "stats": {
+    "totalTrades": "Total Trades",
+    "winRate": "Win Rate",
+    "totalReturn": "Total Return",
+    "maxDrawdown": "Max Drawdown",
+    "profitLossRatio": "Profit/Loss Ratio",
+    "benchmark": "Benchmark Return",
+    "bestTrade": "Best Trade",
+    "worstTrade": "Worst Trade",
+    "avgWin": "Avg Win",
+    "avgLoss": "Avg Loss"
+  },
+  "equityCurve": {
+    "title": "Equity Curve",
+    "strategyReturn": "Strategy Cumulative Return",
+    "holdReturn": "Buy & Hold ({symbol})"
+  },
+  "trades": {
+    "title": "Trade History",
+    "empty": "No trade records",
+    "columns": {
+      "symbol": "Symbol",
+      "direction": "Direction",
+      "entryRange": "Entry Range",
+      "confidence": "Confidence",
+      "pnl": "PnL",
+      "time": "Time"
+    },
+    "pagination": {
+      "prev": "Previous",
+      "next": "Next"
+    }
+  },
+  "error": {
+    "loadFailed": "Failed to load backtest data",
+    "noData": "No data available"
+  }
+}

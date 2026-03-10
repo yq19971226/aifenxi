@@ -31,7 +31,26 @@ export interface UserQueryParams {
   page_size?: number;
 }
 
+export interface CreateUserParams {
+  email: string;
+  password: string;
+  role?: string;
+  membership_level?: number;
+  expires_at?: string | null;
+}
+
 // ── API calls ────────────────────────────────────────────────
+
+export async function createUser(
+  params: CreateUserParams
+): Promise<AdminUserInfo> {
+  const res = await authFetch(`${API_BASE}/api/admin/users`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+  return handleApiResponse(res, "创建用户失败");
+}
 
 export async function getUsers(
   params: UserQueryParams = {}

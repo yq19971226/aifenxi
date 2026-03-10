@@ -1,0 +1,56 @@
+{
+  "fvgTable": {
+    "empty": "未检测到 FVG",
+    "summary": {
+      "total": "{count} 个FVG",
+      "bullish": "看涨 {count}",
+      "bearish": "看跌 {count}",
+      "nearest": "最近距离"
+    },
+    "columns": {
+      "direction": "方向",
+      "gapRange": "缺口区间",
+      "size": "大小",
+      "interval": "周期",
+      "distance": "距离",
+      "status": "状态"
+    },
+    "status": {
+      "mitigated": "已回补",
+      "unmitigated": "未回补"
+    },
+    "actions": {
+      "collapse": "收起",
+      "expandAll": "展开全部 ({count})"
+    }
+  },
+  "orderBlockTable": {
+    "empty": "未检测到订单块",
+    "summary": {
+      "total": "{count} 个订单块",
+      "bullish": "看涨 {count}",
+      "bearish": "看跌 {count}"
+    },
+    "columns": {
+      "direction": "方向",
+      "type": "类型",
+      "priceRange": "价格区间",
+      "trigger": "触发",
+      "whale": "巨鲸"
+    },
+    "whale": {
+      "yes": "是"
+    },
+    "actions": {
+      "collapse": "收起",
+      "expandAll": "展开全部 ({count})"
+    }
+  },
+  "genericTable": {
+    "empty": "未检测到",
+    "actions": {
+      "collapse": "收起",
+      "expandAll": "展开全部 ({count})"
+    }
+  }
+}

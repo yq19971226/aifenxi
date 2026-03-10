@@ -27,7 +27,7 @@ _MAX_CONSECUTIVE_FAILURES = 3
 
 # Redis 缓存键模式和 TTL
 _SNAPSHOT_CACHE_KEY = "derivatives:{symbol}"
-_SNAPSHOT_CACHE_TTL = 900  # 15 minutes (3x collection interval)
+_SNAPSHOT_CACHE_TTL = 1800  # 30 minutes (6x collection interval, 容错更强)
 _LIQUIDATION_CACHE_KEY = "deriv_liquidations:{symbol}"
 _LIQUIDATION_CACHE_TTL = 60  # 1 minute
 

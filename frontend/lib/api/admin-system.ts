@@ -60,18 +60,22 @@ export interface DeployEvent {
   data: string;
 }
 
-export async function startDeploy(
+async function startAction(
+  path: string,
+  body: Record<string, unknown> | null,
   onEvent: (event: DeployEvent) => void,
   onFinish: () => void,
 ): Promise<void> {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
-  const res = await fetch(`${API_BASE}/api/admin/system/deploy`, {
+  const res = await fetch(`${API_BASE}${path}`, {
     method: "POST",
     headers: {
+      "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
+    body: JSON.stringify(body ?? {}),
   });
 
   if (!res.ok) {
@@ -116,4 +120,24 @@ export async function startDeploy(
     reader.releaseLock();
     onFinish();
   }
+}
+
+export async function startDeploy(
+  payload: { target?: string },
+  onEvent: (event: DeployEvent) => void,
+  onFinish: () => void,
+): Promise<void> {
+  return startAction("/api/admin/system/deploy", payload, onEvent, onFinish);
+}
+
+export interface RollbackPayload {
+  target?: string;
+}
+
+export async function startRollback(
+  payload: RollbackPayload,
+  onEvent: (event: DeployEvent) => void,
+  onFinish: () => void,
+): Promise<void> {
+  return startAction("/api/admin/system/rollback", payload as Record<string, unknown>, onEvent, onFinish);
 }

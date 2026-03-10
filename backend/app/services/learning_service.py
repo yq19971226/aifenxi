@@ -61,6 +61,7 @@ class LearningService:
 
         # 剧本胜率（D8）
         playbook_win_rates = await self._get_playbook_win_rates(days)
+        structure_win_rates = await self._get_structure_win_rates(days)
 
         return {
             "stats": stats.model_dump(),
@@ -69,6 +70,7 @@ class LearningService:
             "mode_win_rates": mode_win_rates,
             "changelog_markers": changelog_markers,
             "playbook_win_rates": playbook_win_rates,
+            "structure_win_rates": structure_win_rates,
         }
 
     async def _get_signal_distribution(
@@ -164,12 +166,13 @@ class LearningService:
                 text(f"""
                     SELECT
                         playbook_name,
+                        COALESCE(market_structure_type, 'unknown') AS market_structure_type,
                         {_ci('COUNT(*)')} AS total,
                         {_ci(_cf("status = 'completed'"))} AS completed,
                         COALESCE({_af('final_accuracy', "status = 'completed'")}, 0) AS avg_accuracy
                     FROM playbook_predictions
                     WHERE {_age_pp}
-                    GROUP BY playbook_name
+                    GROUP BY playbook_name, COALESCE(market_structure_type, 'unknown')
                     ORDER BY total DESC
                 """),
                 {"days": days},
@@ -178,6 +181,7 @@ class LearningService:
             return [
                 {
                     "playbook_name": row["playbook_name"],
+                    "market_structure_type": row["market_structure_type"],
                     "total": row["total"],
                     "completed": row["completed"],
                     "avg_accuracy": round(float(row["avg_accuracy"]), 4),
@@ -185,6 +189,43 @@ class LearningService:
                 for row in rows
             ]
         except Exception:
+            return []
+
+    async def _get_structure_win_rates(self, days: int) -> list[dict]:
+        """按市场结构聚合剧本预测表现。"""
+        try:
+            _age_pp = age_filter("created_at", ":days")
+            _ci = cast_int
+            _cf = count_filter
+            _af = avg_filter
+            result = await self._session.execute(
+                text(f"""
+                    SELECT
+                        COALESCE(market_structure_type, 'unknown') AS market_structure_type,
+                        {_ci('COUNT(*)')} AS total,
+                        {_ci(_cf("status = 'completed'"))} AS completed,
+                        {_ci('COUNT(DISTINCT playbook_name)')} AS playbook_count,
+                        COALESCE({_af('final_accuracy', "status = 'completed'")}, 0) AS avg_accuracy
+                    FROM playbook_predictions
+                    WHERE {_age_pp}
+                    GROUP BY COALESCE(market_structure_type, 'unknown')
+                    ORDER BY avg_accuracy DESC, total DESC
+                """),
+                {"days": days},
+            )
+            rows = result.mappings().all()
+            return [
+                {
+                    "market_structure_type": row["market_structure_type"],
+                    "total": row["total"],
+                    "completed": row["completed"],
+                    "playbook_count": row["playbook_count"],
+                    "avg_accuracy": round(float(row["avg_accuracy"]), 4),
+                }
+                for row in rows
+            ]
+        except Exception as exc:
+            logger.error("查询市场结构表现失败: %s", exc)
             return []
 
     async def _get_changelog_markers(self, days: int) -> list[dict]:
@@ -210,7 +251,13 @@ class LearningService:
                     "old_value": row["old_value"],
                     "new_value": row["new_value"],
                     "changed_by": row["changed_by"],
-                    "changed_at": row["changed_at"].isoformat() if row["changed_at"] else None,
+                    "changed_at": (
+                        row["changed_at"].isoformat()
+                        if hasattr(row["changed_at"], "isoformat")
+                        else str(row["changed_at"])
+                        if row["changed_at"]
+                        else None
+                    ),
                     "note": row["note"],
                 }
                 for row in rows

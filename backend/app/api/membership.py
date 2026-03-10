@@ -156,21 +156,19 @@ async def claim_free_trial(
     redis = get_redis_pool()
     claimed_key = f"{_FREE_TRIAL_CLAIMED_PREFIX}:{user.id}"
 
-    already = await redis.exists(claimed_key)
-    if already:
-        quota_svc = AnalysisQuotaService(redis)
+    # 原子领取：SET NX 保证并发只成功一次
+    newly_set = await redis.set(claimed_key, "1", nx=True)
+    quota_svc = AnalysisQuotaService(redis)
+
+    if not newly_set:
         bonus = await quota_svc.get_bonus_remaining(
             UUID(user.id), AnalysisMode.INTRADAY,
         )
         return FreeTrialStatus(enabled=True, total=total, claimed=True, remaining=bonus)
 
-    # 发放 bonus credits
-    quota_svc = AnalysisQuotaService(redis)
     await quota_svc.add_bonus_credits(
         UUID(user.id), AnalysisMode.INTRADAY, total,
     )
-    # 标记已领取（永不过期）
-    await redis.set(claimed_key, "1")
 
     logger.info("免费体验已发放: user=%s, count=%d", user.id, total)
 

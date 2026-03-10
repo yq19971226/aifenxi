@@ -1,0 +1,525 @@
+{
+  "sidebar": {
+    "groups": {
+      "overview": "總覽",
+      "config": "系統配置",
+      "users": "用戶運營",
+      "review": "內容審核",
+      "finance": "財務",
+      "ai": "AI",
+      "system": "系統"
+    },
+    "items": {
+      "dashboard": "後台總覽",
+      "monitor": "系統監控",
+      "setup": "快速設置",
+      "configs": "參數設置",
+      "maintenance": "維護模式",
+      "apiKeys": "API 密鑰",
+      "datasources": "數據源管理",
+      "models": "模型分工",
+      "symbols": "幣種管理",
+      "users": "用戶管理",
+      "operators": "營運員管理",
+      "orders": "平台訂單",
+      "notifications": "通知管理",
+      "push": "推送管理",
+      "announcements": "公告管理",
+      "playbookReview": "劇本審核",
+      "taskReview": "任務審核",
+      "taskTemplates": "任務模板",
+      "withdrawals": "提現審核",
+      "partnerStats": "合夥人統計",
+      "learning": "自主學習",
+      "systemMgmt": "系統管理"
+    },
+    "mobileMenu": "管理選單"
+  },
+  "operators": {
+    "title": "營運員管理",
+    "noAccess": "無權限存取營運員管理",
+    "fetchFailed": "取得營運員列表失敗",
+    "email": "信箱",
+    "initialPassword": "初始密碼（至少 8 位）",
+    "createButton": "建立營運員",
+    "creating": "處理中…",
+    "passwordMinLength": "密碼長度至少 8 位",
+    "createFailed": "建立營運員失敗",
+    "operationFailed": "操作失敗",
+    "createdAt": "建立時間",
+    "status": "狀態",
+    "action": "操作",
+    "enabled": "啟用",
+    "disabled": "停用",
+    "processing": "處理中…"
+  },
+  "permissionDenied": "無權限存取",
+  "maintenance": {
+    "title": "維護模式",
+    "subtitle": "控制各功能模組的維護狀態，維護中的功能將向用戶顯示維護提示",
+    "configDescription": "功能開關: {configKey}",
+    "errors": {
+      "fetchFailed": "取得失敗",
+      "createFailed": "建立失敗",
+      "saveFailed": "儲存失敗"
+    },
+    "loading": "載入中...",
+    "restore": "恢復",
+    "maintenance": "維護",
+    "globalSwitch": {
+      "maintenanceCount": "{count} 個功能處於維護中",
+      "allRunning": "所有功能正常運行",
+      "restoreHint": "點擊「恢復」可恢復所有功能",
+      "maintenanceHint": "點擊「維護」可將所有功能設為維護狀態",
+      "restoreAll": "恢復",
+      "maintenanceAll": "維護"
+    },
+    "features": {
+      "playbook": "劇本推演",
+      "leaderboard": "排行榜",
+      "task": "任務中心",
+      "partner": "合夥人",
+      "push": "推送設定",
+      "alerts": "預警規則",
+      "online_count": "線上人數"
+    },
+    "paths": {
+      "playbook": "/playbook-sim",
+      "leaderboard": "/leaderboard",
+      "task": "/tasks",
+      "partner": "/partner",
+      "push": "/settings/push",
+      "alerts": "/alerts",
+      "online_count": ""
+    }
+  },
+  "push": {
+    "title": "推送管理",
+    "subtitle": "管理推送通知功能的可用性",
+    "noPermission": "無權限存取",
+    "loading": "載入中...",
+    "errors": {
+      "fetchFailed": "取得失敗",
+      "createFailed": "建立失敗",
+      "saveFailed": "儲存失敗"
+    },
+    "states": {
+      "active": "開啟",
+      "maintenance": "維護中",
+      "hidden": "隱藏"
+    },
+    "toggle": {
+      "label": "推送通知",
+      "hint": "/settings/push — 用戶推送渠道與事件訂閱"
+    },
+    "statusSection": {
+      "title": "狀態說明",
+      "activeDesc": "用戶可正常存取推送設定頁面，配置推送渠道",
+      "maintenanceDesc": "推送設定頁面顯示維護提示，用戶無法操作",
+      "hiddenDesc": "導航中完全隱藏推送設定入口"
+    },
+    "featureFlagDescription": "功能開關: {configKey}"
+  },
+  "orders": {
+    "title": "平台訂單",
+    "search": "搜尋",
+    "searchPlaceholder": "信箱 / 訂單ID",
+    "status": "狀態",
+    "statusAll": "全部",
+    "statusPending": "待確認",
+    "statusCompleted": "已完成",
+    "statusFailed": "失敗",
+    "planType": "套餐類型",
+    "planAll": "全部",
+    "planPro": "專業",
+    "planFlagship": "旗艦",
+    "pageSize": "每頁條數",
+    "rows": "條",
+    "paginationSummary": "共 {total} 條 · 第 {page} 頁 / 共 {totalPages} 頁",
+    "prevPage": "上一頁",
+    "nextPage": "下一頁",
+    "errorFetchFailed": "查詢訂單失敗",
+    "emptyTitle": "暫無訂單資料"
+  },
+  "announcements": {
+    "noAccess": "無權限存取公告管理",
+    "title": "公告管理",
+    "subtitle": "超簡版：標題 + 正文 + 發佈；需要時再展開高級設置",
+    "createButton": "新建公告",
+    "editor": {
+      "createDraft": "新建公告草稿",
+      "createNewVersion": "建立新版本草稿",
+      "editAnnouncement": "編輯公告",
+      "createSubtitle": "超簡版默認只填標題和正文，直接發佈；其他規則收進高級設置",
+      "saveDraft": "儲存草稿",
+      "saveNewVersion": "儲存為新版本草稿",
+      "save": "儲存",
+      "publishDirect": "直接發佈",
+      "publishNewVersion": "儲存並發佈新版本",
+      "saveAndPublish": "儲存並發佈",
+      "collapse": "收起",
+      "simpleHint": "超簡版默認只需填寫標題和正文。",
+      "collapseAdvanced": "收起高級設置",
+      "expandAdvanced": "展開高級設置",
+      "labelTitle": "標題",
+      "labelContent": "正文",
+      "labelDisplayMode": "展示方式",
+      "labelSummary": "摘要",
+      "labelKey": "公告標識（留空自動生成）",
+      "labelPriority": "優先級",
+      "labelStrongAck": "強確認",
+      "labelAllowSnooze": "允許稍後提醒",
+      "labelActionText": "操作文案",
+      "labelActionHref": "操作連結",
+      "labelTargetRoles": "目標角色",
+      "labelTargetLevels": "目標會員等級",
+      "labelTargetPaths": "目標路徑前綴",
+      "labelStartsAt": "開始時間",
+      "labelEndsAt": "結束時間",
+      "defaultHint": "默認流程就是標題、正文、發佈；高級規則按需展開。",
+      "cancel": "取消",
+      "saving": "儲存中",
+      "publishing": "發佈中"
+    }
+  },
+  "apiKeys": {
+    "title": "API 密鑰管理",
+    "subtitle": "在此填入各項服務的 API Key，填好後系統會自動開始採集資料。",
+    "progress": "配置進度",
+    "coreConfigured": "✓ 核心密鑰已配置",
+    "coreConfiguredPartial": "核心密鑰 {configured}/{total}，請先配置必填項",
+    "dataSourcesOptional": "其餘資料源可隨時添加",
+    "groups": {
+      "core": "核心（必填）",
+      "data": "資料源（按需填寫）",
+      "notif": "推送通知（可選）",
+      "pay": "支付（可選）"
+    },
+    "status": {
+      "configured": "已配置",
+      "verifiedUnsaved": "已驗證未儲存",
+      "notConfigured": "未配置",
+      "required": "必填"
+    },
+    "howToGet": "如何取得：",
+    "goToRegister": "前往 {provider} 註冊",
+    "placeholder": {
+      "configured": "已配置（輸入新值可覆蓋）",
+      "empty": "貼上你的 API Key…"
+    },
+    "show": "顯示",
+    "hide": "隱藏",
+    "test": "測試連線",
+    "testing": "測試中",
+    "save": "儲存",
+    "saving": "儲存中",
+    "saved": "已儲存",
+    "verifiedUnsavedHint": "目前只完成了連線驗證，尚未寫入系統配置。請繼續點擊「儲存」。",
+    "faq": {
+      "title": "常見問題",
+      "q1": "Q: 必須全部填完才能用嗎？",
+      "a1": "不需要。只有「AI 分析密鑰」是必填的，其他資料源可以按需開通。沒有填的資料源系統會自動略過。",
+      "q2": "Q: 填了 Key 後需要重啟嗎？",
+      "a2": "不需要。儲存後系統會自動生效，下一次採集週期就會使用新的 Key。",
+      "q3": "Q: Key 安全嗎？",
+      "a3": "所有 API Key 在資料庫中加密儲存，前端只能看到脫敏後的值（如 sk-****abc），不會明文顯示。",
+      "q4": "Q: 免費的資料源夠用嗎？",
+      "a4": "免費資料源（Binance + Alternative.me + BlockBeats + CryptoPanic + CoinGecko Demo）已涵蓋 K 線、合約、恐慌指數、新聞、基本面資料，對於基礎分析足夠。付費資料源（CoinGlass、GlassNode、CoinGecko 高級套餐）主要增強衍生品、鏈上深度和社群情緒維度。"
+    },
+    "toast": {
+      "testSuccess": "{name} 連線測試成功",
+      "testFail": "{name} 連線測試失敗: {message}",
+      "testError": "{name} 測試失敗: {message}",
+      "saveSuccess": "{name} 儲存成功",
+      "saveFail": "儲存失敗"
+    },
+    "testFailed": "測試失敗",
+    "keys": {
+      "dmx_api_key": {
+        "name": "AI 分析密鑰",
+        "description": "驅動所有 AI 智慧體的核心密鑰，沒有它系統無法進行任何分析。",
+        "howToGet": "註冊 → 儲值 → 複製 API Key",
+        "cost": "按量付費"
+      },
+      "cryptopanic_api_token": {
+        "name": "新聞資料密鑰",
+        "description": "取得全球加密貨幣新聞，為 NewsAnalystAgent 提供英文新聞資料。",
+        "howToGet": "註冊帳號 → 進入 API 頁面 → 複製 Auth Token",
+        "cost": "免費"
+      },
+      "coinglass_api_key": {
+        "name": "合約資料密鑰",
+        "description": "全市場爆倉熱圖、資金費率聚合、MVRV 估值指標。",
+        "howToGet": "註冊帳號 → 進入 Open API 頁面 → 建立 API Key",
+        "cost": "Startup $29/月起"
+      },
+      "alphanode_api_key": {
+        "name": "CoinGlass 代理密鑰",
+        "description": "CoinGlass REST 代理通道密鑰，用於 proxy > official 雙通道中的代理主通道。",
+        "howToGet": "向 AlphaNode 服務方取得代理存取 Key",
+        "cost": "按代理服務約定"
+      },
+      "cryptoquant_api_key": {
+        "name": "鏈上主源密鑰",
+        "description": "CryptoQuant 鏈上主資料源密鑰，用於交易所流量、儲備、地址與 MVRV 等指標採集。",
+        "howToGet": "註冊帳號 → API 頁面 → 建立或複製 API Key",
+        "cost": "Professional $109/月起"
+      },
+      "fred_api_key": {
+        "name": "宏觀主源密鑰",
+        "description": "FRED 宏觀主資料源密鑰，用於 CPI、失業率、聯邦基金利率、GDP 等官方序列採集。",
+        "howToGet": "登入 FRED 帳號 → API Keys 頁面產生 Key",
+        "cost": "免費"
+      },
+      "glassnode_api_key": {
+        "name": "鏈上資料密鑰",
+        "description": "MVRV、NVT、S2F、活躍地址、交易所流量等鏈上指標。",
+        "howToGet": "註冊帳號 → 選擇套餐 → API 管理 → 複製 Key",
+        "cost": "免費層可用，高級指標需付費"
+      },
+      "coingecko_api_key": {
+        "name": "基本面資料密鑰",
+        "description": "市值、社群情緒、開發者活躍度、全域宏觀、熱門趨勢。",
+        "howToGet": "註冊帳號 → Developer Dashboard → 複製 API Key",
+        "cost": "Demo 免費，Basic $35/月起"
+      },
+      "telegram_bot_token": {
+        "name": "Telegram 機器人",
+        "description": "透過 Telegram 接收預警推送訊息。",
+        "howToGet": "在 Telegram 搜尋 @BotFather → /newbot → 複製 Token",
+        "cost": "免費"
+      },
+      "resend_api_key": {
+        "name": "郵件服務密鑰",
+        "description": "透過郵件接收預警推送訊息（推薦，優先於 SendGrid）。",
+        "howToGet": "註冊帳號 → API Keys → Create API Key",
+        "cost": "免費 3000封/月"
+      },
+      "sendgrid_api_key": {
+        "name": "郵件服務密鑰（備選）",
+        "description": "透過郵件接收預警推送訊息（已配置 Resend 時可不填）。",
+        "howToGet": "註冊帳號 → Settings → API Keys → Create API Key",
+        "cost": "免費層可用"
+      },
+      "nowpayments_api_key": {
+        "name": "支付閘道密鑰",
+        "description": "接受 USDT 加密貨幣支付（會員訂閱用）。",
+        "howToGet": "註冊商戶帳號 → Store Settings → API Keys",
+        "cost": "按交易收費"
+      }
+    }
+  },
+  "monitor": {
+    "title": "系統監控",
+    "subtitle": "{count} 個 AI 智能體 · 多維度市場分析",
+    "monitorSymbol": "監控幣種",
+    "backendService": "後端服務",
+    "statusOk": "正常",
+    "statusError": "異常",
+    "env": "環境",
+    "agentsLabel": "智能體",
+    "agentsCount": "核心5 + 增強3 + 對抗2",
+    "reflection": "反思注入",
+    "reflectionActive": "活躍",
+    "reflectionPending": "待觸發",
+    "defenseLevel": "防禦等級",
+    "collusionDetected": "合謀檢測異常",
+    "onlineUsers": "線上用戶",
+    "websocketSubtitle": "WebSocket 即時連線（30s 刷新）",
+    "live": "即時",
+    "totalConnections": "總連線",
+    "priceChannel": "價格頻道",
+    "alertChannel": "預警頻道",
+    "klineScheduler": "K 線數據採集",
+    "klineSchedulerDesc": "自動從 Binance 拉取 K 線數據並快取，每 {seconds} 秒一輪",
+    "running": "運行中",
+    "stopped": "已停止",
+    "completedRounds": "已完成輪次",
+    "collectTasks": "採集任務",
+    "failed": "失敗",
+    "lastRoundTime": "上輪耗時",
+    "lastCollect": "上次採集",
+    "collectSymbols": "採集幣種",
+    "collectIntervals": "採集週期",
+    "agentsList": "AI 智能體一覽",
+    "agentsListDesc": "系統內建 {count} 個 AI 智能體，從不同維度分析市場並給出綜合建議",
+    "agentHeader": "智能體",
+    "layer": "層級",
+    "aiModel": "AI 模型",
+    "analysisFrequency": "分析頻率",
+    "custom": "自訂",
+    "analysisModes": "分析模式",
+    "analysisModesDesc": "系統會根據市場情況自動選擇合適的分析模式，調度不同數量的智能體",
+    "agentsCountLabel": "{count} 智能體",
+    "agents": {
+      "technical": { "name": "技術分析", "desc": "K線形態、指標信號、支撐壓力位" },
+      "onchain": { "name": "鏈上數據", "desc": "資金動向、交易所流入流出、礦工儲備" },
+      "sentiment": { "name": "輿情分析", "desc": "恐貪指數、社交熱度、流量動向" },
+      "orderbook": { "name": "訂單簿", "desc": "買賣盤深度、大單掛單、掛單價" },
+      "risk": { "name": "風險評估", "desc": "倉位風險、止損建議、盈虧比" },
+      "news_analyst": { "name": "新聞分析", "desc": "全球加密新聞解讀、監管政策影響" },
+      "calendar": { "name": "日曆事件", "desc": "代幣解鎖、上線、減半等事件影響評估" },
+      "reflection": { "name": "反思覆盤", "desc": "回顧歷史判斷準確率，持續自我改進" },
+      "adversarial": { "name": "對抗推演", "desc": "站在莊家視角反推下一步操盤策略" },
+      "collusion_detector": { "name": "合謀檢測", "desc": "檢測對倒交易、協作拉盤、惡意操縱" }
+    },
+    "phases": {
+      "core": "核心層",
+      "enhance": "增強層",
+      "adversarial": "對抗層"
+    },
+    "modes": {
+      "scalping": "超短線",
+      "intraday": "日內",
+      "trend": "趨勢",
+      "offline": "離線"
+    },
+    "modeLabels": {
+      "scalping": "秒級判斷，適合短線交易",
+      "intraday": "分鐘級分析，適合日內波段",
+      "trend": "全維度深度分析，適合中長線佈局"
+    },
+    "agentNames": {
+      "technical": "技術分析",
+      "onchain": "鏈上數據",
+      "risk": "風險評估",
+      "orderbook": "訂單簿",
+      "news_analyst": "新聞分析",
+      "calendar": "日曆事件",
+      "adversarial": "對抗推演",
+      "collusion_detector": "合謀檢測",
+      "reflection": "反思注入"
+    },
+    "modelLabels": {
+      "deepseek": "DeepSeek V3 通用",
+      "grok": "Grok-4 標準"
+    }
+  },
+  "setup": {
+    "title": "系統設定",
+    "subtitle": "管理功能開關與系統配置",
+    "featureToggles": "功能開關",
+    "featureTogglesHint": "控制前台功能的可見性。「開啟」正常顯示，「維護中」顯示維護頁面，「隱藏」完全不可見。",
+    "loading": "載入中...",
+    "configDescription": "功能開關: {configKey}",
+    "errors": {
+      "createFailed": "建立失敗 ({status})",
+      "saveFailed": "儲存失敗 ({status})"
+    },
+    "states": {
+      "active": "開啟",
+      "maintenance": "維護中",
+      "hidden": "隱藏"
+    },
+    "features": {
+      "playbook": {
+        "label": "劇本推演",
+        "desc": "/playbook-sim — AI 對抗劇本推演系統"
+      },
+      "leaderboard": {
+        "label": "排行榜",
+        "desc": "/leaderboard — 策略排行榜"
+      },
+      "task": {
+        "label": "任務中心",
+        "desc": "/tasks — 推廣任務系統"
+      },
+      "partner": {
+        "label": "合夥人",
+        "desc": "/partner — 合夥人推薦系統"
+      },
+      "push": {
+        "label": "推送設定",
+        "desc": "/settings/push — 推送渠道與事件訂閱"
+      },
+      "alerts": {
+        "label": "預警規則",
+        "desc": "/alerts — 用戶自定義價格預警"
+      },
+      "online_count": {
+        "label": "線上人數顯示",
+        "desc": "首頁和儀表板展示當前線上用戶數"
+      }
+    }
+  },
+  "dashboard": {
+    "title": "營運概覽",
+    "configHealth": {
+      "title": "配置體檢",
+      "failCount": "{count} 項異常",
+      "allOk": "全部正常",
+      "pendingCount": "{count} 項待配置",
+      "items": {
+        "aiKey": {
+          "label": "AI 分析引擎",
+          "ok": "已配置，AI 分析功能正常",
+          "fail": "未配置 AI 密鑰，所有分析功能不可用"
+        },
+        "newsKey": {
+          "label": "新聞數據",
+          "ok": "CryptoPanic 已接入",
+          "warn": "CryptoPanic 未配置，僅使用 BlockBeats（免費）"
+        },
+        "onchainKey": {
+          "label": "鏈上深度數據",
+          "ok": "GlassNode 已接入，MVRV/NVT 等鏈上指標可用",
+          "warn": "GlassNode 未配置，鏈上分析僅使用免費數據源（恐慌貪婪指數）"
+        },
+        "params": {
+          "label": "系統參數",
+          "ok": "默認參數已初始化",
+          "warn": "部分默認參數未初始化，建議去參數設置一鍵初始化"
+        },
+        "push": {
+          "label": "消息推送",
+          "ok": "推送通道已配置",
+          "warn": "未配置推送通道，預警消息無法送達"
+        }
+      }
+    },
+    "kpi": {
+      "totalUsers": "總用戶",
+      "todayNew": "今日 +{count}",
+      "newUsers7d": "7日新增",
+      "totalRevenue": "累計收入",
+      "revenue30d": "30d {amount}",
+      "pendingPayments": "待處理支付",
+      "strategies24h": "策略 24h",
+      "totalStrategies": "累計 {count}",
+      "consensus24h": "共識 24h",
+      "totalConsensus": "累計 {count}",
+      "onlineUsers": "線上用戶",
+      "onlineBreakdown": "價格{price} / 預警{alerts}"
+    },
+    "tierBar": {
+      "title": "會員分布",
+      "count": "{count} 人",
+      "free": "免費",
+      "pro": "專業",
+      "flagship": "旗艦"
+    },
+    "llmCost": {
+      "title": "今日 AI 成本",
+      "totalCost": "總成本",
+      "tokens": "Tokens",
+      "calls": "調用",
+      "loading": "AI 成本數據載入中…"
+    },
+    "quickActions": {
+      "title": "快捷操作",
+      "userMgmt": { "label": "用戶管理", "desc": "搜尋/封禁/調整等級" },
+      "apiKeys": { "label": "API 密鑰", "desc": "管理第三方密鑰" },
+      "datasources": { "label": "數據源", "desc": "開關數據源" },
+      "monitor": { "label": "系統監控", "desc": "智能體/編排器" },
+      "models": { "label": "模型分工", "desc": "切換模型映射" },
+      "configs": { "label": "參數設置", "desc": "運行時參數" }
+    },
+    "activity": {
+      "title": "系統活躍度",
+      "agentReports": "智能體報告",
+      "agentReports24h": "24h +{count}",
+      "alertRules": "預警規則",
+      "activeRules": "活躍 {count}"
+    }
+  }
+}

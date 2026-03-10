@@ -11,6 +11,7 @@ from starlette.responses import StreamingResponse
 
 from app.core.mode_contract import ALL_MODE_KLINE_INTERVALS
 from app.core.database import get_db
+from app.core.deps import UserInfo, require_admin
 from app.data.binance_rest import BinanceRestClient
 from app.data.indicators import IndicatorCalculator
 from app.services.market import KlineRecord, IndicatorRecord, MarketService
@@ -114,6 +115,7 @@ async def warmup_market_data(
 async def test_analysis(
     symbol: str = Query("ETHUSDT"),
     mode: str = Query("intraday"),
+    _admin: UserInfo = Depends(require_admin),
 ) -> StreamingResponse:
     """调试用：无需认证的分析 SSE 测试。"""
     from uuid import UUID

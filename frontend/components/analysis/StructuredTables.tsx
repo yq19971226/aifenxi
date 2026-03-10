@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { formatPrice, formatValue, fieldLabel, localizeText } from "./helpers";
 import { HIDDEN_FIELDS } from "./constants";
 import { DirectionBadge } from "./renderers";
@@ -27,10 +28,11 @@ interface FvgItem {
 // ── FVG Table ────────────────────────────────────────────────
 
 export function FvgTable({ items }: { items: FvgItem[] }) {
+  const t = useTranslations('analysis.fvgTable');
   const [showAll, setShowAll] = useState(false);
 
   if (items.length === 0) {
-    return <p className="text-sm text-zinc-500">未检测到 FVG</p>;
+    return <p className="text-sm text-zinc-500">{t('empty')}</p>;
   }
 
   const bullish = items.filter((f) => f.direction === "bullish" || f.direction === "看涨").length;
@@ -47,12 +49,12 @@ export function FvgTable({ items }: { items: FvgItem[] }) {
     <div className="space-y-2">
       {/* Summary bar */}
       <div className="flex items-center gap-3 flex-wrap text-xs md:text-sm">
-        <span className="font-mono font-medium text-zinc-300">{items.length} 个FVG</span>
-        <span className="text-emerald-400">看涨 {bullish}</span>
-        <span className="text-red-400">看跌 {bearish}</span>
+        <span className="font-mono font-medium text-zinc-300">{t('summary.total', { count: items.length })}</span>
+        <span className="text-emerald-400">{t('summary.bullish', { count: bullish })}</span>
+        <span className="text-red-400">{t('summary.bearish', { count: bearish })}</span>
         {nearest < Infinity && (
           <span className="text-zinc-500">
-            最近距离 <span className="font-mono text-zinc-300">{(nearest * 100).toFixed(2)}%</span>
+            {t('summary.nearest')} <span className="font-mono text-zinc-300">{(nearest * 100).toFixed(2)}%</span>
           </span>
         )}
       </div>
@@ -62,12 +64,12 @@ export function FvgTable({ items }: { items: FvgItem[] }) {
         <table className="w-full min-w-[420px] text-xs md:text-sm">
           <thead>
             <tr className="border-b border-white/[0.06] text-zinc-500">
-              <th className="px-2 py-1.5 text-left font-medium">方向</th>
-              <th className="px-2 py-1.5 text-right font-medium">缺口区间</th>
-              <th className="px-2 py-1.5 text-right font-medium hidden sm:table-cell">大小</th>
-              <th className="px-2 py-1.5 text-center font-medium">周期</th>
-              <th className="px-2 py-1.5 text-right font-medium">距离</th>
-              <th className="px-2 py-1.5 text-center font-medium">状态</th>
+              <th className="px-2 py-1.5 text-left font-medium">{t('columns.direction')}</th>
+              <th className="px-2 py-1.5 text-right font-medium">{t('columns.gapRange')}</th>
+              <th className="px-2 py-1.5 text-right font-medium hidden sm:table-cell">{t('columns.size')}</th>
+              <th className="px-2 py-1.5 text-center font-medium">{t('columns.interval')}</th>
+              <th className="px-2 py-1.5 text-right font-medium">{t('columns.distance')}</th>
+              <th className="px-2 py-1.5 text-center font-medium">{t('columns.status')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.03]">
@@ -105,7 +107,7 @@ export function FvgTable({ items }: { items: FvgItem[] }) {
                           : "bg-amber-500/15 text-amber-400"
                       }`}
                     >
-                      {f.mitigated ? "已回补" : "未回补"}
+                      {f.mitigated ? t('status.mitigated') : t('status.unmitigated')}
                     </span>
                   </td>
                 </tr>
@@ -122,7 +124,7 @@ export function FvgTable({ items }: { items: FvgItem[] }) {
           onClick={() => setShowAll((v) => !v)}
           className="text-xs text-accent hover:underline"
         >
-          {showAll ? "收起" : `展开全部 (${items.length})`}
+          {showAll ? t('actions.collapse') : t('actions.expandAll', { count: items.length })}
         </button>
       )}
     </div>
@@ -146,10 +148,11 @@ interface OrderBlockItem {
 // ── Order Block Table ────────────────────────────────────────
 
 export function OrderBlockTable({ items }: { items: OrderBlockItem[] }) {
+  const t = useTranslations('analysis.orderBlockTable');
   const [showAll, setShowAll] = useState(false);
 
   if (items.length === 0) {
-    return <p className="text-sm text-zinc-500">未检测到订单块</p>;
+    return <p className="text-sm text-zinc-500">{t('empty')}</p>;
   }
 
   const bullish = items.filter((b) => b.direction === "bullish" || b.direction === "看涨").length;
@@ -160,9 +163,9 @@ export function OrderBlockTable({ items }: { items: OrderBlockItem[] }) {
     <div className="space-y-2">
       {/* Summary bar */}
       <div className="flex items-center gap-3 flex-wrap text-xs md:text-sm">
-        <span className="font-mono font-medium text-zinc-300">{items.length} 个订单块</span>
-        <span className="text-emerald-400">看涨 {bullish}</span>
-        <span className="text-red-400">看跌 {bearish}</span>
+        <span className="font-mono font-medium text-zinc-300">{t('summary.total', { count: items.length })}</span>
+        <span className="text-emerald-400">{t('summary.bullish', { count: bullish })}</span>
+        <span className="text-red-400">{t('summary.bearish', { count: bearish })}</span>
       </div>
 
       {/* Table */}
@@ -170,11 +173,11 @@ export function OrderBlockTable({ items }: { items: OrderBlockItem[] }) {
         <table className="w-full min-w-[380px] text-xs md:text-sm">
           <thead>
             <tr className="border-b border-white/[0.06] text-zinc-500">
-              <th className="px-2 py-1.5 text-left font-medium">方向</th>
-              <th className="px-2 py-1.5 text-center font-medium">类型</th>
-              <th className="px-2 py-1.5 text-right font-medium">价格区间</th>
-              <th className="px-2 py-1.5 text-left font-medium hidden sm:table-cell">触发</th>
-              <th className="px-2 py-1.5 text-center font-medium">巨鲸</th>
+              <th className="px-2 py-1.5 text-left font-medium">{t('columns.direction')}</th>
+              <th className="px-2 py-1.5 text-center font-medium">{t('columns.type')}</th>
+              <th className="px-2 py-1.5 text-right font-medium">{t('columns.priceRange')}</th>
+              <th className="px-2 py-1.5 text-left font-medium hidden sm:table-cell">{t('columns.trigger')}</th>
+              <th className="px-2 py-1.5 text-center font-medium">{t('columns.whale')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.03]">
@@ -201,7 +204,7 @@ export function OrderBlockTable({ items }: { items: OrderBlockItem[] }) {
                   </td>
                   <td className="px-2 py-1.5 text-center">
                     {b.whale_confirmed ? (
-                      <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-emerald-500/15 text-emerald-400">是</span>
+                      <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-emerald-500/15 text-emerald-400">{t('whale.yes')}</span>
                     ) : (
                       <span className="text-zinc-500">—</span>
                     )}
@@ -219,7 +222,7 @@ export function OrderBlockTable({ items }: { items: OrderBlockItem[] }) {
           onClick={() => setShowAll((v) => !v)}
           className="text-xs text-accent hover:underline"
         >
-          {showAll ? "收起" : `展开全部 (${items.length})`}
+          {showAll ? t('actions.collapse') : t('actions.expandAll', { count: items.length })}
         </button>
       )}
     </div>
@@ -229,10 +232,11 @@ export function OrderBlockTable({ items }: { items: OrderBlockItem[] }) {
 // ── Generic Object Table (improved fallback) ─────────────────
 
 export function GenericObjectTable({ items, label }: { items: Record<string, unknown>[]; label?: string }) {
+  const t = useTranslations('analysis.genericTable');
   const [showAll, setShowAll] = useState(false);
 
   if (items.length === 0) {
-    return <span className="text-sm text-zinc-500">未检测到</span>;
+    return <span className="text-sm text-zinc-500">{t('empty')}</span>;
   }
 
   // Extract column keys from all items (union), limit to 6 most common
@@ -289,7 +293,7 @@ export function GenericObjectTable({ items, label }: { items: Record<string, unk
           onClick={() => setShowAll((v) => !v)}
           className="text-xs text-accent hover:underline"
         >
-          {showAll ? "收起" : `展开全部 (${items.length})`}
+          {showAll ? t('actions.collapse') : t('actions.expandAll', { count: items.length })}
         </button>
       )}
     </div>

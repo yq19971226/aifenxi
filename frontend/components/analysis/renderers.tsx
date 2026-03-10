@@ -186,6 +186,36 @@ export function ObjectArrayTable({ items }: { items: Record<string, unknown>[] }
   );
 }
 
+export function PreviewList({
+  items,
+  renderItem,
+  initialCount = 10,
+}: {
+  items: string[];
+  renderItem: (item: string, index: number) => React.ReactNode;
+  initialCount?: number;
+}) {
+  const [showAll, setShowAll] = useState(false);
+  const displayed = showAll ? items : items.slice(0, initialCount);
+
+  return (
+    <div className="space-y-2">
+      <ul className="space-y-1.5">
+        {displayed.map((item, index) => renderItem(item, index))}
+      </ul>
+      {items.length > initialCount && (
+        <button
+          type="button"
+          onClick={() => setShowAll((v) => !v)}
+          className="text-xs text-accent hover:underline"
+        >
+          {showAll ? "收起" : `展开全部 (${items.length})`}
+        </button>
+      )}
+    </div>
+  );
+}
+
 // ── Collapsible sub-section ──────────────────────────────────
 
 export function CollapsibleSection({ label, children, defaultOpen = false }: { label: string; children: React.ReactNode; defaultOpen?: boolean }) {

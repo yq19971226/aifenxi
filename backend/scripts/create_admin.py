@@ -15,8 +15,9 @@ import sys
 
 
 async def main() -> None:
-    email = os.environ.get("ADMIN_EMAIL") or input("Admin email: ").strip()
+    raw_email = os.environ.get("ADMIN_EMAIL") or input("Admin email: ").strip()
     password = os.environ.get("ADMIN_PASSWORD") or getpass.getpass("Admin password: ")
+    email = raw_email.lower().strip() if raw_email else ""
 
     if not email or not password:
         print("ERROR: email and password are required.")
@@ -35,18 +36,29 @@ async def main() -> None:
 
     async with AsyncSessionLocal() as session:
         async with session.begin():
-            await session.execute(
-                text("""
-                    INSERT INTO users (email, password_hash, role, is_active, is_admin)
-                    VALUES (:email, :hash, 'admin', true, true)
-                    ON CONFLICT (email) DO UPDATE
-                        SET password_hash = EXCLUDED.password_hash,
-                            role = 'admin',
-                            is_admin = true
-                """),
-                {"email": email, "hash": hashed},
+            existing = await session.execute(
+                text("SELECT id FROM users WHERE LOWER(email) = :email"),
+                {"email": email},
             )
-        await session.commit()
+            row = existing.first()
+            if row:
+                await session.execute(
+                    text("""
+                        UPDATE users SET password_hash = :hash, role = 'admin',
+                               is_admin = true, email = :email
+                        WHERE LOWER(email) = :email
+                    """),
+                    {"email": email, "hash": hashed},
+                )
+            else:
+                await session.execute(
+                    text("""
+                        INSERT INTO users (email, password_hash, role, is_active, is_admin)
+                        VALUES (:email, :hash, 'admin', true, true)
+                    """),
+                    {"email": email, "hash": hashed},
+                )
+    # session.begin() 在退出时已提交，无需再 commit
 
     print(f"Admin account ready: {email}")
 

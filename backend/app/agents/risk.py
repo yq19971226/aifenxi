@@ -19,6 +19,8 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 from app.agents.base import AgentReport, BaseAgent
+from app.agents.i18n_prompts import get_system_prompt
+from app.agents.language_detect import check_language_mismatch
 from app.core.llm_client import llm_client
 from app.core.redis import publish_stream
 from app.models.market_data import MarketData
@@ -526,7 +528,9 @@ class RiskAgent(BaseAgent):
         user_prompt = _build_risk_user_prompt(data, alerts)
 
         try:
-            enriched_prompt = await self._enrich_prompt(_SYSTEM_PROMPT, data.symbol)
+            locale = getattr(data, "locale", "zh-CN")
+            risk_prompt = get_system_prompt("risk", locale)
+            enriched_prompt = await self._enrich_prompt(risk_prompt, data.symbol)
             from app.core.model_router import get_model_for_agent
             _model_key = await get_model_for_agent("risk")
             result = await llm_client.call_model(
@@ -566,12 +570,17 @@ class RiskAgent(BaseAgent):
             key_findings.extend(key_risks)
             key_findings.extend(f"建议: {r}" for r in recommendations)
 
+            reasoning_text = result.get("reasoning", "风险评估完成")
+            content_locale, lang_mismatch = check_language_mismatch(
+                reasoning_text, locale,
+            )
+
             return AgentReport(
                 agent_id=self.AGENT_ID,
                 symbol=data.symbol,
                 signal=signal,
                 confidence=confidence,
-                reasoning=result.get("reasoning", "风险评估完成"),
+                reasoning=reasoning_text,
                 key_findings=key_findings,
                 raw_data={
                     "risk_level": risk_level,
@@ -582,6 +591,8 @@ class RiskAgent(BaseAgent):
                     "key_risks": key_risks,
                     "is_fallback": result.get("is_fallback", False),
                 },
+                content_locale=content_locale,
+                language_mismatch=lang_mismatch,
             )
 
         except Exception as exc:

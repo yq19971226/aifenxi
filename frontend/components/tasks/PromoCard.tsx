@@ -266,7 +266,7 @@ export default function PromoCard({ data }: PromoCardProps) {
       <button
         onClick={handleDownload}
         disabled={saving}
-        className="flex items-center justify-center gap-2 w-full rounded-xl bg-white/[0.05] border border-white/[0.08] py-2.5 text-sm font-medium text-zinc-300 hover:bg-white/[0.08] disabled:opacity-40 transition-all"
+        className="flex items-center justify-center gap-2 w-full rounded-lg bg-white/[0.05] border border-white/[0.08] py-2.5 text-sm font-medium text-zinc-300 hover:bg-white/[0.08] disabled:opacity-40 transition-all"
       >
         <Download size={14} />
         {saving ? "生成中..." : "下载推广图"}

@@ -1,0 +1,56 @@
+{
+  "fvgTable": {
+    "empty": "未檢測到 FVG",
+    "summary": {
+      "total": "{count} 個FVG",
+      "bullish": "看漲 {count}",
+      "bearish": "看跌 {count}",
+      "nearest": "最近距離"
+    },
+    "columns": {
+      "direction": "方向",
+      "gapRange": "缺口區間",
+      "size": "大小",
+      "interval": "週期",
+      "distance": "距離",
+      "status": "狀態"
+    },
+    "status": {
+      "mitigated": "已回補",
+      "unmitigated": "未回補"
+    },
+    "actions": {
+      "collapse": "收起",
+      "expandAll": "展開全部 ({count})"
+    }
+  },
+  "orderBlockTable": {
+    "empty": "未檢測到訂單塊",
+    "summary": {
+      "total": "{count} 個訂單塊",
+      "bullish": "看漲 {count}",
+      "bearish": "看跌 {count}"
+    },
+    "columns": {
+      "direction": "方向",
+      "type": "類型",
+      "priceRange": "價格區間",
+      "trigger": "觸發",
+      "whale": "巨鯨"
+    },
+    "whale": {
+      "yes": "是"
+    },
+    "actions": {
+      "collapse": "收起",
+      "expandAll": "展開全部 ({count})"
+    }
+  },
+  "genericTable": {
+    "empty": "未檢測到",
+    "actions": {
+      "collapse": "收起",
+      "expandAll": "展開全部 ({count})"
+    }
+  }
+}

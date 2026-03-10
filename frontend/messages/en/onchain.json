@@ -1,0 +1,31 @@
+{
+  "title": "On-Chain Data",
+  "noAccess": {
+    "message": "Your current plan does not support on-chain data for this symbol",
+    "upgrade": "Upgrade"
+  },
+  "metrics": {
+    "price": "Price",
+    "market_cap": "Market Cap",
+    "nvt": "NVT Ratio",
+    "mvrv": "MVRV",
+    "stock_to_flow": "S2F Model",
+    "exchange_flow": "Exchange Flow"
+  },
+  "badge": {
+    "loading": "Loading...",
+    "available": "Available",
+    "availableTooltip": "Click row to expand and view on-chain data",
+    "locked": "Locked"
+  },
+  "loading": "Loading...",
+  "noData": "No data available",
+  "empty": {
+    "title": "No On-Chain Data",
+    "description": "On-chain snapshot data will be displayed after collection"
+  },
+  "error": {
+    "fetchFailed": "Failed to fetch on-chain data",
+    "upgradeRequired": "Upgrade required to view this data"
+  }
+}

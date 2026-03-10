@@ -10,8 +10,10 @@ async def main():
 
     await set_config_value("partner_feature_enabled", "true", category="partner", description="合伙人系统总开关")
     await set_config_value("task_feature_enabled", "true", category="task", description="任务中心总开关")
+    await set_config_value("push_feature_enabled", "true", category="push", description="推送设置总开关")
     print("✅ partner_feature_enabled = true")
     print("✅ task_feature_enabled = true")
+    print("✅ push_feature_enabled = true")
 
 if __name__ == "__main__":
     asyncio.run(main())

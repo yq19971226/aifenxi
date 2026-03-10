@@ -1,0 +1,148 @@
+{
+  "title": "排行榜",
+  "subtitle": "查看策略表现排名",
+  "header": {
+    "title": "策略排行榜",
+    "subtitle": "基于盈亏比排名 · 数据自功能上线日起统计",
+    "performance": "详细绩效"
+  },
+  "periods": {
+    "7d": "7天",
+    "30d": "30天",
+    "90d": "90天"
+  },
+  "modes": {
+    "all": "全部",
+    "intraday": "日内",
+    "trend": "趋势"
+  },
+  "tabs": {
+    "rankings": "排名",
+    "history": "我的历史"
+  },
+  "rankings": {
+    "title": "策略排名",
+    "empty": "暂无排名数据",
+    "columns": {
+      "rank": "排名",
+      "user": "用户",
+      "pnl": "盈亏",
+      "winRate": "胜率",
+      "trades": "交易数",
+      "period": "周期"
+    },
+    "myRank": "我的排名",
+    "notFound": "未找到排名"
+  },
+  "systemReport": {
+    "title": "系统报告",
+    "totalUsers": "总用户数",
+    "activeUsers": "活跃用户",
+    "totalTrades": "总交易数",
+    "avgPnl": "平均盈亏",
+    "avgWinRate": "平均胜率"
+  },
+  "myStats": {
+    "title": "我的统计",
+    "currentRank": "当前排名",
+    "totalPnl": "总盈亏",
+    "winRate": "胜率",
+    "totalTrades": "总交易数",
+    "bestPeriod": "最佳周期",
+    "recentPerformance": "近期表现"
+  },
+  "history": {
+    "title": "策略历史",
+    "empty": "暂无历史记录",
+    "expand": "查看策略明细",
+    "collapse": "收起策略明细",
+    "columns": {
+      "date": "日期",
+      "symbol": "交易对",
+      "direction": "方向",
+      "entry": "入场",
+      "exit": "出场",
+      "pnl": "盈亏",
+      "status": "状态"
+    },
+    "status": {
+      "win": "盈利",
+      "loss": "亏损",
+      "breakeven": "平局"
+    }
+  },
+  "pagination": {
+    "prev": "上一页",
+    "next": "下一页",
+    "page": "第 {current} 页，共 {total} 页"
+  },
+  "error": {
+    "loadFailed": "排名数据加载失败",
+    "noData": "暂无数据"
+  },
+  "comp": {
+    "systemPerf": "系统绩效",
+    "winRate": "胜率",
+    "profitFactor": "盈亏比",
+    "settled": "已结算",
+    "totalSettled": "总结算",
+    "totalWins": "总盈利",
+    "noRankData": "暂无排行数据",
+    "noRankDataDesc": "完成分析后策略会自动参与排行，数据自功能上线日起统计",
+    "rank": "排名",
+    "trader": "交易员",
+    "winLoss": "胜/负",
+    "avgPnl": "平均盈亏",
+    "me": "(我)",
+    "onBoard": "人上榜",
+    "pageInfo": "第 {page} / {totalPages} 页",
+    "totalInfo": "（共 {total} {label}）",
+    "loading": "加载排行榜..."
+  },
+  "stats": {
+    "myRecord": "我的战绩",
+    "rank": "排名",
+    "notRanked": "未上榜",
+    "published": "已发布",
+    "pending": "待结算",
+    "winLoss": "胜/负",
+    "avgPnl": "平均盈亏",
+    "profitFactor": "盈亏比",
+    "minSettledHint": "至少 3 条已结算策略才可上榜（当前 {count} 条）"
+  },
+  "strategyHistory": {
+    "noRecords": "暂无已发布策略记录",
+    "symbol": "币种",
+    "direction": "方向",
+    "entryPrice": "入场价",
+    "stopLoss": "止损",
+    "status": "状态",
+    "pnl": "盈亏",
+    "mode": "模式",
+    "time": "时间",
+    "long": "做多",
+    "short": "做空",
+    "neutral": "中性",
+    "records": "条记录"
+  },
+  "statusLabels": {
+    "pending": "待结算",
+    "win": "盈利",
+    "loss": "亏损",
+    "expired": "已过期"
+  },
+  "modeLabels": {
+    "intraday": "日内",
+    "trend": "趋势",
+    "scalping": "超短线"
+  },
+  "rules": {
+    "title": "排行榜规则",
+    "rule1": "排名指标为盈亏比（Profit Factor，总利润 ÷ 总亏损绝对值），越高越好",
+    "rule2": "仅日内和趋势模式的策略参与排行，超短线模式不计入",
+    "rule3": "回退策略（数据不足时自动生成）和中性方向策略不计入",
+    "rule4": "同用户同币种去重：日内 24h 内 / 趋势 7d 内仅保留首条",
+    "rule5": "至少 3 条已结算策略才可上榜",
+    "rule6": "匿名编号基于用户 ID 哈希，无法反推身份"
+  }
+}

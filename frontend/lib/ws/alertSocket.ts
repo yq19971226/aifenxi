@@ -24,6 +24,16 @@ export class AlertSocket {
   private shouldReconnect = true;
   private reconnectDelay = 3000;
   private maxReconnectDelay = 30000;
+  private locale = "zh-CN";
+
+  setLocale(locale: string): void {
+    if (this.locale === locale) return;
+    this.locale = locale;
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+    }
+  }
 
   private getUrl(): string | null {
     const token = getAccessToken();
@@ -33,7 +43,7 @@ export class AlertSocket {
     const wsBase = apiBase
       ? apiBase.replace(/^http/, "ws")
       : `ws://${window.location.hostname}:8000`;
-    return `${wsBase}/ws/alerts?token=${token}`;
+    return `${wsBase}/ws/alerts?token=${token}&locale=${this.locale}`;
   }
 
   connect(): void {

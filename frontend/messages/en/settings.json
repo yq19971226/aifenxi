@@ -1,0 +1,501 @@
+{
+  "push": {
+    "title": "Email Notifications",
+    "subtitle": "Manage email notification channels and event subscriptions, customize your notification preferences",
+    "channels": {
+      "title": "Notification Channels",
+      "email": {
+        "label": "Email Push",
+        "description": "Send strategy emails via SendGrid"
+      },
+      "telegram": {
+        "label": "Telegram",
+        "description": "Push to TG groups via Bot"
+      },
+      "websocket": {
+        "label": "WebSocket",
+        "description": "Real-time browser popup notifications"
+      },
+      "testButton": "Send Test Message",
+      "testButtonSending": "Sending..."
+    },
+    "events": {
+      "title": "Event Subscriptions",
+      "strategy_update": {
+        "label": "Strategy Update",
+        "description": "Notify when new strategy is generated or direction changes"
+      },
+      "price_alert": {
+        "label": "Price Alert",
+        "description": "Notify when key support/resistance levels are reached"
+      },
+      "playbook_switch": {
+        "label": "Playbook Switch",
+        "description": "Notify when market maker playbook changes"
+      },
+      "risk_warning": {
+        "label": "Risk Warning",
+        "description": "Notify when on-chain anomaly signals are triggered"
+      },
+      "defense_alert": {
+        "label": "Defense Alert",
+        "description": "Notify when market maker AI simulation/collusion detection triggers medium or higher alerts"
+      },
+      "high_confidence_signal": {
+        "label": "High Confidence Signal",
+        "description": "Push signal direction when analysis confidence exceeds 70%"
+      },
+      "strategy_settlement": {
+        "label": "Strategy Settlement",
+        "description": "Notify when strategy reaches stop-loss/target/timeout settlement"
+      }
+    },
+    "status": {
+      "saving": "Saving...",
+      "saveFailed": "Save failed",
+      "testSent": "Test message sent",
+      "testFailed": "Test failed"
+    }
+  },
+  "membership": {
+    "title": "Membership Center",
+    "currentStatus": {
+      "title": "Current Membership",
+      "levels": {
+        "0": "Free",
+        "1": "Professional",
+        "2": "Flagship"
+      },
+      "expiresAt": "Expires: {date}",
+      "daysLeft": "({count} days left)"
+    },
+    "freeTrial": {
+      "title": "Free Trial",
+      "claim": "Claim Now",
+      "claiming": "Claiming...",
+      "claimed": "available",
+      "used": "Used",
+      "remaining": "{count} intraday analysis trials remaining",
+      "exhausted": "Trial quota exhausted, upgrade to unlock more",
+      "description": "Claim {count} free intraday analysis trials"
+    },
+    "planComparison": {
+      "title": "Plan Benefits Comparison",
+      "feature": "Feature",
+      "free": "Free",
+      "pro": "Pro",
+      "flagship": "Flagship",
+      "features": {
+        "scalping": "Real-time Scalping Analysis",
+        "intraday": "Intraday Analysis",
+        "trend": "Trend Layout Analysis",
+        "onchain": "On-chain Data",
+        "consensus": "Multi-Agent Consensus",
+        "playbook": "Playbook Simulation",
+        "defense": "Adversarial Defense",
+        "backtest": "Strategy Backtest",
+        "push": "Strategy Push",
+        "api": "API Access"
+      },
+      "values": {
+        "locked": "Locked",
+        "delayed": "15min Delay",
+        "realtime": "Real-time",
+        "basic": "Basic",
+        "complete": "Complete",
+        "email": "Email",
+        "emailTelegram": "Email+TG",
+        "days": "{count} days",
+        "timesPerDay": "{count}/day",
+        "freeTrialOnce": "1 free trial"
+      }
+    },
+    "planSelection": {
+      "title": "Select Plan",
+      "duration": {
+        "monthly": "Monthly",
+        "quarterly": "Quarterly",
+        "yearly": "Yearly",
+        "discount": {
+          "quarterly": "10% off",
+          "yearly": "30% off"
+        }
+      },
+      "plans": {
+        "pro": "Professional",
+        "flagship": "Flagship"
+      },
+      "selected": "Selected",
+      "save": "Save {percent}%",
+      "perMonth": "/mo",
+      "perQuarter": "/qtr",
+      "perYear": "/yr"
+    },
+    "payment": {
+      "network": "Payment Network",
+      "createButton": "Pay ${amount}",
+      "creating": "Creating…",
+      "info": {
+        "title": "Payment Information",
+        "amount": "Payment Amount",
+        "address": "Payment Address",
+        "copy": "Copy",
+        "copied": "Copied",
+        "timeRemaining": "Time Remaining",
+        "expired": "Expired"
+      },
+      "status": {
+        "pending": "Pending",
+        "completed": "Completed",
+        "failed": "Failed",
+        "expired": "Expired",
+        "confirming": "Confirming"
+      }
+    },
+    "history": {
+      "title": "Payment History",
+      "columns": {
+        "date": "Date",
+        "plan": "Plan",
+        "amount": "Amount",
+        "network": "Network",
+        "status": "Status"
+      }
+    }
+  },
+  "configs": {
+    "title": "System Configuration",
+    "subtitle": "Manage system parameters and API keys",
+    "permissionDenied": "Access Denied — Only administrators can access system configuration",
+    "batchInit": {
+      "title": "Batch Initialize Default Configuration",
+      "description": "Auto-fill {count} recommended default values (membership limits, risk thresholds, etc.), existing values will not be overwritten",
+      "button": "Batch Initialize",
+      "buttonRunning": "Initializing...",
+      "buttonDone": "✓ Completed",
+      "resultSuccess": "Completed: Created {created} items, skipped {skipped} items (already exist)"
+    },
+    "groups": {
+      "keys": {
+        "icon": "🔑",
+        "title": "API Keys & Access"
+      },
+      "membership": {
+        "icon": "👥",
+        "title": "Membership & Quotas"
+      },
+      "analysis": {
+        "icon": "📊",
+        "title": "Analysis & Signals"
+      },
+      "risk": {
+        "icon": "⚠️",
+        "title": "Risk & Monitoring"
+      },
+      "site": {
+        "icon": "🌐",
+        "title": "Site & Registration"
+      }
+    },
+    "configItem": {
+      "configured": "Configured",
+      "encrypted": "Encrypted",
+      "delete": "Delete this config",
+      "placeholder": "Enter value",
+      "defaultValue": "Default: {value}",
+      "show": "Show",
+      "hide": "Hide"
+    },
+    "groupCard": {
+      "configuredCount": "{current}/{total} configured",
+      "save": "Save",
+      "saving": "Saving...",
+      "saved": "✓ Saved"
+    },
+    "quotaMatrix": {
+      "title": "Quota Matrix Overview",
+      "readonly": "Read-only",
+      "modeHeader": "Analysis Mode",
+      "modes": {
+        "scalping": "Real-time Scalping",
+        "intraday": "Intraday",
+        "trend": "Trend Layout"
+      },
+      "tiers": {
+        "free": "Free",
+        "pro": "Professional",
+        "flagship": "Flagship"
+      },
+      "locked": "Locked",
+      "timesPerDay": "/day",
+      "freeTrial": "Free Trial",
+      "times": "times"
+    },
+    "coinglassTier": {
+      "title": "CoinGlass Plan Capabilities",
+      "rateLimit": "Rate Limit",
+      "interval": "Interval",
+      "features": {
+        "oi": "OI Open Interest",
+        "fundingRate": "Funding Rate",
+        "liquidation": "Liquidation Data",
+        "netPosition": "Net Position",
+        "longShortRatio": "Long/Short Ratio",
+        "heatmapModel1": "Heatmap Model1",
+        "cvd": "CVD / Netflow",
+        "orderbook": "Aggregated Orderbook / Large Orders",
+        "options": "Options (MaxPain/Info)",
+        "heatmapModel23": "Heatmap Model2/3",
+        "websocket": "WebSocket Real-time Push"
+      }
+    },
+    "deleteConfirm": {
+      "message": "Confirm deletion of \"{name}\"? You will need to reconfigure after deletion.",
+      "cancel": "Cancel",
+      "confirm": "Confirm Delete",
+      "deleting": "Deleting..."
+    },
+    "auditLog": {
+      "title": "Audit Log",
+      "columns": {
+        "time": "Time",
+        "action": "Action",
+        "configKey": "Config Key",
+        "oldValue": "Old Value",
+        "newValue": "New Value"
+      },
+      "actions": {
+        "create": "Create",
+        "update": "Update",
+        "delete": "Delete"
+      },
+      "pagination": {
+        "page": "Page {current} / {total} (Total {count})",
+        "prev": "Previous",
+        "next": "Next"
+      }
+    },
+    "status": {
+      "loading": "Loading...",
+      "loadFailed": "Failed to load configuration",
+      "saveFailed": "Save failed",
+      "deleteFailed": "Delete failed"
+    },
+    "presets": {
+      "dmx_api_key": {
+        "label": "AI Analysis API Key",
+        "help": "Used to call AI models for market data analysis"
+      },
+      "dmx_base_url": {
+        "label": "AI Service URL",
+        "help": "AI analysis service endpoint URL"
+      },
+      "glassnode_api_key": {
+        "label": "On-chain Data API Key",
+        "help": "GlassNode on-chain metrics (MVRV/NVT/Active Addresses, etc.)"
+      },
+      "coingecko_api_key": {
+        "label": "Fundamental Data API Key",
+        "help": "CoinGecko market cap/community/developer/trend data"
+      },
+      "coinglass_api_key": {
+        "label": "CoinGlass API Key",
+        "help": "CoinGlass derivatives data API Key"
+      },
+      "alphanode_api_key": {
+        "label": "CoinGlass Proxy API Key",
+        "help": "AlphaNode proxy channel access key (CoinGlass REST proxy)"
+      },
+      "cryptoquant_api_key": {
+        "label": "CryptoQuant Primary API Key",
+        "help": "CryptoQuant on-chain primary data source API Key"
+      },
+      "fred_api_key": {
+        "label": "FRED Primary API Key",
+        "help": "FRED macro primary data source API Key"
+      },
+      "coinglass_tier": {
+        "label": "CoinGlass Plan",
+        "help": "Current subscription tier, determines available endpoints, rate limits, and collection frequency",
+        "options": {
+          "hobbyist": "Hobbyist — 30/min · 5min interval · Basic OI/FR",
+          "startup": "Startup — 80/min · 2min interval · +Net Position/Whale Ratio",
+          "standard": "Standard — 300/min · 1min interval · +CVD/Orderbook/Options/WS",
+          "professional": "Professional — 1200/min · 30s interval · All Endpoints"
+        }
+      },
+      "nowpayments_api_key": {
+        "label": "Payment Gateway API Key",
+        "help": "NowPayments USDT payment"
+      },
+      "nowpayments_ipn_secret": {
+        "label": "Payment Callback Secret",
+        "help": "Payment notification signature verification"
+      },
+      "nowpayments_ipn_callback_url": {
+        "label": "Payment Callback URL",
+        "help": "NowPayments callback full URL (must be publicly accessible)"
+      },
+      "telegram_bot_token": {
+        "label": "Telegram Bot Token",
+        "help": "TG push notification bot token"
+      },
+      "resend_api_key": {
+        "label": "Resend API Key",
+        "help": "Resend email service API Key (takes priority over SendGrid)"
+      },
+      "sendgrid_api_key": {
+        "label": "SendGrid API Key",
+        "help": "SendGrid email push service (fallback)"
+      },
+      "sentry_dsn_backend": {
+        "label": "Error Monitoring DSN",
+        "help": "Sentry error tracking service address"
+      },
+      "plan_price_pro": {
+        "label": "Pro Monthly Price",
+        "help": "Professional plan monthly price (USD)"
+      },
+      "plan_price_flagship": {
+        "label": "Flagship Monthly Price",
+        "help": "Flagship plan monthly price (USD)"
+      },
+      "plan_discount_quarterly": {
+        "label": "Quarterly Discount",
+        "help": "Quarterly subscription discount rate (0.9 = 10% off)"
+      },
+      "plan_discount_yearly": {
+        "label": "Yearly Discount",
+        "help": "Yearly subscription discount rate (0.7 = 30% off)"
+      },
+      "free_trial_intraday_count": {
+        "label": "Free Trial Count",
+        "help": "Number of intraday analysis trials for free users (0=disabled)"
+      },
+      "analysis_daily_limit_free_scalping": {
+        "label": "Free-Scalping",
+        "help": "Daily real-time scalping analysis limit for free users"
+      },
+      "analysis_daily_limit_pro_scalping": {
+        "label": "Pro-Scalping",
+        "help": "Daily real-time scalping analysis limit for pro users"
+      },
+      "analysis_daily_limit_flagship_scalping": {
+        "label": "Flagship-Scalping",
+        "help": "Daily real-time scalping analysis limit for flagship users"
+      },
+      "analysis_daily_limit_pro_intraday": {
+        "label": "Pro-Intraday",
+        "help": "Daily intraday analysis limit for pro users"
+      },
+      "analysis_daily_limit_flagship_intraday": {
+        "label": "Flagship-Intraday",
+        "help": "Daily intraday analysis limit for flagship users"
+      },
+      "analysis_daily_limit_flagship_trend": {
+        "label": "Flagship-Trend",
+        "help": "Daily trend layout analysis limit for flagship users"
+      },
+      "query_limit_free": {
+        "label": "Free Query Limit",
+        "help": "Maximum daily queries for free users"
+      },
+      "perf_days_free": {
+        "label": "Free Performance Days",
+        "help": "Number of recent days free users can view performance"
+      },
+      "new_user_bonus_credits": {
+        "label": "New User Bonus Credits",
+        "help": "Analysis trial credits given to newly registered users"
+      },
+      "new_user_bonus_enabled": {
+        "label": "Bonus Enabled",
+        "help": "Whether to enable new user bonus (true/false)"
+      },
+      "playbook_sim_min_level": {
+        "label": "Playbook Min Level",
+        "help": "Minimum membership level (0=Free, 1=Pro, 2=Flagship)"
+      },
+      "backtest_free_days": {
+        "label": "Free Backtest Days",
+        "help": "Number of backtest data days free users can view"
+      },
+      "consensus_signal_threshold": {
+        "label": "Signal Threshold",
+        "help": "Weighted score must exceed this value to determine bullish/bearish (0.1~0.8)"
+      },
+      "consensus_min_agreement": {
+        "label": "Min Agreement Count",
+        "help": "Minimum number of models that must agree on direction (1~4)"
+      },
+      "signal_push_threshold": {
+        "label": "High Confidence Push Threshold",
+        "help": "Push signal when analysis confidence exceeds this threshold (0.5~0.9)"
+      },
+      "risk_threshold_exchange_inflow_btc": {
+        "label": "Exchange Inflow Alert",
+        "help": "Trigger alert when BTC inflow to exchanges exceeds this value"
+      },
+      "risk_threshold_whale_transfer_usd": {
+        "label": "Whale Transfer Alert",
+        "help": "Trigger alert when large transfer exceeds this value"
+      },
+      "risk_threshold_mvrv_high": {
+        "label": "MVRV High Alert",
+        "help": "MVRV exceeding this value indicates market overheating"
+      },
+      "risk_threshold_mvrv_low": {
+        "label": "MVRV Low Alert",
+        "help": "MVRV below this value indicates market undervaluation"
+      },
+      "risk_threshold_fear_greed_panic": {
+        "label": "Panic Index Alert",
+        "help": "Trigger panic alert when fear & greed index falls below this value"
+      },
+      "risk_threshold_fear_greed_greed": {
+        "label": "Greed Index Alert",
+        "help": "Trigger greed alert when fear & greed index exceeds this value"
+      },
+      "risk_threshold_funding_rate": {
+        "label": "Funding Rate Alert",
+        "help": "Trigger alert when funding rate absolute value exceeds this value"
+      },
+      "risk_threshold_liquidation_1h": {
+        "label": "Liquidation Volume Alert",
+        "help": "Trigger alert when 1-hour liquidation volume exceeds this value"
+      },
+      "risk_threshold_long_short_imbalance": {
+        "label": "Long/Short Imbalance Alert",
+        "help": "Trigger alert when long/short ratio deviation exceeds this value"
+      },
+      "sentry_traces_sample_rate": {
+        "label": "Monitoring Sample Rate",
+        "help": "Performance monitoring sampling ratio (0-1)"
+      },
+      "site_brand_name": {
+        "label": "Brand Name",
+        "help": "Used for promotional copy, invitation pages, etc."
+      },
+      "site_brand_url": {
+        "label": "Brand Website Domain",
+        "help": "Used to construct invitation links, e.g., https://app.example.com"
+      },
+      "register_feature_enabled": {
+        "label": "Allow New User Registration",
+        "help": "When disabled, the public sign-up entry is hidden and both registration-code and registration APIs are blocked (true/false)"
+      },
+      "register_referral_required": {
+        "label": "Require Referral Code",
+        "help": "When enabled, users must provide a valid referral code to register (true/false)"
+      },
+      "partner_commission_rate": {
+        "label": "Partner Commission Rate",
+        "help": "Partner referral order commission rate (0.10 = 10%)"
+      },
+      "partner_min_withdrawal": {
+        "label": "Min Withdrawal Amount",
+        "help": "Partner minimum withdrawal amount"
+      }
+    }
+  }
+}

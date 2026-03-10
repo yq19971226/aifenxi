@@ -1,0 +1,113 @@
+{
+  "title": "合夥人中心",
+  "subtitle": "邀請好友，共享收益",
+  "tabs": {
+    "overview": "概覽",
+    "invitations": "邀請記錄",
+    "commissions": "佣金明細",
+    "wallet": "錢包提現"
+  },
+  "levels": {
+    "0": "免費",
+    "1": "專業",
+    "2": "旗艦"
+  },
+  "overview": {
+    "totalInvitations": "累計邀請",
+    "paidUsers": "付費用戶",
+    "totalCommission": "累計佣金",
+    "availableBalance": "可提現",
+    "referralCode": "我的邀請碼",
+    "copyLink": "複製連結",
+    "copyCode": "複製邀請碼",
+    "linkCopied": "已複製",
+    "commissionRate": "當前分成比例",
+    "summaryInvited": "已邀請 {total} 人，其中 {paid} 人已付費",
+    "frozen": "凍結中 ${amount}（提現審核中）"
+  },
+  "invitations": {
+    "title": "邀請記錄",
+    "empty": "暫無邀請記錄",
+    "columns": {
+      "user": "用戶",
+      "level": "等級",
+      "registeredAt": "註冊時間",
+      "status": "狀態"
+    },
+    "status": {
+      "active": "活躍",
+      "inactive": "不活躍"
+    }
+  },
+  "commissions": {
+    "title": "佣金明細",
+    "empty": "暫無佣金記錄",
+    "columns": {
+      "fromUser": "來源用戶",
+      "amount": "金額",
+      "rate": "比例",
+      "createdAt": "時間",
+      "status": "狀態"
+    },
+    "status": {
+      "pending": "待結算",
+      "settled": "已結算"
+    }
+  },
+  "wallet": {
+    "title": "TRC20 錢包地址",
+    "bound": "已綁定",
+    "unbound": "未綁定",
+    "addressPlaceholder": "T 開頭的 TRC20 地址",
+    "bind": "綁定",
+    "change": "修改",
+    "withdrawButton": "申請提現 ${amount}",
+    "withdrawing": "處理中...",
+    "history": {
+      "title": "提現記錄",
+      "empty": "暫無提現記錄",
+      "columns": {
+        "amount": "金額",
+        "address": "地址",
+        "status": "狀態",
+        "createdAt": "申請時間",
+        "processedAt": "處理時間"
+      },
+      "status": {
+        "pending": "審核中",
+        "completed": "已完成",
+        "rejected": "已駁回"
+      }
+    }
+  },
+  "error": {
+    "loadFailed": "數據加載失敗",
+    "copyFailed": "複製失敗",
+    "withdrawFailed": "提現失敗",
+    "invalidAddress": "請輸入有效的地址",
+    "insufficientBalance": "餘額不足",
+    "belowMinimum": "低於最低提現金額"
+  },
+  "admin": {
+    "title": "合夥人統計",
+    "overview": {
+      "totalReferrals": "總邀請數",
+      "activePartners": "活躍合夥人",
+      "totalCommission": "累計佣金",
+      "pendingWithdrawals": "待審提現",
+      "totalWithdrawn": "已提現總額"
+    },
+    "list": {
+      "title": "合夥人列表",
+      "loading": "加載中...",
+      "empty": "暫無活躍合夥人",
+      "columns": {
+        "email": "郵箱",
+        "referralCode": "邀請碼",
+        "invitationCount": "邀請數",
+        "totalCommission": "累計佣金",
+        "registeredAt": "註冊時間"
+      }
+    }
+  }
+}

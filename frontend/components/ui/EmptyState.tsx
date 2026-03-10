@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Inbox,
   FileSearch,
@@ -31,7 +32,7 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16">
-      <div className="mb-4 rounded-2xl bg-white/[0.04] p-4">
+      <div className="mb-4 rounded-lg bg-white/[0.04] p-4">
         <Icon size={32} className="text-zinc-500" strokeWidth={1.5} />
       </div>
       <p className="text-sm text-zinc-400">{title}</p>
@@ -47,11 +48,12 @@ export function EmptyState({
 /* ── Preset empty states ────────────────────────────────── */
 
 export function EmptyOnchain() {
+  const t = useTranslations('onchain');
   return (
     <EmptyState
       icon={LinkIcon}
-      title="暂无链上数据"
-      description="链上快照数据将在采集后自动展示"
+      title={t('empty.title')}
+      description={t('empty.description')}
     />
   );
 }

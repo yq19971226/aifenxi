@@ -13,6 +13,9 @@ from app.core.deps import UserInfo, get_current_user, require_admin
 from app.core.sql_compat import cast_int, count_filter, avg_filter
 from starlette.responses import StreamingResponse
 
+from app.services.playbook_prediction_maintenance import (
+    backfill_playbook_prediction_market_structures,
+)
 from app.services.playbook_sim_service import simulate, simulate_stream, save_prediction
 from app.services.subscription import get_membership
 
@@ -20,6 +23,73 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/playbook-sim", tags=["playbook-sim"])
 admin_router = APIRouter(prefix="/api/admin/playbook-sim", tags=["admin-playbook-sim"])
+
+_PLAYBOOK_LIFECYCLE_COLUMN_DEFS = {
+    "signal": ("VARCHAR(20) DEFAULT 'neutral'", "TEXT DEFAULT 'neutral'"),
+    "market_structure_type": ("VARCHAR(64) DEFAULT NULL", "TEXT DEFAULT NULL"),
+    "snapshot_price": ("FLOAT DEFAULT NULL", "REAL DEFAULT NULL"),
+    "stage_entry_price": ("FLOAT DEFAULT NULL", "REAL DEFAULT NULL"),
+    "stage_entered_at": ("TIMESTAMP DEFAULT NULL", "TIMESTAMP DEFAULT NULL"),
+    "failure_reason": ("TEXT DEFAULT NULL", "TEXT DEFAULT NULL"),
+    "risk_flag": ("BOOLEAN DEFAULT FALSE", "INTEGER DEFAULT 0"),
+    "risk_note": ("TEXT DEFAULT NULL", "TEXT DEFAULT NULL"),
+    "dominant_factors_json": ("TEXT DEFAULT NULL", "TEXT DEFAULT NULL"),
+    "ranking_reason_summary": ("TEXT DEFAULT NULL", "TEXT DEFAULT NULL"),
+    "decision_sentence": ("TEXT DEFAULT NULL", "TEXT DEFAULT NULL"),
+    "inferred_market_structures_json": ("TEXT DEFAULT NULL", "TEXT DEFAULT NULL"),
+    "matched_confidence_boosters_json": ("TEXT DEFAULT NULL", "TEXT DEFAULT NULL"),
+    "matched_invalidation_signals_json": ("TEXT DEFAULT NULL", "TEXT DEFAULT NULL"),
+    "structure_explanation": ("TEXT DEFAULT NULL", "TEXT DEFAULT NULL"),
+}
+
+
+async def ensure_playbook_prediction_columns(session: AsyncSession) -> set[str]:
+    """兼容旧 SQLite/PG 开发库：补齐 playbook_predictions 生命周期字段。"""
+    dialect = session.bind.dialect.name if session.bind is not None else ""
+    if dialect == "sqlite":
+        result = await session.execute(text("PRAGMA table_info(playbook_predictions)"))
+        existing_columns = {row[1] for row in result.fetchall()}
+        for column_name, (_, sqlite_type) in _PLAYBOOK_LIFECYCLE_COLUMN_DEFS.items():
+            if column_name not in existing_columns:
+                await session.execute(
+                    text(f"ALTER TABLE playbook_predictions ADD COLUMN {column_name} {sqlite_type}")
+                )
+                existing_columns.add(column_name)
+        return existing_columns
+
+    result = await session.execute(
+        text(
+            """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = current_schema()
+              AND table_name = 'playbook_predictions'
+            """
+        )
+    )
+    existing_columns = {row[0] for row in result.fetchall()}
+    for column_name, (pg_type, _) in _PLAYBOOK_LIFECYCLE_COLUMN_DEFS.items():
+        if column_name not in existing_columns:
+            await session.execute(
+                text(f"ALTER TABLE playbook_predictions ADD COLUMN IF NOT EXISTS {column_name} {pg_type}")
+            )
+            existing_columns.add(column_name)
+    return existing_columns
+
+
+def _col_sql(name: str, existing: set[str]) -> str:
+    """根据列是否存在返回列名或 NULL AS 列名，避免在每个路由里重复拼接。"""
+    return name if name in existing else f"NULL AS {name}"
+
+
+def _safe_float(v: object, default: float = 0.0) -> float:
+    """安全 float 转换，脏数据不崩。"""
+    if v is None:
+        return default
+    try:
+        return float(v)
+    except (ValueError, TypeError):
+        return default
 
 
 @router.get("/simulate/{symbol}")
@@ -39,6 +109,8 @@ async def playbook_simulate(
             user_level = 0
 
     try:
+        await ensure_playbook_prediction_columns(session)
+        await backfill_playbook_prediction_market_structures(session)
         result = await simulate(symbol, user_level=user_level)
 
         # 持久化（D5）
@@ -125,10 +197,14 @@ async def plaza_feed(
     where = " AND ".join(conditions)
 
     try:
-        # 获取总数
+        existing_columns = await ensure_playbook_prediction_columns(session)
+        await backfill_playbook_prediction_market_structures(session)
+        c = lambda name: _col_sql(name, existing_columns)
+
+        count_params = {k: v for k, v in params.items() if k not in ("limit", "offset")}
         count_result = await session.execute(
             text(f"SELECT {cast_int('COUNT(*)')} AS cnt FROM playbook_predictions WHERE {where}"),
-            params,
+            count_params,
         )
         total = count_result.scalar() or 0
 
@@ -137,8 +213,15 @@ async def plaza_feed(
             text(f"""
                 SELECT id, symbol, playbook_name, match_pct, current_stage_idx,
                        stages_json, status, final_accuracy, verified_stages,
-                       created_at, signal, snapshot_price, stage_entry_price,
-                       failure_reason, risk_flag, risk_note
+                       created_at, {c("signal")}, {c("market_structure_type")},
+                       {c("snapshot_price")}, {c("stage_entry_price")},
+                       {c("failure_reason")}, {c("risk_flag")}, {c("risk_note")},
+                       {c("dominant_factors_json")}, {c("ranking_reason_summary")},
+                       {c("decision_sentence")},
+                       {c("inferred_market_structures_json")},
+                       {c("matched_confidence_boosters_json")},
+                       {c("matched_invalidation_signals_json")},
+                       {c("structure_explanation")}
                 FROM playbook_predictions
                 WHERE {where}
                 ORDER BY created_at DESC
@@ -154,7 +237,7 @@ async def plaza_feed(
                 "id": str(row["id"]),
                 "symbol": row["symbol"],
                 "playbook_name": row["playbook_name"],
-                "match_pct": float(row["match_pct"]) if row["match_pct"] else 0,
+                "match_pct": _safe_float(row["match_pct"]),
                 "status": row["status"],
                 "created_at": (row["created_at"].isoformat() if hasattr(row["created_at"], "isoformat") else str(row["created_at"])) if row["created_at"] else None,
             }
@@ -163,18 +246,54 @@ async def plaza_feed(
             if user_level >= 1:
                 import json as _json
                 item["current_stage_idx"] = row["current_stage_idx"]
-                item["final_accuracy"] = float(row["final_accuracy"]) if row["final_accuracy"] else None
+                item["final_accuracy"] = _safe_float(row["final_accuracy"]) if row["final_accuracy"] else None
                 item["verified_stages"] = row["verified_stages"]
                 item["signal"] = row["signal"] or "neutral"
-                item["snapshot_price"] = float(row["snapshot_price"]) if row["snapshot_price"] else None
-                item["stage_entry_price"] = float(row["stage_entry_price"]) if row["stage_entry_price"] else None
+                item["market_structure_type"] = row["market_structure_type"]
+                item["snapshot_price"] = _safe_float(row["snapshot_price"]) if row["snapshot_price"] else None
+                item["stage_entry_price"] = _safe_float(row["stage_entry_price"]) if row["stage_entry_price"] else None
                 item["failure_reason"] = row["failure_reason"]
                 item["risk_flag"] = bool(row["risk_flag"]) if row["risk_flag"] is not None else False
                 item["risk_note"] = row["risk_note"]
+                item["ranking_reason_summary"] = row["ranking_reason_summary"]
+                item["decision_sentence"] = row["decision_sentence"]
+                item["structure_explanation"] = row["structure_explanation"]
                 try:
                     item["stages"] = _json.loads(row["stages_json"]) if row["stages_json"] else []
                 except Exception:
                     item["stages"] = []
+                try:
+                    item["dominant_factors"] = (
+                        _json.loads(row["dominant_factors_json"])
+                        if row["dominant_factors_json"]
+                        else []
+                    )
+                except Exception:
+                    item["dominant_factors"] = []
+                try:
+                    item["inferred_market_structures"] = (
+                        _json.loads(row["inferred_market_structures_json"])
+                        if row["inferred_market_structures_json"]
+                        else []
+                    )
+                except Exception:
+                    item["inferred_market_structures"] = []
+                try:
+                    item["matched_confidence_boosters"] = (
+                        _json.loads(row["matched_confidence_boosters_json"])
+                        if row["matched_confidence_boosters_json"]
+                        else []
+                    )
+                except Exception:
+                    item["matched_confidence_boosters"] = []
+                try:
+                    item["matched_invalidation_signals"] = (
+                        _json.loads(row["matched_invalidation_signals_json"])
+                        if row["matched_invalidation_signals_json"]
+                        else []
+                    )
+                except Exception:
+                    item["matched_invalidation_signals"] = []
             else:
                 item["current_stage_idx"] = None
                 item["final_accuracy"] = None
@@ -233,7 +352,7 @@ async def plaza_stats(
             "total_predictions": row["total_predictions"] if row else 0,
             "active_count": row["active_count"] if row else 0,
             "completed_count": row["completed_count"] if row else 0,
-            "avg_accuracy": round(float(row["avg_accuracy"]), 4) if row else 0,
+            "avg_accuracy": round(_safe_float(row["avg_accuracy"]), 4) if row else 0,
             "top_playbooks": [
                 {
                     "name": r["playbook_name"],
@@ -285,6 +404,10 @@ async def admin_list_predictions(
     where = " AND ".join(conditions)
 
     try:
+        existing_columns = await ensure_playbook_prediction_columns(session)
+        await backfill_playbook_prediction_market_structures(session)
+        c = lambda name: _col_sql(name, existing_columns)
+
         count_result = await session.execute(
             text(f"SELECT {cast_int('COUNT(*)')} AS cnt FROM playbook_predictions WHERE {where}"),
             params,
@@ -295,7 +418,13 @@ async def admin_list_predictions(
             text(f"""
                 SELECT id, symbol, playbook_name, match_pct, current_stage_idx,
                        stages_json, status, final_accuracy, verified_stages,
-                       published, created_at
+                       published, created_at, {c("market_structure_type")},
+                       {c("dominant_factors_json")}, {c("ranking_reason_summary")},
+                       {c("decision_sentence")},
+                       {c("inferred_market_structures_json")},
+                       {c("matched_confidence_boosters_json")},
+                       {c("matched_invalidation_signals_json")},
+                       {c("structure_explanation")}
                 FROM playbook_predictions
                 WHERE {where}
                 ORDER BY created_at DESC
@@ -308,17 +437,58 @@ async def admin_list_predictions(
         import json as _json
         items = []
         for row in rows:
+            try:
+                dominant_factors = _json.loads(row["dominant_factors_json"]) if row["dominant_factors_json"] else []
+            except Exception:
+                dominant_factors = []
+            try:
+                inferred_market_structures = (
+                    _json.loads(row["inferred_market_structures_json"])
+                    if row["inferred_market_structures_json"]
+                    else []
+                )
+            except Exception:
+                inferred_market_structures = []
+            try:
+                matched_confidence_boosters = (
+                    _json.loads(row["matched_confidence_boosters_json"])
+                    if row["matched_confidence_boosters_json"]
+                    else []
+                )
+            except Exception:
+                matched_confidence_boosters = []
+            try:
+                matched_invalidation_signals = (
+                    _json.loads(row["matched_invalidation_signals_json"])
+                    if row["matched_invalidation_signals_json"]
+                    else []
+                )
+            except Exception:
+                matched_invalidation_signals = []
+            try:
+                stages = _json.loads(row["stages_json"]) if row["stages_json"] else []
+            except Exception:
+                stages = []
+
             items.append({
                 "id": str(row["id"]),
                 "symbol": row["symbol"],
                 "playbook_name": row["playbook_name"],
-                "match_pct": float(row["match_pct"]) if row["match_pct"] else 0,
+                "match_pct": _safe_float(row["match_pct"]),
                 "current_stage_idx": row["current_stage_idx"],
                 "status": row["status"],
                 "published": row["published"],
-                "final_accuracy": float(row["final_accuracy"]) if row["final_accuracy"] else None,
+                "final_accuracy": _safe_float(row["final_accuracy"]) if row["final_accuracy"] else None,
                 "verified_stages": row["verified_stages"],
-                "stages": _json.loads(row["stages_json"]) if row["stages_json"] else [],
+                "market_structure_type": row["market_structure_type"],
+                "ranking_reason_summary": row["ranking_reason_summary"],
+                "decision_sentence": row["decision_sentence"],
+                "dominant_factors": dominant_factors,
+                "inferred_market_structures": inferred_market_structures,
+                "matched_confidence_boosters": matched_confidence_boosters,
+                "matched_invalidation_signals": matched_invalidation_signals,
+                "structure_explanation": row["structure_explanation"],
+                "stages": stages,
                 "created_at": (row["created_at"].isoformat() if hasattr(row["created_at"], "isoformat") else str(row["created_at"])) if row["created_at"] else None,
             })
 
@@ -368,7 +538,7 @@ async def admin_toggle_publish(
             "id": str(row["id"]),
             "symbol": row["symbol"],
             "playbook_name": row["playbook_name"],
-            "match_pct": float(row["match_pct"] or 0),
+            "match_pct": _safe_float(row["match_pct"]),
             "published": body.published,
             "message": f"已{action}",
         }

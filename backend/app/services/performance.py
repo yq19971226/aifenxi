@@ -41,7 +41,12 @@ class PerformanceTracker:
 
     # ── 快照创建 ──────────────────────────────────────────
 
-    async def create_snapshot(self, strategy_id: UUID) -> UUID:
+    async def create_snapshot(
+        self,
+        strategy_id: UUID,
+        user_id: UUID | None = None,
+        analysis_mode: str | None = None,
+    ) -> UUID:
         """策略生成时创建快照，记录完整市场状态。"""
         strategy = await self._get_strategy(strategy_id)
         if strategy is None:
@@ -58,6 +63,8 @@ class PerformanceTracker:
             targets=strategy["targets"],
             confidence=float(strategy["confidence"]),
             price_at_generation=current_price,
+            user_id=user_id,
+            analysis_mode=analysis_mode,
         )
         return await self._save_snapshot(snapshot)
 
@@ -103,8 +110,10 @@ class PerformanceTracker:
                 snapshot_id, snapshot, current_price, SettlementStatus.HIT_TARGET
             )
 
-        # 72h 超时结算
-        if elapsed_hours >= 72:
+        # 按 analysis_mode 动态超时：intraday=24h, trend=72h, 默认72h
+        mode = snapshot.get("analysis_mode") or ""
+        timeout_hours = 24 if mode == "intraday" else 72
+        if elapsed_hours >= timeout_hours:
             return await self._settle(
                 snapshot_id, snapshot, current_price, SettlementStatus.TIMEOUT
             )
@@ -437,7 +446,11 @@ class PerformanceTracker:
         for row in rows:
             cumulative_pnl += float(row["daily_pnl"])
             trend_data.append({
-                "date": row["date"].isoformat(),
+                "date": (
+                    row["date"].isoformat()
+                    if hasattr(row["date"], "isoformat")
+                    else str(row["date"])
+                ),
                 "win_rate": round(float(row["win_rate"]), 4),
                 "cumulative_pnl": round(cumulative_pnl, 4),
             })
@@ -504,10 +517,12 @@ class PerformanceTracker:
                 f"""
                     INSERT INTO strategy_snapshots
                         (strategy_id, symbol, direction, entry_low, entry_high,
-                         stop_loss, targets, confidence, price_at_generation)
+                         stop_loss, targets, confidence, price_at_generation,
+                         user_id, analysis_mode)
                     VALUES
                         (:strategy_id, :symbol, :direction, :entry_low, :entry_high,
-                         :stop_loss, {jsonb_cast(':targets')}, :confidence, :price_at_generation)
+                         :stop_loss, {jsonb_cast(':targets')}, :confidence, :price_at_generation,
+                         :user_id, :analysis_mode)
                     RETURNING id
                 """,
                 {
@@ -520,6 +535,8 @@ class PerformanceTracker:
                     "targets": json.dumps(snapshot.targets),
                     "confidence": snapshot.confidence,
                     "price_at_generation": snapshot.price_at_generation,
+                    "user_id": str(snapshot.user_id) if snapshot.user_id else None,
+                    "analysis_mode": snapshot.analysis_mode,
                 },
                 table="strategy_snapshots",
             )
@@ -544,7 +561,8 @@ class PerformanceTracker:
                     SELECT id, strategy_id, symbol, direction,
                            entry_low, entry_high, stop_loss, targets,
                            confidence, price_at_generation, status,
-                           settlement_price, settlement_time, pnl_pct, created_at
+                           settlement_price, settlement_time, pnl_pct,
+                           user_id, analysis_mode, published, created_at
                     FROM strategy_snapshots
                     WHERE id = :snapshot_id
                 """),

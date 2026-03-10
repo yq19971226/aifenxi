@@ -34,7 +34,7 @@ export function ConfidenceRing({ value, color }: { value: number; color: string 
 
 // ── Strategy range bar ───────────────────────────────────────
 
-function StrategyRangeBar({
+export function StrategyRangeBar({
   stopLoss, entryLow, entryHigh, targets, direction,
 }: {
   stopLoss: number; entryLow: number; entryHigh: number; targets: number[]; direction: string;
@@ -96,7 +96,7 @@ function StrategyRangeBar({
   );
 }
 
-// ── Strategy card ────────────────────────────────────────────
+// ── Strategy card (standalone, currently unused — kept for reuse in leaderboard/history) ──
 
 export function StrategyCard({ strategy }: { strategy: StrategyData }) {
   const dir = strategy.direction;
@@ -153,19 +153,19 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
         {/* Price grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {/* 入场区间 */}
-          {(entryLow || entryHigh) && (
+          {(entryLow != null || entryHigh != null) && (
             <div className="rounded-lg bg-white/[0.03] px-3 py-2">
               <p className="text-xs text-zinc-500 mb-1">入场区间</p>
               <p className="text-xs md:text-sm font-mono font-semibold text-zinc-200">
-                {entryLow ? formatPrice(entryLow) : "\u2014"}
+                {entryLow != null ? formatPrice(entryLow) : "\u2014"}
               </p>
               <p className="text-xs md:text-sm font-mono font-semibold text-zinc-200">
-                ~ {entryHigh ? formatPrice(entryHigh) : "\u2014"}
+                ~ {entryHigh != null ? formatPrice(entryHigh) : "\u2014"}
               </p>
             </div>
           )}
           {/* 止损 */}
-          {stopLoss && (
+          {stopLoss != null && (
             <div className="rounded-lg bg-red-500/[0.04] px-3 py-2">
               <p className="text-xs text-red-400/70 mb-1">止损</p>
               <p className="text-xs md:text-sm font-mono font-semibold text-red-400">{formatPrice(stopLoss)}</p>
@@ -197,7 +197,7 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
         )}
 
         {/* Visual range bar */}
-        {stopLoss && entryLow && entryHigh && (
+        {stopLoss != null && entryLow != null && entryHigh != null && (
           <StrategyRangeBar
             stopLoss={stopLoss}
             entryLow={entryLow}

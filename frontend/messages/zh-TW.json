@@ -1,0 +1,207 @@
+{
+  "common": {
+    "buttons": {
+      "confirm": "確認",
+      "cancel": "取消",
+      "save": "儲存",
+      "delete": "刪除",
+      "edit": "編輯",
+      "add": "新增",
+      "search": "搜尋",
+      "filter": "篩選",
+      "export": "匯出",
+      "import": "匯入",
+      "refresh": "重新整理",
+      "close": "關閉",
+      "submit": "提交",
+      "reset": "重設",
+      "back": "返回",
+      "next": "下一步",
+      "previous": "上一步",
+      "finish": "完成",
+      "loading": "載入中...",
+      "viewDetails": "檢視詳情",
+      "download": "下載"
+    },
+    "labels": {
+      "status": "狀態",
+      "type": "類型",
+      "time": "時間",
+      "date": "日期",
+      "name": "名稱",
+      "description": "描述",
+      "action": "操作",
+      "total": "總計",
+      "count": "數量",
+      "price": "價格",
+      "volume": "成交量",
+      "change": "漲跌幅",
+      "high": "最高",
+      "low": "最低",
+      "open": "開盤",
+      "close": "收盤",
+      "symbol": "交易對",
+      "value": "數值",
+      "percentage": "百分比",
+      "enabled": "啟用",
+      "disabled": "停用",
+      "active": "活躍",
+      "inactive": "未活躍"
+    },
+    "messages": {
+      "success": "操作成功",
+      "error": "操作失敗",
+      "loading": "正在載入...",
+      "noData": "暫無資料",
+      "confirmDelete": "確認刪除此項？",
+      "deleteSuccess": "刪除成功",
+      "saveSuccess": "儲存成功",
+      "updateSuccess": "更新成功",
+      "createSuccess": "建立成功",
+      "networkError": "網路錯誤，請稍後重試",
+      "unauthorized": "未授權，請先登入",
+      "forbidden": "無權限存取",
+      "notFound": "未找到相關內容",
+      "serverError": "伺服器錯誤，請稍後重試"
+    },
+    "time": {
+      "now": "剛剛",
+      "minutesAgo": "{count} 分鐘前",
+      "hoursAgo": "{count} 小時前",
+      "daysAgo": "{count} 天前",
+      "weeksAgo": "{count} 週前",
+      "monthsAgo": "{count} 個月前",
+      "yearsAgo": "{count} 年前"
+    },
+    "pagination": {
+      "previous": "上一頁",
+      "next": "下一頁",
+      "page": "第 {current} 頁",
+      "total": "共 {total} 條",
+      "pageSize": "每頁 {size} 條"
+    }
+  },
+  "nav": {
+    "main": {
+      "dashboard": "儀表板",
+      "onchain": "鏈上資料",
+      "consensus": "共識分析",
+      "cases": "歷史案例",
+      "performance": "效能分析",
+      "alerts": "預警規則",
+      "settings": "使用者設定",
+      "admin": "後台管理"
+    },
+    "settings": {
+      "profile": "個人資料",
+      "membership": "會員管理",
+      "push": "推送設定",
+      "configs": "系統配置",
+      "security": "安全設定"
+    },
+    "admin": {
+      "users": "使用者管理",
+      "orders": "訂單管理",
+      "operators": "營運管理",
+      "notifications": "通知日誌",
+      "configs": "配置管理"
+    },
+    "breadcrumb": {
+      "home": "首頁",
+      "dashboard": "儀表板",
+      "onchain": "鏈上資料",
+      "consensus": "共識分析",
+      "cases": "歷史案例",
+      "performance": "效能分析",
+      "alerts": "預警規則",
+      "settings": "設定",
+      "admin": "管理"
+    }
+  },
+  "errors": {
+    "http": {
+      "400": "請求參數錯誤",
+      "401": "未授權，請先登入",
+      "403": "無權限存取此資源",
+      "404": "請求的資源不存在",
+      "408": "請求逾時，請重試",
+      "429": "請求過於頻繁，請稍後再試",
+      "500": "伺服器內部錯誤",
+      "502": "閘道錯誤",
+      "503": "服務暫時不可用",
+      "504": "閘道逾時"
+    },
+    "validation": {
+      "required": "此欄位為必填項",
+      "email": "請輸入有效的電子郵件地址",
+      "minLength": "至少需要 {min} 個字元",
+      "maxLength": "最多允許 {max} 個字元",
+      "pattern": "格式不正確",
+      "number": "請輸入有效的數字",
+      "integer": "請輸入整數",
+      "positive": "請輸入正數",
+      "range": "數值應在 {min} 到 {max} 之間",
+      "url": "請輸入有效的 URL",
+      "date": "請輸入有效的日期",
+      "password": "密碼強度不足"
+    },
+    "auth": {
+      "loginFailed": "登入失敗，請檢查使用者名稱和密碼",
+      "sessionExpired": "工作階段已過期，請重新登入",
+      "tokenInvalid": "令牌無效",
+      "permissionDenied": "權限不足",
+      "accountLocked": "帳戶已被鎖定",
+      "accountNotFound": "帳戶不存在"
+    },
+    "api": {
+      "networkError": "網路連線失敗，請檢查網路",
+      "timeout": "請求逾時，請重試",
+      "serverError": "伺服器錯誤，請稍後重試",
+      "unknownError": "未知錯誤",
+      "dataParseError": "資料解析失敗",
+      "rateLimitExceeded": "請求頻率超限"
+    },
+    "form": {
+      "submitFailed": "提交失敗，請重試",
+      "invalidData": "資料格式不正確",
+      "duplicateEntry": "資料已存在",
+      "saveFailed": "儲存失敗"
+    }
+  },
+  "metadata": {
+    "site": {
+      "title": "AXIOM洞察 - 莊家行為 AI 多維分析平台",
+      "description": "多智能體協同分析莊家行為，穿透市場噪音",
+      "og_title": "AXIOM洞察 - 莊家行為 AI 多維分析平台",
+      "og_description": "多 AI 智能體協同分析莊家行為，穿透市場噪音，洞察主力動向"
+    },
+    "dashboard": {
+      "title": "概覽 - AXIOM洞察",
+      "description": "多幣種 AI 分析概覽，即時監控市場信號"
+    },
+    "consensus": {
+      "title": "綜合分析 - AXIOM洞察",
+      "description": "多智能體博弈共識分析，AI 對抗推演精準點位"
+    },
+    "alerts": {
+      "title": "預警規則 - AXIOM洞察",
+      "description": "自訂價格預警和風險監控規則"
+    },
+    "performance": {
+      "title": "策略績效 - AXIOM洞察",
+      "description": "AI 策略歷史表現和勝率統計"
+    },
+    "playbook": {
+      "title": "劇本推演 - AXIOM洞察",
+      "description": "莊家操盤劇本匹配與反制策略模擬"
+    },
+    "settings": {
+      "title": "設置 - AXIOM洞察",
+      "description": "帳戶設置和偏好管理"
+    },
+    "login": {
+      "title": "登入 - AXIOM洞察",
+      "description": "登入 AXIOM洞察 莊家行為 AI 多維分析平台"
+    }
+  }
+}

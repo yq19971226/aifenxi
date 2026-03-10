@@ -22,6 +22,9 @@ _REGISTER_WINDOW = 600     # 10 分钟窗口
 _RESET_LIMIT = 5           # 每窗口最大重置密码请求
 _RESET_WINDOW = 600        # 10 分钟窗口
 
+_REFRESH_LIMIT = 30        # 每窗口最大 token 刷新次数
+_REFRESH_WINDOW = 300      # 5 分钟窗口
+
 
 async def _check_rate(key: str, limit: int, window: int) -> None:
     """通用滑动窗口计数检查，超限抛 429。"""
@@ -67,3 +70,9 @@ async def check_reset_rate(request: Request) -> None:
     """密码重置速率限制：5 次 / 10 分钟 / IP。"""
     ip = _client_ip(request)
     await _check_rate(f"rl:reset:{ip}", _RESET_LIMIT, _RESET_WINDOW)
+
+
+async def check_refresh_rate(request: Request) -> None:
+    """Token 刷新速率限制：30 次 / 5 分钟 / IP。"""
+    ip = _client_ip(request)
+    await _check_rate(f"rl:refresh:{ip}", _REFRESH_LIMIT, _REFRESH_WINDOW)

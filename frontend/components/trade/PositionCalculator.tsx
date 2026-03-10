@@ -124,14 +124,14 @@ export function PositionCalculator({
                   key={i}
                   className="flex items-center justify-between rounded-md bg-white/[0.02] border border-white/[0.06] px-3 py-1.5"
                 >
-                  <span className="text-xs text-zinc-400">
+                  <span className="text-xs md:text-sm text-zinc-400">
                     TP{i + 1}: {formatPrice(tr.price)}
                   </span>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono text-emerald-400">
+                    <span className="text-xs md:text-sm font-mono text-emerald-400">
                       +{fmtUSD(tr.profit)}
                     </span>
-                    <span className="text-xs font-mono text-zinc-500">
+                    <span className="text-xs md:text-sm font-mono text-zinc-500">
                       R:R {tr.riskRewardRatio}
                     </span>
                   </div>

@@ -31,6 +31,32 @@ export interface PlaybookMatch {
   aftermath: string | null;
   matched_features?: number;
   total_features?: number;
+  matched_domains?: number;
+  total_domains?: number;
+  matched_regimes?: number;
+  total_regimes?: number;
+  market_structure_type?: string | null;
+  structure_matched?: boolean;
+  inferred_market_structures?: string[];
+  matched_confidence_boosters?: string[];
+  matched_invalidation_signals?: string[];
+  score_breakdown?: {
+    feature_score: number;
+    domain_score: number;
+    regime_score: number;
+    structure_score: number;
+    booster_bonus: number;
+    invalidation_penalty: number;
+    stage_bonus: number;
+    weighted_score: number;
+  };
+  dominant_factors?: string[];
+  ranking_reason_summary?: string | null;
+  decision_sentence?: string | null;
+  required_domains?: string[];
+  applicable_regimes?: string[];
+  confidence_boosters?: string[];
+  invalidation_signals?: string[];
   current_stage_idx: number | null;
   stages: PlaybookStage[] | null;
   counter_strategy: CounterStrategy | null;
@@ -102,11 +128,19 @@ export interface PlazaItem {
   verified_stages?: number;
   stages: PlaybookStage[] | null;
   signal?: string;
+  market_structure_type?: string | null;
   snapshot_price?: number | null;
   stage_entry_price?: number | null;
   failure_reason?: string | null;
   risk_flag?: boolean;
   risk_note?: string | null;
+  dominant_factors?: string[];
+  ranking_reason_summary?: string | null;
+  decision_sentence?: string | null;
+  inferred_market_structures?: string[];
+  matched_confidence_boosters?: string[];
+  matched_invalidation_signals?: string[];
+  structure_explanation?: string | null;
 }
 
 export interface PlazaFeed {

@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.deps import UserInfo, require_admin
+from app.core.deps import UserInfo, get_current_user, require_admin
 from app.core.redis import get_redis_pool
 from app.services.config_service import (
     AuditLogResponse,
@@ -22,6 +22,40 @@ from app.services.config_service import (
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/admin/configs", tags=["admin-configs"])
+public_router = APIRouter(tags=["feature-flags"])
+
+FEATURE_FLAG_CONFIG_MAP: dict[str, str] = {
+    "playbook": "playbook_feature_enabled",
+    "leaderboard": "leaderboard_feature_enabled",
+    "task": "task_feature_enabled",
+    "partner": "partner_feature_enabled",
+    "push": "push_feature_enabled",
+    "alerts": "alerts_feature_enabled",
+    "online_count": "online_count_feature_enabled",
+}
+
+
+def _normalize_feature_state(value: str) -> str:
+    lowered = str(value).lower()
+    if lowered == "true":
+        return "active"
+    if lowered == "false":
+        return "hidden"
+    if lowered in ("active", "maintenance", "hidden"):
+        return lowered
+    return "active"
+
+
+@public_router.get("/api/feature-flags")
+async def get_feature_flags(
+    user: UserInfo = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> dict[str, str]:
+    svc = ConfigService(session)
+    return {
+        key: _normalize_feature_state(await svc.get_config(config_key, "active"))
+        for key, config_key in FEATURE_FLAG_CONFIG_MAP.items()
+    }
 
 
 class TestConnectionRequest(BaseModel):
@@ -192,6 +226,12 @@ async def test_connection(
             "method": "GET",
             "timeout": 10,
         },
+        "resend_api_key": {
+            "url": "https://api.resend.com/api-keys",
+            "method": "GET",
+            "headers": {"Authorization": f"Bearer {data.api_key}"},
+            "timeout": 10,
+        },
         "sendgrid_api_key": {
             "url": "https://api.sendgrid.com/v3/user/profile",
             "method": "GET",
@@ -215,8 +255,12 @@ async def test_connection(
     endpoint = test_endpoints[data.config_key]
 
     try:
-        # 禁用 SSL 验证以兼容部分环境
-        async with httpx.AsyncClient(verify=False, timeout=endpoint.get("timeout", 10)) as client:
+        import os
+        proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy") or os.environ.get("HTTP_PROXY") or os.environ.get("http_proxy")
+        client_kwargs: dict = {"verify": False, "timeout": endpoint.get("timeout", 10)}
+        if proxy:
+            client_kwargs["proxy"] = proxy
+        async with httpx.AsyncClient(**client_kwargs) as client:
             if endpoint["method"] == "GET":
                 response = await client.get(
                     endpoint["url"],
@@ -280,10 +324,14 @@ async def test_connection(
             "message": "连接超时，目标 API 无响应",
         }
     except httpx.ConnectError as e:
-        logger.warning(f"连接失败: {data.config_key}, {str(e)}")
+        error_msg = str(e)
+        logger.warning(f"连接失败: {data.config_key}, {error_msg}")
+        hint = ""
+        if "All connection attempts failed" in error_msg or "Name or service not known" in error_msg:
+            hint = "（服务器无法访问目标 API，请检查网络/防火墙/DNS 配置，或设置 HTTPS_PROXY 环境变量）"
         return {
             "success": False,
-            "message": f"连接失败: {str(e)}",
+            "message": f"连接失败{hint}: {error_msg}",
         }
     except httpx.RequestError as e:
         logger.warning(f"请求异常: {data.config_key}, {str(e)}")

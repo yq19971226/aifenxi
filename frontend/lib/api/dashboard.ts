@@ -31,3 +31,21 @@ export async function fetchDashboardOverview(): Promise<DashboardOverviewRespons
   const res = await authFetch(`${API_BASE}/api/dashboard/overview`);
   return handleApiResponse(res, "请求失败");
 }
+
+export interface SignalEvent {
+  symbol: string;
+  type: string; // direction_change / confidence_drop / confidence_rise / opportunity / risk_alert
+  message: string;
+  detail: string;
+  timestamp: string;
+}
+
+export interface DashboardSignalsResponse {
+  signals: SignalEvent[];
+  total: number;
+}
+
+export async function fetchDashboardSignals(limit = 20): Promise<DashboardSignalsResponse> {
+  const res = await authFetch(`${API_BASE}/api/dashboard/signals?limit=${limit}`);
+  return handleApiResponse(res, "请求失败");
+}

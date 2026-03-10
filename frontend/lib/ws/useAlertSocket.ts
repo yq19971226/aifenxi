@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useLocale } from "next-intl";
 import { getAlertSocket, type AlertMessage } from "./alertSocket";
 import { getAccessToken } from "@/lib/api/auth";
 
@@ -12,6 +13,7 @@ export function useAlertSocket() {
   const [alerts, setAlerts] = useState<AlertMessage[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [connected, setConnected] = useState(false);
+  const locale = useLocale();
   const socketRef = useRef(getAlertSocket());
 
   useEffect(() => {
@@ -19,6 +21,7 @@ export function useAlertSocket() {
     if (!token) return;
 
     const socket = socketRef.current;
+    socket.setLocale(locale);
 
     const unsub = socket.subscribe((msg) => {
       setAlerts((prev) => [msg, ...prev].slice(0, 50));
@@ -36,7 +39,7 @@ export function useAlertSocket() {
       clearInterval(statusCheck);
       socket.disconnect();
     };
-  }, []);
+  }, [locale]);
 
   const clearUnread = useCallback(() => {
     setUnreadCount(0);

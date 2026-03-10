@@ -174,6 +174,34 @@ async def push_high_confidence(
         logger.warning("高置信推送失败: %s", exc)
 
 
+async def _persist_strategy(
+    user_id: UUID,
+    symbol: str,
+    mode: AnalysisMode,
+    report: AnalysisReport,
+) -> None:
+    """将策略写入 DB 并触发排行榜发布判断（fire-and-forget）。"""
+    if not report.strategy:
+        return
+    try:
+        from app.core.database import AsyncSessionLocal
+        from app.services.strategy import StrategyResult, StrategyService
+
+        strategy = StrategyResult.model_validate(report.strategy)
+        svc = StrategyService()
+        async with AsyncSessionLocal() as session:
+            await svc.save_strategy(
+                session=session,
+                strategy=strategy,
+                user_id=user_id,
+                analysis_mode=mode.value,
+                skip_cache=True,
+            )
+            await session.commit()
+    except Exception as exc:
+        logger.warning("策略持久化失败（不影响分析结果）: %s", exc)
+
+
 async def run_post_complete_tasks(
     user_id: UUID,
     symbol: str,
@@ -196,3 +224,11 @@ async def run_post_complete_tasks(
         )
     except Exception as exc:
         logger.warning("分析后置任务推送失败或超时: %s", exc)
+
+    try:
+        await asyncio.wait_for(
+            _persist_strategy(user_id, symbol, mode, report),
+            timeout=5.0,
+        )
+    except Exception as exc:
+        logger.warning("策略持久化后置任务失败或超时: %s", exc)

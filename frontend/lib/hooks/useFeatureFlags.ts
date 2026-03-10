@@ -12,6 +12,8 @@ const FEATURE_FLAG_MAP: Record<string, string> = {
   "/leaderboard": "leaderboard",
   "/tasks": "task",
   "/partner": "partner",
+  "/settings/push": "push",
+  "/alerts": "alerts",
 };
 
 async function fetchFeatureFlags(): Promise<FeatureFlags> {

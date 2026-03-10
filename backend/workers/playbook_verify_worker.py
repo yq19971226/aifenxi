@@ -27,6 +27,9 @@ from sqlalchemy import text
 from app.agents.phase_tracker import get_current_phase
 from app.core.redis import init_redis, get_redis_pool
 from app.services.push_dispatcher import broadcast
+from app.services.playbook_prediction_maintenance import (
+    get_market_structure_type_for_playbook,
+)
 from workers.celery_app import celery_app
 from workers.db import worker_engine
 
@@ -137,7 +140,7 @@ async def _verify_all() -> dict[str, int]:
             result = await session.execute(text("""
                 SELECT id, symbol, playbook_name, current_stage_idx,
                        stages_json, verified_stages, created_at, published,
-                       signal, snapshot_price, stage_entry_price,
+                       signal, market_structure_type, snapshot_price, stage_entry_price,
                        stage_entered_at, risk_flag, risk_note
                 FROM playbook_predictions
                 WHERE status = 'active'
@@ -222,6 +225,10 @@ async def _handle_stage_match(
     pred_id = pred["id"]
     symbol = pred["symbol"]
     playbook_name = pred["playbook_name"]
+    market_structure_type = (
+        pred.get("market_structure_type")
+        or get_market_structure_type_for_playbook(playbook_name)
+    )
 
     await session.execute(
         text("""
@@ -251,6 +258,7 @@ async def _handle_stage_match(
             data={
                 "symbol": symbol,
                 "matched_playbook": playbook_name,
+                "market_structure_type": market_structure_type,
                 "probability_pct": f"{(new_verified / len(stages) * 100):.0f}%",
                 "stage_description": stage_name,
                 "next_move": next_stage.get("next_stage_probability", "待观察"),
@@ -424,6 +432,7 @@ async def _complete_prediction(
             data={
                 "symbol": symbol,
                 "matched_playbook": playbook_name,
+                "market_structure_type": get_market_structure_type_for_playbook(playbook_name),
                 "stage_match_ratio": f"{accuracy * 100:.0f}%",
             },
         )
@@ -454,6 +463,7 @@ async def _fail_prediction(
             data={
                 "symbol": symbol,
                 "matched_playbook": playbook_name,
+                "market_structure_type": get_market_structure_type_for_playbook(playbook_name),
                 "failure_reason": failure_reason,
             },
         )

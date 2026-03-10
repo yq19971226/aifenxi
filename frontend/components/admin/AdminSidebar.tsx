@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { isNavItemVisible, type UserRole } from "@/lib/route-permissions";
+import { isNavItemVisible, stripLocalePrefix, type UserRole } from "@/lib/route-permissions";
 import { ADMIN_MENU_GROUPS, type AdminMenuGroup } from "./AdminSidebar.config";
 
 function useFilteredGroups(userRole: UserRole): AdminMenuGroup[] {
@@ -52,6 +53,7 @@ export function AdminMobileNav({ userRole }: AdminSidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const filteredGroups = useFilteredGroups(userRole);
+  const t = useTranslations("admin.sidebar");
 
   return (
     <div className="md:hidden border-b border-white/[0.06] bg-black/20">
@@ -61,7 +63,7 @@ export function AdminMobileNav({ userRole }: AdminSidebarProps) {
         className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-zinc-400 hover:text-zinc-200"
       >
         {open ? <X size={15} /> : <Menu size={15} />}
-        <span>管理菜单</span>
+        <span>{t("mobileMenu")}</span>
       </button>
 
       <AnimatePresence>
@@ -92,21 +94,25 @@ function SidebarNav({
   pathname: string;
   collapsed: boolean;
 }) {
+  const t = useTranslations("admin.sidebar");
+
   return (
     <nav className="flex-1 overflow-y-auto px-2 pb-4 space-y-4">
       {groups.map((group) => (
-        <div key={group.label}>
+        <div key={group.labelKey}>
           {!collapsed && (
-            <div className="px-2 pb-1 text-[11px] font-medium uppercase tracking-wider text-zinc-600">
-              {group.label}
+            <div className="px-2 pb-1 text-xs font-medium uppercase tracking-wider text-zinc-500">
+              {t(`groups.${group.labelKey}`)}
             </div>
           )}
           <div className="space-y-0.5">
             {group.items.map((item) => {
+              const normalizedPath = stripLocalePrefix(pathname);
               const active =
-                pathname === item.href ||
-                pathname.startsWith(item.href + "/");
+                normalizedPath === item.href ||
+                normalizedPath.startsWith(item.href + "/");
               const Icon = item.icon;
+              const label = t(`items.${item.labelKey}`);
 
               return (
                 <Link key={item.href} href={item.href}>
@@ -116,11 +122,11 @@ function SidebarNav({
                         ? "text-zinc-100 bg-white/[0.08]"
                         : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]"
                     } ${collapsed ? "justify-center" : ""}`}
-                    title={collapsed ? item.label : undefined}
+                    title={collapsed ? label : undefined}
                   >
                     <Icon size={15} className="flex-shrink-0" />
                     {!collapsed && (
-                      <span className="truncate">{item.label}</span>
+                      <span className="truncate">{label}</span>
                     )}
                   </div>
                 </Link>

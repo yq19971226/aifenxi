@@ -15,8 +15,18 @@ _redis_pool: Redis | None = None
 
 
 async def init_redis() -> None:
-    """初始化 Redis 连接池，在 FastAPI lifespan 中调用。"""
+    """初始化 Redis 连接池，在 FastAPI lifespan 中调用。幂等：已初始化则跳过。"""
     global _redis_pool
+    if _redis_pool is not None:
+        try:
+            await _redis_pool.ping()
+            return
+        except Exception:
+            try:
+                await _redis_pool.aclose()
+            except Exception:
+                pass
+            _redis_pool = None
     _redis_pool = aioredis.from_url(
         settings.redis_url,
         encoding="utf-8",

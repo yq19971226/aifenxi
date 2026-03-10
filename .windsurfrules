@@ -116,7 +116,7 @@
 
 ## 十七、后台一键更新
 
-- 通过 admin API `/api/admin/system/update` 触发，步骤：
+- 通过 admin API `/api/admin/system/deploy` 触发，步骤：
   1. `git pull origin main`
   2. `docker compose build --no-cache backend worker beat frontend`
   3. `docker compose up -d --remove-orphans`
@@ -128,7 +128,8 @@
 ## 十八、回滚
 
 - Docker 镜像保留最近 3 个版本的 tag（`v1.2.3`、`v1.2.2`、`v1.2.1`）。
-- 回滚命令：`docker compose up -d --no-build`（使用上一个 tag 的镜像）。
+- 支持 admin API `/api/admin/system/rollback` 一键回退（可选指定 commit/tag）。
+- 手工回滚命令：`bash scripts/rollback.sh [commit-or-tag]`。
 - 数据库回滚：从 `scripts/backup_db.sh` 的备份恢复。
 
 ---

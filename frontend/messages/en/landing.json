@@ -1,0 +1,125 @@
+{
+  "hero": {
+    "tagline": "Market Maker AI Analysis Platform",
+    "title1": "See the Other Side",
+    "title2": "of the Market",
+    "subtitle": "No need to read charts or understand indicators. AI watches the market for you and tells you what's happening and what the big players might be doing.",
+    "cta": "Get Started Free",
+    "learnMore": "Learn More",
+    "statsAgents": "AI Agents",
+    "statsSources": "Data Sources",
+    "statsModes": "Analysis Modes",
+    "statsOnline": "Users Online"
+  },
+  "painPoints": {
+    "title": "Sound familiar?",
+    "items": [
+      {
+        "problem": "Can't read charts or indicators",
+        "solution": "AI reads them for you — just check the summary"
+      },
+      {
+        "problem": "Never sure when to buy or sell",
+        "solution": "Get directional guidance with key price levels"
+      },
+      {
+        "problem": "Always buying high, selling low",
+        "solution": "See what market makers might be doing before you act"
+      }
+    ]
+  },
+  "capabilities": {
+    "title": "No Technical Skills Required",
+    "subtitle": "AI does the analysis — you make the decisions",
+    "analysis": {
+      "title": "Don't know indicators? No problem",
+      "desc": "MACD, RSI, Bollinger Bands — you don't need to learn any of that. The system automatically analyzes price action, money flow, and market sentiment from multiple angles. You just read the conclusions."
+    },
+    "consensus": {
+      "title": "Multiple AI models, not just one",
+      "desc": "Instead of one model guessing, multiple AIs analyze independently and then combine their views. It's like asking several analysts at once — agreement and disagreement are both valuable signals."
+    },
+    "practice": {
+      "title": "Track record speaks for itself",
+      "desc": "Every analysis is recorded. After some time, you can look back at accuracy and win rates — all tracked by the system. No empty promises, just historical data."
+    }
+  },
+  "modes": {
+    "title": "Pick Your Rhythm",
+    "subtitle": "Not sure which to choose? If you just want a daily overview, \"Trend\" is all you need",
+    "scalping": {
+      "name": "Scalping",
+      "desc": "For those who can watch the screen. The system tracks minute-by-minute changes to spot quick entry and exit opportunities.",
+      "tag": "Minutes"
+    },
+    "intraday": {
+      "name": "Intraday",
+      "desc": "For those who check in a few times a day. The system reads the day's rhythm and tells you whether the day leans bullish or bearish.",
+      "tag": "Hours"
+    },
+    "trend": {
+      "name": "Trend",
+      "desc": "For those who don't have time to watch charts. The system reads the big picture — uptrend, downtrend, or sideways — check it once every few days.",
+      "tag": "Daily"
+    }
+  },
+  "product": {
+    "title": "What You Get After Signing Up",
+    "subtitle": "Three main features, ready to use right away",
+    "dashboard": {
+      "title": "See everything at a glance",
+      "desc": "What's happening with the assets you follow? Any opportunities? High risk? Open the dashboard and see the latest signals for all your tracked assets in one view. No need to search everywhere.",
+      "highlights": ["All assets in one view", "Opportunity & risk flags", "Latest signal alerts", "No data hunting needed"]
+    },
+    "consensus": {
+      "title": "AI analyzes, you read the results",
+      "desc": "Pick an asset, tap analyze, and the system gets to work — multiple AIs examine the market simultaneously, then tell you the likely direction and key price levels. If they disagree, you'll know that too.",
+      "highlights": ["One-tap analysis", "Direction guidance", "Key prices marked", "Disagreement flagged"]
+    },
+    "playbook": {
+      "title": "See what the big players might be thinking",
+      "desc": "Flip the perspective: if you had billions to move, what would you do with this asset right now? The system reasons from that angle, helping you think one step ahead before making decisions.",
+      "highlights": ["Big-player perspective", "Current phase analysis", "Position sizing help", "Community feed"]
+    }
+  },
+  "data": {
+    "title": "Where the Data Comes From",
+    "desc": "Analysis isn't guesswork. The system collects data 24/7 from multiple channels — exchange quotes, blockchain fund flows, derivatives markets, global economic data — ensuring every analysis is evidence-based.",
+    "exchange": "Exchange Data",
+    "onchain": "On-Chain Data",
+    "derivatives": "Derivatives",
+    "macro": "Macroeconomics",
+    "sentiment": "Sentiment",
+    "news": "News Feed"
+  },
+  "cta": {
+    "title": "No Technical Skills Needed",
+    "subtitle": "Sign up and try all basic features for free, no asset limits. Upgrade later if you want more analysis modes and higher frequency.",
+    "button": "Sign Up Free",
+    "login": "Already have an account? Log in",
+    "guide": "User Guide"
+  },
+  "footer": {
+    "slogan": "Market Maker AI Analysis",
+    "product": "Product",
+    "login": "Log In",
+    "register": "Sign Up Free",
+    "resources": "Resources",
+    "guide": "User Guide",
+    "docs": "Data Disclosure",
+    "faq": "FAQ",
+    "legal": "Legal",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "risk": "Risk Disclaimer",
+    "riskText": "All analysis provided on this platform is for reference only and does not constitute investment advice. Cryptocurrency trading carries extremely high risk. Please make independent decisions based on your own circumstances.",
+    "copyright": "© {year} AXIOM Insight. All rights reserved."
+  },
+  "nav": {
+    "features": "Features",
+    "modes": "Modes",
+    "data": "Data",
+    "login": "Log In",
+    "register": "Sign Up Free"
+  }
+}

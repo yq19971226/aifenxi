@@ -23,6 +23,7 @@ from datetime import datetime, timezone
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEPLOY_SCRIPT = os.path.join(PROJECT_DIR, "scripts", "deploy.sh")
+ROLLBACK_SCRIPT = os.path.join(PROJECT_DIR, "scripts", "rollback.sh")
 COMPOSE_CMD = [
     "docker", "compose",
     "-f", os.path.join(PROJECT_DIR, "docker-compose.yml"),
@@ -49,6 +50,19 @@ def _json_response(handler: BaseHTTPRequestHandler, status: int, data: dict):
     handler.send_header("Content-Length", str(len(body)))
     handler.end_headers()
     handler.wfile.write(body)
+
+
+def _read_json_body(handler: BaseHTTPRequestHandler) -> dict:
+    length = int(handler.headers.get("Content-Length", "0") or "0")
+    if length <= 0:
+        return {}
+    raw = handler.rfile.read(length)
+    if not raw:
+        return {}
+    try:
+        return json.loads(raw.decode("utf-8"))
+    except Exception:
+        return {}
 
 
 def _check_auth(handler: BaseHTTPRequestHandler) -> bool:
@@ -184,12 +198,12 @@ class DeployHandler(BaseHTTPRequestHandler):
         _json_response(self, 404, {"error": "未知路径"})
 
     def do_POST(self):
-        global _deploy_running, _last_deploy
+        global _deploy_running, _last_deploy, _git_cache, _git_cache_time
 
         if not _check_auth(self):
             return
 
-        if self.path != "/deploy":
+        if self.path not in ("/deploy", "/rollback"):
             _json_response(self, 404, {"error": "未知路径"})
             return
 
@@ -221,10 +235,28 @@ class DeployHandler(BaseHTTPRequestHandler):
                 except Exception:
                     pass
 
-            send_event("log", "开始部署...")
+            payload = _read_json_body(self)
+            target = str(payload.get("target", "")).strip()
+
+            if self.path == "/rollback":
+                if target:
+                    send_event("log", f"开始回退... (target={target})")
+                    cmd = ["bash", ROLLBACK_SCRIPT, target]
+                else:
+                    send_event("log", "开始回退... (target=上一个版本)")
+                    cmd = ["bash", ROLLBACK_SCRIPT]
+                action = "rollback"
+            else:
+                if target:
+                    send_event("log", f"开始部署... (target={target})")
+                    cmd = ["bash", DEPLOY_SCRIPT, target]
+                else:
+                    send_event("log", "开始部署... (target=latest)")
+                    cmd = ["bash", DEPLOY_SCRIPT]
+                action = "deploy"
 
             process = subprocess.Popen(
-                ["bash", DEPLOY_SCRIPT],
+                cmd,
                 cwd=PROJECT_DIR,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
@@ -242,13 +274,16 @@ class DeployHandler(BaseHTTPRequestHandler):
 
             if process.returncode == 0:
                 success = True
-                send_event("done", f"部署成功，耗时 {elapsed} 秒")
+                done_msg = "回退成功" if action == "rollback" else "部署成功"
+                send_event("done", f"{done_msg}，耗时 {elapsed} 秒")
             else:
-                send_event("error", f"部署失败 (exit code: {process.returncode})，耗时 {elapsed} 秒")
+                fail_msg = "回退失败" if action == "rollback" else "部署失败"
+                send_event("error", f"{fail_msg} (exit code: {process.returncode})，耗时 {elapsed} 秒")
 
         except Exception as e:
             elapsed = round(time.time() - start_time, 1)
-            send_event("error", f"部署异常: {e}")
+            action_name = "回退" if self.path == "/rollback" else "部署"
+            send_event("error", f"{action_name}异常: {e}")
         finally:
             _deploy_running = False
             _last_deploy = {
@@ -256,6 +291,7 @@ class DeployHandler(BaseHTTPRequestHandler):
                 "elapsed_s": elapsed,
                 "finished_at": datetime.now(timezone.utc).isoformat(),
                 "commit": _git_commit_short(),
+                "action": "rollback" if self.path == "/rollback" else "deploy",
             }
             # 部署完成后清除 git 缓存，下次查询会重新 fetch
             _git_cache = None

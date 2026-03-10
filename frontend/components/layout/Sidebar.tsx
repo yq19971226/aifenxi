@@ -100,10 +100,10 @@ export function Sidebar() {
       {/* Logo + Brand */}
       <div className="flex h-14 flex-col items-center justify-center px-4">
         <span className="text-xl font-bold tracking-wider text-white uppercase">
-          {expanded ? "Axiom" : "AX"}
+          {expanded ? "AXIOM洞察" : "AX"}
         </span>
         {expanded && (
-          <span className="text-[10px] tracking-widest text-zinc-500 -mt-0.5">
+          <span className="text-xs tracking-widest text-zinc-500 -mt-0.5">
             剧本流
           </span>
         )}

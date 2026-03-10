@@ -1,0 +1,86 @@
+{
+  "loading": "載入中...",
+  "tabs": {
+    "login": "登入",
+    "register": "註冊"
+  },
+  "fields": {
+    "email": "電子郵件",
+    "password": "密碼",
+    "confirmPassword": "確認密碼",
+    "referralCode": "邀請碼",
+    "referralCodeOptional": "邀請碼（選填）",
+    "registerEmail": "註冊信箱",
+    "verificationCode": "驗證碼",
+    "newPassword": "新密碼",
+    "confirmNewPassword": "確認新密碼"
+  },
+  "placeholders": {
+    "password": "輸入密碼",
+    "minLength": "至少 8 位",
+    "verificationCode": "輸入 6 位驗證碼",
+    "confirmPassword": "再次輸入密碼",
+    "confirmNewPassword": "再次輸入新密碼"
+  },
+  "buttons": {
+    "login": "登入",
+    "register": "建立帳戶",
+    "sendCode": "發送驗證碼",
+    "sendingCode": "發送中...",
+    "resetPassword": "重設密碼"
+  },
+  "forgot": {
+    "link": "忘記密碼？",
+    "backToLogin": "返回登入",
+    "title": "重設密碼",
+    "promptSend": "輸入註冊信箱，我們將發送驗證碼",
+    "promptCode": "請輸入信箱中收到的驗證碼"
+  },
+  "strength": {
+    "weak": "弱",
+    "fair": "一般",
+    "good": "良好",
+    "strong": "強"
+  },
+  "errors": {
+    "networkError": "無法連線伺服器，請檢查網路",
+    "loginFailed": "登入失敗",
+    "registerFailed": "註冊失敗",
+    "registrationDisabled": "目前已關閉新用戶註冊",
+    "passwordMismatch": "兩次密碼不一致",
+    "passwordMinLength": "密碼至少8位",
+    "emailRequired": "請先輸入電子郵件",
+    "verificationCodeRequired": "請輸入驗證碼",
+    "referralRequired": "請填寫邀請碼",
+    "registerCodeSendFailed": "發送註冊驗證碼失敗",
+    "sendFailed": "發送失敗",
+    "resetFailed": "重設失敗",
+    "serverUnavailable": "無法連線伺服器"
+  },
+  "success": {
+    "registerCodeSent": "註冊驗證碼已發送至信箱，請在 10 分鐘內完成註冊",
+    "codeSent": "驗證碼已發送至信箱，請於10分鐘內使用",
+    "passwordReset": "密碼重設成功，請登入"
+  },
+  "features": {
+    "heroTitle1": "Institutional-grade",
+    "heroTitle2": "market intelligence.",
+    "heroSubtitle1": "Multi-agent adversarial consensus engine.",
+    "heroSubtitle2": "See through the noise. Trade the script.",
+    "agentsTitle": "10 AI 智慧體協同",
+    "agentsDesc": "多模型博弈共識，不止一個觀點",
+    "defenseTitle": "莊家對抗防禦",
+    "defenseDesc": "站在莊家視角反推，識別操控風險",
+    "modesTitle": "三模式全覆蓋",
+    "modesDesc": "超短線 / 日內博弈 / 趨勢佈局",
+    "precisionTitle": "精準非整數點位",
+    "precisionDesc": "修正後的進場/停損，避開整數關口"
+  },
+  "stats": {
+    "agents": "AI 智慧體",
+    "models": "共識模型",
+    "timeframes": "時間週期"
+  },
+  "legal": "繼續即表示同意 AXIOM洞察 的服務條款與隱私政策",
+  "guideLink": "不知道怎麼用？查看使用指南 →"
+}

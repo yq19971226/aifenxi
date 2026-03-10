@@ -1,0 +1,74 @@
+{
+  "title": "综合分析",
+  "subtitle": "多智能体并行分析 + AI对抗推演 → 精准点位",
+  "modes": {
+    "scalping": {
+      "label": "超短线",
+      "desc": "快速捕捉短线机会，适合分钟级操作"
+    },
+    "intraday": {
+      "label": "日内博弈",
+      "desc": "{count}个AI并行分析，多维度交叉验证"
+    },
+    "trend": {
+      "label": "趋势布局",
+      "desc": "{count}个AI全景分析 + AI对抗推演"
+    },
+    "locked": "需要{tier}"
+  },
+  "actions": {
+    "startAnalysis": "开始分析",
+    "analyzing": "分析中...",
+    "retry": "重试",
+    "cancel": "取消分析",
+    "refresh": "缓存结果，点击重新分析"
+  },
+  "quota": {
+    "label": "今日配额",
+    "exhausted": "今日配额已用完，明日 UTC 00:00 重置"
+  },
+  "signals": {
+    "bullish": "看多",
+    "bearish": "看空",
+    "neutral": "中性"
+  },
+  "summary": {
+    "consensusSignal": "共识信号",
+    "consensusConfidence": "共识置信度",
+    "lastUpdate": "最后更新",
+    "confidence": "置信度"
+  },
+  "modelCard": {
+    "confidence": "置信度"
+  },
+  "divergence": {
+    "title": "分歧度",
+    "highConsensus": "高度一致",
+    "someDisagreement": "存在分歧",
+    "severeDisagreement": "严重分歧"
+  },
+  "weights": {
+    "title": "权重分布",
+    "models": "模型"
+  },
+  "minority": {
+    "title": "少数派警告"
+  },
+  "empty": {
+    "message": "选择分析模式，点击「开始分析」获取AI报告"
+  },
+  "flow": {
+    "coreAnalysis": "核心AI分析",
+    "crossValidation": "多维交叉验证",
+    "multiModelConsensus": "多模型共识",
+    "makerAI": "庄家AI反推",
+    "collusionDetection": "合谋检测",
+    "aiManipulation": "AI操盘检测",
+    "refinedPositions": "修正精准点位",
+    "strategyAdvice": "策略建议",
+    "adversarialFlow": "AI 对抗流程",
+    "analysisFlow": "AI 分析流程",
+    "makerPerspective": "庄家 AI 视角",
+    "makerCompleted": "庄家AI已完成反向推演"
+  }
+}

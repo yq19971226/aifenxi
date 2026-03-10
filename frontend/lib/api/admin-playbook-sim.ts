@@ -8,6 +8,14 @@ export interface AdminPrediction {
   symbol: string;
   playbook_name: string;
   match_pct: number;
+  market_structure_type?: string | null;
+  dominant_factors?: string[];
+  ranking_reason_summary?: string | null;
+  decision_sentence?: string | null;
+  inferred_market_structures?: string[];
+  matched_confidence_boosters?: string[];
+  matched_invalidation_signals?: string[];
+  structure_explanation?: string | null;
   current_stage_idx: number | null;
   status: string;
   published: boolean;

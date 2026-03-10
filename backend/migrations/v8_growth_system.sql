@@ -129,5 +129,6 @@ VALUES
     ('partner_min_withdrawal', '50', 'partner', '最低提现金额 (USDT)', false),
     ('partner_withdrawal_cooldown_days', '7', 'partner', '提现冷却期（天）', false),
     ('partner_address_cooldown_hours', '24', 'partner', '地址修改冷却期（小时）', false),
+    ('register_feature_enabled', 'true', 'registration', '新用户注册总开关（true=允许公开注册，false=关闭公开注册）', false),
     ('register_referral_required', 'false', 'registration', '强制邀请码注册开关（true=必须填写有效邀请码才能注册）', false)
 ON CONFLICT (config_key) DO NOTHING;

@@ -36,6 +36,8 @@ class StrategySnapshotCreate(BaseModel):
     targets: list[float]
     confidence: float
     price_at_generation: float
+    user_id: UUID | None = None
+    analysis_mode: str | None = None
 
 
 class PerfCheckpoint(BaseModel):

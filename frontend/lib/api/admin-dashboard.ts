@@ -21,6 +21,9 @@ export interface DashboardStats {
   agent_reports_24h: number;
   total_alert_rules: number;
   active_alert_rules: number;
+  online_ws_total: number;
+  online_ws_price: number;
+  online_ws_alerts: number;
 }
 
 export async function fetchDashboardStats(): Promise<DashboardStats> {

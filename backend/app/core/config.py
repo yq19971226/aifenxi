@@ -16,7 +16,12 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 7
 
     # CORS
-    cors_origins: str = "http://localhost:3000"
+    cors_origins: str = ",".join([
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+    ])
 
     # 应用
     app_version: str = "4.1.0"
@@ -24,6 +29,9 @@ class Settings(BaseSettings):
     app_host: str = "0.0.0.0"
     app_port: int = 8000
     
+    # 数据保留
+    snapshot_retention_days: int = 180
+
     # 第三方 API
     coinmarketcal_api_key: str = ""
 

@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
-import type { ReportSection, SignalDirection, SectionStatus } from "@/lib/api/analysis";
+import type { AnalysisMode, ReportSection, SignalDirection, SectionStatus } from "@/lib/api/analysis";
+import type { StrategyData } from "@/lib/types/strategy";
 import {
   FIELD_LABELS,
   SECTION_ICONS,
@@ -23,10 +24,33 @@ export interface StatusStyle {
   label: string;
 }
 
+const CONSENSUS_AGENT_TITLES = new Set([
+  "技术分析",
+  "技术指标摘要",
+  "链上数据",
+  "链上深度解读",
+  "订单流",
+  "订单簿微观结构",
+  "风险评估",
+  "新闻分析",
+  "日历事件",
+  "舆情分析",
+  "剧本推演",
+  "技术面分析",
+  "链上数据分析",
+  "订单簿分析",
+  "市场情绪分析",
+  "剧本匹配",
+]);
+
 // ── Field label ────────────────────────────────────────────
 
 export function fieldLabel(key: string): string {
   return FIELD_LABELS[key] || key;
+}
+
+export function isConsensusAgentSection(title: string): boolean {
+  return CONSENSUS_AGENT_TITLES.has(title);
 }
 
 // ── Signal style ───────────────────────────────────────────
@@ -138,7 +162,7 @@ const _TEXT_REPLACEMENTS: [RegExp, string][] = [
   [/\bnormal\b/gi, "正常"], [/\belevated\b/gi, "偏高"], [/\bextreme\b/gi, "极端"],
   [/\bpartial\b/gi, "部分"], [/\bfull\b/gi, "完全"],
   // ── 风险等级 ──
-  [/\bhigh\b/gi, "高"], [/\bmedium\b/gi, "中"], [/\blow\b/gi, "低"],
+  [/\bhigh\b/gi, "高"], [/\bmoderate\b/gi, "中等"], [/\bmedium\b/gi, "中"], [/\blow\b/gi, "低"],
   // ── 动量/量能 ──
   [/\bmomentum\b/gi, "动量"], [/\bvolume\b/gi, "成交量"],
   [/\bdivergence\b/gi, "背离"], [/\bconvergence\b/gi, "收敛"],
@@ -233,6 +257,20 @@ export function modeLabel(mode: string): string {
   if (mode === "intraday") return "日内博弈";
   if (mode === "trend") return "趋势布局";
   return mode;
+}
+
+export function getRankingEligibility(mode: AnalysisMode, strategy: StrategyData) {
+  const isEligibleMode = mode === "intraday" || mode === "trend";
+  const isNeutral = strategy.direction === "neutral";
+  const isFallback = strategy.is_fallback;
+  const eligible = isEligibleMode && !isNeutral && !isFallback;
+
+  let reason = "";
+  if (!isEligibleMode) reason = "仅日内/趋势模式参与排行";
+  else if (isNeutral) reason = "中性方向不计入排行";
+  else if (isFallback) reason = "回退策略不计入排行";
+
+  return { eligible, reason };
 }
 
 // ── Blocked reason label ───────────────────────────────────

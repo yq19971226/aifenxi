@@ -7,7 +7,7 @@ c = conn.cursor()
 # playbook_predictions table
 c.execute("""
 CREATE TABLE IF NOT EXISTS playbook_predictions (
-    id              TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
     symbol          TEXT NOT NULL,
     playbook_name   TEXT NOT NULL,
     match_pct       REAL DEFAULT 0,
@@ -19,12 +19,20 @@ CREATE TABLE IF NOT EXISTS playbook_predictions (
     published       BOOLEAN DEFAULT 0,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     signal          TEXT DEFAULT 'neutral',
+    market_structure_type TEXT,
     snapshot_price  REAL,
     stage_entry_price REAL,
     stage_entered_at TIMESTAMP,
     failure_reason  TEXT,
     risk_flag       BOOLEAN DEFAULT 0,
-    risk_note       TEXT
+    risk_note       TEXT,
+    dominant_factors_json TEXT,
+    ranking_reason_summary TEXT,
+    decision_sentence TEXT,
+    inferred_market_structures_json TEXT,
+    matched_confidence_boosters_json TEXT,
+    matched_invalidation_signals_json TEXT,
+    structure_explanation TEXT
 )
 """)
 print("Created: playbook_predictions")
@@ -48,9 +56,9 @@ print("Created: klines")
 # params_changelog table (used by learning_service)
 c.execute("""
 CREATE TABLE IF NOT EXISTS params_changelog (
-    id          TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
-    param_type  TEXT,
-    param_key   TEXT,
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    param_type  TEXT NOT NULL,
+    param_key   TEXT NOT NULL,
     old_value   TEXT,
     new_value   TEXT,
     changed_by  TEXT,

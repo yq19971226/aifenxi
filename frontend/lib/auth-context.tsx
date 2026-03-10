@@ -22,7 +22,7 @@ interface AuthContextValue {
   user: UserInfo | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, referralCode?: string) => Promise<void>;
+  register: (email: string, password: string, code: string, referralCode?: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -85,9 +85,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(u);
   }, []);
 
-  const register = useCallback(async (email: string, password: string, referralCode?: string) => {
-    await apiRegister(email, password, referralCode);
-    await apiLogin(email, password);
+  const register = useCallback(async (email: string, password: string, code: string, referralCode?: string) => {
+    if (referralCode) {
+      await apiRegister(email, password, code, referralCode);
+    } else {
+      await apiRegister(email, password, code);
+    }
     const u = await fetchCurrentUser();
     __cachedUser = u;
     setUser(u);

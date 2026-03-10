@@ -2,6 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { useDateFormatter } from "@/lib/i18n/formatters";
 import type { AlertRuleResponse, ConditionExpression, Condition, MetricType, Operator } from "@/lib/api/alerts";
 import { EmptyAlertRules } from "@/components/ui/EmptyState";
 
@@ -12,50 +14,56 @@ interface AlertRuleListProps {
   onDelete: (ruleId: string) => void;
 }
 
-const METRIC_LABELS: Record<MetricType, string> = {
-  price: "价格",
-  rsi: "RSI",
-  macd: "MACD",
-  ema: "EMA",
-  bb_upper: "布林带上轨",
-  bb_lower: "布林带下轨",
-  exchange_netflow: "交易所净流入",
-  whale_change_24h: "巨鲸持仓变化",
-  fear_greed_index: "恐慌贪婪指数",
-  mvrv: "MVRV",
-  funding_rate: "资金费率",
-};
+function useAlertTranslations() {
+  const t = useTranslations('alerts');
+  
+  const METRIC_LABELS: Record<MetricType, string> = {
+    price: t('metrics.price'),
+    rsi: t('metrics.rsi'),
+    macd: t('metrics.macd'),
+    ema: t('metrics.ema'),
+    bb_upper: t('metrics.bb_upper'),
+    bb_lower: t('metrics.bb_lower'),
+    exchange_netflow: t('metrics.exchange_netflow'),
+    whale_change_24h: t('metrics.whale_change_24h'),
+    fear_greed_index: t('metrics.fear_greed_index'),
+    mvrv: t('metrics.mvrv'),
+    funding_rate: t('metrics.funding_rate'),
+  };
 
-const OPERATOR_LABELS: Record<Operator, string> = {
-  gt: ">",
-  lt: "<",
-  gte: "≥",
-  lte: "≤",
-  cross_above: "↑穿越",
-  cross_below: "↓穿越",
-};
+  const OPERATOR_LABELS: Record<Operator, string> = {
+    gt: t('operatorsShort.gt'),
+    lt: t('operatorsShort.lt'),
+    gte: t('operatorsShort.gte'),
+    lte: t('operatorsShort.lte'),
+    cross_above: t('operatorsShort.cross_above'),
+    cross_below: t('operatorsShort.cross_below'),
+  };
 
-const CHANNEL_LABELS: Record<string, string> = {
-  websocket: "WS",
-  telegram: "TG",
-  email: "邮件",
-};
+  const CHANNEL_LABELS: Record<string, string> = {
+    websocket: t('channels.websocketShort'),
+    telegram: t('channels.telegramShort'),
+    email: t('channels.emailShort'),
+  };
+  
+  const formatCondition = (cond: Condition): string => {
+    const metric = METRIC_LABELS[cond.metric] || cond.metric;
+    const op = OPERATOR_LABELS[cond.operator] || cond.operator;
+    return `${metric} ${op} ${cond.threshold}`;
+  };
 
-function formatCondition(cond: Condition): string {
-  const metric = METRIC_LABELS[cond.metric] || cond.metric;
-  const op = OPERATOR_LABELS[cond.operator] || cond.operator;
-  return `${metric} ${op} ${cond.threshold}`;
-}
-
-function summarizeExpression(expr: ConditionExpression): string {
-  const parts = expr.conditions.map(formatCondition);
-  const joiner = expr.logic === "and" ? " 且 " : " 或 ";
-  let summary = parts.join(joiner);
-  if (expr.sub_groups.length > 0) {
-    const subSummaries = expr.sub_groups.map((sg) => `(${summarizeExpression(sg)})`);
-    summary = [summary, ...subSummaries].join(joiner);
-  }
-  return summary;
+  const summarizeExpression = (expr: ConditionExpression): string => {
+    const parts = expr.conditions.map(formatCondition);
+    const joiner = expr.logic === "and" ? ` ${t('logic.andShort')} ` : ` ${t('logic.orShort')} `;
+    let summary = parts.join(joiner);
+    if (expr.sub_groups.length > 0) {
+      const subSummaries = expr.sub_groups.map((sg) => `(${summarizeExpression(sg)})`);
+      summary = [summary, ...subSummaries].join(joiner);
+    }
+    return summary;
+  };
+  
+  return { METRIC_LABELS, OPERATOR_LABELS, CHANNEL_LABELS, formatCondition, summarizeExpression, t };
 }
 
 function ToggleSwitch({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
@@ -87,6 +95,8 @@ function DeleteConfirmDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const t = useTranslations('alerts.delete');
+  
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -100,10 +110,10 @@ function DeleteConfirmDialog({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="card rounded-xl p-6 max-w-sm w-full mx-4 space-y-4"
+        className="card rounded-lg p-6 max-w-sm w-full mx-4 space-y-4"
       >
         <p className="text-sm text-zinc-200">
-          确定删除规则 <span className="text-white font-medium">&ldquo;{ruleName}&rdquo;</span> 吗？此操作不可撤销?
+          {t('confirmMessage', { name: ruleName })}
         </p>
         <div className="flex items-center justify-end gap-3">
           <button
@@ -111,14 +121,14 @@ function DeleteConfirmDialog({
             onClick={onCancel}
             className="px-4 py-1.5 rounded-lg text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
           >
-            取消
+            {t('cancelButton')}
           </button>
           <button
             type="button"
             onClick={onConfirm}
             className="px-4 py-1.5 rounded-lg bg-[var(--color-bear)] text-white text-sm font-medium hover:bg-[var(--color-bear)]/80 transition-colors"
           >
-            删除
+            {t('confirmButton')}
           </button>
         </div>
       </motion.div>
@@ -137,6 +147,8 @@ function RuleCard({
   onToggle: () => void;
   onDelete: () => void;
 }) {
+  const { CHANNEL_LABELS, summarizeExpression, t } = useAlertTranslations();
+  const { formatDateTime } = useDateFormatter();
   const conditionSummary = summarizeExpression(rule.expression);
 
   return (
@@ -145,7 +157,7 @@ function RuleCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
-      className={`card rounded-xl p-4 transition-opacity ${
+      className={`card rounded-lg p-4 transition-opacity ${
         rule.enabled ? "" : "opacity-50"
       }`}
     >
@@ -182,8 +194,8 @@ function RuleCard({
           {/* Last triggered */}
           <span className="text-xs text-zinc-500">
             {rule.last_triggered_at
-              ? `上次触发: ${new Date(rule.last_triggered_at).toLocaleString("zh-CN")}`
-              : "未触发"}
+              ? `${t('list.lastTriggered')}: ${formatDateTime(rule.last_triggered_at)}`
+              : t('list.neverTriggered')}
           </span>
         </div>
 
@@ -193,7 +205,7 @@ function RuleCard({
             type="button"
             onClick={onEdit}
             className="p-1.5 rounded-lg text-zinc-500 hover:text-accent hover:bg-[var(--color-accent)]/10 transition-colors"
-            aria-label={`编辑规则 ${rule.name}`}
+            aria-label={`${t('actions.edit')} ${rule.name}`}
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path
@@ -209,7 +221,7 @@ function RuleCard({
             type="button"
             onClick={onDelete}
             className="p-1.5 rounded-lg text-zinc-500 hover:text-bear hover:bg-[var(--color-bear)]/10 transition-colors"
-            aria-label={`删除规则 ${rule.name}`}
+            aria-label={`${t('actions.delete')} ${rule.name}`}
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path
@@ -239,7 +251,7 @@ export function AlertRuleList({ rules, onEdit, onToggle, onDelete }: AlertRuleLi
 
   if (rules.length === 0) {
     return (
-      <div className="card rounded-xl">
+      <div className="card rounded-lg">
         <EmptyAlertRules />
       </div>
     );

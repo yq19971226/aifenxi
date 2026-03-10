@@ -1,0 +1,45 @@
+{
+  "title": "任務中心",
+  "subtitle": "完成推廣任務，獲取免費高級分析次數",
+  "tabs": {
+    "today": "今日任務",
+    "history": "提交歷史"
+  },
+  "status": {
+    "pending": "審核中",
+    "approved": "已通過",
+    "rejected": "已駁回"
+  },
+  "today": {
+    "submitted": "今日已提交「{task}」任務",
+    "rewardGranted": "獎勵已到賬: +{amount} 次 {mode}",
+    "rejected": "駁回原因: {reason}",
+    "step1": "選擇任務類型",
+    "step2": "生成推廣素材",
+    "step3": "提交審核",
+    "generate": "生成文案",
+    "generating": "生成中...",
+    "promoImage": "推廣配圖",
+    "promoCopy": "推廣文案",
+    "copy": "複製",
+    "copied": "已複製",
+    "postUrl": "帖子連結",
+    "screenshotUrl": "瀏覽量截圖連結",
+    "screenshotPlaceholder": "截圖上傳後的圖片連結",
+    "submit": "提交審核",
+    "submitting": "提交中...",
+    "submitSuccess": "提交成功，等待審核"
+  },
+  "history": {
+    "title": "提交歷史",
+    "empty": "暫無提交記錄",
+    "emptyHint": "你的推廣任務提交將顯示在這裡"
+  },
+  "error": {
+    "loadFailed": "任務數據加載失敗",
+    "submitFailed": "提交失敗",
+    "networkError": "請檢查網絡連接後刷新重試",
+    "invalidUrl": "請輸入有效的連結",
+    "screenshotRequired": "請上傳截圖"
+  }
+}

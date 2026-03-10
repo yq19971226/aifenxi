@@ -61,6 +61,8 @@ async def collect_market_data(
         "derivatives": _safe_get(get_json(f"derivatives:{symbol}")),
         # CoinGlass（9 个 key）
         "cg_oi": _safe_get(get_json(f"cg_oi:{symbol}")),
+        "cg_oi_stablecoin": _safe_get(get_json(f"cg_oi_stablecoin:{symbol}")),
+        "cg_oi_coin": _safe_get(get_json(f"cg_oi_coin:{symbol}")),
         "cg_cvd": _safe_get(get_json(f"cg_cvd:{symbol}")),
         "cg_netflow": _safe_get(get_json(f"cg_netflow:{symbol}")),
         "cg_orderbook": _safe_get(get_json(f"cg_orderbook:{symbol}")),
@@ -177,6 +179,8 @@ def _parse_coinglass(r: dict) -> CoinGlassData | None:
     """解析 CoinGlass 9 域数据。"""
     try:
         cg_oi = r.get("cg_oi")
+        cg_oi_stablecoin = r.get("cg_oi_stablecoin")
+        cg_oi_coin = r.get("cg_oi_coin")
         cg_cvd = r.get("cg_cvd")
         cg_netflow = r.get("cg_netflow")
         cg_ob = r.get("cg_orderbook")
@@ -187,13 +191,15 @@ def _parse_coinglass(r: dict) -> CoinGlassData | None:
         cg_liq = r.get("cg_liquidation")
 
         has_any = any(x is not None for x in [
-            cg_oi, cg_cvd, cg_netflow, cg_ob, cg_lo, cg_fr, cg_mp, cg_info, cg_liq,
+            cg_oi, cg_oi_stablecoin, cg_oi_coin, cg_cvd, cg_netflow, cg_ob, cg_lo, cg_fr, cg_mp, cg_info, cg_liq,
         ])
         if not has_any:
             return None
 
         return CoinGlassData(
             oi_snapshots=cg_oi if isinstance(cg_oi, list) else [],
+            stablecoin_margin_oi_snapshots=cg_oi_stablecoin if isinstance(cg_oi_stablecoin, list) else [],
+            coin_margin_oi_snapshots=cg_oi_coin if isinstance(cg_oi_coin, list) else [],
             cvd_snapshots=cg_cvd if isinstance(cg_cvd, list) else [],
             netflow_snapshots=cg_netflow if isinstance(cg_netflow, list) else [],
             orderbook_levels=cg_ob if isinstance(cg_ob, list) else [],

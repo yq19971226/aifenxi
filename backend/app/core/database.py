@@ -1,4 +1,5 @@
 import uuid
+from contextlib import asynccontextmanager
 from collections.abc import AsyncGenerator
 from datetime import datetime, timezone
 
@@ -71,6 +72,20 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
       * binance.py — WebSocket K线写入 (session_factory)
       * datasource_registry.py — 数据源开关持久化 (AsyncSessionLocal)
     """
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
+
+
+@asynccontextmanager
+async def get_db_context() -> AsyncGenerator[AsyncSession, None]:
+    """Independent async DB session context for non-request code."""
     async with AsyncSessionLocal() as session:
         try:
             yield session

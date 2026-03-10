@@ -16,6 +16,7 @@ from sqlalchemy import (
     Boolean,
     Date,
     DateTime,
+    Float,
     ForeignKey,
     Index,
     Integer,
@@ -99,6 +100,12 @@ class OnchainSnapshotRow(Base):
     whale_change_24h: Mapped[float | None] = mapped_column(Numeric(8, 4))
     fear_greed_index: Mapped[int | None] = mapped_column(Integer)
     mvrv: Mapped[float | None] = mapped_column(Numeric(8, 4))
+    active_addresses: Mapped[int | None] = mapped_column(Integer)
+    new_addresses: Mapped[int | None] = mapped_column(Integer)
+    exchange_balance: Mapped[float | None] = mapped_column(Float)
+    large_tx_count: Mapped[int | None] = mapped_column(Integer)
+    large_tx_volume: Mapped[float | None] = mapped_column(Float)
+    miner_reserve_change: Mapped[float | None] = mapped_column(Float)
 
     __table_args__ = (
         Index("idx_onchain_symbol", "symbol", time.desc()),
@@ -210,9 +217,17 @@ class Payment(Base):
         Integer, server_default=text("1"), nullable=False
     )
     network: Mapped[str | None] = mapped_column(String(20))
+    pay_address: Mapped[str | None] = mapped_column(Text)
+    pay_amount: Mapped[float | None] = mapped_column(Numeric(24, 8))
+    pay_currency: Mapped[str | None] = mapped_column(String(30))
     status: Mapped[str] = mapped_column(
         String(20), server_default=text("'pending'")
     )
+    provider_status: Mapped[str | None] = mapped_column(String(40))
+    status_reason: Mapped[str | None] = mapped_column(String(40))
+    provider_payload_json: Mapped[str | None] = mapped_column(Text)
+    provider_observed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    provider_observation_source: Mapped[str | None] = mapped_column(String(20))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("NOW()")
     )
@@ -571,7 +586,7 @@ class PartnerWallet(Base):
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
         Uuid(),
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey("users.id"),
         unique=True,
         nullable=False,
     )

@@ -163,10 +163,12 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
   const totalCount = Math.max(steps.length, 1);
   const progressPct = Math.min((completedCount / totalCount) * 100, 100);
 
+  const lastStepStatus = steps[steps.length - 1]?.status;
+
   // Auto-scroll to latest step
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [steps.length, steps[steps.length - 1]?.status]);
+  }, [steps.length, lastStepStatus]);
 
   if (steps.length === 0) {
     if (!startTime) return null;
@@ -267,7 +269,7 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
                     )}
                   </div>
                   {step.message && (
-                    <p className={`truncate text-sm leading-4 mt-0.5 ${messageTextClass(step.status)}`}>
+                    <p className={`break-words text-sm leading-4 mt-0.5 ${messageTextClass(step.status)}`}>
                       {localizeText(step.message)}
                     </p>
                   )}

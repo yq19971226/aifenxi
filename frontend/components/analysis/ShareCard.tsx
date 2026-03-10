@@ -3,7 +3,7 @@
 import { forwardRef } from "react";
 
 import type { AnalysisReport } from "@/lib/api/analysis";
-import { modeLabel, formatPrice } from "./helpers";
+import { isConsensusAgentSection, isFallbackReasoning, modeLabel } from "./helpers";
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -29,8 +29,8 @@ interface ShareCardProps {
 // ── Helpers ──────────────────────────────────────────────────
 
 const THEME = {
-  bullish: { primary: "#dc2626", bg: "#fef2f2", emoji: "📈", dirEmoji: "🟢", label: "做多", headerBg: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)" },
-  bearish: { primary: "#16a34a", bg: "#f0fdf4", emoji: "📉", dirEmoji: "🔴", label: "做空", headerBg: "linear-gradient(135deg, #16a34a 0%, #15803d 100%)" },
+  bullish: { primary: "#16a34a", bg: "#f0fdf4", emoji: "📈", dirEmoji: "🟢", label: "做多", headerBg: "linear-gradient(135deg, #16a34a 0%, #15803d 100%)" },
+  bearish: { primary: "#dc2626", bg: "#fef2f2", emoji: "📉", dirEmoji: "🔴", label: "做空", headerBg: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)" },
   neutral: { primary: "#71717a", bg: "#fafafa", emoji: "⏸️", dirEmoji: "⚪", label: "观望", headerBg: "linear-gradient(135deg, #52525b 0%, #3f3f46 100%)" },
 } as const;
 
@@ -42,7 +42,7 @@ function getTheme(signal: string) {
 
 function agentConsensus(sections: AnalysisReport["sections"]) {
   const agents = sections.filter(
-    (s) => s.status === "completed" && s.data?.signal && s.title !== "策略建议",
+    (s) => s.status === "completed" && s.data?.signal && isConsensusAgentSection(s.title),
   );
   const counts = { bullish: 0, bearish: 0, neutral: 0 };
   for (const a of agents) {
@@ -52,6 +52,18 @@ function agentConsensus(sections: AnalysisReport["sections"]) {
     else counts.neutral++;
   }
   return { total: agents.length, ...counts };
+}
+
+function consensusSummaryText(consensus: ReturnType<typeof agentConsensus>) {
+  const ranked = [
+    { key: "bullish", label: "看涨", count: consensus.bullish },
+    { key: "bearish", label: "看跌", count: consensus.bearish },
+    { key: "neutral", label: "中性", count: consensus.neutral },
+  ].sort((a, b) => b.count - a.count);
+
+  if (ranked[0].count === 0) return "暂无明显倾向";
+  if (ranked[1] && ranked[0].count === ranked[1].count) return "多空分歧较大";
+  return `${ranked[0].count} 个${ranked[0].label}占多数`;
 }
 
 function regimeLabel(r: string | null): string {
@@ -75,28 +87,49 @@ const S = {
 export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
   function ShareCard({ report, config: configOverride }, ref) {
     const cfg = { ...DEFAULT_CONFIG, ...configOverride };
-    const t = getTheme(report.signal);
+    const strategy = report.strategy;
+    const displayDirection = strategy?.direction
+      ? strategy.direction
+      : report.signal === "bullish"
+        ? "long"
+        : report.signal === "bearish"
+          ? "short"
+          : "neutral";
+    const displaySignal = displayDirection === "long"
+      ? "bullish"
+      : displayDirection === "short"
+        ? "bearish"
+        : "neutral";
+    const t = getTheme(displaySignal);
     const consensus = agentConsensus(report.sections);
+    const subtitle = consensus.total > 0
+      ? `${consensus.total} AI 智能体共识 | ${modeLabel(report.mode)}`
+      : modeLabel(report.mode);
+    const reasoning = strategy?.reasoning || "";
+    const isLlmDegraded = strategy ? !strategy.is_fallback && isFallbackReasoning(reasoning) : false;
 
     const ts = new Date(report.timestamp);
     const timeStr = ts.toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
 
-    const validUntil = report.strategy?.valid_until
-      ? new Date(report.strategy.valid_until).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+    const validUntil = strategy?.valid_until
+      ? new Date(strategy.valid_until).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
       : null;
+    const regimeText = report.market_regime
+      ? `${regimeLabel(report.market_regime)} 🔍`
+      : "—";
+    const validUntilText = validUntil ? `${validUntil} ⏰` : "—";
 
-    const dir = report.strategy?.direction;
-    const dirLabel = dir === "long" ? "做多 BUY" : dir === "short" ? "做空 SELL" : "观望";
+    const dirLabel = displayDirection === "long" ? "做多 BUY" : displayDirection === "short" ? "做空 SELL" : "观望";
 
     return (
       <div ref={ref} style={S.card}>
         {/* ── Header ── */}
         <div style={{ background: t.headerBg, padding: "20px 24px", textAlign: "center" as const }}>
           <div style={{ fontSize: 22, fontWeight: 800, color: "#ffffff", letterSpacing: "0.02em" }}>
-            {t.emoji} {report.symbol}{dir !== "neutral" ? t.label : "观望"}交易信号 {t.emoji}
+            {t.emoji} {report.symbol}{displayDirection !== "neutral" ? t.label : "观望"}交易信号 {t.emoji}
           </div>
           <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", marginTop: 6 }}>
-            {consensus.total} AI 智能体共识 | {modeLabel(report.mode)}
+            {subtitle}
           </div>
         </div>
 
@@ -125,33 +158,36 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
             </div>
           </div>
 
-          {/* ── Section 2: 交易参数 ── */}
-          {report.strategy && !report.strategy.is_fallback && dir !== "neutral" && (
+          {/* ── Section 2: 策略摘要（安全分享，不含具体点位） ── */}
+          {report.strategy && isLlmDegraded ? (
+            <div style={S.sectionBox("#f59e0b")}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#9a3412", marginBottom: 4 }}>
+                策略生成异常
+              </div>
+              <div style={{ fontSize: 12, color: "#78716c", lineHeight: 1.6 }}>
+                智能体返回了降级响应，建议重新分析后再分享策略摘要。
+              </div>
+            </div>
+          ) : report.strategy && displayDirection !== "neutral" && (
             <div style={S.sectionBox("#6366f1")}>
               <div style={S.row}>
-                <span style={S.label}>进场区间 💰</span>
-                <span style={{ ...S.value, color: "#6366f1", fontWeight: 700 }}>
-                  {formatPrice(report.strategy.entry_low)} ~ {formatPrice(report.strategy.entry_high)}
-                </span>
+                <span style={S.label}>策略类型</span>
+                <span style={S.value}>{report.strategy.is_fallback ? "估算策略" : "标准策略"}</span>
               </div>
-              <div style={S.row}>
-                <span style={S.label}>止损价格 🛑</span>
-                <span style={{ ...S.value, color: "#ef4444", fontWeight: 700 }}>
-                  {formatPrice(report.strategy.stop_loss)}
-                </span>
-              </div>
-              {report.strategy.targets.length > 0 && (
+              {report.strategy.risk_reward_ratio > 0 && (
                 <div style={S.row}>
-                  <span style={S.label}>止盈目标 🎯</span>
-                  <span style={{ ...S.value, color: "#10b981", fontWeight: 700 }}>
-                    {report.strategy.targets.map((tp) => formatPrice(tp)).join(" / ")}
+                  <span style={S.label}>盈亏比 📊</span>
+                  <span style={{ ...S.value, color: "#6366f1", fontWeight: 700 }}>
+                    {report.strategy.risk_reward_ratio.toFixed(2)}
                   </span>
                 </div>
               )}
               <div style={S.row}>
-                <span style={S.label}>盈亏比 📊</span>
-                <span style={{ ...S.value, color: "#6366f1", fontWeight: 700 }}>
-                  {report.strategy.risk_reward_ratio.toFixed(2)}
+                <span style={S.label}>策略置信度</span>
+                <span style={S.value}>
+                  {typeof report.strategy.confidence === "number"
+                    ? `${Math.round(report.strategy.confidence * 100)}%`
+                    : "—"}
                 </span>
               </div>
               <div style={S.row}>
@@ -162,11 +198,11 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               </div>
               <div style={S.row}>
                 <span style={S.label}>市场状态</span>
-                <span style={S.value}>{regimeLabel(report.market_regime)} 🔍</span>
+                <span style={S.value}>{regimeText}</span>
               </div>
               <div style={S.rowLast}>
-                <span style={S.label}>有效期至</span>
-                <span style={S.value}>{validUntil || "—"} ⏰</span>
+                <span style={S.label}>信号时效</span>
+                <span style={S.value}>{validUntilText}</span>
               </div>
             </div>
           )}
@@ -179,12 +215,12 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const }}>
                 {consensus.bullish > 0 && (
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#dc2626", background: "#fef2f2", borderRadius: 6, padding: "4px 12px", border: "1px solid #fecaca" }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#16a34a", background: "#f0fdf4", borderRadius: 6, padding: "4px 12px", border: "1px solid #bbf7d0" }}>
                     📈 看涨 {consensus.bullish}
                   </span>
                 )}
                 {consensus.bearish > 0 && (
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#16a34a", background: "#f0fdf4", borderRadius: 6, padding: "4px 12px", border: "1px solid #bbf7d0" }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#dc2626", background: "#fef2f2", borderRadius: 6, padding: "4px 12px", border: "1px solid #fecaca" }}>
                     📉 看跌 {consensus.bearish}
                   </span>
                 )}
@@ -196,11 +232,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               </div>
               <div style={{ marginTop: 10, fontSize: 12, color: "#78716c" }}>
                 共 {consensus.total} 个智能体参与分析，
-                {consensus.bullish > consensus.bearish
-                  ? `${consensus.bullish} 个看涨占多数`
-                  : consensus.bearish > consensus.bullish
-                    ? `${consensus.bearish} 个看跌占多数`
-                    : "多空分歧较大"}
+                {consensusSummaryText(consensus)}
               </div>
             </div>
           )}

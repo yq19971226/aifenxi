@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BarChart3, Brain, Swords } from "lucide-react";
 
@@ -26,33 +26,89 @@ const TAB_GROUP_MAP: Record<string, TabKey> = {
 
 // ── Deep analysis (Layer 3) ──────────────────────────────────
 
-export function DeepAnalysis({ sections }: { sections: ReportSection[] }) {
+export function DeepAnalysis({
+  sections,
+  reportKey,
+}: {
+  sections: ReportSection[];
+  reportKey: string;
+}) {
   const [activeTab, setActiveTab] = useState<TabKey>("agents");
-  const { groups, ungrouped } = groupSections(sections);
+  const [jumpTarget, setJumpTarget] = useState<{ title: string; token: number } | null>(null);
+  const { tabGroups, visibleTabs } = useMemo(() => {
+    const { groups, ungrouped } = groupSections(sections);
+    const nextTabGroups = new Map<TabKey, { label: string; sections: ReportSection[] }[]>();
 
-  const tabGroups = new Map<TabKey, { label: string; sections: ReportSection[] }[]>();
-  for (const g of groups) {
-    const tabKey = TAB_GROUP_MAP[g.label];
-    if (tabKey) {
-      const arr = tabGroups.get(tabKey) || [];
+    for (const g of groups) {
+      const tabKey = TAB_GROUP_MAP[g.label];
+      if (!tabKey) continue;
+      const arr = nextTabGroups.get(tabKey) || [];
       arr.push(g);
-      tabGroups.set(tabKey, arr);
+      nextTabGroups.set(tabKey, arr);
     }
-  }
-  if (ungrouped.length > 0) {
-    const arr = tabGroups.get("agents") || [];
-    arr.push({ label: "其他", sections: ungrouped });
-    tabGroups.set("agents", arr);
-  }
 
-  const visibleTabs = REPORT_TABS.filter((tab) => {
-    return (tabGroups.get(tab.key)?.reduce((n, g) => n + g.sections.length, 0) ?? 0) > 0;
-  });
+    if (ungrouped.length > 0) {
+      const arr = nextTabGroups.get("agents") || [];
+      arr.push({ label: "其他", sections: ungrouped });
+      nextTabGroups.set("agents", arr);
+    }
+
+    const nextVisibleTabs = REPORT_TABS.filter((tab) => {
+      return (nextTabGroups.get(tab.key)?.reduce((n, g) => n + g.sections.length, 0) ?? 0) > 0;
+    });
+
+    return { tabGroups: nextTabGroups, visibleTabs: nextVisibleTabs };
+  }, [sections]);
+
+  const effectiveTab = visibleTabs.some((t) => t.key === activeTab)
+    ? activeTab
+    : (visibleTabs[0]?.key ?? "agents");
+
+  useEffect(() => {
+    const handleJump = (event: Event) => {
+      const title = (event as CustomEvent<string>).detail;
+      const targetTab = REPORT_TABS.find((tab) =>
+        (tabGroups.get(tab.key) || []).some((group) =>
+          group.sections.some((section) => section.title === title),
+        ),
+      )?.key;
+      if (!targetTab) return;
+      setActiveTab(targetTab);
+      setJumpTarget({ title, token: Date.now() });
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          document
+            .getElementById(`section-${title}`)
+            ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    };
+
+    window.addEventListener(
+      "analysis:jump-to-section",
+      handleJump as EventListener,
+    );
+    return () => {
+      window.removeEventListener(
+        "analysis:jump-to-section",
+        handleJump as EventListener,
+      );
+    };
+  }, [tabGroups]);
+
+  useEffect(() => {
+    if (!jumpTarget) return;
+    const timer = window.setTimeout(() => {
+      setJumpTarget((current) =>
+        current?.token === jumpTarget.token ? null : current,
+      );
+    }, 300);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [jumpTarget]);
 
   if (visibleTabs.length === 0) return null;
-
-  // Default to first visible tab
-  const effectiveTab = visibleTabs.some((t) => t.key === activeTab) ? activeTab : visibleTabs[0].key;
 
   return (
     <div className="space-y-2">
@@ -106,7 +162,12 @@ export function DeepAnalysis({ sections }: { sections: ReportSection[] }) {
                 )}
                 <div className="space-y-2">
                   {group.sections.map((section, idx) => (
-                    <SectionCard key={`${section.title}-${idx}`} section={section} defaultExpanded={idx === 0} />
+                    <SectionCard
+                      key={`${reportKey}-${section.title}-${idx}`}
+                      section={section}
+                      defaultExpanded={false}
+                      forceExpandToken={jumpTarget?.title === section.title ? jumpTarget.token : undefined}
+                    />
                   ))}
                 </div>
               </div>

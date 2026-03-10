@@ -1,0 +1,45 @@
+{
+  "title": "Task Center",
+  "subtitle": "Complete promotion tasks to earn free premium analysis credits",
+  "tabs": {
+    "today": "Today",
+    "history": "History"
+  },
+  "status": {
+    "pending": "Under Review",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "today": {
+    "submitted": "Submitted \"{task}\" task today",
+    "rewardGranted": "Reward granted: +{amount} {mode}",
+    "rejected": "Rejection reason: {reason}",
+    "step1": "Select Task Type",
+    "step2": "Generate Promo Materials",
+    "step3": "Submit for Review",
+    "generate": "Generate Copy",
+    "generating": "Generating...",
+    "promoImage": "Promo Image",
+    "promoCopy": "Promo Copy",
+    "copy": "Copy",
+    "copied": "Copied",
+    "postUrl": "Post URL",
+    "screenshotUrl": "View Count Screenshot URL",
+    "screenshotPlaceholder": "Image URL after uploading screenshot",
+    "submit": "Submit for Review",
+    "submitting": "Submitting...",
+    "submitSuccess": "Submitted successfully, pending review"
+  },
+  "history": {
+    "title": "Submission History",
+    "empty": "No submission records",
+    "emptyHint": "Your promotion task submissions will appear here"
+  },
+  "error": {
+    "loadFailed": "Failed to load task data",
+    "submitFailed": "Submission failed",
+    "networkError": "Please check network connection and refresh",
+    "invalidUrl": "Please enter a valid URL",
+    "screenshotRequired": "Please upload a screenshot"
+  }
+}

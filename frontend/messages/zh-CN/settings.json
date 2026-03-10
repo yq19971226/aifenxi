@@ -1,0 +1,501 @@
+{
+  "push": {
+    "title": "邮件通知",
+    "subtitle": "管理邮件通知渠道和事件订阅，自定义你的通知偏好",
+    "channels": {
+      "title": "通知渠道",
+      "email": {
+        "label": "邮件推送",
+        "description": "通过 SendGrid 发送策略邮件"
+      },
+      "telegram": {
+        "label": "Telegram",
+        "description": "通过 Bot 推送到 TG 群组"
+      },
+      "websocket": {
+        "label": "WebSocket",
+        "description": "浏览器实时弹窗通知"
+      },
+      "testButton": "发送测试消息",
+      "testButtonSending": "发送中..."
+    },
+    "events": {
+      "title": "事件订阅",
+      "strategy_update": {
+        "label": "策略更新",
+        "description": "新策略生成或方向变化时通知"
+      },
+      "price_alert": {
+        "label": "价格预警",
+        "description": "触及关键支撑/阻力位时通知"
+      },
+      "playbook_switch": {
+        "label": "剧本切换",
+        "description": "庄家操盘剧本发生变化时通知"
+      },
+      "risk_warning": {
+        "label": "风险预警",
+        "description": "链上异常信号触发时通知"
+      },
+      "defense_alert": {
+        "label": "防御预警",
+        "description": "庄家AI推演/合谋检测触发中等以上警报时通知"
+      },
+      "high_confidence_signal": {
+        "label": "高置信信号",
+        "description": "分析置信度超过70%时推送信号方向"
+      },
+      "strategy_settlement": {
+        "label": "策略结算",
+        "description": "策略触达止损/目标/超时结算时通知"
+      }
+    },
+    "status": {
+      "saving": "保存中...",
+      "saveFailed": "保存失败",
+      "testSent": "测试消息已发送",
+      "testFailed": "测试失败"
+    }
+  },
+  "membership": {
+    "title": "会员中心",
+    "currentStatus": {
+      "title": "当前会员",
+      "levels": {
+        "0": "免费",
+        "1": "专业",
+        "2": "旗舰"
+      },
+      "expiresAt": "到期时间：{date}",
+      "daysLeft": "（还剩 {count} 天）"
+    },
+    "freeTrial": {
+      "title": "免费体验",
+      "claim": "立即领取",
+      "claiming": "领取中...",
+      "claimed": "次可用",
+      "used": "已使用",
+      "remaining": "剩余 {count} 次日内博弈分析体验",
+      "exhausted": "体验次数已用完，升级解锁更多",
+      "description": "免费领取 {count} 次日内博弈分析体验"
+    },
+    "planComparison": {
+      "title": "等级权益对比",
+      "feature": "功能",
+      "free": "免费",
+      "pro": "专业",
+      "flagship": "旗舰",
+      "features": {
+        "scalping": "实时短线分析",
+        "intraday": "日内博弈分析",
+        "trend": "趋势布局分析",
+        "onchain": "链上数据",
+        "consensus": "多智能体共识",
+        "playbook": "剧本推演",
+        "defense": "对抗防御",
+        "backtest": "策略回测",
+        "push": "策略推送",
+        "api": "API 访问"
+      },
+      "values": {
+        "locked": "锁定",
+        "delayed": "延迟15分钟",
+        "realtime": "实时",
+        "basic": "基础",
+        "complete": "完整",
+        "email": "邮件",
+        "emailTelegram": "邮件+TG",
+        "days": "{count}天",
+        "timesPerDay": "{count}次/天",
+        "freeTrialOnce": "免费体验1次"
+      }
+    },
+    "planSelection": {
+      "title": "选择套餐",
+      "duration": {
+        "monthly": "月付",
+        "quarterly": "季付",
+        "yearly": "年付",
+        "discount": {
+          "quarterly": "9折",
+          "yearly": "7折"
+        }
+      },
+      "plans": {
+        "pro": "专业",
+        "flagship": "旗舰"
+      },
+      "selected": "已选择",
+      "save": "省 {percent}%",
+      "perMonth": "/月",
+      "perQuarter": "/季",
+      "perYear": "/年"
+    },
+    "payment": {
+      "network": "支付网络",
+      "createButton": "支付 ${amount}",
+      "creating": "创建中…",
+      "info": {
+        "title": "支付信息",
+        "amount": "支付金额",
+        "address": "支付地址",
+        "copy": "复制",
+        "copied": "已复制",
+        "timeRemaining": "剩余时间",
+        "expired": "已超时"
+      },
+      "status": {
+        "pending": "待支付",
+        "completed": "已完成",
+        "failed": "失败",
+        "expired": "已过期",
+        "confirming": "确认中"
+      }
+    },
+    "history": {
+      "title": "支付历史",
+      "columns": {
+        "date": "日期",
+        "plan": "套餐",
+        "amount": "金额",
+        "network": "网络",
+        "status": "状态"
+      }
+    }
+  },
+  "configs": {
+    "title": "参数设置",
+    "subtitle": "管理系统运行所需的各项参数和密钥",
+    "permissionDenied": "权限不足 — 仅管理员可访问参数设置",
+    "batchInit": {
+      "title": "一键初始化默认配置",
+      "description": "自动填入 {count} 项推荐默认值（会员限制、风险阈值等），已有的不会被覆盖",
+      "button": "一键初始化",
+      "buttonRunning": "写入中...",
+      "buttonDone": "✓ 已完成",
+      "resultSuccess": "完成：写入 {created} 项，跳过 {skipped} 项（已存在）"
+    },
+    "groups": {
+      "keys": {
+        "icon": "🔑",
+        "title": "密钥与接入"
+      },
+      "membership": {
+        "icon": "👥",
+        "title": "会员与配额"
+      },
+      "analysis": {
+        "icon": "📊",
+        "title": "分析与信号"
+      },
+      "risk": {
+        "icon": "⚠️",
+        "title": "风险与监控"
+      },
+      "site": {
+        "icon": "🌐",
+        "title": "站点与注册"
+      }
+    },
+    "configItem": {
+      "configured": "已配置",
+      "encrypted": "加密",
+      "delete": "删除此配置",
+      "placeholder": "请输入",
+      "defaultValue": "默认: {value}",
+      "show": "显示",
+      "hide": "隐藏"
+    },
+    "groupCard": {
+      "configuredCount": "{current}/{total} 已配置",
+      "save": "保存",
+      "saving": "保存中...",
+      "saved": "✓ 已保存"
+    },
+    "quotaMatrix": {
+      "title": "配额矩阵总览",
+      "readonly": "只读",
+      "modeHeader": "分析模式",
+      "modes": {
+        "scalping": "实时短线",
+        "intraday": "日内博弈",
+        "trend": "趋势布局"
+      },
+      "tiers": {
+        "free": "免费版",
+        "pro": "专业版",
+        "flagship": "旗舰版"
+      },
+      "locked": "锁定",
+      "timesPerDay": "次/天",
+      "freeTrial": "免费体验",
+      "times": "次"
+    },
+    "coinglassTier": {
+      "title": "CoinGlass 套餐能力",
+      "rateLimit": "限频",
+      "interval": "间隔",
+      "features": {
+        "oi": "OI 持仓量",
+        "fundingRate": "资金费率",
+        "liquidation": "爆仓数据",
+        "netPosition": "净持仓",
+        "longShortRatio": "大户多空比",
+        "heatmapModel1": "热力图 Model1",
+        "cvd": "CVD / Netflow",
+        "orderbook": "聚合订单簿 / 大单",
+        "options": "期权 (MaxPain/Info)",
+        "heatmapModel23": "热力图 Model2/3",
+        "websocket": "WebSocket 实时推送"
+      }
+    },
+    "deleteConfirm": {
+      "message": "确认删除「{name}」？删除后需要重新配置。",
+      "cancel": "取消",
+      "confirm": "确认删除",
+      "deleting": "删除中..."
+    },
+    "auditLog": {
+      "title": "操作记录",
+      "columns": {
+        "time": "时间",
+        "action": "操作",
+        "configKey": "配置项",
+        "oldValue": "旧值",
+        "newValue": "新值"
+      },
+      "actions": {
+        "create": "创建",
+        "update": "更新",
+        "delete": "删除"
+      },
+      "pagination": {
+        "page": "第 {current} / {total} 页（共 {count} 条）",
+        "prev": "上一页",
+        "next": "下一页"
+      }
+    },
+    "status": {
+      "loading": "加载中...",
+      "loadFailed": "加载配置失败",
+      "saveFailed": "保存失败",
+      "deleteFailed": "删除失败"
+    },
+    "presets": {
+      "dmx_api_key": {
+        "label": "AI 分析密钥",
+        "help": "用于调用 AI 模型分析市场数据"
+      },
+      "dmx_base_url": {
+        "label": "AI 服务地址",
+        "help": "AI 分析服务的接口地址"
+      },
+      "glassnode_api_key": {
+        "label": "链上数据密钥",
+        "help": "GlassNode 链上指标（MVRV/NVT/活跃地址等）"
+      },
+      "coingecko_api_key": {
+        "label": "基本面数据密钥",
+        "help": "CoinGecko 市值/社区/开发者/趋势数据"
+      },
+      "coinglass_api_key": {
+        "label": "CoinGlass 密钥",
+        "help": "CoinGlass 衍生品数据 API Key"
+      },
+      "alphanode_api_key": {
+        "label": "CoinGlass 代理密钥",
+        "help": "AlphaNode 代理通道访问 Key（CoinGlass REST proxy）"
+      },
+      "cryptoquant_api_key": {
+        "label": "CryptoQuant 主源密钥",
+        "help": "CryptoQuant 链上主数据源 API Key"
+      },
+      "fred_api_key": {
+        "label": "FRED 主源密钥",
+        "help": "FRED 宏观主数据源 API Key"
+      },
+      "coinglass_tier": {
+        "label": "CoinGlass 套餐",
+        "help": "当前订阅的套餐等级，决定可用端点、限频和采集频率",
+        "options": {
+          "hobbyist": "Hobbyist — 30次/分 · 5分钟间隔 · 基础OI/FR",
+          "startup": "Startup — 80次/分 · 2分钟间隔 · +净持仓/大户比",
+          "standard": "Standard — 300次/分 · 1分钟间隔 · +CVD/订单簿/期权/WS",
+          "professional": "Professional — 1200次/分 · 30秒间隔 · 全部端点"
+        }
+      },
+      "nowpayments_api_key": {
+        "label": "支付网关密钥",
+        "help": "NowPayments USDT 支付"
+      },
+      "nowpayments_ipn_secret": {
+        "label": "支付回调密钥",
+        "help": "支付通知验证签名"
+      },
+      "nowpayments_ipn_callback_url": {
+        "label": "支付回调地址",
+        "help": "NowPayments 回调完整地址（需公网可访问）"
+      },
+      "telegram_bot_token": {
+        "label": "Telegram 机器人",
+        "help": "TG 推送通知的机器人令牌"
+      },
+      "resend_api_key": {
+        "label": "Resend 邮件密钥",
+        "help": "Resend 邮件服务 API Key（优先于 SendGrid）"
+      },
+      "sendgrid_api_key": {
+        "label": "SendGrid 邮件密钥",
+        "help": "SendGrid 邮件推送服务（备选）"
+      },
+      "sentry_dsn_backend": {
+        "label": "错误监控地址",
+        "help": "Sentry 错误追踪服务地址"
+      },
+      "plan_price_pro": {
+        "label": "专业版月价",
+        "help": "专业版每月价格（USD）"
+      },
+      "plan_price_flagship": {
+        "label": "旗舰版月价",
+        "help": "旗舰版每月价格（USD）"
+      },
+      "plan_discount_quarterly": {
+        "label": "季度折扣",
+        "help": "季度订阅折扣比例（0.9 = 9折）"
+      },
+      "plan_discount_yearly": {
+        "label": "年度折扣",
+        "help": "年度订阅折扣比例（0.7 = 7折）"
+      },
+      "free_trial_intraday_count": {
+        "label": "免费体验次数",
+        "help": "免费用户可领取的日内博弈体验次数（0=关闭）"
+      },
+      "analysis_daily_limit_free_scalping": {
+        "label": "免费-实时短线",
+        "help": "免费用户每天实时短线分析次数"
+      },
+      "analysis_daily_limit_pro_scalping": {
+        "label": "专业-实时短线",
+        "help": "专业用户每天实时短线分析次数"
+      },
+      "analysis_daily_limit_flagship_scalping": {
+        "label": "旗舰-实时短线",
+        "help": "旗舰用户每天实时短线分析次数"
+      },
+      "analysis_daily_limit_pro_intraday": {
+        "label": "专业-日内博弈",
+        "help": "专业用户每天日内博弈分析次数"
+      },
+      "analysis_daily_limit_flagship_intraday": {
+        "label": "旗舰-日内博弈",
+        "help": "旗舰用户每天日内博弈分析次数"
+      },
+      "analysis_daily_limit_flagship_trend": {
+        "label": "旗舰-趋势布局",
+        "help": "旗舰用户每天趋势布局分析次数"
+      },
+      "query_limit_free": {
+        "label": "免费查询次数",
+        "help": "免费用户每天最多查询几次"
+      },
+      "perf_days_free": {
+        "label": "免费绩效天数",
+        "help": "免费用户可查看最近几天的绩效"
+      },
+      "new_user_bonus_credits": {
+        "label": "新用户赠送次数",
+        "help": "新注册用户赠送的分析体验次数"
+      },
+      "new_user_bonus_enabled": {
+        "label": "赠送开关",
+        "help": "是否启用新用户赠送（true/false）"
+      },
+      "playbook_sim_min_level": {
+        "label": "剧本推演最低等级",
+        "help": "最低会员等级（0=免费, 1=专业, 2=旗舰）"
+      },
+      "backtest_free_days": {
+        "label": "免费回测天数",
+        "help": "免费用户可查看的回测数据天数"
+      },
+      "consensus_signal_threshold": {
+        "label": "信号阈值",
+        "help": "加权分数超过此值才判定为 bullish/bearish（0.1~0.8）"
+      },
+      "consensus_min_agreement": {
+        "label": "最小一致数",
+        "help": "至少几个模型方向一致才可判定（1~4）"
+      },
+      "signal_push_threshold": {
+        "label": "高置信推送阈值",
+        "help": "分析置信度超过此阈值时推送信号（0.5~0.9）"
+      },
+      "risk_threshold_exchange_inflow_btc": {
+        "label": "交易所流入预警",
+        "help": "BTC 流入交易所超过此值触发预警"
+      },
+      "risk_threshold_whale_transfer_usd": {
+        "label": "鲸鱼转账预警",
+        "help": "大额转账超过此值触发预警"
+      },
+      "risk_threshold_mvrv_high": {
+        "label": "MVRV 高位预警",
+        "help": "MVRV 超过此值表示市场过热"
+      },
+      "risk_threshold_mvrv_low": {
+        "label": "MVRV 低位预警",
+        "help": "MVRV 低于此值表示市场低估"
+      },
+      "risk_threshold_fear_greed_panic": {
+        "label": "恐慌指数预警",
+        "help": "恐贪指数低于此值触发恐慌预警"
+      },
+      "risk_threshold_fear_greed_greed": {
+        "label": "贪婪指数预警",
+        "help": "恐贪指数高于此值触发贪婪预警"
+      },
+      "risk_threshold_funding_rate": {
+        "label": "资金费率预警",
+        "help": "费率绝对值超过此值触发预警"
+      },
+      "risk_threshold_liquidation_1h": {
+        "label": "爆仓量预警",
+        "help": "1小时爆仓量超过此值触发预警"
+      },
+      "risk_threshold_long_short_imbalance": {
+        "label": "多空比失衡预警",
+        "help": "多空比偏离超过此值触发预警"
+      },
+      "sentry_traces_sample_rate": {
+        "label": "监控采样率",
+        "help": "性能监控的采样比例（0-1）"
+      },
+      "site_brand_name": {
+        "label": "品牌名称",
+        "help": "用于推广文案、邀请页等"
+      },
+      "site_brand_url": {
+        "label": "品牌官网域名",
+        "help": "用于拼接邀请链接，如 https://app.example.com"
+      },
+      "register_feature_enabled": {
+        "label": "允许新用户注册",
+        "help": "关闭后前台注册入口不可用，注册验证码和注册接口都会被拦截（true/false）"
+      },
+      "register_referral_required": {
+        "label": "强制邀请码注册",
+        "help": "开启后用户必须填写有效邀请码才能注册（true/false）"
+      },
+      "partner_commission_rate": {
+        "label": "合伙人分成比例",
+        "help": "合伙人推荐订单分成比例（0.10 = 10%）"
+      },
+      "partner_min_withdrawal": {
+        "label": "最低提现金额",
+        "help": "合伙人最低提现金额"
+      }
+    }
+  }
+}

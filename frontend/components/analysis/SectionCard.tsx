@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
-import type { ReportSection, SignalDirection } from "@/lib/api/analysis";
+import type { ReportSection } from "@/lib/api/analysis";
 import { HIDDEN_FIELDS, COLLAPSED_FIELDS } from "./constants";
 import {
   fieldLabel,
@@ -12,7 +12,6 @@ import {
   formatValue,
   getSectionStatusStyle,
   getSectionIcon,
-  getSignalStyle,
   isEmpty,
   isFallbackReasoning,
   localizeText,
@@ -22,6 +21,7 @@ import {
   DirectionBadge,
   ObjectArrayTable,
   PriceLevels,
+  PreviewList,
   ReasoningBlock,
   SignalRow,
 } from "./renderers";
@@ -173,7 +173,15 @@ export function DataPairs({ data, hideEmpty = true }: { data: Record<string, unk
 
 // ── Collapsible section card ─────────────────────────────────
 
-export function SectionCard({ section, defaultExpanded = false }: { section: ReportSection; defaultExpanded?: boolean }) {
+export function SectionCard({
+  section,
+  defaultExpanded = false,
+  forceExpandToken,
+}: {
+  section: ReportSection;
+  defaultExpanded?: boolean;
+  forceExpandToken?: number;
+}) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const statusStyle = getSectionStatusStyle(section.status);
   const sectionIcon = getSectionIcon(section.title);
@@ -184,6 +192,16 @@ export function SectionCard({ section, defaultExpanded = false }: { section: Rep
   const rawConf = section.data?.confidence;
   const sectionConf = typeof rawConf === "number" ? rawConf : undefined;
   const signalColor = sectionSignal === "bullish" ? "text-emerald-400" : sectionSignal === "bearish" ? "text-red-400" : "";
+
+  useEffect(() => {
+    setExpanded(defaultExpanded);
+  }, [defaultExpanded, section]);
+
+  useEffect(() => {
+    if (typeof forceExpandToken === "number") {
+      setExpanded(true);
+    }
+  }, [forceExpandToken]);
 
   return (
     <div id={`section-${section.title}`} className="rounded-lg border border-white/[0.06] bg-zinc-900/60">
@@ -243,27 +261,26 @@ export function SectionCard({ section, defaultExpanded = false }: { section: Rep
                 <>
                   {Array.isArray(section.data.key_findings) &&
                     section.data.key_findings.length > 0 && (
-                      <ul className="space-y-1.5">
-                        {(section.data.key_findings as string[]).map(
-                          (f, idx) => (
-                            <li
-                              key={idx}
-                              className="flex items-start gap-2.5 text-sm text-zinc-300 leading-relaxed"
-                            >
-                              <span
-                                className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${
-                                  sectionSignal === "bullish"
-                                    ? "bg-emerald-400"
-                                    : sectionSignal === "bearish"
-                                      ? "bg-red-400"
-                                      : "bg-zinc-500"
-                                }`}
-                              />
-                              {localizeText(String(f))}
-                            </li>
-                          ),
+                      <PreviewList
+                        items={section.data.key_findings as string[]}
+                        renderItem={(f, idx) => (
+                          <li
+                            key={`${section.title}-${idx}`}
+                            className="flex items-start gap-2.5 text-sm text-zinc-300 leading-relaxed"
+                          >
+                            <span
+                              className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${
+                                sectionSignal === "bullish"
+                                  ? "bg-emerald-400"
+                                  : sectionSignal === "bearish"
+                                    ? "bg-red-400"
+                                    : "bg-zinc-500"
+                              }`}
+                            />
+                            {localizeText(String(f))}
+                          </li>
                         )}
-                      </ul>
+                      />
                     )}
                   {typeof section.data.reasoning === "string" &&
                     section.data.reasoning.length > 0 &&

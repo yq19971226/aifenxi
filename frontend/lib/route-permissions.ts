@@ -5,6 +5,9 @@
  * 1. `/admin/*` 默认 admin-only
  * 2. 放宽白名单：`/admin/orders`、`/admin/users` → admin + operator（只读）
  * 3. 其他需要额外保护的非 admin 路径在 EXTRA_PROTECTED 中声明
+ *
+ * 注意：i18n 模式下 usePathname() 返回带 locale 前缀的路径（如 /zh-CN/admin/...），
+ * 因此所有判断前必须先通过 stripLocalePrefix() 归一化。
  */
 
 export type UserRole = "admin" | "operator" | "user";
@@ -15,68 +18,66 @@ export const ROLE_LEVEL: Record<UserRole, number> = {
   admin: 2,
 };
 
+const SUPPORTED_LOCALES = ["zh-CN", "zh-TW", "en"];
+
 /**
- * /admin/* 路径下的角色放宽白名单。
- * 未在此列出的 /admin/* 路径一律 admin-only。
+ * 去除路径中的 locale 前缀，返回归一化的路径。
+ * 例: "/zh-CN/admin/dashboard" → "/admin/dashboard"
+ * 例: "/admin/dashboard" → "/admin/dashboard"（无 locale 时不变）
  */
+export function stripLocalePrefix(pathname: string): string {
+  for (const loc of SUPPORTED_LOCALES) {
+    const prefix = `/${loc}`;
+    if (pathname === prefix) return "/";
+    if (pathname.startsWith(prefix + "/")) return pathname.slice(prefix.length);
+  }
+  return pathname;
+}
+
 const ADMIN_WHITELIST: Record<string, UserRole[]> = {
   "/admin/orders": ["admin", "operator"],
   "/admin/users": ["admin", "operator"],
 };
 
-/**
- * 非 /admin 前缀但仍需额外角色保护的路径。
- */
 const EXTRA_PROTECTED: Record<string, UserRole[]> = {
   "/settings/configs": ["admin"],
 };
 
 // ── Public API ────────────────────────────────────────────────
 
-/**
- * 判断给定路径是否允许指定角色访问。
- * 返回 true 表示允许，false 表示拒绝。
- */
 export function isRouteAllowed(pathname: string, role: UserRole): boolean {
-  // /admin/* 前缀匹配
-  if (pathname.startsWith("/admin")) {
+  const p = stripLocalePrefix(pathname);
+
+  if (p.startsWith("/admin")) {
     const matched = Object.entries(ADMIN_WHITELIST).find(([path]) =>
-      pathname === path || pathname.startsWith(path + "/")
+      p === path || p.startsWith(path + "/")
     );
     const allowedRoles = matched ? matched[1] : ["admin"] as UserRole[];
     return allowedRoles.includes(role);
   }
 
-  // 额外保护路径
   const extraMatch = Object.entries(EXTRA_PROTECTED).find(([path]) =>
-    pathname === path || pathname.startsWith(path + "/")
+    p === path || p.startsWith(path + "/")
   );
   if (extraMatch) {
     return extraMatch[1].includes(role);
   }
 
-  // 其余路径对所有已登录用户开放
   return true;
 }
 
-/**
- * 判断导航项是否对指定角色可见。
- * TopNav 用此函数过滤子菜单项。
- */
 export function isNavItemVisible(href: string, role: UserRole): boolean {
   return isRouteAllowed(href, role);
 }
 
-/**
- * 获取某路径所需的最低角色（供 TopNav minRole 使用）。
- */
 export function getMinRole(href: string): UserRole {
-  if (href.startsWith("/admin")) {
+  const h = stripLocalePrefix(href);
+
+  if (h.startsWith("/admin")) {
     const matched = Object.entries(ADMIN_WHITELIST).find(([path]) =>
-      href === path || href.startsWith(path + "/")
+      h === path || h.startsWith(path + "/")
     );
     if (matched) {
-      // 白名单中最低角色
       if (matched[1].includes("user")) return "user";
       if (matched[1].includes("operator")) return "operator";
       return "admin";
@@ -85,7 +86,7 @@ export function getMinRole(href: string): UserRole {
   }
 
   const extraMatch = Object.entries(EXTRA_PROTECTED).find(([path]) =>
-    href === path || href.startsWith(path + "/")
+    h === path || h.startsWith(path + "/")
   );
   if (extraMatch) {
     if (extraMatch[1].includes("user")) return "user";

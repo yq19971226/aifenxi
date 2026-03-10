@@ -31,7 +31,7 @@ export class ModuleErrorBoundary extends Component<
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div className="rounded-xl card-surface p-6">
+        <div className="rounded-lg card-surface p-6">
           <div className="flex items-center justify-center py-6">
             <span className="text-sm text-red-400">
               {this.props.moduleName} 加载失败

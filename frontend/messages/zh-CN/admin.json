@@ -1,0 +1,525 @@
+{
+  "sidebar": {
+    "groups": {
+      "overview": "概览",
+      "config": "系统配置",
+      "users": "用户运营",
+      "review": "内容审核",
+      "finance": "财务",
+      "ai": "AI",
+      "system": "系统"
+    },
+    "items": {
+      "dashboard": "后台总览",
+      "monitor": "系统监控",
+      "setup": "快速设置",
+      "configs": "参数设置",
+      "maintenance": "维护模式",
+      "apiKeys": "API 密钥",
+      "datasources": "数据源管理",
+      "models": "模型分工",
+      "symbols": "币种管理",
+      "users": "用户管理",
+      "operators": "运营员管理",
+      "orders": "平台订单",
+      "notifications": "通知管理",
+      "push": "推送管理",
+      "announcements": "公告管理",
+      "playbookReview": "剧本审核",
+      "taskReview": "任务审核",
+      "taskTemplates": "任务模板",
+      "withdrawals": "提现审核",
+      "partnerStats": "合伙人统计",
+      "learning": "自主学习",
+      "systemMgmt": "系统管理"
+    },
+    "mobileMenu": "管理菜单"
+  },
+  "operators": {
+    "title": "运营员管理",
+    "noAccess": "无权限访问运营员管理",
+    "fetchFailed": "获取运营员列表失败",
+    "email": "邮箱",
+    "initialPassword": "初始密码（至少 8 位）",
+    "createButton": "创建运营员",
+    "creating": "处理中…",
+    "passwordMinLength": "密码长度至少 8 位",
+    "createFailed": "创建运营员失败",
+    "operationFailed": "操作失败",
+    "createdAt": "创建时间",
+    "status": "状态",
+    "action": "操作",
+    "enabled": "启用",
+    "disabled": "停用",
+    "processing": "处理中…"
+  },
+  "permissionDenied": "无权限访问",
+  "maintenance": {
+    "title": "维护模式",
+    "subtitle": "控制各功能模块的维护状态，维护中的功能将向用户显示维护提示",
+    "configDescription": "功能开关: {configKey}",
+    "errors": {
+      "fetchFailed": "获取失败",
+      "createFailed": "创建失败",
+      "saveFailed": "保存失败"
+    },
+    "loading": "加载中...",
+    "restore": "恢复",
+    "maintenance": "维护",
+    "globalSwitch": {
+      "maintenanceCount": "{count} 个功能处于维护中",
+      "allRunning": "所有功能正常运行",
+      "restoreHint": "点击「恢复」可恢复所有功能",
+      "maintenanceHint": "点击「维护」可将所有功能设为维护状态",
+      "restoreAll": "恢复",
+      "maintenanceAll": "维护"
+    },
+    "features": {
+      "playbook": "剧本推演",
+      "leaderboard": "排行榜",
+      "task": "任务中心",
+      "partner": "合伙人",
+      "push": "推送设置",
+      "alerts": "预警规则",
+      "online_count": "在线人数"
+    },
+    "paths": {
+      "playbook": "/playbook-sim",
+      "leaderboard": "/leaderboard",
+      "task": "/tasks",
+      "partner": "/partner",
+      "push": "/settings/push",
+      "alerts": "/alerts",
+      "online_count": ""
+    }
+  },
+  "push": {
+    "title": "推送管理",
+    "subtitle": "管理推送通知功能的可用性",
+    "noPermission": "无权限访问",
+    "loading": "加载中...",
+    "errors": {
+      "fetchFailed": "获取失败",
+      "createFailed": "创建失败",
+      "saveFailed": "保存失败"
+    },
+    "states": {
+      "active": "开启",
+      "maintenance": "维护中",
+      "hidden": "隐藏"
+    },
+    "toggle": {
+      "label": "推送通知",
+      "hint": "/settings/push — 用户推送渠道与事件订阅"
+    },
+    "statusSection": {
+      "title": "状态说明",
+      "activeDesc": "用户可正常访问推送设置页面，配置推送渠道",
+      "maintenanceDesc": "推送设置页面显示维护提示，用户无法操作",
+      "hiddenDesc": "导航中完全隐藏推送设置入口"
+    },
+    "featureFlagDescription": "功能开关: {configKey}"
+  },
+  "orders": {
+    "title": "平台订单",
+    "search": "搜索",
+    "searchPlaceholder": "邮箱 / 订单ID",
+    "status": "状态",
+    "statusAll": "全部",
+    "statusPending": "待确认",
+    "statusCompleted": "已完成",
+    "statusFailed": "失败",
+    "planType": "套餐类型",
+    "planAll": "全部",
+    "planPro": "专业",
+    "planFlagship": "旗舰",
+    "pageSize": "每页条数",
+    "rows": "条",
+    "paginationSummary": "共 {total} 条 · 第 {page} 页 / 共 {totalPages} 页",
+    "prevPage": "上一页",
+    "nextPage": "下一页",
+    "errorFetchFailed": "查询订单失败",
+    "emptyTitle": "暂无订单数据"
+  },
+  "announcements": {
+    "noAccess": "无权限访问公告管理",
+    "title": "公告管理",
+    "subtitle": "超简版：标题 + 正文 + 发布；需要时再展开高级设置",
+    "createButton": "新建公告",
+    "editor": {
+      "createDraft": "新建公告草稿",
+      "createNewVersion": "创建新版本草稿",
+      "editAnnouncement": "编辑公告",
+      "createSubtitle": "超简版默认只填标题和正文，直接发布；其他规则收进高级设置",
+      "saveDraft": "保存草稿",
+      "saveNewVersion": "保存为新版本草稿",
+      "save": "保存",
+      "publishDirect": "直接发布",
+      "publishNewVersion": "保存并发布新版本",
+      "saveAndPublish": "保存并发布",
+      "collapse": "收起",
+      "simpleHint": "超简版默认只需填写标题和正文。",
+      "collapseAdvanced": "收起高级设置",
+      "expandAdvanced": "展开高级设置",
+      "labelTitle": "标题",
+      "labelContent": "正文",
+      "labelDisplayMode": "展示方式",
+      "labelSummary": "摘要",
+      "labelKey": "公告标识（留空自动生成）",
+      "labelPriority": "优先级",
+      "labelStrongAck": "强确认",
+      "labelAllowSnooze": "允许稍后提醒",
+      "labelActionText": "操作文案",
+      "labelActionHref": "操作链接",
+      "labelTargetRoles": "目标角色",
+      "labelTargetLevels": "目标会员等级",
+      "labelTargetPaths": "目标路径前缀",
+      "labelStartsAt": "开始时间",
+      "labelEndsAt": "结束时间",
+      "defaultHint": "默认流程就是标题、正文、发布；高级规则按需展开。",
+      "cancel": "取消",
+      "saving": "保存中",
+      "publishing": "发布中"
+    }
+  },
+  "apiKeys": {
+    "title": "API 密钥管理",
+    "subtitle": "在这里填入各个服务的 API Key，填好后系统会自动开始采集数据。",
+    "progress": "配置进度",
+    "coreConfigured": "✓ 核心密钥已配置",
+    "coreConfiguredPartial": "核心密钥 {configured}/{total}，请先配置必填项",
+    "dataSourcesOptional": "其余数据源可随时添加",
+    "groups": {
+      "core": "核心（必填）",
+      "data": "数据源（按需填写）",
+      "notif": "推送通知（可选）",
+      "pay": "支付（可选）"
+    },
+    "status": {
+      "configured": "已配置",
+      "verifiedUnsaved": "已验证未保存",
+      "notConfigured": "未配置",
+      "required": "必填"
+    },
+    "howToGet": "如何获取：",
+    "goToRegister": "前往 {provider} 注册",
+    "placeholder": {
+      "configured": "已配置（输入新值可覆盖）",
+      "empty": "粘贴你的 API Key…"
+    },
+    "show": "显示",
+    "hide": "隐藏",
+    "test": "测试连接",
+    "testing": "测试中",
+    "save": "保存",
+    "saving": "保存中",
+    "saved": "已保存",
+    "verifiedUnsavedHint": "当前只完成了连接验证，还没有写入系统配置。请继续点击「保存」。",
+    "faq": {
+      "title": "常见问题",
+      "q1": "Q: 必须全部填完才能用吗？",
+      "a1": "不需要。只有「AI 分析密钥」是必填的，其他数据源可以按需开通。没有填的数据源系统会自动跳过。",
+      "q2": "Q: 填了 Key 后需要重启吗？",
+      "a2": "不需要。保存后系统会自动生效，下一次采集周期就会使用新的 Key。",
+      "q3": "Q: Key 安全吗？",
+      "a3": "所有 API Key 在数据库中加密存储，前端只能看到脱敏后的值（如 sk-****abc），不会明文显示。",
+      "q4": "Q: 免费的数据源够用吗？",
+      "a4": "免费数据源（Binance + Alternative.me + BlockBeats + CryptoPanic + CoinGecko Demo）已经覆盖了 K 线、合约、恐慌指数、新闻、基本面数据，对于基础分析足够。付费数据源（CoinGlass、GlassNode、CoinGecko 高级套餐）主要增强衡生品、链上深度和社区情绪维度。"
+    },
+    "toast": {
+      "testSuccess": "{name} 连接测试成功",
+      "testFail": "{name} 连接测试失败: {message}",
+      "testError": "{name} 测试失败: {message}",
+      "saveSuccess": "{name} 保存成功",
+      "saveFail": "保存失败"
+    },
+    "testFailed": "测试失败",
+    "keys": {
+      "dmx_api_key": {
+        "name": "AI 分析密钥",
+        "description": "驱动所有 AI 智能体的核心密钥，没有它系统无法进行任何分析。",
+        "howToGet": "注册 → 充值 → 复制 API Key",
+        "cost": "按量付费"
+      },
+      "cryptopanic_api_token": {
+        "name": "新闻数据密钥",
+        "description": "获取全球加密货币新闻，为 NewsAnalystAgent 提供英文新闻数据。",
+        "howToGet": "注册账号 → 进入 API 页面 → 复制 Auth Token",
+        "cost": "免费"
+      },
+      "coinglass_api_key": {
+        "name": "合约数据密钥",
+        "description": "全市场爆仓热图、资金费率聚合、MVRV 估值指标。",
+        "howToGet": "注册账号 → 进入 Open API 页面 → 创建 API Key",
+        "cost": "Startup $29/月起"
+      },
+      "alphanode_api_key": {
+        "name": "CoinGlass 代理密钥",
+        "description": "CoinGlass REST 代理通道密钥，用于 proxy > official 双通道中的代理主通道。",
+        "howToGet": "向 AlphaNode 服务方获取代理访问 Key",
+        "cost": "按代理服务约定"
+      },
+      "cryptoquant_api_key": {
+        "name": "链上主源密钥",
+        "description": "CryptoQuant 链上主数据源密钥，用于交易所流量、储备、地址与 MVRV 等指标采集。",
+        "howToGet": "注册账号 → API 页面 → 创建或复制 API Key",
+        "cost": "Professional $109/月起"
+      },
+      "fred_api_key": {
+        "name": "宏观主源密钥",
+        "description": "FRED 宏观主数据源密钥，用于 CPI、失业率、联邦基金利率、GDP 等官方序列采集。",
+        "howToGet": "登录 FRED 账号 → API Keys 页面生成 Key",
+        "cost": "免费"
+      },
+      "glassnode_api_key": {
+        "name": "链上数据密钥",
+        "description": "MVRV、NVT、S2F、活跃地址、交易所流量等链上指标。",
+        "howToGet": "注册账号 → 选择套餐 → API 管理 → 复制 Key",
+        "cost": "免费层可用，高级指标需付费"
+      },
+      "coingecko_api_key": {
+        "name": "基本面数据密钥",
+        "description": "市值、社区情绪、开发者活跃度、全局宏观、热门趋势。",
+        "howToGet": "注册账号 → Developer Dashboard → 复制 API Key",
+        "cost": "Demo 免费，Basic $35/月起"
+      },
+      "telegram_bot_token": {
+        "name": "Telegram 机器人",
+        "description": "通过 Telegram 接收预警推送消息。",
+        "howToGet": "在 Telegram 搜索 @BotFather → /newbot → 复制 Token",
+        "cost": "免费"
+      },
+      "resend_api_key": {
+        "name": "邮件服务密钥",
+        "description": "通过邮件接收预警推送消息（推荐，优先于 SendGrid）。",
+        "howToGet": "注册账号 → API Keys → Create API Key",
+        "cost": "免费 3000封/月"
+      },
+      "sendgrid_api_key": {
+        "name": "邮件服务密钥（备选）",
+        "description": "通过邮件接收预警推送消息（已配置 Resend 时可不填）。",
+        "howToGet": "注册账号 → Settings → API Keys → Create API Key",
+        "cost": "免费层可用"
+      },
+      "nowpayments_api_key": {
+        "name": "支付网关密钥",
+        "description": "接受 USDT 加密货币支付（会员订阅用）。",
+        "howToGet": "注册商户账号 → Store Settings → API Keys",
+        "cost": "按交易收费"
+      }
+    }
+  },
+  "monitor": {
+    "title": "系统监控",
+    "subtitle": "{count} 个 AI 智能体 · 多维度市场分析",
+    "monitorSymbol": "监控币种",
+    "backendService": "后端服务",
+    "statusOk": "正常",
+    "statusError": "异常",
+    "env": "环境",
+    "agentsLabel": "智能体",
+    "agentsCount": "核心5 + 增强3 + 对抗2",
+    "reflection": "反思注入",
+    "reflectionActive": "活跃",
+    "reflectionPending": "待触发",
+    "defenseLevel": "防御等级",
+    "collusionDetected": "合谋检测异常",
+    "onlineUsers": "在线用户",
+    "websocketSubtitle": "WebSocket 实时连接（30s 刷新）",
+    "live": "实时",
+    "totalConnections": "总连接",
+    "priceChannel": "价格频道",
+    "alertChannel": "预警频道",
+    "klineScheduler": "K 线数据采集",
+    "klineSchedulerDesc": "自动从 Binance 拉取 K 线数据并缓存，每 {seconds} 秒一轮",
+    "running": "运行中",
+    "stopped": "已停止",
+    "completedRounds": "已完成轮次",
+    "collectTasks": "采集任务",
+    "failed": "失败",
+    "lastRoundTime": "上轮耗时",
+    "lastCollect": "上次采集",
+    "collectSymbols": "采集币种",
+    "collectIntervals": "采集周期",
+    "agentsList": "AI 智能体一览",
+    "agentsListDesc": "系统内置 {count} 个 AI 智能体，从不同维度分析市场并给出综合建议",
+    "agentHeader": "智能体",
+    "layer": "层级",
+    "aiModel": "AI 模型",
+    "analysisFrequency": "分析频率",
+    "custom": "自定义",
+    "analysisModes": "分析模式",
+    "analysisModesDesc": "系统会根据市场情况自动选择合适的分析模式，调度不同数量的智能体",
+    "agentsCountLabel": "{count} 智能体",
+    "agents": {
+      "technical": { "name": "技术分析", "desc": "K线形态、指标信号、支撑压力位" },
+      "onchain": { "name": "链上数据", "desc": "资金动向、交易所流入流出、矿工储备" },
+      "sentiment": { "name": "舆情分析", "desc": "恐贪指数、社交热度、流量动向" },
+      "orderbook": { "name": "订单簿", "desc": "买卖盘深度、大单挂单、挂单价" },
+      "risk": { "name": "风险评估", "desc": "仓位风险、止损建议、盈亏比" },
+      "news_analyst": { "name": "新闻分析", "desc": "全球加密新闻解读、监管政策影响" },
+      "calendar": { "name": "日历事件", "desc": "代币解锁、上线、减半等事件影响评估" },
+      "reflection": { "name": "反思复盘", "desc": "回顾历史判断准确率，持续自我改进" },
+      "adversarial": { "name": "对抗推演", "desc": "站在庄家视角反推下一步操盘策略" },
+      "collusion_detector": { "name": "合谋检测", "desc": "检测对倒交易、协作拉盘、恶意操纵" }
+    },
+    "phases": {
+      "core": "核心层",
+      "enhance": "增强层",
+      "adversarial": "对抗层"
+    },
+    "modes": {
+      "scalping": "超短线",
+      "intraday": "日内",
+      "trend": "趋势",
+      "offline": "离线"
+    },
+    "modeLabels": {
+      "scalping": "秒级判断，适合短线交易",
+      "intraday": "分钟级分析，适合日内波段",
+      "trend": "全维度深度分析，适合中长线布局"
+    },
+    "agentNames": {
+      "technical": "技术分析",
+      "onchain": "链上数据",
+      "risk": "风险评估",
+      "orderbook": "订单簿",
+      "news_analyst": "新闻分析",
+      "calendar": "日历事件",
+      "adversarial": "对抗推演",
+      "collusion_detector": "合谋检测",
+      "reflection": "反思注入"
+    },
+    "modelLabels": {
+      "deepseek": "DeepSeek V3 通用",
+      "grok": "Grok-4 标准"
+    }
+  },
+  "setup": {
+    "title": "系统设置",
+    "subtitle": "管理功能开关与系统配置",
+    "featureToggles": "功能开关",
+    "featureTogglesHint": "控制前台功能的可见性。「开启」正常显示，「维护中」显示维护页面，「隐藏」完全不可见。",
+    "loading": "加载中...",
+    "configDescription": "功能开关: {configKey}",
+    "errors": {
+      "createFailed": "创建失败 ({status})",
+      "saveFailed": "保存失败 ({status})"
+    },
+    "states": {
+      "active": "开启",
+      "maintenance": "维护中",
+      "hidden": "隐藏"
+    },
+    "features": {
+      "playbook": {
+        "label": "剧本推演",
+        "desc": "/playbook-sim — AI对抗剧本推演系统"
+      },
+      "leaderboard": {
+        "label": "排行榜",
+        "desc": "/leaderboard — 策略排行榜"
+      },
+      "task": {
+        "label": "任务中心",
+        "desc": "/tasks — 推广任务系统"
+      },
+      "partner": {
+        "label": "合伙人",
+        "desc": "/partner — 合伙人推荐系统"
+      },
+      "push": {
+        "label": "推送设置",
+        "desc": "/settings/push — 推送渠道与事件订阅"
+      },
+      "alerts": {
+        "label": "预警规则",
+        "desc": "/alerts — 用户自定义价格预警"
+      },
+      "online_count": {
+        "label": "在线人数显示",
+        "desc": "首页和仪表盘展示当前在线用户数"
+      }
+    }
+  },
+  "dashboard": {
+    "title": "运营概览",
+    "configHealth": {
+      "title": "配置体检",
+      "failCount": "{count} 项异常",
+      "allOk": "全部正常",
+      "pendingCount": "{count} 项待配置",
+      "items": {
+        "aiKey": {
+          "label": "AI 分析引擎",
+          "ok": "已配置，AI 分析功能正常",
+          "fail": "未配置 AI 密钥，所有分析功能不可用"
+        },
+        "newsKey": {
+          "label": "新闻数据",
+          "ok": "CryptoPanic 已接入",
+          "warn": "CryptoPanic 未配置，仅使用 BlockBeats（免费）"
+        },
+        "onchainKey": {
+          "label": "链上深度数据",
+          "ok": "GlassNode 已接入，MVRV/NVT 等链上指标可用",
+          "warn": "GlassNode 未配置，链上分析仅使用免费数据源（恐慌贪婪指数）"
+        },
+        "params": {
+          "label": "系统参数",
+          "ok": "默认参数已初始化",
+          "warn": "部分默认参数未初始化，建议去参数设置一键初始化"
+        },
+        "push": {
+          "label": "消息推送",
+          "ok": "推送通道已配置",
+          "warn": "未配置推送通道，预警消息无法送达"
+        }
+      }
+    },
+    "kpi": {
+      "totalUsers": "总用户",
+      "todayNew": "今日 +{count}",
+      "newUsers7d": "7日新增",
+      "totalRevenue": "累计收入",
+      "revenue30d": "30d {amount}",
+      "pendingPayments": "待处理支付",
+      "strategies24h": "策略 24h",
+      "totalStrategies": "累计 {count}",
+      "consensus24h": "共识 24h",
+      "totalConsensus": "累计 {count}",
+      "onlineUsers": "在线用户",
+      "onlineBreakdown": "价格{price} / 预警{alerts}"
+    },
+    "tierBar": {
+      "title": "会员分布",
+      "count": "{count} 人",
+      "free": "免费",
+      "pro": "专业",
+      "flagship": "旗舰"
+    },
+    "llmCost": {
+      "title": "今日 AI 成本",
+      "totalCost": "总成本",
+      "tokens": "Tokens",
+      "calls": "调用",
+      "loading": "AI 成本数据加载中…"
+    },
+    "quickActions": {
+      "title": "快捷操作",
+      "userMgmt": { "label": "用户管理", "desc": "搜索/封禁/调整等级" },
+      "apiKeys": { "label": "API 密钥", "desc": "管理第三方密钥" },
+      "datasources": { "label": "数据源", "desc": "开关数据源" },
+      "monitor": { "label": "系统监控", "desc": "智能体/编排器" },
+      "models": { "label": "模型分工", "desc": "切换模型映射" },
+      "configs": { "label": "参数设置", "desc": "运行时参数" }
+    },
+    "activity": {
+      "title": "系统活跃度",
+      "agentReports": "智能体报告",
+      "agentReports24h": "24h +{count}",
+      "alertRules": "预警规则",
+      "activeRules": "活跃 {count}"
+    }
+  }
+}

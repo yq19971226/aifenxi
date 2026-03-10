@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { useDateFormatter, useNumberFormatter } from "@/lib/i18n/formatters";
 import type { AlertTriggerResponse } from "@/lib/api/alerts";
 import { EmptyAlertHistory } from "@/components/ui/EmptyState";
 
@@ -8,31 +10,8 @@ interface AlertTriggerHistoryProps {
   triggers: AlertTriggerResponse[];
 }
 
-const METRIC_LABELS: Record<string, string> = {
-  price: "价格",
-  rsi: "RSI",
-  macd: "MACD",
-  ema: "EMA",
-  bb_upper: "布林带上轨",
-  bb_lower: "布林带下轨",
-  exchange_netflow: "交易所净流入",
-  whale_change_24h: "巨鲸持仓变化",
-  fear_greed_index: "恐慌贪婪指数",
-  mvrv: "MVRV",
-  funding_rate: "资金费率",
-};
-
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleString("zh-CN", {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
-}
-
 function StatusBadge({ status }: { status: string }) {
+  const t = useTranslations('alerts.history.status');
   const isSent = status === "sent";
   return (
     <span
@@ -42,13 +21,40 @@ function StatusBadge({ status }: { status: string }) {
           : "bg-[var(--color-bear)]/15 text-bear"
       }`}
     >
-      {isSent ? "已发送" : "失败"}
+      {isSent ? t('sent') : t('failed')}
     </span>
   );
 }
 
 function TriggerRow({ trigger, index }: { trigger: AlertTriggerResponse; index: number }) {
+  const t = useTranslations('alerts');
+  const { formatDateTime } = useDateFormatter();
+  const { formatNumber } = useNumberFormatter();
+  
+  const METRIC_LABELS: Record<string, string> = {
+    price: t('metrics.price'),
+    rsi: t('metrics.rsi'),
+    macd: t('metrics.macd'),
+    ema: t('metrics.ema'),
+    bb_upper: t('metrics.bb_upper'),
+    bb_lower: t('metrics.bb_lower'),
+    exchange_netflow: t('metrics.exchange_netflow'),
+    whale_change_24h: t('metrics.whale_change_24h'),
+    fear_greed_index: t('metrics.fear_greed_index'),
+    mvrv: t('metrics.mvrv'),
+    funding_rate: t('metrics.funding_rate'),
+  };
+  
   const metricLabel = METRIC_LABELS[trigger.metric_type] || trigger.metric_type;
+  
+  // Format triggered value - keep technical symbols unchanged
+  const formatTriggeredValue = (value: string | number): string => {
+    const numValue = typeof value === "number" ? value : parseFloat(value);
+    if (!isNaN(numValue)) {
+      return formatNumber(numValue, 2);
+    }
+    return String(value); // Keep non-numeric values as-is
+  };
 
   return (
     <motion.div
@@ -69,7 +75,7 @@ function TriggerRow({ trigger, index }: { trigger: AlertTriggerResponse; index: 
 
       {/* Triggered value */}
       <span className="shrink-0 font-mono text-xs text-white">
-        {trigger.triggered_value}
+        {formatTriggeredValue(trigger.triggered_value)}
       </span>
 
       {/* Channel */}
@@ -80,35 +86,37 @@ function TriggerRow({ trigger, index }: { trigger: AlertTriggerResponse; index: 
       {/* Status */}
       <StatusBadge status={trigger.notify_status} />
 
-      {/* Time ?pushed to the right */}
+      {/* Time - pushed to the right */}
       <span className="ml-auto shrink-0 text-xs text-zinc-500 font-mono">
-        {formatTime(trigger.triggered_at)}
+        {formatDateTime(trigger.triggered_at)}
       </span>
     </motion.div>
   );
 }
 
 export function AlertTriggerHistory({ triggers }: AlertTriggerHistoryProps) {
+  const t = useTranslations('alerts.history');
+  
   if (triggers.length === 0) {
     return (
-      <div className="card rounded-xl">
+      <div className="card rounded-lg">
         <EmptyAlertHistory />
       </div>
     );
   }
 
   return (
-    <div className="card rounded-xl overflow-hidden">
+    <div className="card rounded-lg overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-2.5 border-b border-white/[0.06] bg-white/[0.02]">
         <span className="text-sm text-zinc-500 min-w-[100px] max-w-[160px]">
-          规则名称
+          {t('table.ruleName')}
         </span>
-        <span className="text-sm text-zinc-500">指标</span>
-        <span className="text-sm text-zinc-500">触发值</span>
-        <span className="text-sm text-zinc-500">渠道</span>
-        <span className="text-sm text-zinc-500">状态</span>
-        <span className="ml-auto text-sm text-zinc-500">时间</span>
+        <span className="text-sm text-zinc-500">{t('table.metric')}</span>
+        <span className="text-sm text-zinc-500">{t('table.triggeredValue')}</span>
+        <span className="text-sm text-zinc-500">{t('table.channel')}</span>
+        <span className="text-sm text-zinc-500">{t('table.status')}</span>
+        <span className="ml-auto text-sm text-zinc-500">{t('table.time')}</span>
       </div>
 
       {/* Scrollable list */}

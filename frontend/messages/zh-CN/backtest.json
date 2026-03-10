@@ -1,0 +1,52 @@
+{
+  "title": "策略回测",
+  "subtitle": "查看历史策略表现和回测结果",
+  "filter": {
+    "allSymbols": "全部币种",
+    "selectSymbol": "选择币种",
+    "days": "{d} 天"
+  },
+  "limited": "免费用户最多查看 {max} 天数据。升级旗舰版会员可查看最长 180 天完整回测。",
+  "directions": {
+    "bullish": "看涨",
+    "bearish": "看跌",
+    "neutral": "中性"
+  },
+  "stats": {
+    "totalTrades": "总交易次数",
+    "winRate": "胜率",
+    "totalReturn": "总收益",
+    "maxDrawdown": "最大回撤",
+    "profitLossRatio": "盈亏比",
+    "benchmark": "基准收益 (Benchmark)",
+    "bestTrade": "单笔最大盈利",
+    "worstTrade": "单笔最大亏损",
+    "avgWin": "平均单笔盈利",
+    "avgLoss": "平均单笔亏损"
+  },
+  "equityCurve": {
+    "title": "收益曲线",
+    "strategyReturn": "策略累计收益",
+    "holdReturn": "持有不动 ({symbol})"
+  },
+  "trades": {
+    "title": "历史交易记录",
+    "empty": "暂无交易记录",
+    "columns": {
+      "symbol": "币种",
+      "direction": "方向",
+      "entryRange": "入场区间",
+      "confidence": "置信度",
+      "pnl": "盈亏",
+      "time": "时间"
+    },
+    "pagination": {
+      "prev": "上一页",
+      "next": "下一页"
+    }
+  },
+  "error": {
+    "loadFailed": "回测数据加载失败",
+    "noData": "暂无数据"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "title": "Announcements",
+  "subtitle": "View announcements and recent interaction history",
+  "refreshing": "Refreshing...",
+  "totalRecords": "{total} records",
+  "empty": {
+    "title": "No announcement history",
+    "description": "Announcements you've received and interacted with will appear here"
+  },
+  "events": {
+    "confirmed": "Confirmed",
+    "clicked": "Clicked",
+    "closed": "Closed",
+    "snoozed": "Snoozed",
+    "delivered": "Delivered",
+    "failed": "Failed",
+    "none": "No interaction"
+  },
+  "card": {
+    "archived": "Archived",
+    "published": "Published",
+    "publishedAt": "Published At",
+    "archivedAt": "Archived At",
+    "lastAction": "Last Action",
+    "confirmedAt": "Confirmed At",
+    "backHome": "Back to Home"
+  },
+  "table": {
+    "columns": {
+      "title": "Title",
+      "type": "Type",
+      "priority": "Priority",
+      "createdAt": "Created At",
+      "lastEvent": "Last Event",
+      "actions": "Actions"
+    },
+    "actions": {
+      "view": "View"
+    }
+  },
+  "types": {
+    "info": "Info",
+    "warning": "Warning",
+    "error": "Error",
+    "maintenance": "Maintenance",
+    "feature": "Feature Update"
+  },
+  "priorities": {
+    "low": "Low",
+    "normal": "Normal",
+    "high": "High",
+    "urgent": "Urgent"
+  },
+  "pagination": {
+    "prev": "Previous",
+    "next": "Next",
+    "page": "Page {current} / {total}"
+  },
+  "error": {
+    "loadFailed": "Failed to load announcement data"
+  }
+}

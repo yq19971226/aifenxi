@@ -29,7 +29,7 @@ export function TopBar() {
   const title =
     Object.entries(pageTitles).find(([path]) =>
       pathname.startsWith(path)
-    )?.[1] ?? "Axiom";
+    )?.[1] ?? "AXIOM洞察";
 
   const initial = user?.email?.charAt(0).toUpperCase() ?? "U";
 

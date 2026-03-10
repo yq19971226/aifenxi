@@ -1,0 +1,53 @@
+{
+  "main": {
+    "dashboard": "仪表盘",
+    "onchain": "链上数据",
+    "consensus": "共识分析",
+    "cases": "历史案例",
+    "performance": "性能分析",
+    "alerts": "预警规则",
+    "settings": "用户设置",
+    "admin": "后台管理",
+    "playbook": "剧本",
+    "leaderboard": "排行榜",
+    "growth": "活动"
+  },
+  "settings": {
+    "profile": "个人资料",
+    "membership": "会员中心",
+    "push": "邮件通知",
+    "configs": "系统配置",
+    "security": "安全设置",
+    "tasks": "任务中心",
+    "partner": "合伙人"
+  },
+  "admin": {
+    "users": "用户管理",
+    "orders": "订单管理",
+    "operators": "运营管理",
+    "notifications": "通知日志",
+    "configs": "配置管理"
+  },
+  "common": {
+    "menu": "菜单",
+    "more": "更多",
+    "maintenance": "维护中",
+    "notifications": "通知",
+    "roleAdmin": "管理员",
+    "roleOperator": "运营",
+    "roleUser": "用户",
+    "announcements": "公告管理",
+    "logout": "退出登录"
+  },
+  "breadcrumb": {
+    "home": "首页",
+    "dashboard": "仪表盘",
+    "onchain": "链上数据",
+    "consensus": "共识分析",
+    "cases": "历史案例",
+    "performance": "性能分析",
+    "alerts": "预警规则",
+    "settings": "设置",
+    "admin": "管理"
+  }
+}

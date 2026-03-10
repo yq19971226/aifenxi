@@ -1,0 +1,31 @@
+{
+  "title": "鏈上數據",
+  "noAccess": {
+    "message": "當前套餐不支持該幣種的鏈上數據",
+    "upgrade": "升級查看"
+  },
+  "metrics": {
+    "price": "價格",
+    "market_cap": "市值",
+    "nvt": "NVT 比率",
+    "mvrv": "MVRV",
+    "stock_to_flow": "S2F 模型",
+    "exchange_flow": "交易所流量"
+  },
+  "badge": {
+    "loading": "加載中...",
+    "available": "可用",
+    "availableTooltip": "點擊行展開查看鏈上數據",
+    "locked": "鎖定"
+  },
+  "loading": "加載中...",
+  "noData": "暫無數據",
+  "empty": {
+    "title": "暫無鏈上數據",
+    "description": "鏈上快照數據將在採集後自動展示"
+  },
+  "error": {
+    "fetchFailed": "獲取鏈上數據失敗",
+    "upgradeRequired": "需要升級套餐才能查看此數據"
+  }
+}

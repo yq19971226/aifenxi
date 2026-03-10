@@ -2,9 +2,11 @@ from contextlib import asynccontextmanager
 from collections.abc import AsyncGenerator
 from datetime import datetime, timezone
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
+
+from app.core.deps import UserInfo, require_admin
 
 from app.core.mode_contract import ALL_MODE_KLINE_INTERVALS
 from app.core.sql_compat import serial_pk, varchar, timestamptz_default
@@ -23,7 +25,7 @@ from app.api.sentiment import router as sentiment_router
 from app.api.strategy import router as strategy_router
 from app.api.calendar import router as calendar_router
 from app.api.agents import router as agents_router
-from app.api.admin_configs import router as admin_configs_router
+from app.api.admin_configs import router as admin_configs_router, public_router as feature_flags_router
 from app.api.admin_dashboard import router as admin_dashboard_router
 from app.api.admin_notifications import router as admin_notifications_router
 from app.api.admin_orders import router as admin_orders_router
@@ -47,12 +49,16 @@ from app.api.partner import user_router as partner_user_router, admin_router as 
 from app.api.tasks import user_router as tasks_user_router, admin_router as tasks_admin_router
 from app.api.announcements import user_router as announcements_user_router, admin_router as announcements_admin_router
 from app.api.admin_system import router as admin_system_router
+from app.api.webhooks_resend import router as webhooks_resend_router
 from app.api.dashboard_overview import router as dashboard_overview_router
 from app.api.leaderboard import router as leaderboard_router
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.redis import init_redis, close_redis
 from app.core.sentry import init_sentry
+from app.services.playbook_prediction_maintenance import (
+    backfill_playbook_prediction_market_structures,
+)
 
 _DEFAULT_KLINE_INTERVALS_CSV = ",".join(ALL_MODE_KLINE_INTERVALS)
 
@@ -67,7 +73,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     try:
         from app.core.database import AsyncSessionLocal
         from app.services.config_service import ConfigService
+        from app.services.operator_service import ensure_operator_user_columns
         async with AsyncSessionLocal() as session:
+            await ensure_operator_user_columns(session)
             svc = ConfigService(session)
             await svc.load_all_to_cache()
             # Sentry 初始化：从配置读取 DSN 和采样率
@@ -111,14 +119,24 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                     final_accuracy FLOAT DEFAULT NULL,
                     published BOOLEAN DEFAULT FALSE,
                     signal {_v20} DEFAULT 'neutral',
+                    market_structure_type VARCHAR(64) DEFAULT NULL,
                     snapshot_price FLOAT DEFAULT NULL,
                     stage_entry_price FLOAT DEFAULT NULL,
                     stage_entered_at TIMESTAMP DEFAULT NULL,
                     failure_reason TEXT DEFAULT NULL,
                     risk_flag BOOLEAN DEFAULT FALSE,
-                    risk_note TEXT DEFAULT NULL
+                    risk_note TEXT DEFAULT NULL,
+                    dominant_factors_json TEXT DEFAULT NULL,
+                    ranking_reason_summary TEXT DEFAULT NULL,
+                    decision_sentence TEXT DEFAULT NULL,
+                    inferred_market_structures_json TEXT DEFAULT NULL,
+                    matched_confidence_boosters_json TEXT DEFAULT NULL,
+                    matched_invalidation_signals_json TEXT DEFAULT NULL,
+                    structure_explanation TEXT DEFAULT NULL
                 )
             """))
+            await session.commit()
+            await backfill_playbook_prediction_market_structures(session)
             await session.commit()
     except Exception as exc:
         import logging
@@ -226,6 +244,7 @@ app.add_middleware(
 )
 
 
+app.include_router(feature_flags_router)
 app.include_router(admin_configs_router)
 app.include_router(admin_dashboard_router)
 app.include_router(admin_notifications_router)
@@ -269,6 +288,7 @@ app.include_router(tasks_admin_router)
 app.include_router(announcements_user_router)
 app.include_router(announcements_admin_router)
 app.include_router(admin_system_router)
+app.include_router(webhooks_resend_router)
 app.include_router(dashboard_overview_router)
 app.include_router(leaderboard_router)
 
@@ -594,27 +614,36 @@ async def kline_scheduler_status() -> dict:
     }
 
 
-@app.get("/api/feature-flags", tags=["system"])
-async def feature_flags() -> dict[str, str]:
-    """返回功能开关状态。三态: active / maintenance / hidden。"""
+
+@app.get("/api/stats/online", tags=["system"])
+async def online_stats() -> dict:
+    """返回当前在线用户数（公开端点，受功能开关控制）。"""
     from app.services.config_service import get_config_value
+    from app.api.ws import get_online_count
 
-    VALID_STATES = {"active", "maintenance", "hidden"}
+    flag = (await get_config_value("online_count_feature_enabled", "hidden")).lower().strip()
+    if flag not in ("active", "true"):
+        return {"enabled": False, "count": 0}
 
-    async def _read(key: str, default: str = "active") -> str:
-        raw = (await get_config_value(key, default)).lower().strip()
-        # 兼容旧的 true/false 值
-        if raw == "true":
-            return "active"
-        if raw == "false":
-            return "hidden"
-        return raw if raw in VALID_STATES else default
+    price_count = await get_online_count("price")
+    alerts_count = await get_online_count("alerts")
+    total = max(price_count, alerts_count)
+    return {"enabled": True, "count": total}
 
+
+@app.get("/api/admin/stats/online", tags=["admin"])
+async def admin_online_stats(
+    admin: UserInfo = Depends(require_admin),
+) -> dict:
+    """返回分频道在线用户明细（仅管理员）。"""
+    from app.api.ws import get_online_count
+
+    price_count = await get_online_count("price")
+    alerts_count = await get_online_count("alerts")
     return {
-        "playbook": await _read("playbook_feature_enabled", "active"),
-        "leaderboard": await _read("leaderboard_feature_enabled", "active"),
-        "task": await _read("task_feature_enabled", "active"),
-        "partner": await _read("partner_feature_enabled", "active"),
+        "count": max(price_count, alerts_count),
+        "price": price_count,
+        "alerts": alerts_count,
     }
 
 

@@ -1,0 +1,86 @@
+{
+  "loading": "加载中...",
+  "tabs": {
+    "login": "登录",
+    "register": "注册"
+  },
+  "fields": {
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "referralCode": "邀请码",
+    "referralCodeOptional": "邀请码（选填）",
+    "registerEmail": "注册邮箱",
+    "verificationCode": "验证码",
+    "newPassword": "新密码",
+    "confirmNewPassword": "确认新密码"
+  },
+  "placeholders": {
+    "password": "输入密码",
+    "minLength": "至少 8 位",
+    "verificationCode": "输入 6 位验证码",
+    "confirmPassword": "再次输入密码",
+    "confirmNewPassword": "再次输入新密码"
+  },
+  "buttons": {
+    "login": "登录",
+    "register": "创建账户",
+    "sendCode": "发送验证码",
+    "sendingCode": "发送中...",
+    "resetPassword": "重置密码"
+  },
+  "forgot": {
+    "link": "忘记密码？",
+    "backToLogin": "返回登录",
+    "title": "重置密码",
+    "promptSend": "输入注册邮箱，我们将发送验证码",
+    "promptCode": "请输入邮箱中收到的验证码"
+  },
+  "strength": {
+    "weak": "弱",
+    "fair": "一般",
+    "good": "良好",
+    "strong": "强"
+  },
+  "errors": {
+    "networkError": "无法连接服务器，请检查网络",
+    "loginFailed": "登录失败",
+    "registerFailed": "注册失败",
+    "registrationDisabled": "当前已关闭新用户注册",
+    "passwordMismatch": "两次密码不一致",
+    "passwordMinLength": "密码至少8位",
+    "emailRequired": "请先输入邮箱",
+    "verificationCodeRequired": "请输入验证码",
+    "referralRequired": "请填写邀请码",
+    "registerCodeSendFailed": "发送注册验证码失败",
+    "sendFailed": "发送失败",
+    "resetFailed": "重置失败",
+    "serverUnavailable": "无法连接服务器"
+  },
+  "success": {
+    "registerCodeSent": "注册验证码已发送到邮箱，请在 10 分钟内完成注册",
+    "codeSent": "验证码已发送到邮箱，请10分钟内有效",
+    "passwordReset": "密码重置成功，请登录"
+  },
+  "features": {
+    "heroTitle1": "Institutional-grade",
+    "heroTitle2": "market intelligence.",
+    "heroSubtitle1": "Multi-agent adversarial consensus engine.",
+    "heroSubtitle2": "See through the noise. Trade the script.",
+    "agentsTitle": "10 AI 智能体协同",
+    "agentsDesc": "多模型博弈共识，不止一个观点",
+    "defenseTitle": "庄家对抗防御",
+    "defenseDesc": "站在庄家视角反推，识别操纵风险",
+    "modesTitle": "三模式全覆盖",
+    "modesDesc": "超短线 / 日内博弈 / 趋势布局",
+    "precisionTitle": "精准非整数点位",
+    "precisionDesc": "修正后的入场/止损，避开整数关口"
+  },
+  "stats": {
+    "agents": "AI 智能体",
+    "models": "共识模型",
+    "timeframes": "时间周期"
+  },
+  "legal": "继续即表示同意 AXIOM洞察 的服务条款与隐私政策",
+  "guideLink": "不知道怎么用？查看使用指南 →"
+}

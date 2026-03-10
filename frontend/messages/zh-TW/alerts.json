@@ -1,0 +1,132 @@
+{
+  "title": "預警管理",
+  "subtitle": "自定義監控條件，即時接收市場異動通知",
+  "createButton": "+ 創建規則",
+  "tabs": {
+    "rules": "規則列表",
+    "history": "觸發歷史"
+  },
+  "quota": {
+    "label": "規則額度（{level}）",
+    "used": "已使用 {used}/{limit} 條規則",
+    "limitReached": "已達當前等級上限，升級會員可創建更多規則"
+  },
+  "levels": {
+    "free": "免費",
+    "pro": "專業",
+    "flagship": "旗艦"
+  },
+  "form": {
+    "createTitle": "創建預警規則",
+    "editTitle": "編輯預警規則",
+    "ruleName": "規則名稱",
+    "ruleNamePlaceholder": "例：BTC 跌破 60000",
+    "symbol": "交易對",
+    "symbolPlaceholder": "BTCUSDT",
+    "conditions": "預警條件",
+    "conditionGroup": "條件組",
+    "subConditionGroup": "子條件組",
+    "notifyChannels": "通知渠道",
+    "submitCreate": "創建規則",
+    "submitEdit": "保存修改",
+    "submitting": "提交中...",
+    "cancel": "取消"
+  },
+  "metrics": {
+    "price": "價格",
+    "rsi": "RSI",
+    "macd": "MACD",
+    "ema": "EMA",
+    "bb_upper": "布林帶上軌",
+    "bb_lower": "布林帶下軌",
+    "exchange_netflow": "交易所淨流入",
+    "whale_change_24h": "巨鯨持倉變化",
+    "fear_greed_index": "恐慌貪婪指數",
+    "mvrv": "MVRV",
+    "funding_rate": "資金費率"
+  },
+  "operators": {
+    "gt": "大於 (>)",
+    "lt": "小於 (<)",
+    "gte": "大於等於",
+    "lte": "小於等於",
+    "cross_above": "穿越上方",
+    "cross_below": "穿越下方"
+  },
+  "operatorsShort": {
+    "gt": ">",
+    "lt": "<",
+    "gte": "≥",
+    "lte": "≤",
+    "cross_above": "↑穿越",
+    "cross_below": "↓穿越"
+  },
+  "logic": {
+    "and": "AND（全部滿足）",
+    "or": "OR（任一滿足）",
+    "andShort": "且",
+    "orShort": "或"
+  },
+  "channels": {
+    "websocket": "WebSocket 推送",
+    "telegram": "Telegram",
+    "email": "郵件",
+    "websocketShort": "WS",
+    "telegramShort": "TG",
+    "emailShort": "郵件"
+  },
+  "actions": {
+    "addCondition": "添加條件",
+    "addSubGroup": "添加子條件組",
+    "removeSubGroup": "移除子組",
+    "removeCondition": "刪除條件",
+    "edit": "編輯",
+    "delete": "刪除",
+    "toggleOn": "啟用",
+    "toggleOff": "禁用"
+  },
+  "list": {
+    "empty": "暫無預警規則",
+    "emptyHint": "創建您的第��個預警規則",
+    "lastTriggered": "上次觸發",
+    "neverTriggered": "未觸發",
+    "enabled": "已啟用",
+    "disabled": "已禁用"
+  },
+  "delete": {
+    "confirmTitle": "確認刪除",
+    "confirmMessage": "確定刪除規則 \"{name}\" 嗎？此操作不可撤銷。",
+    "confirmButton": "刪除",
+    "cancelButton": "取消"
+  },
+  "history": {
+    "title": "觸發歷史",
+    "empty": "暫無觸發記錄",
+    "table": {
+      "ruleName": "規則名稱",
+      "metric": "指標",
+      "triggeredValue": "觸發值",
+      "channel": "渠道",
+      "status": "狀態",
+      "time": "時間"
+    },
+    "status": {
+      "sent": "已發送",
+      "failed": "失敗"
+    }
+  },
+  "validation": {
+    "nameRequired": "請輸入規則名稱",
+    "symbolRequired": "請輸入交易對",
+    "conditionsRequired": "至少需要一個條件",
+    "channelsRequired": "至少選擇一個通知渠道",
+    "thresholdPlaceholder": "閾值"
+  },
+  "error": {
+    "loadFailed": "加載預警規則失敗",
+    "createFailed": "創建規則失敗",
+    "updateFailed": "更新規則失敗",
+    "deleteFailed": "刪除規則失敗",
+    "submitFailed": "提交失敗"
+  }
+}

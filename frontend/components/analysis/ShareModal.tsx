@@ -2,7 +2,6 @@
 
 import { useCallback, useRef, useState } from "react";
 import { X, Download, Loader2, Check } from "lucide-react";
-import dynamic from "next/dynamic";
 
 import type { AnalysisReport } from "@/lib/api/analysis";
 import { ShareCard, type ShareCardConfig } from "./ShareCard";

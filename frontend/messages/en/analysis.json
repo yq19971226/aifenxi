@@ -1,0 +1,56 @@
+{
+  "fvgTable": {
+    "empty": "No FVG detected",
+    "summary": {
+      "total": "{count} FVGs",
+      "bullish": "Bullish {count}",
+      "bearish": "Bearish {count}",
+      "nearest": "Nearest distance"
+    },
+    "columns": {
+      "direction": "Direction",
+      "gapRange": "Gap Range",
+      "size": "Size",
+      "interval": "Interval",
+      "distance": "Distance",
+      "status": "Status"
+    },
+    "status": {
+      "mitigated": "Mitigated",
+      "unmitigated": "Unmitigated"
+    },
+    "actions": {
+      "collapse": "Collapse",
+      "expandAll": "Expand All ({count})"
+    }
+  },
+  "orderBlockTable": {
+    "empty": "No order blocks detected",
+    "summary": {
+      "total": "{count} Order Blocks",
+      "bullish": "Bullish {count}",
+      "bearish": "Bearish {count}"
+    },
+    "columns": {
+      "direction": "Direction",
+      "type": "Type",
+      "priceRange": "Price Range",
+      "trigger": "Trigger",
+      "whale": "Whale"
+    },
+    "whale": {
+      "yes": "Yes"
+    },
+    "actions": {
+      "collapse": "Collapse",
+      "expandAll": "Expand All ({count})"
+    }
+  },
+  "genericTable": {
+    "empty": "Not detected",
+    "actions": {
+      "collapse": "Collapse",
+      "expandAll": "Expand All ({count})"
+    }
+  }
+}

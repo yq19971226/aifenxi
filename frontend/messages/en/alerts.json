@@ -1,0 +1,132 @@
+{
+  "title": "Alert Management",
+  "subtitle": "Customize monitoring conditions, receive real-time market alerts",
+  "createButton": "+ Create Rule",
+  "tabs": {
+    "rules": "Rule List",
+    "history": "Trigger History"
+  },
+  "quota": {
+    "label": "Rule Quota ({level})",
+    "used": "Used {used}/{limit} rules",
+    "limitReached": "Limit reached, upgrade membership for more rules"
+  },
+  "levels": {
+    "free": "Free",
+    "pro": "Pro",
+    "flagship": "Flagship"
+  },
+  "form": {
+    "createTitle": "Create Alert Rule",
+    "editTitle": "Edit Alert Rule",
+    "ruleName": "Rule Name",
+    "ruleNamePlaceholder": "e.g., BTC drops below 60000",
+    "symbol": "Symbol",
+    "symbolPlaceholder": "BTCUSDT",
+    "conditions": "Alert Conditions",
+    "conditionGroup": "Condition Group",
+    "subConditionGroup": "Sub Condition Group",
+    "notifyChannels": "Notification Channels",
+    "submitCreate": "Create Rule",
+    "submitEdit": "Save Changes",
+    "submitting": "Submitting...",
+    "cancel": "Cancel"
+  },
+  "metrics": {
+    "price": "Price",
+    "rsi": "RSI",
+    "macd": "MACD",
+    "ema": "EMA",
+    "bb_upper": "Bollinger Upper",
+    "bb_lower": "Bollinger Lower",
+    "exchange_netflow": "Exchange Netflow",
+    "whale_change_24h": "Whale Position Change",
+    "fear_greed_index": "Fear & Greed Index",
+    "mvrv": "MVRV",
+    "funding_rate": "Funding Rate"
+  },
+  "operators": {
+    "gt": "Greater than (>)",
+    "lt": "Less than (<)",
+    "gte": "Greater or equal",
+    "lte": "Less or equal",
+    "cross_above": "Cross above",
+    "cross_below": "Cross below"
+  },
+  "operatorsShort": {
+    "gt": ">",
+    "lt": "<",
+    "gte": "≥",
+    "lte": "≤",
+    "cross_above": "↑Cross",
+    "cross_below": "↓Cross"
+  },
+  "logic": {
+    "and": "AND (all conditions)",
+    "or": "OR (any condition)",
+    "andShort": "and",
+    "orShort": "or"
+  },
+  "channels": {
+    "websocket": "WebSocket Push",
+    "telegram": "Telegram",
+    "email": "Email",
+    "websocketShort": "WS",
+    "telegramShort": "TG",
+    "emailShort": "Email"
+  },
+  "actions": {
+    "addCondition": "Add Condition",
+    "addSubGroup": "Add Sub Group",
+    "removeSubGroup": "Remove Sub Group",
+    "removeCondition": "Remove Condition",
+    "edit": "Edit",
+    "delete": "Delete",
+    "toggleOn": "Enable",
+    "toggleOff": "Disable"
+  },
+  "list": {
+    "empty": "No alert rules",
+    "emptyHint": "Create your first alert rule",
+    "lastTriggered": "Last triggered",
+    "neverTriggered": "Never triggered",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
+  },
+  "delete": {
+    "confirmTitle": "Confirm Delete",
+    "confirmMessage": "Are you sure you want to delete rule \"{name}\"? This action cannot be undone.",
+    "confirmButton": "Delete",
+    "cancelButton": "Cancel"
+  },
+  "history": {
+    "title": "Trigger History",
+    "empty": "No trigger records",
+    "table": {
+      "ruleName": "Rule Name",
+      "metric": "Metric",
+      "triggeredValue": "Triggered Value",
+      "channel": "Channel",
+      "status": "Status",
+      "time": "Time"
+    },
+    "status": {
+      "sent": "Sent",
+      "failed": "Failed"
+    }
+  },
+  "validation": {
+    "nameRequired": "Please enter rule name",
+    "symbolRequired": "Please enter symbol",
+    "conditionsRequired": "At least one condition required",
+    "channelsRequired": "At least one notification channel required",
+    "thresholdPlaceholder": "Threshold"
+  },
+  "error": {
+    "loadFailed": "Failed to load alert rules",
+    "createFailed": "Failed to create rule",
+    "updateFailed": "Failed to update rule",
+    "deleteFailed": "Failed to delete rule",
+    "submitFailed": "Submit failed"
+  }
+}

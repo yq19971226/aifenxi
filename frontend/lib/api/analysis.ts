@@ -138,6 +138,8 @@ export async function* runAnalysis(
   symbol: string,
   mode: AnalysisMode,
   forceRefresh: boolean = false,
+  locale: string = "zh-CN",
+  signal?: AbortSignal,
 ): AsyncGenerator<SSEEvent> {
   const res = await fetch(`${API_BASE}/api/analysis/run`, {
     method: "POST",
@@ -149,7 +151,9 @@ export async function* runAnalysis(
       symbol,
       mode,
       force_refresh: forceRefresh,
+      locale,
     }),
+    signal,
   });
 
   if (!res.ok) {

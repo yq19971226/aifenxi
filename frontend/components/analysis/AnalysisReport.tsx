@@ -5,9 +5,7 @@ import { motion } from "framer-motion";
 import { Info, Share2, Zap } from "lucide-react";
 
 import type { AnalysisReport as AnalysisReportType } from "@/lib/api/analysis";
-import { ExecutiveSummary } from "./ExecutiveSummary";
-import { AgentConsensusBar } from "./AgentConsensusBar";
-import { KeyFindingsSummary } from "./KeyFindings";
+import { UnifiedResultCard } from "./UnifiedResultCard";
 import { DeepAnalysis } from "./DeepAnalysis";
 import { ShareModal } from "./ShareModal";
 import { useShareCardConfig } from "@/lib/hooks/useShareCardConfig";
@@ -43,20 +41,18 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
         </div>
       )}
 
-      {/* Layer 1: Executive Summary (always shown — includes StatusBanner for blocked) */}
-      <ExecutiveSummary report={report} />
+      {/* Unified result card: signal → prices → consensus → findings → risk */}
+      <UnifiedResultCard report={report} />
 
-      {/* Layers 1.5–3: skip when blocked — strategy data is unreliable */}
+      {/* Deep Analysis (Tab system) — separate below */}
       {!isBlocked && (
         <>
-          {/* Layer 1.5: Agent Consensus Bar */}
-          <AgentConsensusBar sections={report.sections} />
-
-          {/* Layer 2: Key Findings */}
-          <KeyFindingsSummary sections={report.sections} />
-
-          {/* Layer 3: Deep Analysis (Tab system) */}
-          <DeepAnalysis sections={report.sections} />
+          <div className="flex items-center gap-3 pt-1">
+            <div className="h-px flex-1 bg-white/[0.06]" />
+            <span className="text-xs font-medium text-zinc-500 shrink-0">详细分析</span>
+            <div className="h-px flex-1 bg-white/[0.06]" />
+          </div>
+          <DeepAnalysis sections={report.sections} reportKey={report.timestamp} />
         </>
       )}
 

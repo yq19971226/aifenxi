@@ -39,12 +39,30 @@ export interface ChangelogMarker {
   note: string;
 }
 
+export interface PlaybookWinRate {
+  playbook_name: string;
+  market_structure_type?: string | null;
+  total: number;
+  completed: number;
+  avg_accuracy: number;
+}
+
+export interface StructureWinRate {
+  market_structure_type?: string | null;
+  total: number;
+  completed: number;
+  playbook_count: number;
+  avg_accuracy: number;
+}
+
 export interface PerformanceReview {
   stats: PerformanceStats;
   trend: TrendPoint[];
   signal_distribution: { long: number; short: number };
   mode_win_rates: ModeWinRate[];
   changelog_markers: ChangelogMarker[];
+  playbook_win_rates: PlaybookWinRate[];
+  structure_win_rates: StructureWinRate[];
 }
 
 export interface ModelDetail {

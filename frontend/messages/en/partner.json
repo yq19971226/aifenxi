@@ -1,0 +1,113 @@
+{
+  "title": "Partner Center", 
+  "subtitle": "Invite friends and share earnings",
+  "tabs": {
+    "overview": "Overview",
+    "invitations": "Invitations",
+    "commissions": "Commissions",
+    "wallet": "Wallet"
+  },
+  "levels": {
+    "0": "Free",
+    "1": "Pro",
+    "2": "Flagship"
+  },
+  "overview": {
+    "totalInvitations": "Total Invites",
+    "paidUsers": "Paid Users",
+    "totalCommission": "Total Commission",
+    "availableBalance": "Withdrawable",
+    "referralCode": "My Referral Code",
+    "copyLink": "Copy Link",
+    "copyCode": "Copy Code",
+    "linkCopied": "Copied",
+    "commissionRate": "Commission Rate",
+    "summaryInvited": "Invited {total} users, {paid} paid",
+    "frozen": "Frozen ${amount} (withdrawal under review)"
+  },
+  "invitations": {
+    "title": "Invitation Records",
+    "empty": "No invitation records",
+    "columns": {
+      "user": "User",
+      "level": "Level",
+      "registeredAt": "Registered At",
+      "status": "Status"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  },
+  "commissions": {
+    "title": "Commission Details",
+    "empty": "No commission records",
+    "columns": {
+      "fromUser": "From User",
+      "amount": "Amount",
+      "rate": "Rate",
+      "createdAt": "Time",
+      "status": "Status"
+    },
+    "status": {
+      "pending": "Pending",
+      "settled": "Settled"
+    }
+  },
+  "wallet": {
+    "title": "TRC20 Wallet Address",
+    "bound": "Bound",
+    "unbound": "Not bound",
+    "addressPlaceholder": "TRC20 address starting with T",
+    "bind": "Bind",
+    "change": "Change",
+    "withdrawButton": "Withdraw ${amount}",
+    "withdrawing": "Processing...",
+    "history": {
+      "title": "Withdrawal History",
+      "empty": "No withdrawal records",
+      "columns": {
+        "amount": "Amount",
+        "address": "Address",
+        "status": "Status",
+        "createdAt": "Applied At",
+        "processedAt": "Processed At"
+      },
+      "status": {
+        "pending": "Under Review",
+        "completed": "Completed",
+        "rejected": "Rejected"
+      }
+    }
+  },
+  "error": {
+    "loadFailed": "Failed to load data",
+    "copyFailed": "Copy failed",
+    "withdrawFailed": "Withdrawal failed",
+    "invalidAddress": "Please enter a valid address",
+    "insufficientBalance": "Insufficient balance",
+    "belowMinimum": "Below minimum withdrawal amount"
+  },
+  "admin": {
+    "title": "Partner Stats",
+    "overview": {
+      "totalReferrals": "Total Referrals",
+      "activePartners": "Active Partners",
+      "totalCommission": "Total Commission",
+      "pendingWithdrawals": "Pending Withdrawals",
+      "totalWithdrawn": "Total Withdrawn"
+    },
+    "list": {
+      "title": "Partner List",
+      "loading": "Loading...",
+      "empty": "No active partners",
+      "columns": {
+        "email": "Email",
+        "referralCode": "Referral Code",
+        "invitationCount": "Invitations",
+        "totalCommission": "Total Commission",
+        "registeredAt": "Registered At"
+      }
+    }
+  }
+}

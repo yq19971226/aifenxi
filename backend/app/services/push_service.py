@@ -202,7 +202,7 @@ async def test_push_channel(
             )
             if ok:
                 return TestPushResult(success=True, message="测试邮件已发送")
-            return TestPushResult(success=False, message="邮件发送失败，请检查 SendGrid 配置")
+            return TestPushResult(success=False, message="邮件发送失败，请检查 Resend 或 SendGrid 配置")
         except Exception as exc:
             logger.error("test_push email send error: %s", exc)
             return TestPushResult(success=False, message="邮件发送异常")

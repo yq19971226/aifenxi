@@ -7,7 +7,6 @@
 """
 
 import hashlib
-import json
 import logging
 from uuid import UUID
 
@@ -48,7 +47,7 @@ class LeaderboardService:
     ) -> dict:
         """获取排行榜。返回 { rankings, total, my_rank, my_stats }。"""
         # 排行榜页数据可缓存（与用户无关）
-        cache_key = f"leaderboard:{period}:{mode}:{page}"
+        cache_key = f"leaderboard:{period}:{mode}:{page}:{page_size}"
         cached = await get_json(cache_key)
         if cached:
             page_data = cached
@@ -181,14 +180,15 @@ class LeaderboardService:
 
     # ── 系统周报 ──────────────────────────────────────────
 
-    async def get_system_report(self, period: str = "7d") -> dict:
+    async def get_system_report(self, period: str = "7d", mode: str = "all") -> dict:
         """系统整体绩效摘要。"""
-        cache_key = f"leaderboard:report:{period}"
+        cache_key = f"leaderboard:report:{period}:{mode}"
         cached = await get_json(cache_key)
         if cached:
             return cached
 
         period_cutoff = self._period_to_cutoff(period)
+        mode_filter = "AND analysis_mode = :mode" if mode != "all" else ""
         _settled = count_filter("status != 'pending'")
         _wins = count_filter("pnl_pct > 0")
         _profit = sum_filter("pnl_pct", "pnl_pct > 0")
@@ -209,10 +209,12 @@ class LeaderboardService:
             FROM strategy_snapshots
             WHERE published = TRUE
               AND created_at > {period_cutoff}
+              {mode_filter}
         """
+        params: dict = {"mode": mode} if mode != "all" else {}
 
         try:
-            result = await self._session.execute(text(sql))
+            result = await self._session.execute(text(sql), params)
             row = result.mappings().first()
         except Exception as exc:
             logger.error("系统周报查询失败: %s", exc)
@@ -238,9 +240,10 @@ class LeaderboardService:
 
     # ── 个人战绩 ──────────────────────────────────────────
 
-    async def get_my_stats(self, user_id: UUID, period: str = "7d") -> dict:
+    async def get_my_stats(self, user_id: UUID, period: str = "7d", mode: str = "all") -> dict:
         """当前用户的个人战绩（仅统计迁移后有 user_id 的数据）。"""
         period_cutoff = self._period_to_cutoff(period)
+        mode_filter = "AND analysis_mode = :mode" if mode != "all" else ""
         _pending = count_filter("status = 'pending'")
         _settled = count_filter("status != 'pending'")
         _wins = count_filter("pnl_pct > 0")
@@ -262,12 +265,14 @@ class LeaderboardService:
             WHERE user_id = :user_id
               AND published = TRUE
               AND created_at > {period_cutoff}
+              {mode_filter}
         """
+        params: dict = {"user_id": str(user_id)}
+        if mode != "all":
+            params["mode"] = mode
 
         try:
-            result = await self._session.execute(
-                text(sql), {"user_id": str(user_id)}
-            )
+            result = await self._session.execute(text(sql), params)
             row = result.mappings().first()
         except Exception as exc:
             logger.error("个人战绩查询失败: %s", exc)
@@ -303,20 +308,23 @@ class LeaderboardService:
         }
 
     async def get_my_history(
-        self, user_id: UUID, period: str = "7d", page: int = 1, page_size: int = 20,
+        self, user_id: UUID, period: str = "7d", mode: str = "all",
+        page: int = 1, page_size: int = 20,
     ) -> dict:
         """当前用户的已发布策略明细列表。"""
         period_cutoff = self._period_to_cutoff(period)
+        mode_filter = "AND analysis_mode = :mode" if mode != "all" else ""
         base_where = f"""
             WHERE user_id = :user_id
               AND published = TRUE
               AND created_at > {period_cutoff}
+              {mode_filter}
         """
 
         count_sql = f"SELECT COUNT(*) FROM strategy_snapshots {base_where}"
         list_sql = f"""
             SELECT id, symbol, direction, entry_low, entry_high, stop_loss,
-                   targets, confidence, status, pnl_pct, analysis_mode, created_at
+                   status, pnl_pct, analysis_mode, created_at
             FROM strategy_snapshots
             {base_where}
             ORDER BY created_at DESC
@@ -324,6 +332,8 @@ class LeaderboardService:
         """
 
         params: dict = {"user_id": str(user_id)}
+        if mode != "all":
+            params["mode"] = mode
         offset = (page - 1) * page_size
 
         try:
@@ -343,16 +353,12 @@ class LeaderboardService:
             entry_low = float(r["entry_low"]) if r["entry_low"] else None
             entry_high = float(r["entry_high"]) if r["entry_high"] else None
             entry_mid = round((entry_low + entry_high) / 2, 8) if entry_low and entry_high else None
-            targets_raw = r["targets"]
-            targets = json.loads(targets_raw) if isinstance(targets_raw, str) else targets_raw
-            first_target = float(targets[0]) if targets else None
 
             items.append({
                 "id": str(r["id"]),
                 "symbol": r["symbol"],
                 "direction": r["direction"],
                 "entry_price": entry_mid,
-                "target_price": first_target,
                 "stop_loss": float(r["stop_loss"]) if r["stop_loss"] else None,
                 "status": r["status"],
                 "pnl_pct": float(r["pnl_pct"]) if r["pnl_pct"] is not None else None,

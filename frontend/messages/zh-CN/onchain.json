@@ -1,0 +1,31 @@
+{
+  "title": "链上数据",
+  "noAccess": {
+    "message": "当前套餐不支持该币种的链上数据",
+    "upgrade": "升级查看"
+  },
+  "metrics": {
+    "price": "价格",
+    "market_cap": "市值",
+    "nvt": "NVT 比率",
+    "mvrv": "MVRV",
+    "stock_to_flow": "S2F 模型",
+    "exchange_flow": "交易所流量"
+  },
+  "badge": {
+    "loading": "加载中...",
+    "available": "可用",
+    "availableTooltip": "点击行展开查看链上数据",
+    "locked": "锁定"
+  },
+  "loading": "加载中...",
+  "noData": "暂无数据",
+  "empty": {
+    "title": "暂无链上数据",
+    "description": "链上快照数据将在采集后自动展示"
+  },
+  "error": {
+    "fetchFailed": "获取链上数据失败",
+    "upgradeRequired": "需要升级套餐才能查看此数据"
+  }
+}

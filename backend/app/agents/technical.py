@@ -9,6 +9,8 @@ import logging
 from datetime import datetime, timezone
 
 from app.agents.base import AgentReport, BaseAgent
+from app.agents.i18n_prompts import get_system_prompt
+from app.agents.language_detect import check_language_mismatch
 from app.core.llm_client import llm_client
 from app.models.market_data import MarketData
 
@@ -162,7 +164,9 @@ class TechnicalAgent(BaseAgent):
         user_prompt = _build_user_prompt(data)
 
         try:
-            enriched_prompt = await self._enrich_prompt(_SYSTEM_PROMPT, data.symbol)
+            locale = getattr(data, "locale", "zh-CN")
+            system_prompt = get_system_prompt("technical", locale)
+            enriched_prompt = await self._enrich_prompt(system_prompt, data.symbol)
             from app.core.model_router import get_model_for_agent
             _model_key = await get_model_for_agent("technical")
             result = await llm_client.call_model(
@@ -204,14 +208,21 @@ class TechnicalAgent(BaseAgent):
                 "trend": trend,
             }
 
+            reasoning_text = result.get("reasoning", "")
+            content_locale, lang_mismatch = check_language_mismatch(
+                reasoning_text, locale,
+            )
+
             return AgentReport(
                 agent_id=self.AGENT_ID,
                 symbol=data.symbol,
                 signal=signal,
                 confidence=confidence,
-                reasoning=result.get("reasoning", ""),
+                reasoning=reasoning_text,
                 key_findings=key_findings,
                 raw_data=raw,
+                content_locale=content_locale,
+                language_mismatch=lang_mismatch,
             )
 
         except Exception as exc:

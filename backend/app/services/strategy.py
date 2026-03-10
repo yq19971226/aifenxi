@@ -583,10 +583,18 @@ class StrategyService:
                 pass
         return fallback
 
-    async def save_strategy(self, session: AsyncSession, strategy: StrategyResult) -> UUID:
+    async def save_strategy(
+        self,
+        session: AsyncSession,
+        strategy: StrategyResult,
+        user_id: UUID | None = None,
+        analysis_mode: str | None = None,
+        skip_cache: bool = False,
+    ) -> UUID:
         """将策略写入 strategies 表并更新 Redis 缓存，然后创建绩效快照。
 
         返回新插入策略的 UUID。绩效快照创建失败不影响策略保存。
+        skip_cache: 为 True 时跳过 Redis 写入（调用方已缓存过）。
         """
         try:
             result = await insert_returning(
@@ -613,9 +621,9 @@ class StrategyService:
             row = result.mappings().first()
             strategy_id = UUID(str(row["id"]))
 
-            # 写入缓存
-            cache_key = f"strategy:latest:{strategy.symbol.upper()}"
-            await set_with_ttl(cache_key, strategy.model_dump(mode="json"), _CACHE_TTL_SECONDS)
+            if not skip_cache:
+                cache_key = f"strategy:latest:{strategy.symbol.upper()}"
+                await set_with_ttl(cache_key, strategy.model_dump(mode="json"), _CACHE_TTL_SECONDS)
 
             logger.info("Strategy saved", extra={"symbol": strategy.symbol, "direction": strategy.direction, "id": str(strategy_id)})
         except Exception as exc:
@@ -625,9 +633,31 @@ class StrategyService:
         # 创建绩效快照（失败不影响策略保存）
         try:
             tracker = PerformanceTracker(session)
-            await tracker.create_snapshot(strategy_id)
+            snapshot_id = await tracker.create_snapshot(
+                strategy_id,
+                user_id=user_id,
+                analysis_mode=analysis_mode,
+            )
         except Exception as exc:
             logger.warning("绩效快照创建失败，不影响策略保存: %s", exc)
+            snapshot_id = None
+
+        # 发布判断（失败不影响策略保存）
+        if snapshot_id and user_id and analysis_mode:
+            try:
+                from app.services.publish_engine import PublishRuleEngine
+                engine = PublishRuleEngine(session)
+                await engine.try_publish(
+                    snapshot_id=snapshot_id,
+                    user_id=user_id,
+                    symbol=strategy.symbol,
+                    analysis_mode=analysis_mode,
+                    direction=strategy.direction,
+                    is_fallback=strategy.is_fallback,
+                    is_worth_taking=strategy.is_worth_taking,
+                )
+            except Exception as exc:
+                logger.warning("发布判断失败，不影响策略保存: %s", exc)
 
         return strategy_id
 

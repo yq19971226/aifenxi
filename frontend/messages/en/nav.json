@@ -1,0 +1,53 @@
+{
+  "main": {
+    "dashboard": "Dashboard",
+    "onchain": "On-Chain Data",
+    "consensus": "Consensus Analysis",
+    "cases": "Historical Cases",
+    "performance": "Performance",
+    "alerts": "Alert Rules",
+    "settings": "Settings",
+    "admin": "Admin",
+    "playbook": "Playbook",
+    "leaderboard": "Leaderboard",
+    "growth": "Activities"
+  },
+  "settings": {
+    "profile": "Profile",
+    "membership": "Membership",
+    "push": "Email Notifications",
+    "configs": "System Config",
+    "security": "Security",
+    "tasks": "Tasks",
+    "partner": "Partner"
+  },
+  "admin": {
+    "users": "User Management",
+    "orders": "Order Management",
+    "operators": "Operator Management",
+    "notifications": "Notification Logs",
+    "configs": "Config Management"
+  },
+  "common": {
+    "menu": "Menu",
+    "more": "More",
+    "maintenance": "Maintenance",
+    "notifications": "Notifications",
+    "roleAdmin": "Admin",
+    "roleOperator": "Operator",
+    "roleUser": "User",
+    "announcements": "Announcements",
+    "logout": "Log Out"
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "onchain": "On-Chain",
+    "consensus": "Consensus",
+    "cases": "Cases",
+    "performance": "Performance",
+    "alerts": "Alerts",
+    "settings": "Settings",
+    "admin": "Admin"
+  }
+}

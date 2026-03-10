@@ -11,6 +11,8 @@ import logging
 from typing import Any, Literal
 
 from app.agents.base import AgentReport, BaseAgent
+from app.agents.i18n_prompts import get_system_prompt
+from app.agents.language_detect import check_language_mismatch
 from app.agents.phase_tracker import (
     PhaseTransition,
     detect_transition,
@@ -29,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 _SYSTEM_PROMPT = """你是一位资深加密货币庄家行为分析师，擅长从多维数据推演庄家操盘剧本并制定反制策略。
 
-根据提供的市场数据（技术指标、链上数据、情绪数据），从以下12种庄家操盘剧本中匹配最可能的一种，并给出各剧本的概率分布。同时，基于匹配的剧本和当前实时数据，给出具体的反制策略和交易点位建议。
+根据提供的市场数据（技术指标、链上数据、情绪数据、衍生品和订单簿线索），从知识库中的庄家操盘剧本里匹配最可能的一种，并给出各剧本的概率分布。同时，基于匹配的剧本和当前实时数据，给出具体的反制策略和交易点位建议。
 
 【硬约束 - 反幻觉规则】
 1. 剧本匹配概率必须基于输入数据中实际存在的特征计算，禁止凭空赋予概率
@@ -40,9 +42,10 @@ _SYSTEM_PROMPT = """你是一位资深加密货币庄家行为分析师，擅长
 """
 
 
-def _build_system_prompt() -> str:
+def _build_system_prompt(locale: str = "zh-CN") -> str:
     """构建包含知识库剧本定义的系统 prompt。"""
-    parts: list[str] = [_SYSTEM_PROMPT, "## 庄家操盘剧本知识库\n"]
+    base_prompt = get_system_prompt("playbook", locale)
+    parts: list[str] = [base_prompt, "## 庄家操盘剧本知识库\n"]
 
     for i, pattern in enumerate(PLAYBOOK_PATTERNS, 1):
         cs = pattern.counter_strategy
@@ -50,6 +53,16 @@ def _build_system_prompt() -> str:
         parts.append(f"特征: {', '.join(pattern.features)}")
         parts.append(f"后续走势: {pattern.aftermath}")
         parts.append(f"策略类型: {pattern.strategy_type}")
+        if pattern.market_structure_type:
+            parts.append(f"适用市场结构: {pattern.market_structure_type}")
+        if pattern.applicable_regimes:
+            parts.append(f"适用市场环境: {', '.join(pattern.applicable_regimes)}")
+        if pattern.required_domains:
+            parts.append(f"关键数据域: {', '.join(pattern.required_domains)}")
+        if pattern.confidence_boosters:
+            parts.append(f"增强置信度信号: {', '.join(pattern.confidence_boosters)}")
+        if pattern.invalidation_signals:
+            parts.append(f"失效条件: {', '.join(pattern.invalidation_signals)}")
         parts.append(f"反制方案: {cs.action}")
         parts.append(f"进场逻辑: {cs.entry_logic}")
         parts.append(f"止损逻辑: {cs.stop_loss_logic}")
@@ -202,6 +215,59 @@ def _build_user_prompt(
         if deriv.liquidation_1h_long_pct is not None:
             parts.append(f"多头爆仓占比: {deriv.liquidation_1h_long_pct:.1f}%")
 
+    cg = data.coinglass
+    if cg:
+        parts.append("\n## CoinGlass / 微结构补充")
+        if cg.oi_snapshots:
+            latest_oi = cg.oi_snapshots[-1]
+            if isinstance(latest_oi, dict):
+                oi_value = latest_oi.get("open_interest") or latest_oi.get("oi")
+                oi_change = latest_oi.get("open_interest_change_pct") or latest_oi.get("oi_change_percent")
+                if oi_value is not None:
+                    parts.append(f"最新OI: {oi_value}")
+                if oi_change is not None:
+                    parts.append(f"OI变化: {oi_change}")
+        if cg.stablecoin_margin_oi_snapshots:
+            latest_stablecoin_oi = cg.stablecoin_margin_oi_snapshots[-1]
+            if isinstance(latest_stablecoin_oi, dict):
+                stablecoin_oi = latest_stablecoin_oi.get("open_interest") or latest_stablecoin_oi.get("oi")
+                stablecoin_change = latest_stablecoin_oi.get("oi_change_24h") or latest_stablecoin_oi.get("change_24h")
+                if stablecoin_oi is not None:
+                    parts.append(f"稳定币保证金OI: {stablecoin_oi}")
+                if stablecoin_change is not None:
+                    parts.append(f"稳定币保证金OI 24h变化: {stablecoin_change}")
+        if cg.coin_margin_oi_snapshots:
+            latest_coin_oi = cg.coin_margin_oi_snapshots[-1]
+            if isinstance(latest_coin_oi, dict):
+                coin_oi = latest_coin_oi.get("open_interest") or latest_coin_oi.get("oi")
+                coin_change = latest_coin_oi.get("oi_change_24h") or latest_coin_oi.get("change_24h")
+                if coin_oi is not None:
+                    parts.append(f"币本位保证金OI: {coin_oi}")
+                if coin_change is not None:
+                    parts.append(f"币本位保证金OI 24h变化: {coin_change}")
+        if cg.netflow_snapshots:
+            latest_netflow = cg.netflow_snapshots[-1]
+            if isinstance(latest_netflow, dict):
+                value = latest_netflow.get("value") or latest_netflow.get("netflow")
+                if value is not None:
+                    parts.append(f"期货净流入/流出: {value}")
+        if cg.orderbook_levels:
+            parts.append(f"订单簿聚合层级数: {len(cg.orderbook_levels)}")
+        if cg.large_orders:
+            parts.append(f"大单挂单数: {len(cg.large_orders)}")
+        if cg.option_max_pain:
+            parts.append(f"期权Max Pain: {cg.option_max_pain.get('max_pain_price', 'N/A')}")
+        if cg.option_info:
+            parts.append(f"期权Put/Call比: {cg.option_info.get('put_call_ratio', 'N/A')}")
+            parts.append(f"期权总OI: {cg.option_info.get('total_oi', 'N/A')}")
+            parts.append(f"期权IV: {cg.option_info.get('iv', 'N/A')}")
+
+    gecko = data.coingecko
+    if gecko and gecko.global_data:
+        parts.append("\n## CoinGecko / 宏观补充")
+        if gecko.global_data.stablecoin_volume_24h is not None:
+            parts.append(f"稳定币24h成交额: {gecko.global_data.stablecoin_volume_24h}")
+
     return "\n".join(parts)
 
 
@@ -233,7 +299,8 @@ class PlaybookAgent(BaseAgent):
                 extra={"symbol": data.symbol, "error": str(exc)},
             )
 
-        system_prompt = _build_system_prompt()
+        locale = getattr(data, "locale", "zh-CN")
+        system_prompt = _build_system_prompt(locale)
         user_prompt = _build_user_prompt(data, current_phase_str, transition)
 
         try:
@@ -247,7 +314,7 @@ class PlaybookAgent(BaseAgent):
             )
 
             return self._parse_result(
-                result, data.symbol, current_phase_str, transition
+                result, data.symbol, current_phase_str, transition, locale,
             )
 
         except Exception as exc:
@@ -263,6 +330,7 @@ class PlaybookAgent(BaseAgent):
         symbol: str,
         current_phase: str = "",
         transition: PhaseTransition | None = None,
+        locale: str = "zh-CN",
     ) -> AgentReport:
         """解析 LLM 返回结果，构建 AgentReport。"""
         # 解析 matched_playbook
@@ -319,12 +387,17 @@ class PlaybookAgent(BaseAgent):
         if counter_strategy.get("action"):
             key_findings.append(f"反制策略: {counter_strategy['action']}")
 
+        reasoning_final = reasoning or f"匹配剧本: {matched}" if matched else "无明确匹配"
+        content_locale, lang_mismatch = check_language_mismatch(
+            reasoning_final, locale,
+        )
+
         return AgentReport(
             agent_id=self.AGENT_ID,
             symbol=symbol,
             signal=signal,
             confidence=confidence,
-            reasoning=reasoning or f"匹配剧本: {matched}" if matched else "无明确匹配",
+            reasoning=reasoning_final,
             key_findings=key_findings,
             raw_data={
                 "matched_playbook": matched,
@@ -345,6 +418,8 @@ class PlaybookAgent(BaseAgent):
                     else None
                 ),
             },
+            content_locale=content_locale,
+            language_mismatch=lang_mismatch,
         )
 
     def _fallback_report(self, symbol: str, error: str) -> AgentReport:
