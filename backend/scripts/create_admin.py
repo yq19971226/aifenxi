@@ -26,12 +26,10 @@ async def main() -> None:
         print("ERROR: password must be at least 8 characters.")
         sys.exit(1)
 
-    from passlib.context import CryptContext
-
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    hashed = pwd_context.hash(password)
-
+    from app.core.security import hash_password
     from app.core.database import AsyncSessionLocal
+
+    hashed = hash_password(password)
     from sqlalchemy import text
 
     async with AsyncSessionLocal() as session:

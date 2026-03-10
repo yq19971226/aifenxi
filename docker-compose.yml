@@ -48,6 +48,7 @@ services:
       - ./backend/migrations/v15_email_normalize.sql:/docker-entrypoint-initdb.d/20_v15_email_normalize.sql
       - ./backend/migrations/v16_resend_config.sql:/docker-entrypoint-initdb.d/21_v16_resend_config.sql
       - ./backend/migrations/v17_email_suppression.sql:/docker-entrypoint-initdb.d/22_v17_email_suppression.sql
+      - ./backend/migrations/v18_audit_logs.sql:/docker-entrypoint-initdb.d/23_v18_audit_logs.sql
       - ./backend/migrations/seed_cases_2025.sql:/docker-entrypoint-initdb.d/99_seed_cases_2025.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U omnimind"]
