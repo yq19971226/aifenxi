@@ -16,6 +16,7 @@
     "confirmNewPassword": "Confirm New Password"
   },
   "placeholders": {
+    "email": "Enter your email",
     "password": "Enter password",
     "minLength": "At least 8 characters",
     "verificationCode": "Enter 6-digit verification code",

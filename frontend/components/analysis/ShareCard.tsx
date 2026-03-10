@@ -174,6 +174,8 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                 <span style={S.label}>策略类型</span>
                 <span style={S.value}>{report.strategy.is_fallback ? "估算策略" : "标准策略"}</span>
               </div>
+              {(report.strategy.entry_low != null || report.strategy.entry_high != null || report.strategy.stop_loss != null || (report.strategy.targets && report.strategy.targets.length > 0)) ? (
+                <>
               {(report.strategy.entry_low != null || report.strategy.entry_high != null) && (
                 <div style={S.row}>
                   <span style={S.label}>进场点位</span>
@@ -198,6 +200,13 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                   <span style={{ ...S.value, color: "#16a34a", fontWeight: 600 }}>
                     {report.strategy.targets.slice(0, 3).map((t, i) => `T${i + 1}:${t.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`).join(" ")}
                   </span>
+                </div>
+              )}
+                </>
+              ) : (
+                <div style={S.row}>
+                  <span style={S.label}>进场/止损/止盈</span>
+                  <span style={{ ...S.value, color: "#78716c", fontSize: 12 }}>本次分析未返回点位，请重试或切换模式</span>
                 </div>
               )}
               {(report.strategy.risk_reward_ratio ?? 0) > 0 && (

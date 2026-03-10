@@ -16,6 +16,7 @@
     "confirmNewPassword": "確認新密碼"
   },
   "placeholders": {
+    "email": "請輸入電子郵件",
     "password": "輸入密碼",
     "minLength": "至少 8 位",
     "verificationCode": "輸入 6 位驗證碼",

@@ -16,6 +16,7 @@
     "confirmNewPassword": "确认新密码"
   },
   "placeholders": {
+    "email": "请输入邮箱",
     "password": "输入密码",
     "minLength": "至少 8 位",
     "verificationCode": "输入 6 位验证码",

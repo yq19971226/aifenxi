@@ -670,7 +670,7 @@ function LoginPageInner() {
                   label={t('fields.email')}
                   icon={<Mail size={15} />}
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t('placeholders.email')}
                   required
                   autoComplete="email"
                   value={email}
@@ -716,7 +716,7 @@ function LoginPageInner() {
                       label={t('fields.registerEmail')}
                       icon={<Mail size={15} />}
                       type="email"
-                      placeholder="you@example.com"
+                      placeholder={t('placeholders.email')}
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -783,7 +783,7 @@ function LoginPageInner() {
                   label={t('fields.email')}
                   icon={<Mail size={15} />}
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t('placeholders.email')}
                   required
                   autoComplete="email"
                   value={email}

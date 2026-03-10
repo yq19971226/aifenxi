@@ -87,7 +87,15 @@ export function ShareModal({ report, config, onClose }: ShareModalProps) {
           {saving ? "生成中…" : saved ? "已保存" : "保存图片"}
         </button>
 
-        <p className="text-xs text-zinc-500">不含具体点位，可安全分享</p>
+        <p className="text-xs text-zinc-500">
+          {report.strategy &&
+          (report.strategy.entry_low != null ||
+            report.strategy.entry_high != null ||
+            report.strategy.stop_loss != null ||
+            (report.strategy.targets && report.strategy.targets.length > 0))
+            ? "含进场/止损/止盈点位，分享时请注意隐私"
+            : "不含具体点位，可安全分享"}
+        </p>
       </div>
     </div>
   );
