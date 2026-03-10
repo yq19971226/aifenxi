@@ -599,7 +599,7 @@ function LoginPageInner() {
                 <button
                   key={tabKey}
                   type="button"
-                  onClick={() => switchTab(tabKey)}
+                  onClick={() => switchTab(tabKey as TabType)}
                   className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
                     tab === tabKey
                       ? "bg-white/[0.08] text-zinc-100 shadow-sm"
