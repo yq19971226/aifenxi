@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
@@ -11,10 +11,18 @@ import { ArrowRight, Loader2, AlertCircle } from "lucide-react";
 export default function LoginPage() {
   const router = useRouter();
   const locale = useLocale();
-  const { login } = useAuth();
+  const { user, loading: authLoading, login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  
+  const t = useTranslations("login");
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (user) {
+      router.replace(`/${locale}/dashboard`);
+    }
+  }, [user, authLoading, locale, router]);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -28,10 +36,18 @@ export default function LoginPage() {
       await login(email, password);
       router.push(`/${locale}/dashboard`);
     } catch (err) {
-      setError("Invalid credentials. Please try again.");
+      setError(t("page.errorInvalidCredentials"));
     } finally {
       setLoading(false);
     }
+  }
+
+  if (authLoading || user) {
+    return (
+      <div className="flex min-h-[200px] items-center justify-center">
+        <Loader2 size={24} className="animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
   return (
@@ -45,21 +61,21 @@ export default function LoginPage() {
         )}
 
         <div className="space-y-2">
-          <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Email</label>
+          <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">{t("fields.email")}</label>
           <input
             name="email"
             type="email"
             required
             className="w-full h-12 bg-transparent border-b border-border focus:border-foreground outline-none transition-colors font-mono text-sm placeholder:text-muted-foreground/50"
-            placeholder="name@example.com"
+            placeholder={t("placeholders.email")}
           />
         </div>
 
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Password</label>
+            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">{t("fields.password")}</label>
             <Link href={`/${locale}/forgot-password`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-              Forgot?
+              {t("page.forgotLink")}
             </Link>
           </div>
           <input
@@ -80,15 +96,15 @@ export default function LoginPage() {
             <Loader2 size={18} className="animate-spin" />
           ) : (
             <>
-              Access Terminal <ArrowRight size={18} />
+              {t("page.submitButton")} <ArrowRight size={18} />
             </>
           )}
         </button>
 
         <div className="text-center mt-6">
-          <span className="text-sm text-muted-foreground">Don't have an account? </span>
+          <span className="text-sm text-muted-foreground">{t("page.noAccount")}</span>
           <Link href={`/${locale}/register`} className="text-sm font-medium text-foreground hover:underline underline-offset-4">
-            Apply for access
+            {t("page.applyForAccess")}
           </Link>
         </div>
       </form>

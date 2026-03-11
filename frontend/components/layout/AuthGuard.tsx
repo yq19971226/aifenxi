@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 
 import { useAuth } from "@/lib/auth-context";
 import { isRouteAllowed } from "@/lib/route-permissions";
+import { getLocaleFromPathname, isAuthRoute } from "@/lib/utils/locale";
 import type { ReactNode } from "react";
 
 interface AuthGuardProps {
@@ -15,21 +16,22 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname);
 
   useEffect(() => {
     if (loading) return;
 
-    // 未登录用户重定向到 /login
-    if (!user && !pathname.startsWith("/login")) {
-      router.push("/login");
+    // 未登录用户重定向到 /{locale}/login，避免丢 locale
+    if (!user && !isAuthRoute(pathname)) {
+      router.push(`/${locale}/login`);
       return;
     }
 
     // 已登录用户：使用共享权限真相源检查路由权限
     if (user && !isRouteAllowed(pathname, user.role)) {
-      router.push("/dashboard");
+      router.push(`/${locale}/dashboard`);
     }
-  }, [user, loading, pathname, router]);
+  }, [user, loading, pathname, router, locale]);
 
   if (loading) {
     return (

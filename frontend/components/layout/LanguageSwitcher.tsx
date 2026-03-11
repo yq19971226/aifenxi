@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { motion } from 'framer-motion';
@@ -13,9 +13,9 @@ import {
 import { authHeaders } from '@/lib/api/auth';
 
 const LOCALES = [
-  { code: 'zh-CN', name: '简体中文', flag: '🇨🇳' },
-  { code: 'zh-TW', name: '繁體中文', flag: '🇭🇰' },
-  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'zh-CN', nameKey: 'zhCN', flag: '🇨🇳' },
+  { code: 'zh-TW', nameKey: 'zhTW', flag: '🇭🇰' },
+  { code: 'en', nameKey: 'en', flag: '🇺🇸' },
 ] as const;
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
@@ -24,10 +24,12 @@ export function LanguageSwitcher() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations('common');
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
 
   const currentLocale = LOCALES.find(l => l.code === locale) || LOCALES[0];
+  const currentName = t(`languages.${currentLocale.nameKey}`);
 
   const switchLocale = async (newLocale: string) => {
     const startMark = `locale-switch-start-${Date.now()}`;
@@ -137,7 +139,7 @@ export function LanguageSwitcher() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }}
           >
-            {currentLocale.name}
+            {currentName}
           </motion.span>
         </motion.button>
       </DropdownMenuTrigger>
@@ -155,7 +157,7 @@ export function LanguageSwitcher() {
               className="flex items-center gap-2 w-full"
             >
               <span className="text-lg">{loc.flag}</span>
-              <span className="text-sm">{loc.name}</span>
+              <span className="text-sm">{t(`languages.${loc.nameKey}`)}</span>
               {loc.code === locale && (
                 <motion.span 
                   className="ml-auto text-indigo-400"

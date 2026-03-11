@@ -35,6 +35,7 @@
     "backToLogin": "Back to login",
     "title": "Reset Password",
     "promptSend": "Enter your email and we'll send a verification code",
+    "contactPrompt": "Please contact the administrator or use your registration email to reset your password.",
     "promptCode": "Enter the code sent to your email"
   },
   "strength": {
@@ -83,5 +84,24 @@
     "timeframes": "Timeframes"
   },
   "legal": "By continuing you agree to AXIOM Insight's Terms of Service and Privacy Policy",
-  "guideLink": "New here? Check out the User Guide →"
+  "guideLink": "New here? Check out the User Guide →",
+  "layout": {
+    "back": "Back",
+    "welcomeTitle": "Welcome back.",
+    "welcomeSubtitle": "Enter your credentials to access the terminal.",
+    "registerSubtitle": "Fill in your details to apply for access.",
+    "terminalTagline": "Truth is in the code."
+  },
+  "page": {
+    "submitButton": "Access Terminal",
+    "noAccount": "Don't have an account? ",
+    "applyForAccess": "Apply for access",
+    "forgotLink": "Forgot?",
+    "errorInvalidCredentials": "Invalid credentials. Please try again.",
+    "haveAccount": "Already have an account? ",
+    "submitApplication": "Submit Application",
+    "username": "Username",
+    "confirm": "Confirm",
+    "placeholderUsername": "e.g. trader_01"
+  }
 }

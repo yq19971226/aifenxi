@@ -4,7 +4,8 @@ import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { locales } from '@/i18n';
 import { Providers } from "@/lib/providers";
-import "../globals.css";
+import { ToastProvider } from "@/components/ui/Toast";
+import { LangAttr } from "@/components/layout/LangAttr";
 
 export async function generateMetadata({
   params: { locale },
@@ -52,14 +53,13 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className="dark">
-      <body className="font-sans antialiased">
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <Providers>
-            {children}
-          </Providers>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <LangAttr />
+      <Providers>
+        <ToastProvider>
+          {children}
+        </ToastProvider>
+      </Providers>
+    </NextIntlClientProvider>
   );
 }

@@ -81,6 +81,11 @@
   },
   "menu": "選單",
   "more": "更多",
+  "languages": {
+    "zhCN": "簡體中文",
+    "zhTW": "繁體中文",
+    "en": "English"
+  },
   "notifications": "通知",
   "announcements": "公告中心",
   "guide": "使用指南",

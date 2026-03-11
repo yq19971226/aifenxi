@@ -1,4 +1,5 @@
 import { handleApiResponse } from "./helpers";
+import { getLocaleFromPathname } from "@/lib/utils/locale";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
 const TOKEN_KEY = "axiom_access_token";
@@ -97,7 +98,8 @@ export async function authFetch(
       _refreshPromise = null;
       clearTokens();
       if (typeof window !== "undefined") {
-        window.location.href = "/login";
+        const locale = getLocaleFromPathname(window.location.pathname);
+        window.location.href = `/${locale}/login`;
       }
     }
   }

@@ -33,8 +33,9 @@
   "forgot": {
     "link": "忘記密碼？",
     "backToLogin": "返回登入",
-    "title": "重設密碼",
+    "title": "找回密碼",
     "promptSend": "輸入註冊信箱，我們將發送驗證碼",
+    "contactPrompt": "請聯繫管理員或透過註冊信箱找回密碼。",
     "promptCode": "請輸入信箱中收到的驗證碼"
   },
   "strength": {
@@ -64,10 +65,10 @@
     "passwordReset": "密碼重設成功，請登入"
   },
   "features": {
-    "heroTitle1": "Institutional-grade",
-    "heroTitle2": "market intelligence.",
-    "heroSubtitle1": "Multi-agent adversarial consensus engine.",
-    "heroSubtitle2": "See through the noise. Trade the script.",
+    "heroTitle1": "機構級",
+    "heroTitle2": "市場情報。",
+    "heroSubtitle1": "多智慧體對抗共識引擎。",
+    "heroSubtitle2": "穿透噪音，交易劇本。",
     "agentsTitle": "10 AI 智慧體協同",
     "agentsDesc": "多模型博弈共識，不止一個觀點",
     "defenseTitle": "莊家對抗防禦",
@@ -83,5 +84,24 @@
     "timeframes": "時間週期"
   },
   "legal": "繼續即表示同意 AXIOM洞察 的服務條款與隱私政策",
-  "guideLink": "不知道怎麼用？查看使用指南 →"
+  "guideLink": "不知道怎麼用？查看使用指南 →",
+  "layout": {
+    "back": "返回",
+    "welcomeTitle": "歡迎回來",
+    "welcomeSubtitle": "輸入帳號密碼進入終端",
+    "registerSubtitle": "填寫資訊申請訪問",
+    "terminalTagline": "Truth is in the code."
+  },
+  "page": {
+    "submitButton": "進入終端",
+    "noAccount": "還沒有帳號？",
+    "applyForAccess": "申請訪問",
+    "forgotLink": "忘記密碼？",
+    "errorInvalidCredentials": "信箱或密碼錯誤，請重試。",
+    "haveAccount": "已有帳號？",
+    "submitApplication": "提交申請",
+    "username": "用戶名",
+    "confirm": "確認密碼",
+    "placeholderUsername": "例如 trader_01"
+  }
 }

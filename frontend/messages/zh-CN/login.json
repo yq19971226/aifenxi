@@ -33,8 +33,9 @@
   "forgot": {
     "link": "忘记密码？",
     "backToLogin": "返回登录",
-    "title": "重置密码",
+    "title": "找回密码",
     "promptSend": "输入注册邮箱，我们将发送验证码",
+    "contactPrompt": "请联系管理员或通过注册邮箱找回密码。",
     "promptCode": "请输入邮箱中收到的验证码"
   },
   "strength": {
@@ -64,10 +65,10 @@
     "passwordReset": "密码重置成功，请登录"
   },
   "features": {
-    "heroTitle1": "Institutional-grade",
-    "heroTitle2": "market intelligence.",
-    "heroSubtitle1": "Multi-agent adversarial consensus engine.",
-    "heroSubtitle2": "See through the noise. Trade the script.",
+    "heroTitle1": "机构级",
+    "heroTitle2": "市场情报。",
+    "heroSubtitle1": "多智能体对抗共识引擎。",
+    "heroSubtitle2": "穿透噪音，交易剧本。",
     "agentsTitle": "10 AI 智能体协同",
     "agentsDesc": "多模型博弈共识，不止一个观点",
     "defenseTitle": "庄家对抗防御",
@@ -83,5 +84,24 @@
     "timeframes": "时间周期"
   },
   "legal": "继续即表示同意 AXIOM洞察 的服务条款与隐私政策",
-  "guideLink": "不知道怎么用？查看使用指南 →"
+  "guideLink": "不知道怎么用？查看使用指南 →",
+  "layout": {
+    "back": "返回",
+    "welcomeTitle": "欢迎回来",
+    "welcomeSubtitle": "输入账号密码进入终端",
+    "registerSubtitle": "填写信息申请访问",
+    "terminalTagline": "Truth is in the code."
+  },
+  "page": {
+    "submitButton": "进入终端",
+    "noAccount": "还没有账号？",
+    "applyForAccess": "申请访问",
+    "forgotLink": "忘记密码？",
+    "errorInvalidCredentials": "邮箱或密码错误，请重试。",
+    "haveAccount": "已有账号？",
+    "submitApplication": "提交申请",
+    "username": "用户名",
+    "confirm": "确认密码",
+    "placeholderUsername": "例如 trader_01"
+  }
 }

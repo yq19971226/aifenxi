@@ -46,5 +46,7 @@
     "invalidData": "数据格式不正确",
     "duplicateEntry": "数据已存在",
     "saveFailed": "保存失败"
-  }
+  },
+  "pageError": "页面加载出错",
+  "retry": "重试"
 }

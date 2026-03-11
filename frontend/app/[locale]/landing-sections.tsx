@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { LogoMark } from "@/components/ui/Logo";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { useAuth } from "@/lib/auth-context";
 
 // ── Shared Components ──────────────────────────────────────
 
@@ -46,7 +47,7 @@ function FadeIn({
 // ── Hero Section ───────────────────────────────────────────
 
 function HeroSection() {
-  const t = useTranslations("landing.hero");
+  const t = useTranslations("landing");
   const locale = useLocale();
 
   return (
@@ -60,24 +61,24 @@ function HeroSection() {
           <FadeIn delay={0.1}>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-bg-surface/50 text-xs font-mono text-muted-foreground mb-8">
               <span className="w-2 h-2 rounded-full bg-bull animate-pulse" />
-              {t("badge")}
+              {t("hero.badge")}
             </div>
           </FadeIn>
           
           <FadeIn delay={0.2}>
             <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-foreground mb-6 font-mono">
-              {t("titleLine1")} <br />
+              {t("hero.titleLine1")} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-foreground to-muted-foreground">
-                {t("titleLine2")}
+                {t("hero.titleLine2")}
               </span>
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.3}>
             <p className="text-xl text-muted-foreground mb-10 max-w-lg leading-relaxed">
-              {t("subtitleLine1")}
+              {t("hero.subtitleLine1")}
               <br />
-              {t("subtitleLine2")}
+              {t("hero.subtitleLine2")}
             </p>
           </FadeIn>
 
@@ -87,13 +88,19 @@ function HeroSection() {
                 href={`/${locale}/login`}
                 className="h-12 px-8 rounded bg-foreground text-bg-primary font-bold flex items-center gap-2 hover:bg-muted-foreground transition-colors"
               >
-                {t("ctaPrimary")} <ArrowRight size={18} />
+                {t("hero.ctaPrimary")} <ArrowRight size={18} />
+              </Link>
+              <Link
+                href={`/${locale}/guide`}
+                className="h-12 px-8 rounded border border-border text-foreground font-medium flex items-center hover:bg-bg-surface transition-colors"
+              >
+                {t("cta.guide")}
               </Link>
               <Link
                 href="#features"
-                className="h-12 px-8 rounded border border-border text-foreground font-medium flex items-center hover:bg-bg-surface transition-colors"
+                className="h-12 px-8 rounded border border-border text-muted-foreground font-medium flex items-center hover:bg-bg-surface transition-colors text-sm"
               >
-                {t("ctaSecondary")}
+                {t("hero.learnMore")}
               </Link>
             </div>
           </FadeIn>
@@ -159,9 +166,213 @@ function TerminalBlock() {
   );
 }
 
+// ── Pain Points ─────────────────────────────────────────────
+
+function PainPointsSection() {
+  const t = useTranslations("landing.painPoints");
+  const items = t.raw("items") as { problem: string; solution: string }[];
+  return (
+    <section className="py-20 border-t border-border bg-bg-surface">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <FadeIn>
+          <h2 className="text-3xl font-bold mb-12">{t("title")}</h2>
+        </FadeIn>
+        <div className="grid md:grid-cols-3 gap-8">
+          {(items || []).map((item, i) => (
+            <FadeIn key={i} delay={i * 0.1}>
+              <div className="p-6 rounded-lg border border-border bg-bg-primary">
+                <p className="text-muted-foreground mb-2">{item.problem}</p>
+                <p className="text-foreground font-medium text-bull">{item.solution}</p>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Capabilities ────────────────────────────────────────────
+
+function CapabilitiesSection() {
+  const t = useTranslations("landing.capabilities");
+  return (
+    <section className="py-20 border-t border-border bg-bg-primary">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <FadeIn>
+          <h2 className="text-3xl font-bold mb-4">{t("title")}</h2>
+          <p className="text-muted-foreground max-w-2xl mb-16">{t("subtitle")}</p>
+        </FadeIn>
+        <div className="grid md:grid-cols-3 gap-8">
+          <FadeIn delay={0.1}>
+            <div className="p-6 rounded-lg border border-border bg-bg-surface">
+              <h3 className="text-lg font-bold mb-3">{t("analysis.title")}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t("analysis.desc")}</p>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.2}>
+            <div className="p-6 rounded-lg border border-border bg-bg-surface">
+              <h3 className="text-lg font-bold mb-3">{t("consensus.title")}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t("consensus.desc")}</p>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.3}>
+            <div className="p-6 rounded-lg border border-border bg-bg-surface">
+              <h3 className="text-lg font-bold mb-3">{t("practice.title")}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t("practice.desc")}</p>
+            </div>
+          </FadeIn>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Modes ───────────────────────────────────────────────────
+
+function ModesSection() {
+  const t = useTranslations("landing.modes");
+  return (
+    <section className="py-20 border-t border-border bg-bg-surface">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <FadeIn>
+          <h2 className="text-3xl font-bold mb-4">{t("title")}</h2>
+          <p className="text-muted-foreground max-w-2xl mb-12">{t("subtitle")}</p>
+        </FadeIn>
+        <div className="grid md:grid-cols-3 gap-6">
+          <FadeIn delay={0.1}>
+            <div className="p-6 rounded-lg border border-border bg-bg-primary">
+              <span className="text-xs font-mono text-bull border border-bull/50 px-2 py-0.5 rounded">{t("scalping.tag")}</span>
+              <h3 className="text-lg font-bold mt-3 mb-2">{t("scalping.name")}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t("scalping.desc")}</p>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.2}>
+            <div className="p-6 rounded-lg border border-border bg-bg-primary">
+              <span className="text-xs font-mono text-bull border border-bull/50 px-2 py-0.5 rounded">{t("intraday.tag")}</span>
+              <h3 className="text-lg font-bold mt-3 mb-2">{t("intraday.name")}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t("intraday.desc")}</p>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.3}>
+            <div className="p-6 rounded-lg border border-border bg-bg-primary">
+              <span className="text-xs font-mono text-bull border border-bull/50 px-2 py-0.5 rounded">{t("trend.tag")}</span>
+              <h3 className="text-lg font-bold mt-3 mb-2">{t("trend.name")}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t("trend.desc")}</p>
+            </div>
+          </FadeIn>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Product ──────────────────────────────────────────────────
+
+function ProductSection() {
+  const t = useTranslations("landing.product");
+  const dashboardHighlights = t.raw("dashboard.highlights") as string[];
+  const consensusHighlights = t.raw("consensus.highlights") as string[];
+  const playbookHighlights = t.raw("playbook.highlights") as string[];
+  return (
+    <section className="py-20 border-t border-border bg-bg-primary">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <FadeIn>
+          <h2 className="text-3xl font-bold mb-4">{t("title")}</h2>
+          <p className="text-muted-foreground max-w-2xl mb-16">{t("subtitle")}</p>
+        </FadeIn>
+        <div className="grid md:grid-cols-3 gap-8">
+          <FadeIn delay={0.1}>
+            <div className="p-6 rounded-lg border border-border bg-bg-surface h-full flex flex-col">
+              <h3 className="text-lg font-bold mb-3">{t("dashboard.title")}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">{t("dashboard.desc")}</p>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                {(dashboardHighlights || []).map((h, i) => <li key={i}>· {h}</li>)}
+              </ul>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.2}>
+            <div className="p-6 rounded-lg border border-border bg-bg-surface h-full flex flex-col">
+              <h3 className="text-lg font-bold mb-3">{t("consensus.title")}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">{t("consensus.desc")}</p>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                {(consensusHighlights || []).map((h, i) => <li key={i}>· {h}</li>)}
+              </ul>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.3}>
+            <div className="p-6 rounded-lg border border-border bg-bg-surface h-full flex flex-col">
+              <h3 className="text-lg font-bold mb-3">{t("playbook.title")}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">{t("playbook.desc")}</p>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                {(playbookHighlights || []).map((h, i) => <li key={i}>· {h}</li>)}
+              </ul>
+            </div>
+          </FadeIn>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Data Sources ─────────────────────────────────────────────
+
+function DataSection() {
+  const t = useTranslations("landing.data");
+  const tags = ["exchange", "onchain", "derivatives", "macro", "sentiment", "news"] as const;
+  return (
+    <section className="py-20 border-t border-border bg-bg-surface">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <FadeIn>
+          <h2 className="text-3xl font-bold mb-4">{t("title")}</h2>
+          <p className="text-muted-foreground max-w-2xl mb-10">{t("desc")}</p>
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <div className="flex flex-wrap gap-3">
+            {tags.map((key) => (
+              <span key={key} className="px-4 py-2 rounded-full border border-border bg-bg-primary text-sm text-muted-foreground">
+                {t(key)}
+              </span>
+            ))}
+          </div>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
+// ── CTA ──────────────────────────────────────────────────────
+
+function CTASection() {
+  const t = useTranslations("landing.cta");
+  const locale = useLocale();
+  return (
+    <section className="py-20 border-t border-border bg-bg-primary">
+      <div className="max-w-2xl mx-auto px-4 text-center">
+        <FadeIn>
+          <h2 className="text-3xl font-bold mb-4">{t("title")}</h2>
+          <p className="text-muted-foreground mb-8">{t("subtitle")}</p>
+        </FadeIn>
+        <FadeIn delay={0.1} className="flex flex-wrap justify-center gap-4">
+          <Link href={`/${locale}/register`} className="h-12 px-8 rounded bg-foreground text-bg-primary font-bold inline-flex items-center hover:bg-muted-foreground transition-colors">
+            {t("button")}
+          </Link>
+          <Link href={`/${locale}/login`} className="h-12 px-8 rounded border border-border text-foreground font-medium inline-flex items-center hover:bg-bg-surface transition-colors">
+            {t("login")}
+          </Link>
+          <Link href={`/${locale}/guide`} className="h-12 px-8 rounded border border-border text-muted-foreground font-medium inline-flex items-center hover:bg-bg-surface transition-colors">
+            {t("guide")}
+          </Link>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
 // ── Features Grid ──────────────────────────────────────────
 
 const FEATURE_ICONS = [Cpu, Shield, Activity, Search, Zap, Globe];
+
 
 function FeaturesSection() {
   const t = useTranslations("landing.features");
@@ -220,6 +431,7 @@ function TrustSection() {
 export function LandingPage() {
   const locale = useLocale();
   const t = useTranslations("landing");
+  const { user } = useAuth();
   return (
     <div className="min-h-screen bg-bg-primary text-foreground font-sans selection:bg-foreground selection:text-bg-primary">
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-bg-primary/80 backdrop-blur-md">
@@ -230,9 +442,18 @@ export function LandingPage() {
           </div>
           <div className="flex items-center gap-6">
             <LanguageSwitcher />
-            <Link href={`/${locale}/login`} className="text-sm font-medium hover:text-muted-foreground transition-colors">
-              {t("nav.login")}
+            <Link href={`/${locale}/guide`} className="text-sm font-medium hover:text-muted-foreground transition-colors">
+              {t("footer.guide")}
             </Link>
+            {user ? (
+              <Link href={`/${locale}/dashboard`} className="text-sm font-medium hover:text-muted-foreground transition-colors">
+                {t("nav.enterApp")}
+              </Link>
+            ) : (
+              <Link href={`/${locale}/login`} className="text-sm font-medium hover:text-muted-foreground transition-colors">
+                {t("nav.login")}
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -240,10 +461,21 @@ export function LandingPage() {
       <main>
         <HeroSection />
         <TrustSection />
+        <PainPointsSection />
+        <CapabilitiesSection />
+        <ModesSection />
+        <ProductSection />
+        <DataSection />
         <FeaturesSection />
+        <CTASection />
       </main>
 
       <footer className="py-12 border-t border-border bg-bg-primary text-center text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-center gap-6 mb-4">
+          <Link href={`/${locale}/guide`} className="hover:text-foreground transition-colors">{t("footer.guide")}</Link>
+          <Link href={`/${locale}/guide`} className="hover:text-foreground transition-colors">{t("footer.docs")}</Link>
+          <Link href={`/${locale}/guide#faq`} className="hover:text-foreground transition-colors">{t("footer.faq")}</Link>
+        </div>
         <p>{t("footerOperational", { year: new Date().getFullYear() })}</p>
       </footer>
     </div>

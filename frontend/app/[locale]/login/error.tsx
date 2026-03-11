@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 export default function LoginError({
   error,
   reset,
@@ -7,9 +9,11 @@ export default function LoginError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("errors");
+
   return (
     <div style={{ background: "#09090b", color: "#fff", fontFamily: "system-ui", padding: 40, minHeight: "100vh" }}>
-      <h2 style={{ color: "#ef4444" }}>登录页错误</h2>
+      <h2 style={{ color: "#ef4444" }}>{t("pageError")}</h2>
       <pre style={{ color: "#fbbf24", whiteSpace: "pre-wrap", fontSize: 13 }}>
         {error.message}
       </pre>
@@ -28,7 +32,7 @@ export default function LoginError({
           cursor: "pointer",
         }}
       >
-        重试
+        {t("retry")}
       </button>
     </div>
   );

@@ -46,5 +46,7 @@
     "invalidData": "Invalid data format",
     "duplicateEntry": "Data already exists",
     "saveFailed": "Save failed"
-  }
+  },
+  "pageError": "Page loading error",
+  "retry": "Retry"
 }

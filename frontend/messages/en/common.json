@@ -81,6 +81,11 @@
   },
   "menu": "Menu",
   "more": "More",
+  "languages": {
+    "zhCN": "Simplified Chinese",
+    "zhTW": "Traditional Chinese",
+    "en": "English"
+  },
   "notifications": "Notifications",
   "announcements": "Announcements",
   "guide": "User Guide",

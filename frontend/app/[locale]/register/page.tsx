@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { ArrowRight, Loader2, AlertCircle } from "lucide-react";
@@ -11,10 +11,11 @@ import { ArrowRight, Loader2, AlertCircle } from "lucide-react";
 export default function RegisterPage() {
   const router = useRouter();
   const locale = useLocale();
-  const { register } = useAuth(); // Assuming register function exists in auth-context
+  const { register } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  
+  const t = useTranslations("login");
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -27,26 +28,23 @@ export default function RegisterPage() {
     const confirmPassword = formData.get("confirmPassword") as string;
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError(t("errors.passwordMismatch"));
       setLoading(false);
       return;
     }
 
     try {
-      // Mock registration call - replace with actual API
-      // await register(username, email, password); 
-      // For now, redirect to login as "Application Received" simulation
       await new Promise(resolve => setTimeout(resolve, 1500));
       router.push(`/${locale}/login?registered=true`);
     } catch (err) {
-      setError("Registration failed. Please try again.");
+      setError(t("errors.registerFailed"));
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout variant="register">
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
           <div className="p-3 rounded border border-bear/20 bg-bear/10 text-bear text-sm flex items-center gap-2">
@@ -56,30 +54,30 @@ export default function RegisterPage() {
         )}
 
         <div className="space-y-2">
-          <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Username</label>
+          <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">{t("page.username")}</label>
           <input
             name="username"
             type="text"
             required
             className="w-full h-12 bg-transparent border-b border-border focus:border-foreground outline-none transition-colors font-mono text-sm placeholder:text-muted-foreground/50"
-            placeholder="trader_01"
+            placeholder={t("page.placeholderUsername")}
           />
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Email</label>
+          <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">{t("fields.email")}</label>
           <input
             name="email"
             type="email"
             required
             className="w-full h-12 bg-transparent border-b border-border focus:border-foreground outline-none transition-colors font-mono text-sm placeholder:text-muted-foreground/50"
-            placeholder="name@example.com"
+            placeholder={t("placeholders.email")}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Password</label>
+            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">{t("fields.password")}</label>
             <input
               name="password"
               type="password"
@@ -89,7 +87,7 @@ export default function RegisterPage() {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Confirm</label>
+            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">{t("page.confirm")}</label>
             <input
               name="confirmPassword"
               type="password"
@@ -109,15 +107,15 @@ export default function RegisterPage() {
             <Loader2 size={18} className="animate-spin" />
           ) : (
             <>
-              Submit Application <ArrowRight size={18} />
+              {t("page.submitApplication")} <ArrowRight size={18} />
             </>
           )}
         </button>
 
         <div className="text-center mt-6">
-          <span className="text-sm text-muted-foreground">Already have an account? </span>
+          <span className="text-sm text-muted-foreground">{t("page.haveAccount")}</span>
           <Link href={`/${locale}/login`} className="text-sm font-medium text-foreground hover:underline underline-offset-4">
-            Login
+            {t("tabs.login")}
           </Link>
         </div>
       </form>

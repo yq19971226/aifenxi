@@ -46,5 +46,7 @@
     "invalidData": "資料格式不正確",
     "duplicateEntry": "資料已存在",
     "saveFailed": "儲存失敗"
-  }
+  },
+  "pageError": "頁面載入出錯",
+  "retry": "重試"
 }
