@@ -123,6 +123,7 @@ export function Sidebar() {
   };
 
   const currentPath = stripLocalePrefix(pathname);
+  const role: UserRole = user?.role ?? "user";
 
   return (
     <motion.aside
@@ -156,8 +157,9 @@ export function Sidebar() {
       {/* Nav Items */}
       <div className="flex-1 overflow-y-auto py-4 px-2 space-y-1 scrollbar-thin scrollbar-thumb-bg-elevated">
         {allItems.map((item) => {
-          if (!isNavItemVisible(item, user, flags)) return null;
-          
+          if (item.featureFlag && !flags?.[item.featureFlag]) return null;
+          if (!isNavItemVisible(item.href, role)) return null;
+
           const isActive = currentPath.startsWith(item.href);
           const hasChildren = item.children && item.children.length > 0;
           const isOpen = openSubmenus.includes(item.key);
@@ -214,7 +216,8 @@ export function Sidebar() {
                     className="overflow-hidden ml-4 pl-4 border-l border-border mt-1 space-y-1"
                   >
                     {item.children!.map((sub) => {
-                      if (!isNavItemVisible(sub, user, flags)) return null;
+                      if (sub.featureFlag && !flags?.[sub.featureFlag]) return null;
+                      if (!isNavItemVisible(sub.href, role)) return null;
                       const isSubActive = currentPath === sub.href;
                       
                       return (
