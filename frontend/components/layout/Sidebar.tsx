@@ -243,7 +243,7 @@ export function Sidebar() {
         {user ? (
           <div className={cn("flex items-center gap-3 px-2 py-2 rounded-md", expanded ? "bg-bg-surface" : "")}>
             <div className="h-8 w-8 rounded-full bg-bg-elevated flex items-center justify-center text-xs font-mono shrink-0 border border-border">
-              {user.username.substring(0, 2).toUpperCase()}
+              {(user.email?.split("@")[0] ?? "U").substring(0, 2).toUpperCase()}
             </div>
             <AnimatePresence>
               {expanded && (
@@ -253,7 +253,7 @@ export function Sidebar() {
                   exit={{ opacity: 0, width: 0 }}
                   className="flex-1 overflow-hidden"
                 >
-                  <div className="text-xs font-medium truncate">{user.username}</div>
+                  <div className="text-xs font-medium truncate">{user.email?.split("@")[0] ?? "User"}</div>
                   <div className="text-[10px] text-muted-foreground truncate">
                     {user.membership_level >= 2 ? "PRO PLAN" : "BASIC"}
                   </div>
