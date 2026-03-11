@@ -57,7 +57,7 @@ export default function DashboardPage() {
             Command Center
           </h1>
           <p className="text-sm text-muted-foreground font-mono">
-            > WELCOME BACK, {user?.username?.toUpperCase()}
+            {">"} WELCOME BACK, {user?.username?.toUpperCase()}
           </p>
         </div>
         
