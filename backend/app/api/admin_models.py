@@ -10,7 +10,6 @@ from pydantic import BaseModel
 from app.core.deps import require_admin
 from app.core.model_router import (
     AVAILABLE_MODELS,
-    ALL_MODEL_NAMES,
     get_all_assignments,
     set_model_for_agent,
     invalidate_cache,
