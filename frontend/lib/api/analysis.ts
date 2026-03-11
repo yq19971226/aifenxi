@@ -75,6 +75,8 @@ export interface AnalysisReport {
   regime_suggestion: string | null;
   regime_support: number | null;
   regime_resistance: number | null;
+  /** 关键发现摘要（可选，后端可能返回） */
+  key_findings?: string[];
 }
 
 export interface ProgressEvent {
