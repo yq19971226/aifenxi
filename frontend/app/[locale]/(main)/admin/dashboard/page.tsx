@@ -353,8 +353,15 @@ function CrawlerStatsCard({ stats }: { stats: CrawlerStats }) {
                   style={{ width: `${Math.min(100, (bot.count / stats.total_hits) * 100)}%` }} 
                 />
               </div>
+              <div className="flex items-center gap-2 mt-1 px-0.5">
+                {Object.entries(bot.locales).map(([lang, count]) => (
+                  <span key={lang} className="text-[9px] text-zinc-500 bg-white/[0.04] px-1 rounded">
+                    {lang}: {count}
+                  </span>
+                ))}
+              </div>
               {bot.last_seen && (
-                <p className="text-[9px] text-zinc-600 mt-1">
+                <p className="text-[9px] text-zinc-600 mt-1 pl-0.5">
                   Last: {new Date(bot.last_seen).toLocaleTimeString()}
                 </p>
               )}

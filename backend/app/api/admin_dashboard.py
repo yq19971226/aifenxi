@@ -277,10 +277,12 @@ async def get_crawler_stats(
         # Format for frontend
         bot_details = []
         for name, count in (bots or {}).items():
+            locales = await redis.hgetall(f"stats:crawler:locales:{name}")
             bot_details.append({
                 "name": name,
                 "count": int(count),
-                "last_seen": last_seen.get(name) if last_seen else None
+                "last_seen": last_seen.get(name) if last_seen else None,
+                "locales": {k: int(v) for k, v in (locales or {}).items()}
             })
             
         # Sort by count desc

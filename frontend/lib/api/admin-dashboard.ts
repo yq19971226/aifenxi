@@ -60,6 +60,7 @@ export interface CrawlerBot {
   name: string;
   count: number;
   last_seen: string | null;
+  locales: Record<string, number>;
 }
 
 export interface CrawlerStats {

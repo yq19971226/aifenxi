@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from app.core.redis import get_redis_pool
+from app.core.i18n_middleware import get_locale_from_request
 
 # 2026 AI Crawler Signatures
 AI_CRAWLER_PATTERNS = {
@@ -28,15 +29,24 @@ class AICrawlerMiddleware(BaseHTTPMiddleware):
                 break
         
         if found_bot:
+            # Detect locale
+            locale = request.query_params.get("locale")
+            if not locale:
+                path = request.url.path
+                if path.startswith("/zh-CN"): locale = "zh-CN"
+                elif path.startswith("/zh-TW"): locale = "zh-TW"
+                elif path.startswith("/en"): locale = "en"
+            if not locale:
+                locale = get_locale_from_request(request)
+
             try:
                 redis = get_redis_pool()
-                # Track total hits
-                await redis.incr(f"stats:crawler:total")
-                # Track specific bot hits
+                await redis.incr("stats:crawler:total")
                 await redis.hincrby("stats:crawler:bots", found_bot, 1)
-                # Track last seen
+                # Track bot + locale breakdown
+                await redis.hincrby(f"stats:crawler:locales:{found_bot}", locale, 1)
                 await redis.hset("stats:crawler:last_seen", found_bot, datetime.now(timezone.utc).isoformat())
             except Exception:
-                pass # Don't block request if redis fails
+                pass
                 
         return await call_next(request)
