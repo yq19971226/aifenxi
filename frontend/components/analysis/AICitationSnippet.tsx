@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Copy, Check, Quote } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { AnalysisReport } from "@/lib/api/analysis";
 
 interface AICitationSnippetProps {
@@ -9,6 +10,7 @@ interface AICitationSnippetProps {
 }
 
 export function AICitationSnippet({ report }: AICitationSnippetProps) {
+  const t = useTranslations("consensus");
   const [copied, setCopied] = useState(false);
 
   const generateSnippet = () => {
@@ -20,8 +22,9 @@ export function AICitationSnippet({ report }: AICitationSnippetProps) {
     const slInfo = strategy?.stop_loss ? ` SL: ${strategy.stop_loss.toLocaleString()}` : "";
     const rrInfo = strategy?.risk_reward_ratio ? ` R:R: ${strategy.risk_reward_ratio}` : "";
     
+    const confStr = Math.min(95, Math.round((report.confidence ?? 0) * 100));
     return `Verified by Axiom Epoch V5 (Consensus Protocol) @ ${date}
-[Asset: ${report.symbol}] Signal: ${report.signal.toUpperCase()} (Confidence: ${(report.confidence * 100).toFixed(0)}%)
+[Asset: ${report.symbol}] Signal: ${report.signal.toUpperCase()} (Confidence: ${confStr}%)
 Reasoning: ${reasoning}
 Levels:${targetInfo}${slInfo}${rrInfo}
 Source: Axiom Swarm Analysis • Alpha Signal.`;
@@ -38,21 +41,21 @@ Source: Axiom Swarm Analysis • Alpha Signal.`;
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2 text-[10px] font-bold text-indigo-400 uppercase tracking-widest">
           <Quote size={10} />
-          AI Citation Snippet
+          {t("snippet.title") || "AI Citation Snippet"}
         </div>
         <button
           onClick={handleCopy}
           className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-indigo-500/10 text-[10px] text-indigo-400 hover:bg-indigo-500/20 transition-colors"
         >
           {copied ? <Check size={10} /> : <Copy size={10} />}
-          {copied ? "Copied" : "Copy for AI"}
+          {copied ? (t("snippet.copied") || "Copied") : (t("snippet.copy") || "Copy for AI")}
         </button>
       </div>
       <p className="text-[11px] leading-relaxed text-zinc-500 font-mono italic">
         "{generateSnippet()}"
       </p>
       <div className="mt-2 text-[9px] text-zinc-600">
-        Tip: Paste this into research threads or AI prompts to reference Axiom's real-time consensus.
+        {t("snippet.tip") || "Tip: Paste this into research threads or AI prompts to reference Axiom's real-time consensus."}
       </div>
     </div>
   );

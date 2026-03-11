@@ -252,10 +252,13 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
 
 function MetricItem({ label, value, sub, valueColor = "text-foreground", fontMono = false }: { label: string, value: string | number, sub: string, valueColor?: string, fontMono?: boolean }) {
   return (
-    <div className="p-3 flex flex-col items-center justify-center text-center">
-      <span className="text-xs text-muted-foreground uppercase tracking-wider mb-0.5">{label}</span>
-      <span className={cn("text-base font-bold", valueColor, fontMono && "font-mono")}>{value}</span>
-      <span className="text-xs text-muted-foreground/80">{sub}</span>
+    <div className="p-4 lg:p-5 flex flex-col justify-center bg-white/[0.01] hover:bg-white/[0.03] transition-colors group">
+      <div className="flex items-center gap-2 mb-2 opacity-70 group-hover:opacity-100 transition-opacity">
+        <span className="w-1 h-3 rounded-sm bg-indigo-500/50" />
+        <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest leading-none">{label}</span>
+      </div>
+      <span className={cn("text-lg lg:text-xl font-bold tracking-tight text-white mb-0.5", valueColor !== "text-foreground" ? valueColor : "", fontMono && "font-mono")}>{value}</span>
+      <span className="text-[10px] text-zinc-500 font-medium uppercase tracking-wider">{sub}</span>
     </div>
   );
 }

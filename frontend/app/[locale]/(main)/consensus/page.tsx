@@ -76,13 +76,17 @@ export default function ConsensusPage() {
   const displayConsensus = consensusReport;
 
   return (
-    <div className="min-h-screen bg-grid">
-      <div className="mx-auto max-w-[1500px] px-4 md:px-8 py-8 space-y-6">
+    <div className="min-h-screen bg-grid relative overflow-hidden">
+      {/* Background Ambience */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/10 blur-[120px] pointer-events-none rounded-full" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-violet-500/10 blur-[120px] pointer-events-none rounded-full" />
+      
+      <div className="mx-auto max-w-5xl px-4 md:px-8 py-8 space-y-8 relative z-10">
       <JSONLD report={displayReport || displayConsensus} />
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-semibold text-white">{t("title")}</h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-2">{t("title")}</h1>
+          <p className="text-sm font-medium text-zinc-500 tracking-wide uppercase">
             {t("subtitle")}
           </p>
         </div>
