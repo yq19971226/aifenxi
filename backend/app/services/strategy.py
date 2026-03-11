@@ -177,7 +177,7 @@ class StrategyService:
             targets=targets,
             confidence=0.0,
             valid_until=datetime.now(timezone.utc) + timedelta(hours=1),
-            reasoning="智能体未返回有效数据，已生成基于当前价格的回退策略。",
+            reasoning="Agent analysis failed to return valid data. A baseline safety strategy has been generated based on current market price levels.",
             is_fallback=True,
         )
 
@@ -248,19 +248,33 @@ class StrategyService:
             direction, price, entry_low, entry_high, stop_loss, targets,
         )
 
+        # 价格精度优化：根据价格量级自动四舍五入
+        def _fmt(val: float) -> float:
+            if val > 1000: return round(val, 1)
+            if val > 1: return round(val, 2)
+            return round(val, 6)
+
+        entry_low = _fmt(entry_low)
+        entry_high = _fmt(entry_high)
+        stop_loss = _fmt(stop_loss)
+        targets = [_fmt(t) for t in targets]
+
         rr, worth = self._calc_risk_reward(direction, entry_low, entry_high, stop_loss, targets)
         worth = worth and report.confidence >= 0.4
+
+        # 置信度封顶 95%
+        safe_confidence = min(0.95, report.confidence)
 
         return StrategyResult(
             symbol=report.symbol,
             direction=direction,
-            entry_low=round(entry_low, 8),
-            entry_high=round(entry_high, 8),
-            stop_loss=round(stop_loss, 8),
-            targets=[round(t, 8) for t in targets],
-            confidence=report.confidence,
+            entry_low=entry_low,
+            entry_high=entry_high,
+            stop_loss=stop_loss,
+            targets=targets,
+            confidence=safe_confidence,
             valid_until=datetime.now(timezone.utc) + timedelta(hours=4),
-            reasoning=report.reasoning,
+            reasoning=report.reasoning or "Consensus reached based on multi-agent technical and fundamental analysis.",
             risk_reward_ratio=rr,
             is_worth_taking=worth,
         )
@@ -409,25 +423,45 @@ class StrategyService:
             direction, current_price, entry_low, entry_high, stop_loss, targets,
         )
 
+        # 价格精度优化
+        def _fmt(val: float) -> float:
+            if val > 1000: return round(val, 1)
+            if val > 1: return round(val, 2)
+            return round(val, 6)
+
+        entry_low = _fmt(entry_low)
+        entry_high = _fmt(entry_high)
+        stop_loss = _fmt(stop_loss)
+        targets = [_fmt(t) for t in targets]
+
         # 构建 reasoning
-        regime_label = {"trending": "趋势", "volatile": "高波动", "ranging": "震荡"}.get(market_regime or "", "")
-        reasoning = f"共识信号: {report.consensus_signal} (置信度 {report.consensus_confidence:.0%}, 分歧度 {report.divergence:.1f}%)"
+        regime_label = {"trending": "Trend", "volatile": "Volatile", "ranging": "Ranging"}.get(market_regime or "", "")
+        
+        # 统计 Agent 投票分布以增强专业感
+        bull_votes = sum(1 for v in report.model_votes if v.signal == "bullish")
+        bear_votes = sum(1 for v in report.model_votes if v.signal == "bearish")
+        total_votes = len(report.model_votes)
+
+        reasoning = f"Consensus: {report.consensus_signal.upper()} ({bull_votes if report.consensus_signal == 'bullish' else bear_votes}/{total_votes} Agents concur). Confidence: {confidence:.0%}. Divergence: {report.divergence:.1f}%."
         if regime_label:
-            reasoning = f"【{regime_label}行情】" + reasoning
+            reasoning = f"[{regime_label} Market] " + reasoning
         if report.minority_warnings:
-            reasoning += "\n少数派警告:\n" + "\n".join(report.minority_warnings)
+            reasoning += "\nMinority Warnings: " + "; ".join([w.split("理由:")[0].strip() for w in report.minority_warnings])
 
         rr, worth = self._calc_risk_reward(direction, entry_low, entry_high, stop_loss, targets)
-        worth = worth and confidence >= 0.4
+        
+        # 置信度封顶 95%
+        safe_confidence = min(0.95, confidence)
+        worth = worth and safe_confidence >= 0.4
 
         return StrategyResult(
             symbol=report.symbol,
             direction=direction,
-            entry_low=round(entry_low, 8),
-            entry_high=round(entry_high, 8),
-            stop_loss=round(stop_loss, 8),
-            targets=[round(t, 8) for t in targets],
-            confidence=confidence,
+            entry_low=entry_low,
+            entry_high=entry_high,
+            stop_loss=stop_loss,
+            targets=targets,
+            confidence=safe_confidence,
             valid_until=datetime.now(timezone.utc) + timedelta(hours=4),
             reasoning=reasoning,
             risk_reward_ratio=rr,

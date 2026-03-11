@@ -272,7 +272,7 @@ def _weighted_aggregate(
     else:
         consensus_signal = "neutral"
 
-    return consensus_signal, round(max(0.0, min(1.0, weighted_confidence)), 4)
+    return consensus_signal, round(max(0.0, min(0.95, weighted_confidence)), 4)
 
 
 def _calculate_divergence(votes: list[ModelVote]) -> float:

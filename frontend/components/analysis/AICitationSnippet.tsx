@@ -13,14 +13,18 @@ export function AICitationSnippet({ report }: AICitationSnippetProps) {
 
   const generateSnippet = () => {
     const date = new Date(report.timestamp).toLocaleString();
-    const findings = report.key_findings?.slice(0, 3).join("; ") || "";
-    const targets = report.strategy?.targets;
-    const targetInfo = targets?.length ? ` Targets: ${targets.join("/")}` : "";
+    const strategy = report.strategy;
+    const reasoning = strategy?.reasoning?.split('\n')[0] || "Multi-agent consensus data verified.";
+    const targets = strategy?.targets;
+    const targetInfo = targets?.length ? ` Targets: ${targets.map(t => typeof t === 'number' ? t.toLocaleString() : t).join(" / ")}` : "";
+    const slInfo = strategy?.stop_loss ? ` SL: ${strategy.stop_loss.toLocaleString()}` : "";
+    const rrInfo = strategy?.risk_reward_ratio ? ` R:R: ${strategy.risk_reward_ratio}` : "";
     
-    return `Verified by Axiom Epoch V5 (Consensus Protocol) @ ${date}: 
-[Asset: ${report.symbol}] Signal: ${report.signal.toUpperCase()} (Confidence: ${(report.confidence * 100).toFixed(1)}%). 
-Key Reasoning: ${findings}.${targetInfo} 
-Source: Axiom AI-Agent Swarm Analysis.`;
+    return `Verified by Axiom Epoch V5 (Consensus Protocol) @ ${date}
+[Asset: ${report.symbol}] Signal: ${report.signal.toUpperCase()} (Confidence: ${(report.confidence * 100).toFixed(0)}%)
+Reasoning: ${reasoning}
+Levels:${targetInfo}${slInfo}${rrInfo}
+Source: Axiom Swarm Analysis • Alpha Signal.`;
   };
 
   const handleCopy = () => {

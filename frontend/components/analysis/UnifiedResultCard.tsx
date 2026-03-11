@@ -58,7 +58,8 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
     label: t("signals.neutral")
   };
 
-  const confidence = ((report.confidence ?? 0) * 100).toFixed(0);
+  const confidenceValue = Math.round((report.confidence ?? 0) * 100);
+  const confidence = confidenceValue.toString();
   const { avgConf } = useConsensusData(report.sections);
 
   return (
@@ -107,58 +108,112 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
       <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border border-b border-border bg-bg-surface/30">
         <MetricItem
           label={t("card.consensus")}
-          value={`${(avgConf * 100).toFixed(0)}%`}
+          value={confidenceValue > 0 ? `${confidence}%` : "—"}
           sub={t("card.agreement")}
-        />
-        <MetricItem
-          label={t("card.riskLevel")}
-          value="—"
-          sub={t("card.assessment")}
-        />
-        <MetricItem
-          label={t("card.support")}
-          value={formatPrice(report.strategy?.entry_low ?? report.strategy?.entry_high)}
-          sub={t("card.keyLevel")}
           fontMono
         />
         <MetricItem
-          label={t("card.resistance")}
-          value={formatPrice(report.strategy?.targets?.[0] ?? report.strategy?.entry_high)}
-          sub={t("card.keyLevel")}
+          label="Risk/Reward"
+          value={report.strategy?.risk_reward_ratio ? `${report.strategy.risk_reward_ratio}` : "—"}
+          sub="R:R Ratio"
+          fontMono
+        />
+        <MetricItem
+          label="Entry Zone"
+          value={report.strategy?.entry_low ? `${formatPrice(report.strategy.entry_low)} - ${formatPrice(report.strategy.entry_high)}` : "—"}
+          sub="Entry Range"
+          fontMono
+        />
+        <MetricItem
+          label="Stop-Loss"
+          value={formatPrice(report.strategy?.stop_loss)}
+          sub="Safety Level"
+          valueColor="text-bear"
           fontMono
         />
       </div>
 
       {/* ── Content Body ── */}
-      <div className="p-5 space-y-5">
-        {/* Reasoning */}
-        <div>
-          <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
-            <Activity size={14} />
-            {t("card.analysisReasoning")}
-          </h4>
-          <p className="text-base leading-relaxed text-foreground/90">
-            {report.strategy?.reasoning ?? "—"}
-          </p>
+      <div className="p-5 grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-6">
+        {/* Left: Reasoning & Findings */}
+        <div className="space-y-5">
+          <div>
+            <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+              <Activity size={12} />
+              {t("card.analysisReasoning")}
+            </h4>
+            <div className="bg-white/[0.02] border border-white/[0.05] p-4 rounded-lg">
+              <p className="text-sm leading-relaxed text-zinc-300 whitespace-pre-wrap">
+                {report.strategy?.reasoning || "Analyzing market conditions..."}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                <Shield size={10} /> Valid Until
+              </p>
+              <p className="text-xs font-mono text-zinc-400">
+                {report.strategy?.valid_until ? new Date(report.strategy.valid_until).toLocaleString() : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                <Database size={10} /> Source
+              </p>
+              <p className="text-xs font-mono text-zinc-400">
+                Axiom Swarm • Epoch V5
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Key Findings List */}
-        {report.key_findings && report.key_findings.length > 0 && (
-          <div>
-            <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
-              <Database size={14} />
-              {t("card.keyFindings")}
-            </h4>
-            <ul className="grid gap-2">
-              {report.key_findings.slice(0, 3).map((finding, i) => (
-                <li key={i} className="flex gap-2 text-sm text-muted-foreground items-start">
-                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-border shrink-0" />
-                  <span>{finding}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {/* Right: Targets (High Precision) */}
+        <div className="bg-zinc-950/50 rounded-xl border border-white/[0.05] p-5 flex flex-col justify-between">
+           <div>
+             <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4">
+               Take-Profit Targets
+             </h4>
+             <div className="space-y-4">
+               {report.strategy?.targets?.map((target: number, idx: number) => (
+                 <div key={idx} className="relative pl-4 border-l-2 border-bull/30 py-0.5">
+                   <div className="absolute -left-[5px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-bull" />
+                   <div className="flex justify-between items-baseline mb-0.5">
+                     <span className="text-[9px] font-bold text-zinc-600 uppercase">TP{idx+1}</span>
+                     <span className="text-[9px] text-bull/60 font-mono">+{(((target / (report.strategy?.entry_high || target)) - 1) * 100).toFixed(1)}%</span>
+                   </div>
+                   <div className="text-lg font-mono font-bold leading-none tracking-tight text-white">
+                     {formatPrice(target)}
+                   </div>
+                   <p className="text-[8px] text-zinc-500 uppercase mt-1">
+                     {idx === 0 ? "Initial Resistance" : idx === 1 ? "Secondary Extension" : "Trend Objective"}
+                   </p>
+                 </div>
+               )) || (
+                 <div className="text-xs text-zinc-700 italic">No targets defined</div>
+               )}
+             </div>
+           </div>
+
+           <div className="mt-6 pt-4 border-t border-white/[0.05]">
+              <div className="flex justify-between items-end">
+                <div>
+                  <p className="text-[9px] text-zinc-600 uppercase font-bold mb-1">Status</p>
+                  <p className="text-xs font-mono text-emerald-500 uppercase tracking-widest">Active Tracking</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[9px] text-zinc-600 uppercase font-bold mb-1">Confidence</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-bull" style={{ width: `${confidence}%` }} />
+                    </div>
+                    <span className="text-[10px] font-mono font-bold">{confidence}%</span>
+                  </div>
+                </div>
+              </div>
+           </div>
+        </div>
       </div>
 
       {/* ── Footer Metadata ── */}
