@@ -22,14 +22,30 @@
     "partner": "Partner"
   },
   "admin": {
+    "setup": "Setup",
+    "dashboard": "Dashboard",
+    "configs": "Config Management",
+    "api_keys": "API Keys",
     "users": "User Management",
-    "orders": "Order Management",
     "operators": "Operator Management",
+    "datasources": "Datasources",
+    "models": "Models",
+    "orders": "Order Management",
+    "learning": "Learning",
+    "symbols": "Symbols",
     "notifications": "Notification Logs",
-    "configs": "Config Management"
+    "monitor": "Monitor",
+    "playbook_review": "Playbook Review",
+    "task_review": "Task Review",
+    "task_templates": "Task Templates",
+    "withdrawals": "Withdrawals",
+    "partner_stats": "Partner Stats"
   },
   "common": {
     "menu": "Menu",
+    "login": "Login",
+    "account": "Account",
+    "system": "System",
     "more": "More",
     "maintenance": "Maintenance",
     "notifications": "Notifications",

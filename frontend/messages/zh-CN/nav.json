@@ -22,14 +22,30 @@
     "partner": "合伙人"
   },
   "admin": {
+    "setup": "初始化",
+    "dashboard": "仪表盘",
+    "configs": "配置管理",
+    "api_keys": "API 密钥",
     "users": "用户管理",
-    "orders": "订单管理",
     "operators": "运营管理",
+    "datasources": "数据源",
+    "models": "模型",
+    "orders": "订单管理",
+    "learning": "学习",
+    "symbols": "交易对",
     "notifications": "通知日志",
-    "configs": "配置管理"
+    "monitor": "监控",
+    "playbook_review": "剧本审核",
+    "task_review": "任务审核",
+    "task_templates": "任务模板",
+    "withdrawals": "提现",
+    "partner_stats": "合伙统计"
   },
   "common": {
     "menu": "菜单",
+    "login": "登录",
+    "account": "账户",
+    "system": "系统",
     "more": "更多",
     "maintenance": "维护中",
     "notifications": "通知",

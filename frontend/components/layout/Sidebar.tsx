@@ -4,271 +4,229 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations, useLocale } from "next-intl";
+import { LogoMark } from "@/components/ui/Logo";
 import {
   LayoutDashboard,
-  History,
-  CreditCard,
-  ChevronDown,
-  Bell,
-  ShieldCheck,
   Brain,
-  BarChart3,
+  History,
+  TrendingUp,
+  Shield,
   Gift,
-  Users,
+  ShieldCheck,
+  ChevronDown,
+  LogOut,
   type LucideIcon,
+  Settings,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
+import { type UserRole, isNavItemVisible, stripLocalePrefix } from "@/lib/route-permissions";
+import { cn } from "@/lib/utils";
 
 interface SubNavItem {
-  label: string;
+  key: string;
   href: string;
+  minRole?: UserRole;
+  featureFlag?: string;
 }
 
 interface NavItem {
-  label: string;
+  key: string;
   href: string;
   icon: LucideIcon;
+  minRole: UserRole;
   children?: SubNavItem[];
+  featureFlag?: string;
 }
 
 const navItems: NavItem[] = [
-  { label: "庄家看板", href: "/dashboard", icon: LayoutDashboard },
-  { label: "综合分析", href: "/consensus", icon: Brain },
-  { label: "剧本推演", href: "/playbook-sim", icon: History },
-  { label: "策略绩效", href: "/performance", icon: BarChart3 },
-  { label: "预警提醒", href: "/alerts", icon: Bell },
-  { label: "任务中心", href: "/tasks", icon: Gift },
-  { label: "合伙人", href: "/partner", icon: Users },
+  { key: "dashboard", href: "/dashboard", icon: LayoutDashboard, minRole: "user" },
+  { key: "consensus", href: "/consensus", icon: Brain, minRole: "user" },
+  { key: "playbook", href: "/playbook-sim", icon: History, minRole: "user", featureFlag: "playbook" },
+  { key: "leaderboard", href: "/leaderboard", icon: TrendingUp, minRole: "user", featureFlag: "leaderboard" },
+  { key: "alerts", href: "/alerts", icon: Shield, minRole: "user", featureFlag: "alerts" },
   {
-    label: "设置",
-    href: "/settings",
-    icon: CreditCard,
+    key: "growth",
+    href: "/tasks",
+    icon: Gift,
+    minRole: "user",
     children: [
-      { label: "会员中心", href: "/settings/membership" },
-      { label: "推送设置", href: "/settings/push" },
+      { key: "tasks", href: "/tasks", featureFlag: "task" },
+      { key: "partner", href: "/partner", featureFlag: "partner" },
     ],
   },
 ];
 
 const adminNavItem: NavItem = {
-  label: "管理后台",
+  key: "admin",
   href: "/admin",
   icon: ShieldCheck,
+  minRole: "admin",
   children: [
-    { label: "快速设置", href: "/admin/setup" },
-    { label: "运营概览", href: "/admin/dashboard" },
-    { label: "参数设置", href: "/settings/configs" },
-    { label: "API 密钥", href: "/admin/api-keys" },
-    { label: "用户管理", href: "/admin/users" },
-    { label: "运营员管理", href: "/admin/operators" },
-    { label: "数据源管理", href: "/admin/datasources" },
-    { label: "模型分工", href: "/admin/models" },
-    { label: "订单管理", href: "/admin/orders" },
-    { label: "自主学习", href: "/admin/learning" },
-    { label: "币种管理", href: "/admin/symbols" },
-    { label: "通知管理", href: "/admin/notifications" },
-    { label: "系统监控", href: "/admin/monitor" },
-    { label: "剧本审核", href: "/admin/playbook-review" },
-    { label: "任务审核", href: "/admin/task-review" },
-    { label: "任务模板", href: "/admin/task-templates" },
-    { label: "提现审核", href: "/admin/withdrawals" },
-    { label: "合伙人统计", href: "/admin/partner-stats" },
+    { key: "setup", href: "/admin/setup" },
+    { key: "dashboard", href: "/admin/dashboard" },
+    { key: "configs", href: "/settings/configs" },
+    { key: "api_keys", href: "/admin/api-keys" },
+    { key: "users", href: "/admin/users" },
+    { key: "operators", href: "/admin/operators" },
+    { key: "datasources", href: "/admin/datasources" },
+    { key: "models", href: "/admin/models" },
+    { key: "orders", href: "/admin/orders" },
+    { key: "learning", href: "/admin/learning" },
+    { key: "symbols", href: "/admin/symbols" },
+    { key: "notifications", href: "/admin/notifications" },
+    { key: "monitor", href: "/admin/monitor" },
+    { key: "playbook_review", href: "/admin/playbook-review" },
+    { key: "task_review", href: "/admin/task-review" },
+    { key: "task_templates", href: "/admin/task-templates" },
+    { key: "withdrawals", href: "/admin/withdrawals" },
+    { key: "partner_stats", href: "/admin/partner-stats" },
   ],
 };
 
+const settingsItem: NavItem = {
+  key: "settings",
+  href: "/settings",
+  icon: Settings,
+  minRole: "user",
+  children: [
+    { key: "membership", href: "/settings/membership" },
+    { key: "push", href: "/settings/push" },
+  ],
+};
+
+function getSubLabelKey(parentKey: string, subKey: string): string {
+  return parentKey === "admin" ? `admin.${subKey}` : `settings.${subKey}`;
+}
+
 export function Sidebar() {
+  const t = useTranslations('nav');
+  const locale = useLocale();
   const pathname = usePathname();
-  const { user } = useAuth();
-  const isAdmin = user?.is_admin ?? false;
+  const { user, logout } = useAuth();
+  const { flags } = useFeatureFlags();
   const [expanded, setExpanded] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [adminOpen, setAdminOpen] = useState(false);
-  const filteredNavItems = navItems;
+  const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
+  
+  // Combine all items based on role
+  const allItems = [
+    ...navItems,
+    settingsItem,
+    ...(user?.is_admin ? [adminNavItem] : [])
+  ];
+
+  const toggleSubmenu = (key: string) => {
+    setOpenSubmenus(prev => 
+      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+    );
+  };
+
+  const currentPath = stripLocalePrefix(pathname);
 
   return (
     <motion.aside
+      initial={false}
       animate={{ width: expanded ? 240 : 64 }}
-      transition={{ duration: 0.2, ease: "easeInOut" }}
+      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => {
         setExpanded(false);
-        setSettingsOpen(false);
-        setAdminOpen(false);
+        setOpenSubmenus([]);
       }}
-      className="fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-white/[0.05] bg-black/40 backdrop-blur-xl"
+      className="hidden md:flex fixed left-0 top-0 z-40 h-screen flex-col border-r border-border bg-bg-primary/95 backdrop-blur-md"
     >
-      {/* Logo + Brand */}
-      <div className="flex h-14 flex-col items-center justify-center px-4">
-        <span className="text-xl font-bold tracking-wider text-white uppercase">
-          {expanded ? "AXIOM洞察" : "AX"}
-        </span>
-        {expanded && (
-          <span className="text-xs tracking-widest text-zinc-500 -mt-0.5">
-            剧本流
-          </span>
-        )}
+      {/* Logo Area */}
+      <div className="flex h-14 items-center border-b border-border px-4">
+        <LogoMark className="h-6 w-6 text-primary shrink-0" />
+        <AnimatePresence>
+          {expanded && (
+            <motion.span
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              className="ml-3 font-bold tracking-tight text-foreground whitespace-nowrap"
+            >
+              AXIOM
+            </motion.span>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Navigation */}
-      <nav className="mt-2 flex flex-1 flex-col gap-1 px-2">
-        {filteredNavItems.map((item) => {
-          const isActive =
-            pathname === item.href || pathname.startsWith(item.href + "/");
-          const Icon = item.icon;
+      {/* Nav Items */}
+      <div className="flex-1 overflow-y-auto py-4 px-2 space-y-1 scrollbar-thin scrollbar-thumb-bg-elevated">
+        {allItems.map((item) => {
+          if (!isNavItemVisible(item, user, flags)) return null;
+          
+          const isActive = currentPath.startsWith(item.href);
           const hasChildren = item.children && item.children.length > 0;
+          const isOpen = openSubmenus.includes(item.key);
 
-          if (hasChildren) {
-            return (
-              <div key={item.href}>
-                <button
-                  type="button"
-                  onClick={() => setSettingsOpen((prev) => !prev)}
-                  className={`relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ${
-                    isActive
-                      ? "bg-white/[0.06] text-zinc-100"
-                      : "text-zinc-500 hover:bg-white/[0.03] hover:text-zinc-300"
-                  }`}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="sidebar-active"
-                      className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-zinc-100"
-                    />
-                  )}
-                  <Icon size={20} />
-                  {expanded && (
-                    <>
-                      <span className="flex-1 whitespace-nowrap text-left">
-                        {item.label}
-                      </span>
-                      <motion.span
-                        animate={{ rotate: settingsOpen ? 180 : 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <ChevronDown size={14} />
-                      </motion.span>
-                    </>
-                  )}
-                </button>
-
+          return (
+            <div key={item.key}>
+              <Link
+                href={hasChildren ? "#" : `/${locale}${item.href}`}
+                onClick={(e) => {
+                  if (hasChildren) {
+                    e.preventDefault();
+                    toggleSubmenu(item.key);
+                  }
+                }}
+                className={cn(
+                  "group flex items-center h-10 px-3 rounded-md transition-colors relative",
+                  isActive ? "bg-bg-elevated text-foreground" : "text-muted-foreground hover:bg-bg-surface hover:text-foreground"
+                )}
+              >
+                <item.icon size={18} className={cn("shrink-0", isActive && "text-primary")} />
+                
                 <AnimatePresence>
-                  {expanded && settingsOpen && item.children && (
+                  {expanded && (
                     <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: "auto" }}
+                      exit={{ opacity: 0, width: 0 }}
+                      className="ml-3 flex-1 overflow-hidden flex items-center justify-between"
                     >
-                      {item.children.map((child) => {
-                        const childActive = pathname === child.href;
-                        return (
-                          <Link key={child.href} href={child.href}>
-                            <div
-                              className={`ml-7 rounded-md px-3 py-2 text-xs transition-colors ${
-                                childActive
-                                  ? "text-zinc-100 bg-white/[0.04]"
-                                  : "text-zinc-500 hover:text-zinc-300"
-                              }`}
-                            >
-                              {child.label}
-                            </div>
-                          </Link>
-                        );
-                      })}
+                      <span className="text-sm font-medium whitespace-nowrap">{t(`main.${item.key}`)}</span>
+                      {hasChildren && (
+                        <ChevronDown
+                          size={14}
+                          className={cn("transition-transform", isOpen && "rotate-180")}
+                        />
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
-            );
-          }
+                
+                {/* Active Indicator Line */}
+                {isActive && !expanded && (
+                  <div className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-primary" />
+                )}
+              </Link>
 
-          return (
-            <Link key={item.href} href={item.href}>
-              <motion.div
-                whileHover={{ scale: 1.04 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ${
-                  isActive
-                    ? "bg-white/[0.06] text-zinc-100"
-                    : "text-zinc-500 hover:bg-white/[0.03] hover:text-zinc-300"
-                }`}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="sidebar-active"
-                    className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-zinc-100"
-                  />
-                )}
-                <Icon size={20} />
-                {expanded && (
-                  <span className="whitespace-nowrap">{item.label}</span>
-                )}
-              </motion.div>
-            </Link>
-          );
-        })}
-
-        {/* Admin 菜单组 — 仅管理员可见 */}
-        {isAdmin && (() => {
-          const item = adminNavItem;
-          const Icon = item.icon;
-          const isActive = pathname.startsWith(item.href + "/") || pathname === item.href || pathname === "/settings/configs";
-          return (
-            <div key={item.href}>
-              <button
-                type="button"
-                onClick={() => setAdminOpen((prev) => !prev)}
-                className={`relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ${
-                  isActive
-                    ? "bg-white/[0.06] text-indigo-300"
-                    : "text-zinc-500 hover:bg-white/[0.03] hover:text-zinc-300"
-                }`}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="sidebar-active-admin"
-                    className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-indigo-400"
-                  />
-                )}
-                <Icon size={20} />
-                {expanded && (
-                  <>
-                    <span className="flex-1 whitespace-nowrap text-left">
-                      {item.label}
-                    </span>
-                    <motion.span
-                      animate={{ rotate: adminOpen ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <ChevronDown size={14} />
-                    </motion.span>
-                  </>
-                )}
-              </button>
-
+              {/* Submenu */}
               <AnimatePresence>
-                {expanded && adminOpen && item.children && (
+                {expanded && hasChildren && isOpen && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
+                    className="overflow-hidden ml-4 pl-4 border-l border-border mt-1 space-y-1"
                   >
-                    {item.children.map((child) => {
-                      const childActive = pathname === child.href;
+                    {item.children!.map((sub) => {
+                      if (!isNavItemVisible(sub, user, flags)) return null;
+                      const isSubActive = currentPath === sub.href;
+                      
                       return (
-                        <Link key={child.href} href={child.href}>
-                          <div
-                            className={`ml-7 rounded-md px-3 py-2 text-xs transition-colors ${
-                              childActive
-                                ? "text-indigo-300 bg-white/[0.04]"
-                                : "text-zinc-500 hover:text-zinc-300"
-                            }`}
-                          >
-                            {child.label}
-                          </div>
+                        <Link
+                          key={sub.key}
+                          href={`/${locale}${sub.href}`}
+                          className={cn(
+                            "block py-2 px-2 text-xs rounded-md transition-colors",
+                            isSubActive ? "text-primary bg-primary/5" : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          {t(getSubLabelKey(item.key, sub.key))}
                         </Link>
                       );
                     })}
@@ -277,13 +235,43 @@ export function Sidebar() {
               </AnimatePresence>
             </div>
           );
-        })()}
-      </nav>
+        })}
+      </div>
 
-      {/* Footer */}
-      <div className="border-t border-white/[0.08] px-4 py-3">
-        {expanded && (
-          <p className="text-xs text-zinc-500">v3.0.0</p>
+      {/* User Footer */}
+      <div className="p-2 border-t border-border">
+        {user ? (
+          <div className={cn("flex items-center gap-3 px-2 py-2 rounded-md", expanded ? "bg-bg-surface" : "")}>
+            <div className="h-8 w-8 rounded-full bg-bg-elevated flex items-center justify-center text-xs font-mono shrink-0 border border-border">
+              {user.username.substring(0, 2).toUpperCase()}
+            </div>
+            <AnimatePresence>
+              {expanded && (
+                <motion.div
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: "auto" }}
+                  exit={{ opacity: 0, width: 0 }}
+                  className="flex-1 overflow-hidden"
+                >
+                  <div className="text-xs font-medium truncate">{user.username}</div>
+                  <div className="text-[10px] text-muted-foreground truncate">
+                    {user.membership_level >= 2 ? "PRO PLAN" : "BASIC"}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            {expanded && (
+              <button onClick={logout} className="text-muted-foreground hover:text-destructive transition-colors">
+                <LogOut size={16} />
+              </button>
+            )}
+          </div>
+        ) : (
+          expanded && (
+            <Link href={`/${locale}/login`} className="flex items-center justify-center h-9 rounded-md bg-primary text-primary-foreground text-sm font-medium">
+              {t('common.login')}
+            </Link>
+          )
         )}
       </div>
     </motion.aside>

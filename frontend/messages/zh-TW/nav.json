@@ -22,14 +22,30 @@
     "partner": "合夥人"
   },
   "admin": {
+    "setup": "初始化",
+    "dashboard": "儀表板",
+    "configs": "配置管理",
+    "api_keys": "API 金鑰",
     "users": "使用者管理",
-    "orders": "訂單管理",
     "operators": "營運管理",
+    "datasources": "資料來源",
+    "models": "模型",
+    "orders": "訂單管理",
+    "learning": "學習",
+    "symbols": "交易對",
     "notifications": "通知日誌",
-    "configs": "配置管理"
+    "monitor": "監控",
+    "playbook_review": "劇本審核",
+    "task_review": "任務審核",
+    "task_templates": "任務範本",
+    "withdrawals": "提領",
+    "partner_stats": "合夥統計"
   },
   "common": {
     "menu": "選單",
+    "login": "登入",
+    "account": "帳戶",
+    "system": "系統",
     "more": "更多",
     "maintenance": "維護中",
     "notifications": "通知",

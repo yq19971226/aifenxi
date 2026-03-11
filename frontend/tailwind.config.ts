@@ -20,20 +20,17 @@ const config: Config = {
         "bg-card-hover": "var(--bg-card-hover)",
         
         bull: "var(--color-bull)",
+        "bull-muted": "var(--color-bull-muted)",
         bear: "var(--color-bear)",
+        "bear-muted": "var(--color-bear-muted)",
         warn: "var(--color-warn)",
+        "warn-muted": "var(--color-warn-muted)",
         info: "var(--color-info)",
-        
-        accent: {
-          DEFAULT: "var(--color-accent)",
-          hover: "var(--color-accent-hover)",
-          muted: "var(--color-accent-muted)",
-          subtle: "var(--color-accent-subtle)",
-        },
+        "info-muted": "var(--color-info-muted)",
         
         border: "var(--border-default)",
         input: "var(--border-default)",
-        ring: "var(--color-accent)",
+        ring: "var(--color-info)",
         background: "var(--bg-primary)",
         foreground: "var(--color-text)",
         primary: {
@@ -41,12 +38,12 @@ const config: Config = {
           foreground: "#18181b",
         },
         secondary: {
-          DEFAULT: "rgba(255,255,255,0.06)",
-          foreground: "#a1a1aa",
+          DEFAULT: "var(--bg-secondary)",
+          foreground: "var(--color-text-secondary)",
         },
         destructive: {
-          DEFAULT: "rgba(239,68,68,0.12)",
-          foreground: "#ef4444",
+          DEFAULT: "var(--color-bear-muted)",
+          foreground: "var(--color-bear)",
         },
         muted: {
           DEFAULT: "var(--bg-surface)",
@@ -66,10 +63,10 @@ const config: Config = {
         mono: ["JetBrains Mono", "SF Mono", "Fira Code", "Roboto Mono", "ui-monospace", "monospace"],
       },
       borderRadius: {
-        xl: "16px",
-        lg: "12px",
-        md: "8px",
-        sm: "6px",
+        xl: "var(--radius-xl)",
+        lg: "var(--radius-lg)",
+        md: "var(--radius-md)",
+        sm: "var(--radius-sm)",
       },
       boxShadow: {
         card: "var(--shadow-card)",

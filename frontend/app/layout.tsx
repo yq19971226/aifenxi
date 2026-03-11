@@ -1,14 +1,52 @@
-// This root layout is kept minimal as the actual layout is in [locale]/layout.tsx
-// The middleware will redirect all requests to the appropriate locale path
+import { type Metadata, type Viewport } from "next";
+import { Inter, JetBrains_Mono } from "next/font/google";
+import "./globals.css";
+import { Providers } from "@/lib/providers";
+import { AuthProvider } from "@/lib/auth-context";
+import { Toaster } from "@/components/ui/Toast";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  title: "AXIOM | Professional Crypto Analysis",
+  description: "AI-powered institutional grade cryptocurrency analysis platform.",
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#09090b",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
-  // Root layout must have html and body tags
+}>) {
   return (
-    <html suppressHydrationWarning>
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased min-h-screen bg-bg-primary text-foreground overflow-x-hidden`}>
+        <Providers>
+          <AuthProvider>
+            {children}
+            <Toaster />
+          </AuthProvider>
+        </Providers>
+      </body>
     </html>
   );
 }
