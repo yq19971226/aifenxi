@@ -107,7 +107,7 @@ function ConfigHealthList({ configs }: { configs: SystemConfig[] }) {
         : t("dashboard.configHealth.pendingCount", { count: results.length - okCount });
 
   return (
-    <div className="card">
+    <div className="glass-card">
       <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
         <div className="flex items-center gap-2">
           <Stethoscope size={14} className="text-zinc-500" />
@@ -192,7 +192,7 @@ function KpiCard({
   color: string;
 }) {
   return (
-    <div className="card p-4">
+    <div className="glass-card glass-card-hover p-4">
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm text-zinc-500">{label}</span>
         <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${color}`}>
@@ -212,7 +212,7 @@ function TierBar({ free, pro, flagship }: { free: number; pro: number; flagship:
   const pct = (n: number) => ((n / total) * 100).toFixed(1);
 
   return (
-    <div className="card p-4">
+    <div className="glass-card p-4">
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs text-zinc-400">会员分布</span>
         <span className="text-sm text-zinc-500">{total} 人</span>
@@ -282,7 +282,7 @@ function LLMCostCompact({ cost }: { cost: LLMCostSummary }) {
   const total = cost.total_cost_usd || 1;
 
   return (
-    <div className="card p-4">
+    <div className="glass-card p-4">
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs text-zinc-400">今日 AI 成本</span>
         <span className="text-xs text-zinc-500">{cost.date}</span>
@@ -328,7 +328,7 @@ function CrawlerStatsCard({ stats }: { stats: CrawlerStats }) {
   const bots = stats.bots.slice(0, 5); // 只看前5个
   
   return (
-    <div className="card p-4">
+    <div className="glass-card p-4">
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs text-zinc-400">AI 引擎收录检测 (2026 GEO)</span>
         <span className="text-xs text-zinc-500">累计 {stats.total_hits} 次</span>
@@ -386,7 +386,7 @@ const QUICK_ACTIONS: { label: string; href: string; icon: LucideIcon; desc: stri
 
 function QuickActions() {
   return (
-    <div className="card">
+    <div className="glass-card">
       <div className="px-5 py-4 border-b border-white/[0.06]">
         <span className="text-sm font-medium text-zinc-200">快捷操作</span>
       </div>
@@ -476,109 +476,119 @@ export default function AdminDashboardPage() {
     n.toLocaleString("en-US", { style: "currency", currency: "USD" });
 
   return (
-    <div className="mx-auto max-w-[1400px] px-6 py-6 space-y-5">
-      {/* ── Header ── */}
-      <h1 className="text-xl font-semibold text-zinc-100">运营概览</h1>
-
-      {/* ── System health grid ── */}
-      <SystemHealthGrid services={healthData} />
-
-      {/* ── KPI row (6 columns) ── */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
-        <KpiCard
-          label="总用户"
-          value={stats.total_users}
-          sub={`今日 +${stats.new_users_today}`}
-          icon={Users}
-          color="bg-indigo-500/10 text-indigo-400"
-        />
-        <KpiCard
-          label="7日新增"
-          value={stats.new_users_7d}
-          icon={UserPlus}
-          color="bg-emerald-500/10 text-emerald-400"
-        />
-        <KpiCard
-          label="累计收入"
-          value={fmtUsd(stats.total_revenue_usd)}
-          sub={`30d ${fmtUsd(stats.revenue_30d_usd)}`}
-          icon={DollarSign}
-          color="bg-amber-500/10 text-amber-400"
-        />
-        <KpiCard
-          label="待处理支付"
-          value={stats.pending_payments}
-          icon={Clock}
-          color={stats.pending_payments > 0 ? "bg-red-500/10 text-red-400" : "bg-white/[0.04] text-zinc-500"}
-        />
-        <KpiCard
-          label="策略 24h"
-          value={`+${stats.strategies_24h}`}
-          sub={`累计 ${stats.total_strategies}`}
-          icon={TrendingUp}
-          color="bg-indigo-500/10 text-indigo-400"
-        />
-        <KpiCard
-          label="共识 24h"
-          value={`+${stats.consensus_24h}`}
-          sub={`累计 ${stats.total_consensus}`}
-          icon={Brain}
-          color="bg-purple-500/10 text-purple-400"
-        />
-        <KpiCard
-          label="在线用户"
-          value={onlineStats?.total ?? 0}
-          sub={`价格${onlineStats?.price ?? 0} / 预警${onlineStats?.alerts ?? 0}`}
-          icon={Wifi}
-          color={(onlineStats?.total ?? 0) > 50 ? "bg-emerald-500/10 text-emerald-400" : "bg-blue-500/10 text-blue-400"}
-        />
-      </div>
-
-      {/* ── Middle row: Tier + Crawler + Cost + Activity ── */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <TierBar free={stats.free_users} pro={stats.pro_users} flagship={stats.flagship_users} />
-        {crawlerStats ? (
-          <CrawlerStatsCard stats={crawlerStats} />
-        ) : (
-          <div className="card p-4">
-            <span className="text-xs text-zinc-500">爬虫数据加载中…</span>
+    <div className="min-h-screen bg-grid">
+      <div className="mx-auto max-w-[1400px] px-6 py-6 space-y-5">
+        {/* ── Header ── */}
+        <div className="flex items-end justify-between">
+          <div>
+            <h1 className="text-xl font-semibold text-zinc-100">运营概览</h1>
+            <p className="text-[10px] mt-1 font-mono text-zinc-600 uppercase tracking-wider">
+              ADMIN CONTROL PANEL • {new Date().toLocaleDateString("zh-CN")}
+            </p>
           </div>
-        )}
-        {llmCost ? (
-          <LLMCostCompact cost={llmCost} />
-        ) : (
-          <div className="card p-4">
-            <span className="text-xs text-zinc-500">AI 成本数据加载中…</span>
-          </div>
-        )}
-        <div className="card p-4">
-          <span className="text-xs text-zinc-400 mb-3 block">系统活跃度</span>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-xs text-zinc-500">智能体报告</p>
-              <p className="stat-value text-base text-zinc-200">{stats.total_agent_reports}</p>
-              <p className="text-xs text-zinc-500">24h +{stats.agent_reports_24h}</p>
+          <div className="h-px w-24 bg-gradient-to-r from-indigo-500/30 to-transparent hidden md:block" />
+        </div>
+
+        {/* ── System health grid ── */}
+        <SystemHealthGrid services={healthData} />
+
+        {/* ── KPI row (6 columns) ── */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
+          <KpiCard
+            label="总用户"
+            value={stats.total_users}
+            sub={`今日 +${stats.new_users_today}`}
+            icon={Users}
+            color="bg-indigo-500/10 text-indigo-400"
+          />
+          <KpiCard
+            label="7日新增"
+            value={stats.new_users_7d}
+            icon={UserPlus}
+            color="bg-emerald-500/10 text-emerald-400"
+          />
+          <KpiCard
+            label="累计收入"
+            value={fmtUsd(stats.total_revenue_usd)}
+            sub={`30d ${fmtUsd(stats.revenue_30d_usd)}`}
+            icon={DollarSign}
+            color="bg-amber-500/10 text-amber-400"
+          />
+          <KpiCard
+            label="待处理支付"
+            value={stats.pending_payments}
+            icon={Clock}
+            color={stats.pending_payments > 0 ? "bg-red-500/10 text-red-400" : "bg-white/[0.04] text-zinc-500"}
+          />
+          <KpiCard
+            label="策略 24h"
+            value={`+${stats.strategies_24h}`}
+            sub={`累计 ${stats.total_strategies}`}
+            icon={TrendingUp}
+            color="bg-indigo-500/10 text-indigo-400"
+          />
+          <KpiCard
+            label="共识 24h"
+            value={`+${stats.consensus_24h}`}
+            sub={`累计 ${stats.total_consensus}`}
+            icon={Brain}
+            color="bg-purple-500/10 text-purple-400"
+          />
+          <KpiCard
+            label="在线用户"
+            value={onlineStats?.total ?? 0}
+            sub={`价格${onlineStats?.price ?? 0} / 预警${onlineStats?.alerts ?? 0}`}
+            icon={Wifi}
+            color={(onlineStats?.total ?? 0) > 50 ? "bg-emerald-500/10 text-emerald-400" : "bg-blue-500/10 text-blue-400"}
+          />
+        </div>
+
+        {/* ── Middle row: Tier + Crawler + Cost + Activity ── */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <TierBar free={stats.free_users} pro={stats.pro_users} flagship={stats.flagship_users} />
+          {crawlerStats ? (
+            <CrawlerStatsCard stats={crawlerStats} />
+          ) : (
+            <div className="glass-card p-4">
+              <span className="text-xs text-zinc-500">爬虫数据加载中…</span>
             </div>
-            <div>
-              <p className="text-xs text-zinc-500">预警规则</p>
-              <p className="stat-value text-base text-zinc-200">{stats.total_alert_rules}</p>
-              <p className="text-xs text-zinc-500">活跃 {stats.active_alert_rules}</p>
+          )}
+          {llmCost ? (
+            <LLMCostCompact cost={llmCost} />
+          ) : (
+            <div className="glass-card p-4">
+              <span className="text-xs text-zinc-500">AI 成本数据加载中…</span>
+            </div>
+          )}
+          <div className="glass-card p-4">
+            <span className="text-xs text-zinc-400 mb-3 block">系统活跃度</span>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <p className="text-xs text-zinc-500">智能体报告</p>
+                <p className="stat-value text-base text-zinc-200">{stats.total_agent_reports}</p>
+                <p className="text-xs text-zinc-500">24h +{stats.agent_reports_24h}</p>
+              </div>
+              <div>
+                <p className="text-xs text-zinc-500">预警规则</p>
+                <p className="stat-value text-base text-zinc-200">{stats.total_alert_rules}</p>
+                <p className="text-xs text-zinc-500">活跃 {stats.active_alert_rules}</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ── API call chart ── */}
-      <ApiCallChart data={apiCallData} />
+        {/* ── API call chart ── */}
+        <ApiCallChart data={apiCallData} />
 
-      {/* ── User table + Config health + Quick actions ── */}
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        <div className="xl:col-span-2">
-          <AdminUserTable />
-        </div>
-        <div className="space-y-4">
-          <ConfigHealthList configs={configs} />
-          <QuickActions />
+        {/* ── User table + Config health + Quick actions ── */}
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+          <div className="xl:col-span-2">
+            <AdminUserTable />
+          </div>
+          <div className="space-y-4">
+            <ConfigHealthList configs={configs} />
+            <QuickActions />
+          </div>
         </div>
       </div>
     </div>

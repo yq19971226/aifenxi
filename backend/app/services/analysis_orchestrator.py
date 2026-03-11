@@ -342,9 +342,21 @@ class AnalysisOrchestrator:
             start_ts = time.monotonic()
 
             yield _sse(ProgressEvent(
+                step="初始化专家组",
+                status="running",
+                message=f"正在拉起全能智能体专家组 ({mode.value})...",
+            ))
+            await asyncio.sleep(0.4)
+            yield _sse(ProgressEvent(
+                step="环境对齐",
+                status="running",
+                message="正在同步跨链数据中心与高性能计算环境...",
+            ))
+            await asyncio.sleep(0.3)
+            yield _sse(ProgressEvent(
                 step="开始分析",
                 status="running",
-                message=f"正在采集 {symbol} 市场数据...",
+                message=f"正在采集 {symbol} 市场实时数据...",
             ))
 
             _partial_ctx: dict = {}

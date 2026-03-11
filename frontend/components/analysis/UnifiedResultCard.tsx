@@ -62,45 +62,59 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
   const confidence = confidenceValue.toString();
   const { avgConf } = useConsensusData(report.sections);
 
+  const glowClass = rawSignal === "bullish" ? "glow-green" : rawSignal === "bearish" ? "glow-red" : "";
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 4 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-lg border border-border bg-bg-card backdrop-blur-sm overflow-hidden"
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className={cn(
+        "glass-card bg-grid group relative overflow-hidden transition-all duration-500",
+        glowClass
+      )}
     >
       {/* ── Header ── */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 flex items-center justify-center rounded bg-bg-elevated border border-border">
-            {/* Symbol Logo Placeholder - In real app use Image */}
-            <span className="text-sm font-bold font-mono">{report.symbol.substring(0, 1)}</span>
+      <div className="flex items-center justify-between p-5 border-b border-white/[0.06] bg-white/[0.01]">
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 flex items-center justify-center rounded-xl bg-zinc-900 border border-white/[0.08] shadow-inner">
+            <span className="text-lg font-black font-mono text-zinc-400 group-hover:text-white transition-colors">
+               {report.symbol.substring(0, 1)}
+            </span>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-lg font-bold font-mono tracking-tight">{report.symbol}</h3>
-              <span className="text-xs text-muted-foreground px-1.5 py-0.5 rounded border border-border bg-bg-surface">
-                {t("card.perp")}
+              <h3 className="text-xl font-bold font-mono tracking-tight text-white group-hover:glow-text transition-all">
+                {report.symbol}
+              </h3>
+              <span className="text-[10px] text-zinc-500 px-1.5 py-0.5 rounded border border-white/[0.06] bg-white/[0.02] font-bold uppercase tracking-widest">
+                PERPETUAL
               </span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
-              <span>{modeLabel(report.mode)}</span>
-              <span>•</span>
-              <span className="font-mono">{(report.execution_time_ms / 1000).toFixed(2)}s</span>
+            <div className="flex items-center gap-2 text-xs text-zinc-500 mt-1">
+              <span className="bg-zinc-800/50 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">{modeLabel(report.mode)}</span>
+              <span className="opacity-30">•</span>
+              <span className="font-mono text-[10px] opacity-70">LATENCY: {(report.execution_time_ms / 1000).toFixed(2)}s</span>
             </div>
           </div>
         </div>
 
-        {/* Signal Badge - Outlined Tag Style */}
+        {/* Signal Badge - Premium Plate Style */}
         <div className={cn(
-          "flex items-center gap-2 px-3 py-1.5 rounded border text-sm font-bold tracking-wide",
-          signalConfig.borderColor,
-          signalConfig.color,
-          "bg-transparent" // No background for cleaner look
+          "flex items-center gap-3 px-4 py-2 rounded-lg border-2 font-black tracking-tighter uppercase transition-all duration-500",
+          rawSignal === 'bullish' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.1)]' :
+          rawSignal === 'bearish' ? 'border-red-500/30 bg-red-500/10 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.1)]' :
+          'border-zinc-500/30 bg-zinc-500/10 text-zinc-400'
         )}>
-          <signalConfig.icon size={16} strokeWidth={2.5} />
-          <span>{signalConfig.label}</span>
-          <span className="opacity-50 mx-1">|</span>
-          <span className="font-mono">{confidence}%</span>
+          <signalConfig.icon size={18} strokeWidth={3} className="animate-pulse" />
+          <div className="flex flex-col leading-none">
+            <span className="text-xs opacity-70 mb-0.5">DECISION</span>
+            <span className="text-base">{signalConfig.label}</span>
+          </div>
+          <div className="h-8 w-px bg-current opacity-20 mx-1" />
+          <div className="flex flex-col leading-none">
+            <span className="text-xs opacity-70 mb-0.5">SCORE</span>
+            <span className="text-base font-mono">{confidence}%</span>
+          </div>
         </div>
       </div>
 

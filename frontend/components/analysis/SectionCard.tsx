@@ -26,6 +26,9 @@ import {
   SignalRow,
 } from "./renderers";
 import { FvgTable, OrderBlockTable, GenericObjectTable } from "./StructuredTables";
+import { AdversarialRenderer } from "./AdversarialRenderer";
+import { CollusionRenderer } from "./CollusionRenderer";
+import { PlaybookRenderer } from "./PlaybookRenderer";
 
 // ── Data pairs renderer ──────────────────────────────────────
 
@@ -203,8 +206,10 @@ export function SectionCard({
     }
   }, [forceExpandToken]);
 
+  const glowClass = sectionSignal === "bullish" ? "glow-green" : sectionSignal === "bearish" ? "glow-red" : "";
+
   return (
-    <div id={`section-${section.title}`} className="rounded-lg border border-white/[0.06] bg-zinc-900/60">
+    <div id={`section-${section.title}`} className={`glass-card overflow-hidden transition-all duration-300 ${glowClass}`}>
       {/* Header — clickable */}
       <button
         type="button"
@@ -287,7 +292,14 @@ export function SectionCard({
                     !isFallbackReasoning(section.data.reasoning as string) && (
                       <ReasoningBlock text={section.data.reasoning as string} />
                     )}
-                  {section.data.raw_data &&
+                  {section.title === "对抗推演" && section.data.raw_data ? (
+                    <AdversarialRenderer data={section.data.raw_data as any} />
+                  ) : section.title === "合谋检测" && section.data.raw_data ? (
+                    <CollusionRenderer data={section.data.raw_data as any} />
+                  ) : (section.title === "剧本推演" || section.title === "剧本匹配") && section.data.raw_data ? (
+                    <PlaybookRenderer data={section.data.raw_data as any} />
+                  ) : (
+                    section.data.raw_data &&
                     typeof section.data.raw_data === "object" &&
                     Object.keys(
                       section.data.raw_data as Record<string, unknown>,
@@ -299,7 +311,8 @@ export function SectionCard({
                           }
                         />
                       </CollapsibleSection>
-                    )}
+                    )
+                  )}
                 </>
               ) : (
                 <DataPairs data={section.data} />

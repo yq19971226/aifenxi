@@ -51,7 +51,7 @@ export default function ConsensusPage() {
   const canStart = symbol.trim().length > 0 && !isModeLocked(mode) && !isQuotaExhausted;
 
   const {
-    running, progressSteps, analysisReport, error,
+    running, startTime, progressSteps, analysisReport, error,
     handleStart, handleAbort,
   } = useAnalysis(symbol, mode, canStart);
 
@@ -76,7 +76,8 @@ export default function ConsensusPage() {
   const displayConsensus = consensusReport;
 
   return (
-    <div className="mx-auto max-w-[1500px] px-4 md:px-8 py-8 space-y-6">
+    <div className="min-h-screen bg-grid">
+      <div className="mx-auto max-w-[1500px] px-4 md:px-8 py-8 space-y-6">
       <JSONLD report={displayReport || displayConsensus} />
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -98,12 +99,12 @@ export default function ConsensusPage() {
               type="button"
               onClick={() => handleModeSelect(cfg.value)}
               disabled={running}
-              className={`relative card p-5 text-left transition-all ${
+              className={`relative glass-card glass-card-hover p-5 text-left transition-all ${
                 selected
-                  ? "ring-1 ring-indigo-500/50 bg-indigo-500/[0.05]"
+                  ? "ring-1 ring-indigo-500/50 bg-indigo-500/[0.05] shadow-[0_0_25px_rgba(99,102,241,0.08)]"
                   : locked
                     ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-white/[0.02] cursor-pointer"
+                    : "cursor-pointer"
               }`}
             >
               {locked && (
@@ -137,11 +138,11 @@ export default function ConsensusPage() {
           type="button"
           onClick={() => handleStart(false)}
           disabled={!canStart}
-          className={`w-full sm:w-auto px-8 py-3.5 rounded-lg font-bold text-base flex items-center justify-center gap-2 transition-all ${
+          className={`w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all duration-300 ${
             running
               ? "bg-white/[0.05] text-zinc-400 border border-white/[0.1]"
               : canStart
-                ? "bg-indigo-600 text-white hover:bg-indigo-500 transition-colors"
+                ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-500 hover:to-violet-500 shadow-[0_4px_20px_rgba(99,102,241,0.3)] hover:shadow-[0_6px_30px_rgba(99,102,241,0.4)]"
                 : "bg-white/[0.02] text-zinc-600 border border-white/[0.05]"
           }`}
         >
@@ -188,7 +189,7 @@ export default function ConsensusPage() {
 
       {running && (
         <div className="space-y-3">
-          <AnalysisProgress steps={progressSteps} />
+          <AnalysisProgress steps={progressSteps} startTime={startTime} />
           <button
             type="button"
             onClick={handleAbort}
@@ -245,13 +246,24 @@ export default function ConsensusPage() {
       )}
 
       {!running && !displayReport && !displayConsensus && !error && (
-        <div className="flex flex-col items-center justify-center py-20 relative z-10">
-          <Brain size={32} className="text-zinc-500 mb-3" />
-          <p className="text-base text-zinc-400">
+        <div className="flex flex-col items-center justify-center py-24 relative z-10">
+          <div className="relative h-16 w-16 mb-5">
+            <svg className="absolute inset-0" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="2" strokeDasharray="6 4" />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Brain size={24} className="text-zinc-600" />
+            </div>
+          </div>
+          <p className="text-base text-zinc-400 font-medium">
             {t("empty.message")}
+          </p>
+          <p className="mt-1 text-xs text-zinc-600">
+            选择币对和分析模式，点击上方按钮开始
           </p>
         </div>
       )}
+      </div>
     </div>
   );
 }

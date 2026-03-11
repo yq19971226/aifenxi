@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { fetchDashboardOverview } from "@/lib/api/dashboard";
 import { runDashboardRuleEngine, type RuleResult } from "@/lib/dashboardRuleEngine";
-import { AlertCircle, Loader2, RefreshCw, TrendingUp, TrendingDown, Minus, ChevronRight } from "lucide-react";
+import { AlertCircle, RefreshCw, TrendingUp, TrendingDown, Minus, ChevronRight } from "lucide-react";
 
 export default function DashboardPage() {
   const t = useTranslations("dashboard");
@@ -27,9 +27,16 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-muted-foreground">
-        <Loader2 size={32} className="animate-spin mb-4" />
-        <p className="text-sm font-mono tracking-widest uppercase">{t("initializingEngine")}</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="relative h-16 w-16 mb-5">
+          <svg className="absolute inset-0 -rotate-90" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="3" />
+          </svg>
+          <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
+            <div className="absolute top-0 left-1/2 -ml-[4px] w-2 h-2 rounded-full bg-zinc-400 shadow-[0_0_10px_rgba(255,255,255,0.3)]" />
+          </div>
+        </div>
+        <p className="text-sm font-mono text-zinc-500 tracking-widest uppercase">{t("initializingEngine")}</p>
       </div>
     );
   }
@@ -56,22 +63,28 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight mb-1">{t("commandCenter")}</h1>
-          <p className="text-sm text-muted-foreground font-mono">
-            {">"} {t("welcomeBack")}, {user?.email?.split("@")[0]?.toUpperCase() ?? "USER"}
-          </p>
+      <div className="relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.01] p-6 md:p-8">
+        {/* Background ambient glow */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-[300px] h-[300px] rounded-full bg-indigo-500/[0.03] blur-[80px]" />
         </div>
-        <div className="flex items-center gap-6 px-4 py-2 rounded bg-bg-surface border border-border text-xs font-mono">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <span className="text-muted-foreground mr-2">{t("credits").toUpperCase()}</span>
-            <span className="text-foreground font-bold">{overview?.credits_remaining ?? 0}</span>
+            <h1 className="text-2xl font-bold tracking-tight mb-1 text-white">{t("commandCenter")}</h1>
+            <p className="text-sm text-zinc-500 font-mono">
+              {">"} {t("welcomeBack")}, {user?.email?.split("@")[0]?.toUpperCase() ?? "USER"}
+            </p>
           </div>
-          <div className="w-px h-3 bg-border" />
-          <div>
-            <span className="text-muted-foreground mr-2">{t("rank").toUpperCase()}</span>
-            <span className="text-bull font-bold">{t("topPercent")}</span>
+          <div className="flex items-center gap-6 px-5 py-2.5 rounded-lg glass-card text-xs font-mono">
+            <div>
+              <span className="text-zinc-600 mr-2 text-[10px] uppercase tracking-wider">{t("credits").toUpperCase()}</span>
+              <span className="text-white font-bold text-base">{overview?.credits_remaining ?? 0}</span>
+            </div>
+            <div className="w-px h-5 bg-white/[0.06]" />
+            <div>
+              <span className="text-zinc-600 mr-2 text-[10px] uppercase tracking-wider">{t("rank").toUpperCase()}</span>
+              <span className="text-emerald-400 font-bold text-base">{t("topPercent")}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -98,13 +111,18 @@ export default function DashboardPage() {
         </div>
 
         {!hasSymbols ? (
-          <div className="rounded-lg border border-border border-dashed p-12 text-center">
-            <p className="text-muted-foreground mb-2">{t("noActiveSessions")}</p>
-            <p className="text-xs text-muted-foreground/80 max-w-md mx-auto">{t("noSymbolsHint")}</p>
+          <div className="rounded-xl border border-white/[0.04] border-dashed p-14 text-center">
+            <div className="relative h-12 w-12 mx-auto mb-4">
+              <svg className="absolute inset-0 -rotate-90" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="2" strokeDasharray="4 4" />
+              </svg>
+            </div>
+            <p className="text-zinc-400 mb-1 font-medium">{t("noActiveSessions")}</p>
+            <p className="text-xs text-zinc-600 max-w-md mx-auto">{t("noSymbolsHint")}</p>
             <button
               type="button"
               onClick={() => refetch()}
-              className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded bg-bg-surface border border-border text-sm text-foreground hover:bg-bg-elevated"
+              className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-lg glass-card text-sm text-zinc-300 hover:bg-white/[0.04] transition-colors"
             >
               <RefreshCw size={14} /> {t("retryConnection")}
             </button>
@@ -141,7 +159,7 @@ function RuleResultRow({
   return (
     <Link
       href={`/${locale}/consensus?symbol=${row.symbol}`}
-      className="flex items-center justify-between rounded-lg border border-border bg-bg-surface/50 px-4 py-3 hover:bg-bg-surface transition-colors"
+      className="flex items-center justify-between glass-card glass-card-hover px-4 py-3"
     >
       <div className="flex items-center gap-3 min-w-0">
         <span className="text-sm font-semibold text-foreground shrink-0">

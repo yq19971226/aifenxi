@@ -12,6 +12,7 @@ import {
 
 interface UseAnalysisReturn {
   running: boolean;
+  startTime: number | undefined;
   progressSteps: ProgressEvent[];
   analysisReport: AnalysisReport | null;
   error: string | null;
@@ -25,6 +26,7 @@ export function useAnalysis(
   canStart: boolean,
 ): UseAnalysisReturn {
   const [running, setRunning] = useState(false);
+  const [startTime, setStartTime] = useState<number | undefined>(undefined);
   const [progressSteps, setProgressSteps] = useState<ProgressEvent[]>([]);
   const [analysisReport, setAnalysisReport] = useState<AnalysisReport | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +45,7 @@ export function useAnalysis(
 
       abortRef.current = false;
       setRunning(true);
+      setStartTime(Date.now());
       setProgressSteps([]);
       setAnalysisReport(null);
       setError(null);
@@ -81,6 +84,7 @@ export function useAnalysis(
         }
       } finally {
         setRunning(false);
+        setStartTime(undefined);
         queryClient.invalidateQueries({ queryKey: ["analysis-quota"] });
         queryClient.invalidateQueries({ queryKey: ["consensus", symbol] });
       }
@@ -88,5 +92,5 @@ export function useAnalysis(
     [running, symbol, mode, canStart, queryClient],
   );
 
-  return { running, progressSteps, analysisReport, error, handleStart, handleAbort };
+  return { running, startTime, progressSteps, analysisReport, error, handleStart, handleAbort };
 }

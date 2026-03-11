@@ -7,6 +7,7 @@ import { BarChart3, Brain, Swords } from "lucide-react";
 import type { ReportSection } from "@/lib/api/analysis";
 import { groupSections } from "./helpers";
 import { SectionCard } from "./SectionCard";
+import { cn } from "@/lib/utils";
 
 // ── Tab configuration ────────────────────────────────────────
 
@@ -123,16 +124,31 @@ export function DeepAnalysis({
               key={tab.key}
               type="button"
               onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
-                isActive
-                  ? "border-indigo-500 text-white"
+              className={cn(
+                "flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-all duration-300 border-b-2 -mb-px relative",
+                isActive 
+                  ? tab.key === 'adversarial' ? "border-red-500 text-red-500 shadow-[0_4px_12px_rgba(239,68,68,0.2)]"
+                    : tab.key === 'structure' ? "border-amber-500 text-amber-500 shadow-[0_4px_12px_rgba(245,158,11,0.2)]"
+                    : "border-indigo-500 text-white shadow-[0_4px_12px_rgba(99,102,241,0.2)]"
                   : "border-transparent text-zinc-500 hover:text-zinc-300"
-              }`}
+              )}
             >
-              <Icon className="h-3.5 w-3.5" />
+              <Icon className={cn("h-3.5 w-3.5", isActive && "animate-pulse")} />
               {tab.label}
               {count > 0 && (
-                <span className="ml-1 text-xs text-zinc-500 font-mono">{count}</span>
+                <span className={cn(
+                   "ml-1 text-[10px] font-mono px-1 rounded bg-white/[0.05]",
+                   isActive ? "text-current" : "text-zinc-600"
+                )}>{count}</span>
+              )}
+              {isActive && (
+                <motion.div 
+                  layoutId="activeTabGlow"
+                  className={cn(
+                    "absolute -bottom-[2px] left-0 right-0 h-[2px] blur-sm",
+                    tab.key === 'adversarial' ? "bg-red-500" : tab.key === 'structure' ? "bg-amber-500" : "bg-indigo-500"
+                  )}
+                />
               )}
             </button>
           );
@@ -160,7 +176,7 @@ export function DeepAnalysis({
                     <div className="h-px flex-1 bg-white/[0.06]" />
                   </div>
                 )}
-                <div className="space-y-2">
+                <div className={effectiveTab === 'agents' ? "grid grid-cols-1 md:grid-cols-2 gap-3" : "space-y-2"}>
                   {group.sections.map((section, idx) => (
                     <SectionCard
                       key={`${reportKey}-${section.title}-${idx}`}
