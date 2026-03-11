@@ -1,0 +1,15 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="6" fill="#0a0a0b"/>
+  <!-- Outer diamond / prism shape -->
+  <path d="M16 2L30 16L16 30L2 16L16 2Z" stroke="white" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+  <!-- Inner cross-axis lines -->
+  <line x1="16" y1="2" x2="16" y2="30" stroke="white" stroke-width="1" opacity="0.3"/>
+  <line x1="2" y1="16" x2="30" y2="16" stroke="white" stroke-width="1" opacity="0.3"/>
+  <!-- Central node — consensus point -->
+  <circle cx="16" cy="16" r="3" fill="white" opacity="0.9"/>
+  <!-- Corner nodes — agents -->
+  <circle cx="16" cy="6" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="26" cy="16" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="16" cy="26" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="6" cy="16" r="1.5" fill="white" opacity="0.5"/>
+</svg>

@@ -18,7 +18,8 @@ export const metadata: Metadata = {
   title: "AXIOM | Professional Crypto Analysis",
   description: "AI-powered institutional grade cryptocurrency analysis platform.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.svg",
+    apple: "/apple-touch-icon.svg",
   },
 };
 
