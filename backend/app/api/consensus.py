@@ -17,6 +17,12 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["consensus"])
 
 
+def _normalize_symbol(s: str) -> str:
+    """去掉 :杠杆 等后缀，与缓存键一致。"""
+    base = (s or "").strip().split(":")[0].strip()
+    return base or "BTCUSDT"
+
+
 @router.get("/consensus/latest", response_model=ConsensusReport)
 async def get_latest_consensus(
     symbol: str = Query(
@@ -28,6 +34,7 @@ async def get_latest_consensus(
     _user: UserInfo = Depends(require_level(2)),
 ) -> ConsensusReport:
     """获取最新共识报告（Redis 缓存）。"""
+    symbol = _normalize_symbol(symbol)
     try:
         cache_key = f"consensus:latest:{symbol}"
         cached = await get_json(cache_key)

@@ -873,25 +873,91 @@ export default function ConfigsPage() {
     setSavedGroupId(null);
     setSaveError(null);
 
+    // #region agent log
+    const logSave = (msg: string, data: Record<string, unknown>) => {
+      fetch("http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "22da79" },
+        body: JSON.stringify({
+          sessionId: "22da79",
+          location: "settings/configs/page.tsx:handleSaveGroup",
+          message: msg,
+          data,
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+    };
+    logSave("handleSaveGroup started", { groupId: group.id, itemCount: group.items.length });
+    // #endregion
+
     try {
       for (const item of group.items) {
         const currentValue = editValues[item.key]?.trim() ?? "";
+        const existing = configMap.get(item.key);
+        const action =
+          !currentValue
+            ? "skip_empty"
+            : existing
+              ? currentValue !== existing.value
+                ? "update"
+                : "skip_unchanged"
+              : "create";
+
+        // #region agent log
+        logSave("save item decision", {
+          hypothesisId: "H1",
+          key: item.key,
+          currentValueLen: currentValue.length,
+          currentValueEmpty: !currentValue,
+          hasExisting: !!existing,
+          existingValueLen: existing?.value?.length ?? 0,
+          action,
+        });
+        // #endregion
+
         if (!currentValue) continue;
 
-        const existing = configMap.get(item.key);
         if (existing) {
           if (currentValue !== existing.value) {
-            await updateConfig(item.key, { value: currentValue });
+            try {
+              await updateConfig(item.key, { value: currentValue });
+              // #region agent log
+              logSave("updateConfig ok", { hypothesisId: "H2", key: item.key });
+              // #endregion
+            } catch (apiErr) {
+              // #region agent log
+              logSave("updateConfig failed", {
+                hypothesisId: "H2",
+                key: item.key,
+                error: apiErr instanceof Error ? apiErr.message : String(apiErr),
+              });
+              // #endregion
+              throw apiErr;
+            }
           }
         } else {
-          const data: ConfigCreate = {
-            config_key: item.key,
-            value: currentValue,
-            category: item.category,
-            description: t(`presets.${item.key}.help`),
-            is_secret: item.isSecret,
-          };
-          await createConfig(data);
+          try {
+            const data: ConfigCreate = {
+              config_key: item.key,
+              value: currentValue,
+              category: item.category,
+              description: t(`presets.${item.key}.help`),
+              is_secret: item.isSecret,
+            };
+            await createConfig(data);
+            // #region agent log
+            logSave("createConfig ok", { hypothesisId: "H2", key: item.key });
+            // #endregion
+          } catch (apiErr) {
+            // #region agent log
+            logSave("createConfig failed", {
+              hypothesisId: "H2",
+              key: item.key,
+              error: apiErr instanceof Error ? apiErr.message : String(apiErr),
+            });
+            // #endregion
+            throw apiErr;
+          }
         }
       }
       setSavedGroupId(group.id);
@@ -900,6 +966,12 @@ export default function ConfigsPage() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t("status.saveFailed");
       setSaveError(msg);
+      // #region agent log
+      logSave("handleSaveGroup catch", {
+        hypothesisId: "H2",
+        error: msg,
+      });
+      // #endregion
     } finally {
       setSavingGroupId(null);
     }

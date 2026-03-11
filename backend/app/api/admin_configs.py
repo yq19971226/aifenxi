@@ -123,6 +123,20 @@ async def create_config(
         )
 
 
+def _debug_log(key: str, message: str, data: dict) -> None:
+    # #region agent log
+    import json
+    import os
+    try:
+        log_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "debug-22da79.log")
+        log_path = os.path.normpath(log_path)
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps({"sessionId": "22da79", "location": "admin_configs.update_config", "message": message, "data": data, "key": key}, ensure_ascii=False) + "\n")
+    except Exception:
+        pass
+    # #endregion
+
+
 @router.put("/{key}", response_model=SystemConfigResponse)
 async def update_config(
     key: str,
@@ -131,13 +145,22 @@ async def update_config(
     session: AsyncSession = Depends(get_db),
 ) -> SystemConfigResponse:
     """更新配置值。"""
+    # #region agent log
+    _debug_log(key, "update_config entry", {"valueLen": len(data.value), "hypothesisId": "H3"})
+    # #endregion
     svc = ConfigService(session)
     config = await svc.update_config(key, data, admin_user_id=admin.id)
     if config is None:
+        # #region agent log
+        _debug_log(key, "update_config config is None", {"hypothesisId": "H4"})
+        # #endregion
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="配置不存在",
         )
+    # #region agent log
+    _debug_log(key, "update_config success", {"hypothesisId": "H3"})
+    # #endregion
     return config
 
 

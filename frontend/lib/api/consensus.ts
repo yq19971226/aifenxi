@@ -22,11 +22,18 @@ export interface ConsensusReport {
   minority_warnings: string[];
 }
 
+/** 规范为 API 使用的交易对（去掉 :杠杆 等后缀） */
+function normalizeSymbolForApi(symbol: string): string {
+  const base = symbol.trim().split(":")[0];
+  return base || "BTCUSDT";
+}
+
 export async function fetchConsensusLatest(
   symbol: string
 ): Promise<ConsensusReport | null> {
+  const normalized = normalizeSymbolForApi(symbol);
   const res = await authFetch(
-    `${API_BASE}/api/consensus/latest?symbol=${symbol}`
+    `${API_BASE}/api/consensus/latest?symbol=${encodeURIComponent(normalized)}`
   );
   if (res.status === 404) return null;
   return handleApiResponse(res, "请求失败");

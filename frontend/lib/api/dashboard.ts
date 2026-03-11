@@ -25,6 +25,10 @@ export interface SymbolOverview {
 export interface DashboardOverviewResponse {
   symbols: SymbolOverview[];
   total: number;
+  /** 剩余配额（可选，overview 接口未返回时显示 0） */
+  credits_remaining?: number;
+  /** 近期分析报告（可选，供看板展示） */
+  recent_reports?: unknown[];
 }
 
 export async function fetchDashboardOverview(): Promise<DashboardOverviewResponse> {

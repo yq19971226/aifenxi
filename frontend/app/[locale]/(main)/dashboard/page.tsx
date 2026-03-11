@@ -65,7 +65,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-6 px-4 py-2 rounded bg-bg-surface border border-border text-xs font-mono">
           <div>
             <span className="text-muted-foreground mr-2">CREDITS</span>
-            <span className="text-foreground font-bold">{overview?.credits_remaining || 0}</span>
+            <span className="text-foreground font-bold">{overview?.credits_remaining ?? 0}</span>
           </div>
           <div className="w-px h-3 bg-border" />
           <div>
