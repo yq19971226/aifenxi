@@ -7,8 +7,11 @@ export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 const DEFAULT_LOCALE: SupportedLocale = "zh-CN";
 
-/** Auth-related route segments (used by AuthGuard to skip redirect). */
-export const AUTH_SEGMENTS = new Set(["login", "register", "forgot-password"]);
+/** Auth-related or public SEO route segments (used by AuthGuard to skip redirect). */
+export const PUBLIC_SEGMENTS = new Set(["login", "register", "forgot-password", "consensus"]);
+
+/** @deprecated Use PUBLIC_SEGMENTS */
+export const AUTH_SEGMENTS = PUBLIC_SEGMENTS;
 
 /**
  * Extract locale from a pathname like `/{locale}/dashboard`.

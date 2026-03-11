@@ -48,7 +48,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     );
   }
 
-  if (!user) {
+  if (!user && !isAuthRoute(pathname)) {
     return null;
   }
 

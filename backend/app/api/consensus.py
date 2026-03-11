@@ -31,9 +31,8 @@ async def get_latest_consensus(
         max_length=20,
         description="交易对，如 BTCUSDT",
     ),
-    _user: UserInfo = Depends(require_level(2)),
 ) -> ConsensusReport:
-    """获取最新共识报告（Redis 缓存）。"""
+    """获取最新共识报告（Redis 缓存）— 公开端点，支持 SEO/GEO。"""
     symbol = _normalize_symbol(symbol)
     try:
         cache_key = f"consensus:latest:{symbol}"
