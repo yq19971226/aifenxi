@@ -262,3 +262,34 @@ async def get_sidebar_badges(
         # 忽略错误返回全0以避免中断前端渲染
     
     return badges
+
+@router.get("/crawler-stats")
+async def get_crawler_stats(
+    admin: UserInfo = Depends(require_admin),
+) -> dict:
+    """获取 AI 爬虫访问统计数据。"""
+    try:
+        redis = get_redis_pool()
+        total = await redis.get("stats:crawler:total")
+        bots = await redis.hgetall("stats:crawler:bots")
+        last_seen = await redis.hgetall("stats:crawler:last_seen")
+        
+        # Format for frontend
+        bot_details = []
+        for name, count in (bots or {}).items():
+            bot_details.append({
+                "name": name,
+                "count": int(count),
+                "last_seen": last_seen.get(name) if last_seen else None
+            })
+            
+        # Sort by count desc
+        bot_details.sort(key=lambda x: x["count"], reverse=True)
+        
+        return {
+            "total_hits": int(total) if total else 0,
+            "bots": bot_details
+        }
+    except Exception as exc:
+        logger.error("获取爬虫统计失败: %s", exc)
+        return {"total_hits": 0, "bots": []}

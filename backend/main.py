@@ -59,6 +59,7 @@ from app.core.sentry import init_sentry
 from app.services.playbook_prediction_maintenance import (
     backfill_playbook_prediction_market_structures,
 )
+from app.middleware.crawler_tracker import AICrawlerMiddleware
 
 _DEFAULT_KLINE_INTERVALS_CSV = ",".join(ALL_MODE_KLINE_INTERVALS)
 
@@ -242,6 +243,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(AICrawlerMiddleware)
 
 
 app.include_router(feature_flags_router)

@@ -22,7 +22,14 @@ import {
   Wifi,
   type LucideIcon,
 } from "lucide-react";
-import { fetchDashboardStats, fetchLLMCost, type DashboardStats, type LLMCostSummary } from "@/lib/api/admin-dashboard";
+import { 
+  fetchDashboardStats, 
+  fetchLLMCost, 
+  fetchCrawlerStats,
+  type DashboardStats, 
+  type LLMCostSummary,
+  type CrawlerStats
+} from "@/lib/api/admin-dashboard";
 import { fetchConfigs, type SystemConfig } from "@/lib/api/configs";
 import { SkeletonStatCard, Skeleton } from "@/components/ui/Skeleton";
 import { SystemHealthGrid } from "@/components/admin/SystemHealthGrid";
@@ -315,6 +322,50 @@ function LLMCostCompact({ cost }: { cost: LLMCostSummary }) {
   );
 }
 
+/* ── AI 爬虫访问统计 ────────────────────────────────────── */
+
+function CrawlerStatsCard({ stats }: { stats: CrawlerStats }) {
+  const bots = stats.bots.slice(0, 5); // 只看前5个
+  
+  return (
+    <div className="card p-4">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs text-zinc-400">AI 引擎收录检测 (2026 GEO)</span>
+        <span className="text-xs text-zinc-500">累计 {stats.total_hits} 次</span>
+      </div>
+      
+      {bots.length === 0 ? (
+        <div className="py-8 flex flex-col items-center justify-center gap-2 text-zinc-600">
+          <Wifi size={20} className="animate-pulse" />
+          <p className="text-xs">等待 AI 引擎首访同步...</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {bots.map((bot) => (
+            <div key={bot.name}>
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-zinc-300 font-medium">{bot.name}</span>
+                <span className="text-zinc-500">{bot.count} hits</span>
+              </div>
+              <div className="flex h-1 overflow-hidden rounded-full bg-white/[0.04]">
+                <div 
+                  className="bg-indigo-500 transition-all" 
+                  style={{ width: `${Math.min(100, (bot.count / stats.total_hits) * 100)}%` }} 
+                />
+              </div>
+              {bot.last_seen && (
+                <p className="text-[9px] text-zinc-600 mt-1">
+                  Last: {new Date(bot.last_seen).toLocaleTimeString()}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── 快捷操作 ──────────────────────────────────────────────── */
 
 const QUICK_ACTIONS: { label: string; href: string; icon: LucideIcon; desc: string }[] = [
@@ -365,6 +416,7 @@ export default function AdminDashboardPage() {
   if (!user || user.role !== "admin") return null;
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [llmCost, setLLMCost] = useState<LLMCostSummary | null>(null);
+  const [crawlerStats, setCrawlerStats] = useState<CrawlerStats | null>(null);
   const [configs, setConfigs] = useState<SystemConfig[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -381,6 +433,7 @@ export default function AdminDashboardPage() {
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
     fetchLLMCost().then(setLLMCost).catch(() => {});
+    fetchCrawlerStats().then(setCrawlerStats).catch(() => {});
     fetchConfigs().then(setConfigs).catch(() => {});
   }, []);
 
@@ -474,9 +527,16 @@ export default function AdminDashboardPage() {
         />
       </div>
 
-      {/* ── Middle row: Tier + LLM cost + Activity ── */}
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+      {/* ── Middle row: Tier + Crawler + Cost + Activity ── */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <TierBar free={stats.free_users} pro={stats.pro_users} flagship={stats.flagship_users} />
+        {crawlerStats ? (
+          <CrawlerStatsCard stats={crawlerStats} />
+        ) : (
+          <div className="card p-4">
+            <span className="text-xs text-zinc-500">爬虫数据加载中…</span>
+          </div>
+        )}
         {llmCost ? (
           <LLMCostCompact cost={llmCost} />
         ) : (

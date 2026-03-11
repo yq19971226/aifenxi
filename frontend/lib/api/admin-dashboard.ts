@@ -55,3 +55,19 @@ export async function fetchAdminBadges(): Promise<AdminBadges> {
   const res = await authFetch(`${API}/api/admin/dashboard/badges`);
   return handleApiResponse(res, "获取后台徽标计数失败");
 }
+
+export interface CrawlerBot {
+  name: string;
+  count: number;
+  last_seen: string | null;
+}
+
+export interface CrawlerStats {
+  total_hits: number;
+  bots: CrawlerBot[];
+}
+
+export async function fetchCrawlerStats(): Promise<CrawlerStats> {
+  const res = await authFetch(`${API}/api/admin/dashboard/crawler-stats`);
+  return handleApiResponse(res, "获取爬虫数据失败");
+}
