@@ -3,6 +3,13 @@
     "tagline": "Market Maker AI Analysis Platform",
     "title1": "See the Other Side",
     "title2": "of the Market",
+    "badge": "SYSTEM ONLINE: V4.1.0",
+    "titleLine1": "Decentralized",
+    "titleLine2": "Intelligence.",
+    "subtitleLine1": "11 AI Agents. 3 Rounds of Debate. 1 Consensus.",
+    "subtitleLine2": "Institutional-grade crypto analysis for the rest of us.",
+    "ctaPrimary": "Start Analysis",
+    "ctaSecondary": "View Documentation",
     "subtitle": "No need to read charts or understand indicators. AI watches the market for you and tells you what's happening and what the big players might be doing.",
     "cta": "Get Started Free",
     "learnMore": "Learn More",
@@ -121,5 +128,30 @@
     "data": "Data",
     "login": "Log In",
     "register": "Sign Up Free"
-  }
+  },
+  "features": {
+    "sectionTitle": "THE BLUEPRINT",
+    "sectionDesc": "We don't just predict price. We deconstruct the market using 11 specialized AI agents working in concert.",
+    "items": [
+      { "title": "NSED Engine", "desc": "Multi-model consensus mechanism that reduces hallucination by 94%." },
+      { "title": "Adversarial AI", "desc": "Dedicated 'Red Team' agents specifically designed to find flaws in your strategy." },
+      { "title": "Onchain Deep-dive", "desc": "Real-time tracking of exchange inflows/outflows and whale wallet movements." },
+      { "title": "Sentiment Analysis", "desc": "Scans millions of social signals to gauge true market fear/greed." },
+      { "title": "Micro-structure", "desc": "Order book heatmap analysis to identify hidden liquidity walls." },
+      { "title": "Macro Context", "desc": "Correlates crypto moves with traditional finance (SPX, DXY, Yields)." }
+    ]
+  },
+  "trust": {
+    "status": "System Status: ",
+    "statusValue": "OPERATIONAL",
+    "analyzed": "24h Analyzed: ",
+    "analyzedValue": "1,402 Pairs",
+    "signals": "Signals Generated: ",
+    "signalsValue": "89",
+    "accuracy": "Avg. Accuracy (7d): ",
+    "accuracyValue": "78.4%",
+    "nodes": "Active Nodes: ",
+    "nodesValue": "11"
+  },
+  "footerOperational": "© {year} AXIOM. All systems operational."
 }

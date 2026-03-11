@@ -3,6 +3,13 @@
     "tagline": "庄家行为 AI 多维分析平台",
     "title1": "看清市场另一面",
     "title2": "做更冷静的判断",
+    "badge": "系统在线：V4.1.0",
+    "titleLine1": "去中心化",
+    "titleLine2": "智能。",
+    "subtitleLine1": "11 个 AI 智能体 · 3 轮辩论 · 1 个共识。",
+    "subtitleLine2": "机构级加密分析，人人可用。",
+    "ctaPrimary": "开始分析",
+    "ctaSecondary": "查看文档",
     "subtitle": "不用自己看指标、看 K 线。AI 替你盯盘、替你分析，直接告诉你现在市场什么情况、庄家可能在做什么。",
     "cta": "免费开始",
     "learnMore": "了解更多",
@@ -121,5 +128,30 @@
     "data": "数据来源",
     "login": "登录",
     "register": "免费注册"
-  }
+  },
+  "features": {
+    "sectionTitle": "核心架构",
+    "sectionDesc": "我们不仅预测价格。我们用 11 个专业 AI 智能体协同解构市场。",
+    "items": [
+      { "title": "NSED 引擎", "desc": "多模型共识机制，将幻觉率降低 94%。" },
+      { "title": "对抗式 AI", "desc": "专职「红队」智能体，专门找出策略中的漏洞。" },
+      { "title": "链上深度", "desc": "交易所充提、巨鲸钱包动向实时追踪。" },
+      { "title": "情绪分析", "desc": "扫描海量社交信号，衡量真实市场恐惧/贪婪。" },
+      { "title": "微观结构", "desc": "订单簿热力图分析，识别隐藏流动性墙。" },
+      { "title": "宏观语境", "desc": "加密走势与传统金融（SPX、DXY、美债）关联。" }
+    ]
+  },
+  "trust": {
+    "status": "系统状态：",
+    "statusValue": "运行中",
+    "analyzed": "24h 分析：",
+    "analyzedValue": "1,402 交易对",
+    "signals": "生成信号：",
+    "signalsValue": "89",
+    "accuracy": "平均准确率(7日)：",
+    "accuracyValue": "78.4%",
+    "nodes": "活跃节点：",
+    "nodesValue": "11"
+  },
+  "footerOperational": "© {year} AXIOM。系统运行中。"
 }

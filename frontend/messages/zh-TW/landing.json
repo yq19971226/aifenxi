@@ -3,6 +3,13 @@
     "tagline": "莊家行為 AI 多維分析平台",
     "title1": "看清市場另一面",
     "title2": "做更冷靜的判斷",
+    "badge": "系統在線：V4.1.0",
+    "titleLine1": "去中心化",
+    "titleLine2": "智能。",
+    "subtitleLine1": "11 個 AI 智能體 · 3 輪辯論 · 1 個共識。",
+    "subtitleLine2": "機構級加密分析，人人可用。",
+    "ctaPrimary": "開始分析",
+    "ctaSecondary": "查看文檔",
     "subtitle": "不用自己看指標、看 K 線。AI 替你盯盤、替你分析，直接告訴你現在市場什麼情況、莊家可能在做什麼。",
     "cta": "免費開始",
     "learnMore": "了解更多",
@@ -121,5 +128,30 @@
     "data": "數據來源",
     "login": "登入",
     "register": "免費註冊"
-  }
+  },
+  "features": {
+    "sectionTitle": "核心架構",
+    "sectionDesc": "我們不僅預測價格。我們用 11 個專業 AI 智能體協同解構市場。",
+    "items": [
+      { "title": "NSED 引擎", "desc": "多模型共識機制，將幻覺率降低 94%。" },
+      { "title": "對抗式 AI", "desc": "專職「紅隊」智能體，專門找出策略中的漏洞。" },
+      { "title": "鏈上深度", "desc": "交易所充提、巨鯨錢包動向即時追蹤。" },
+      { "title": "情緒分析", "desc": "掃描海量社交信號，衡量真實市場恐懼/貪婪。" },
+      { "title": "微觀結構", "desc": "訂單簿熱力圖分析，識別隱藏流動性牆。" },
+      { "title": "宏觀語境", "desc": "加密走勢與傳統金融（SPX、DXY、美債）關聯。" }
+    ]
+  },
+  "trust": {
+    "status": "系統狀態：",
+    "statusValue": "運行中",
+    "analyzed": "24h 分析：",
+    "analyzedValue": "1,402 交易對",
+    "signals": "生成信號：",
+    "signalsValue": "89",
+    "accuracy": "平均準確率(7日)：",
+    "accuracyValue": "78.4%",
+    "nodes": "活躍節點：",
+    "nodesValue": "11"
+  },
+  "footerOperational": "© {year} AXIOM。系統運行中。"
 }

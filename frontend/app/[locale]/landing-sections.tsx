@@ -12,7 +12,6 @@ import {
   Search,
   Zap,
   Globe,
-  Lock,
 } from "lucide-react";
 import { LogoMark } from "@/components/ui/Logo";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
@@ -61,24 +60,24 @@ function HeroSection() {
           <FadeIn delay={0.1}>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-bg-surface/50 text-xs font-mono text-muted-foreground mb-8">
               <span className="w-2 h-2 rounded-full bg-bull animate-pulse" />
-              SYSTEM ONLINE: V4.1.0
+              {t("badge")}
             </div>
           </FadeIn>
           
           <FadeIn delay={0.2}>
             <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-foreground mb-6 font-mono">
-              Decentralized <br />
+              {t("titleLine1")} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-foreground to-muted-foreground">
-                Intelligence.
+                {t("titleLine2")}
               </span>
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.3}>
             <p className="text-xl text-muted-foreground mb-10 max-w-lg leading-relaxed">
-              11 AI Agents. 3 Rounds of Debate. 1 Consensus.
+              {t("subtitleLine1")}
               <br />
-              Institutional-grade crypto analysis for the rest of us.
+              {t("subtitleLine2")}
             </p>
           </FadeIn>
 
@@ -88,13 +87,13 @@ function HeroSection() {
                 href={`/${locale}/login`}
                 className="h-12 px-8 rounded bg-foreground text-bg-primary font-bold flex items-center gap-2 hover:bg-muted-foreground transition-colors"
               >
-                Start Analysis <ArrowRight size={18} />
+                {t("ctaPrimary")} <ArrowRight size={18} />
               </Link>
               <Link
                 href="#features"
                 className="h-12 px-8 rounded border border-border text-foreground font-medium flex items-center hover:bg-bg-surface transition-colors"
               >
-                View Documentation
+                {t("ctaSecondary")}
               </Link>
             </div>
           </FadeIn>
@@ -162,62 +161,37 @@ function TerminalBlock() {
 
 // ── Features Grid ──────────────────────────────────────────
 
+const FEATURE_ICONS = [Cpu, Shield, Activity, Search, Zap, Globe];
+
 function FeaturesSection() {
-  const features = [
-    {
-      icon: Cpu,
-      title: "NSED Engine",
-      desc: "Multi-model consensus mechanism that reduces hallucination by 94%."
-    },
-    {
-      icon: Shield,
-      title: "Adversarial AI",
-      desc: "Dedicated 'Red Team' agents specifically designed to find flaws in your strategy."
-    },
-    {
-      icon: Activity,
-      title: "Onchain Deep-dive",
-      desc: "Real-time tracking of exchange inflows/outflows and whale wallet movements."
-    },
-    {
-      icon: Search,
-      title: "Sentiment Analysis",
-      desc: "Scans millions of social signals to gauge true market fear/greed."
-    },
-    {
-      icon: Zap,
-      title: "Micro-structure",
-      desc: "Order book heatmap analysis to identify hidden liquidity walls."
-    },
-    {
-      icon: Globe,
-      title: "Macro Context",
-      desc: "Correlates crypto moves with traditional finance (SPX, DXY, Yields)."
-    }
-  ];
+  const t = useTranslations("landing.features");
+  const items = t.raw("items") as { title: string; desc: string }[];
 
   return (
     <section id="features" className="py-32 border-t border-border bg-bg-surface">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-20">
-          <h2 className="text-3xl font-bold mb-6">THE BLUEPRINT</h2>
+          <h2 className="text-3xl font-bold mb-6">{t("sectionTitle")}</h2>
           <p className="text-muted-foreground max-w-2xl">
-            We don't just predict price. We deconstruct the market using 11 specialized AI agents working in concert.
+            {t("sectionDesc")}
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
-          {features.map((f, i) => (
-            <FadeIn key={i} delay={i * 0.1}>
-              <div className="bg-bg-primary p-10 h-full hover:bg-bg-elevated transition-colors group">
-                <f.icon className="w-8 h-8 text-muted-foreground mb-6 group-hover:text-foreground transition-colors" strokeWidth={1.5} />
-                <h3 className="text-lg font-bold mb-3 font-mono">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {f.desc}
-                </p>
-              </div>
-            </FadeIn>
-          ))}
+          {(items || []).map((f, i) => {
+            const Icon = FEATURE_ICONS[i] ?? Cpu;
+            return (
+              <FadeIn key={i} delay={i * 0.1}>
+                <div className="bg-bg-primary p-10 h-full hover:bg-bg-elevated transition-colors group">
+                  <Icon className="w-8 h-8 text-muted-foreground mb-6 group-hover:text-foreground transition-colors" strokeWidth={1.5} />
+                  <h3 className="text-lg font-bold mb-3 font-mono">{f.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {f.desc}
+                  </p>
+                </div>
+              </FadeIn>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -227,14 +201,15 @@ function FeaturesSection() {
 // ── Trust Section ──────────────────────────────────────────
 
 function TrustSection() {
+  const t = useTranslations("landing.trust");
   return (
     <div className="border-y border-border bg-bg-primary overflow-hidden py-4">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between font-mono text-xs text-muted-foreground uppercase tracking-widest overflow-x-auto whitespace-nowrap gap-8 scrollbar-none">
-        <span>System Status: <span className="text-bull">OPERATIONAL</span></span>
-        <span>24h Analyzed: <span className="text-foreground">1,402 Pairs</span></span>
-        <span>Signals Generated: <span className="text-foreground">89</span></span>
-        <span>Avg. Accuracy (7d): <span className="text-bull">78.4%</span></span>
-        <span>Active Nodes: <span className="text-foreground">11</span></span>
+        <span>{t("status")}<span className="text-bull">{t("statusValue")}</span></span>
+        <span>{t("analyzed")}<span className="text-foreground">{t("analyzedValue")}</span></span>
+        <span>{t("signals")}<span className="text-foreground">{t("signalsValue")}</span></span>
+        <span>{t("accuracy")}<span className="text-bull">{t("accuracyValue")}</span></span>
+        <span>{t("nodes")}<span className="text-foreground">{t("nodesValue")}</span></span>
       </div>
     </div>
   );
@@ -243,6 +218,8 @@ function TrustSection() {
 // ── Landing Page Export ────────────────────────────────────
 
 export function LandingPage() {
+  const locale = useLocale();
+  const t = useTranslations("landing");
   return (
     <div className="min-h-screen bg-bg-primary text-foreground font-sans selection:bg-foreground selection:text-bg-primary">
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-bg-primary/80 backdrop-blur-md">
@@ -253,8 +230,8 @@ export function LandingPage() {
           </div>
           <div className="flex items-center gap-6">
             <LanguageSwitcher />
-            <Link href="/login" className="text-sm font-medium hover:text-muted-foreground transition-colors">
-              Login
+            <Link href={`/${locale}/login`} className="text-sm font-medium hover:text-muted-foreground transition-colors">
+              {t("nav.login")}
             </Link>
           </div>
         </div>
@@ -267,7 +244,7 @@ export function LandingPage() {
       </main>
 
       <footer className="py-12 border-t border-border bg-bg-primary text-center text-xs text-muted-foreground">
-        <p>© 2024 AXIOM. All systems operational.</p>
+        <p>{t("footerOperational", { year: new Date().getFullYear() })}</p>
       </footer>
     </div>
   );
