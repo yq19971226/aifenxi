@@ -57,6 +57,21 @@
   "empty": {
     "message": "Select analysis mode, click 'Start Analysis' to get AI report"
   },
+  "card": {
+    "consensus": "Consensus",
+    "riskLevel": "Risk Level",
+    "support": "Support",
+    "resistance": "Resistance",
+    "agreement": "Agreement",
+    "assessment": "Assessment",
+    "keyLevel": "Key Level",
+    "analysisReasoning": "Analysis Reasoning",
+    "keyFindings": "Key Findings",
+    "updated": "Updated",
+    "engine": "NSED-v4 Engine",
+    "id": "ID",
+    "perp": "PERP"
+  },
   "flow": {
     "coreAnalysis": "Core AI Analysis",
     "crossValidation": "Multi-dim Cross Validation",

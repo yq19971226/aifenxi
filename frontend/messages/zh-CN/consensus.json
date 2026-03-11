@@ -57,6 +57,21 @@
   "empty": {
     "message": "选择分析模式，点击「开始分析」获取AI报告"
   },
+  "card": {
+    "consensus": "共识",
+    "riskLevel": "风险等级",
+    "support": "支撑",
+    "resistance": "阻力",
+    "agreement": "一致",
+    "assessment": "评估",
+    "keyLevel": "关键位",
+    "analysisReasoning": "分析推理",
+    "keyFindings": "关键发现",
+    "updated": "更新",
+    "engine": "NSED-v4 引擎",
+    "id": "ID",
+    "perp": "永续"
+  },
   "flow": {
     "coreAnalysis": "核心AI分析",
     "crossValidation": "多维交叉验证",

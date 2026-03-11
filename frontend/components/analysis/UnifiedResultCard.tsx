@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import {
   TrendingDown,
   TrendingUp,
@@ -22,40 +23,39 @@ import { useConsensusData } from "./UnifiedSections";
 // ── Technical Blueprint Style Card ─────────────────────────
 
 export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
+  const t = useTranslations("consensus");
   const strategy = report.strategy;
-  
-  // Signal Determination
+
   const rawSignal = strategy?.direction === "long" ? "bullish" : strategy?.direction === "short" ? "bearish" : report.signal;
-  
-  // Styles based on signal
+
   const signalConfig = {
     bullish: {
       color: "text-bull",
       borderColor: "border-bull/20",
       bg: "bg-bull-muted",
       icon: TrendingUp,
-      label: "BULLISH"
+      label: t("signals.bullish")
     },
     bearish: {
       color: "text-bear",
       borderColor: "border-bear/20",
       bg: "bg-bear-muted",
       icon: TrendingDown,
-      label: "BEARISH"
+      label: t("signals.bearish")
     },
     neutral: {
       color: "text-muted-foreground",
       borderColor: "border-border",
       bg: "bg-muted",
       icon: Minus,
-      label: "NEUTRAL"
+      label: t("signals.neutral")
     }
   }[rawSignal] || {
     color: "text-muted-foreground",
     borderColor: "border-border",
     bg: "bg-muted",
     icon: Minus,
-    label: "NEUTRAL"
+    label: t("signals.neutral")
   };
 
   const confidence = ((report.confidence ?? 0) * 100).toFixed(0);
@@ -78,13 +78,13 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
             <div className="flex items-center gap-2">
               <h3 className="text-lg font-bold font-mono tracking-tight">{report.symbol}</h3>
               <span className="text-xs text-muted-foreground px-1.5 py-0.5 rounded border border-border bg-bg-surface">
-                PERP
+                {t("card.perp")}
               </span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-               <span>{modeLabel(report.mode)}</span>
-               <span>•</span>
-               <span className="font-mono">{(report.execution_time_ms / 1000).toFixed(2)}s</span>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
+              <span>{modeLabel(report.mode)}</span>
+              <span>•</span>
+              <span className="font-mono">{(report.execution_time_ms / 1000).toFixed(2)}s</span>
             </div>
           </div>
         </div>
@@ -105,26 +105,26 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
 
       {/* ── Key Metrics Grid ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border border-b border-border bg-bg-surface/30">
-        <MetricItem 
-          label="Consensus" 
-          value={`${(avgConf * 100).toFixed(0)}%`} 
-          sub="Agreement"
+        <MetricItem
+          label={t("card.consensus")}
+          value={`${(avgConf * 100).toFixed(0)}%`}
+          sub={t("card.agreement")}
         />
-        <MetricItem 
-          label="Risk Level" 
-          value="—" 
-          sub="Assessment"
+        <MetricItem
+          label={t("card.riskLevel")}
+          value="—"
+          sub={t("card.assessment")}
         />
-        <MetricItem 
-          label="Support" 
-          value={formatPrice(report.strategy?.entry_low ?? report.strategy?.entry_high)} 
-          sub="Key Level"
+        <MetricItem
+          label={t("card.support")}
+          value={formatPrice(report.strategy?.entry_low ?? report.strategy?.entry_high)}
+          sub={t("card.keyLevel")}
           fontMono
         />
-        <MetricItem 
-          label="Resistance" 
-          value={formatPrice(report.strategy?.targets?.[0] ?? report.strategy?.entry_high)} 
-          sub="Key Level"
+        <MetricItem
+          label={t("card.resistance")}
+          value={formatPrice(report.strategy?.targets?.[0] ?? report.strategy?.entry_high)}
+          sub={t("card.keyLevel")}
           fontMono
         />
       </div>
@@ -133,11 +133,11 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
       <div className="p-5 space-y-5">
         {/* Reasoning */}
         <div>
-          <h4 className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
-            <Activity size={12} />
-            Analysis Reasoning
+          <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
+            <Activity size={14} />
+            {t("card.analysisReasoning")}
           </h4>
-          <p className="text-sm leading-relaxed text-foreground/90">
+          <p className="text-base leading-relaxed text-foreground/90">
             {report.strategy?.reasoning ?? "—"}
           </p>
         </div>
@@ -145,36 +145,36 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
         {/* Key Findings List */}
         {report.key_findings && report.key_findings.length > 0 && (
           <div>
-             <h4 className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
-               <Database size={12} />
-               Key Findings
-             </h4>
-             <ul className="grid gap-2">
-               {report.key_findings.slice(0, 3).map((finding, i) => (
-                 <li key={i} className="flex gap-2 text-sm text-muted-foreground items-start">
-                   <span className="mt-1.5 w-1 h-1 rounded-full bg-border shrink-0" />
-                   <span>{finding}</span>
-                 </li>
-               ))}
-             </ul>
+            <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
+              <Database size={14} />
+              {t("card.keyFindings")}
+            </h4>
+            <ul className="grid gap-2">
+              {report.key_findings.slice(0, 3).map((finding, i) => (
+                <li key={i} className="flex gap-2 text-sm text-muted-foreground items-start">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-border shrink-0" />
+                  <span>{finding}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </div>
 
       {/* ── Footer Metadata ── */}
-      <div className="px-4 py-2 bg-bg-surface border-t border-border flex items-center justify-between text-[10px] text-muted-foreground font-mono">
+      <div className="px-4 py-2.5 bg-bg-surface border-t border-border flex items-center justify-between text-xs text-muted-foreground font-mono">
         <div className="flex items-center gap-3">
-           <span className="flex items-center gap-1">
-             <Clock size={10} />
-             Updated: {formatCachedTime(report.timestamp)}
-           </span>
-           <span className="flex items-center gap-1">
-             <Shield size={10} />
-             NSED-v4 Engine
-           </span>
+          <span className="flex items-center gap-1.5">
+            <Clock size={12} />
+            {t("card.updated")}: {formatCachedTime(report.timestamp)}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Shield size={12} />
+            {t("card.engine")}
+          </span>
         </div>
         <div>
-          ID: {(report as { report_id?: string }).report_id?.substring(0, 8) ?? report.timestamp.slice(0, 19).replace(/[-:T]/g, "").slice(0, 8)}
+          {t("card.id")}: {(report as { report_id?: string }).report_id?.substring(0, 8) ?? report.timestamp.slice(0, 19).replace(/[-:T]/g, "").slice(0, 8)}
         </div>
       </div>
     </motion.div>
@@ -184,9 +184,9 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
 function MetricItem({ label, value, sub, valueColor = "text-foreground", fontMono = false }: { label: string, value: string | number, sub: string, valueColor?: string, fontMono?: boolean }) {
   return (
     <div className="p-3 flex flex-col items-center justify-center text-center">
-      <span className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">{label}</span>
+      <span className="text-xs text-muted-foreground uppercase tracking-wider mb-0.5">{label}</span>
       <span className={cn("text-base font-bold", valueColor, fontMono && "font-mono")}>{value}</span>
-      <span className="text-[10px] text-muted-foreground/60">{sub}</span>
+      <span className="text-xs text-muted-foreground/80">{sub}</span>
     </div>
   );
 }

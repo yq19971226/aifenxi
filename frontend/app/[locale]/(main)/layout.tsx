@@ -17,41 +17,42 @@ interface MainLayoutProps {
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
     <AuthGuard>
-      <div className="flex min-h-screen bg-bg-primary text-foreground font-sans selection:bg-primary/20">
+      {/* 移动端 flex-col 纵向堆叠避免左侧留白；桌面端 flex-row 左侧 Sidebar */}
+      <div className="flex min-h-screen w-full flex-col overflow-x-hidden bg-bg-primary text-foreground font-sans selection:bg-primary/20 md:flex-row">
         <ErrorBoundary name="OfflineBanner">
           <OfflineBanner />
         </ErrorBoundary>
-        
-        {/* Desktop Sidebar */}
+
+        {/* Desktop Sidebar - 仅 md 以上显示 */}
         <ErrorBoundary name="Sidebar">
           <Sidebar />
         </ErrorBoundary>
 
-        {/* Mobile Navigation */}
+        {/* Mobile: TopNav 的 header 与下方内容区纵向排列；Desktop: 与内容区同行 */}
         <ErrorBoundary name="TopNav">
           <TopNav />
         </ErrorBoundary>
-        
-        <div className="flex-1 flex flex-col md:pl-[64px] transition-[padding] duration-200">
+
+        <div className="flex min-w-0 flex-1 flex-col md:pl-[64px] transition-[padding] duration-200">
           <ErrorBoundary name="AnnouncementRuntime">
             <AnnouncementRuntime />
           </ErrorBoundary>
-          
-          <div className="flex flex-1">
-            <main className="flex-1 min-w-0 pb-20 md:pb-0">
-               <div className="mx-auto w-full max-w-[1600px] px-4 md:px-8 pt-6">
-                 <ErrorBoundary name="DataSourceBanner">
-                    <div className="mb-6">
-                      <DataSourceBanner />
-                    </div>
-                  </ErrorBoundary>
-                  {children}
-               </div>
+
+          <div className="flex min-w-0 flex-1">
+            <main className="min-w-0 flex-1 pb-20 md:pb-0">
+              <div className="mx-auto w-full max-w-[1600px] px-4 pt-6 md:px-8">
+                <ErrorBoundary name="DataSourceBanner">
+                  <div className="mb-6">
+                    <DataSourceBanner />
+                  </div>
+                </ErrorBoundary>
+                {children}
+              </div>
             </main>
 
             {/* Right Context Sidebar - Desktop Only */}
-            <aside className="hidden xl:block w-[300px] border-l border-border bg-bg-primary/50 sticky top-0 h-screen overflow-y-auto p-4 shrink-0">
-               <ContextSidebar />
+            <aside className="hidden xl:block w-[300px] shrink-0 border-l border-border bg-bg-primary/50 sticky top-0 h-screen overflow-y-auto p-4">
+              <ContextSidebar />
             </aside>
           </div>
         </div>

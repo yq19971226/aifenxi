@@ -57,6 +57,21 @@
   "empty": {
     "message": "選擇分析模式，點擊「開始分析」獲取AI報告"
   },
+  "card": {
+    "consensus": "共識",
+    "riskLevel": "風險等級",
+    "support": "支撐",
+    "resistance": "阻力",
+    "agreement": "一致",
+    "assessment": "評估",
+    "keyLevel": "關鍵位",
+    "analysisReasoning": "分析推理",
+    "keyFindings": "關鍵發現",
+    "updated": "更新",
+    "engine": "NSED-v4 引擎",
+    "id": "ID",
+    "perp": "永續"
+  },
   "flow": {
     "coreAnalysis": "核心AI分析",
     "crossValidation": "多維交叉驗證",

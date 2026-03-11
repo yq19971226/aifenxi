@@ -27,8 +27,8 @@ export function TopNav() {
 
   return (
     <>
-      {/* Mobile Top Bar */}
-      <header className="md:hidden sticky top-0 z-50 flex h-14 w-full items-center justify-between border-b border-border bg-bg-primary/95 backdrop-blur-md px-4">
+      {/* Mobile Top Bar - 移动端占满宽，避免与内容区并排留白 */}
+      <header className="md:hidden sticky top-0 z-50 flex h-14 w-full min-w-0 shrink-0 items-center justify-between border-b border-border bg-bg-primary/95 backdrop-blur-md px-4">
         <Link href={`/${locale}`} className="flex items-center gap-2">
           <LogoMark className="h-6 w-6 text-primary" />
           <span className="font-bold tracking-tight text-sm">AXIOM</span>
@@ -50,24 +50,25 @@ export function TopNav() {
       {/* Mobile Bottom Bar - Essential Actions Only */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 h-16 border-t border-border bg-bg-primary/90 backdrop-blur-xl pb-safe">
         <div className="grid h-full grid-cols-4 items-center justify-items-center">
-          <Link href={`/${locale}/dashboard`} className={cn("flex flex-col items-center gap-1", pathname.includes("/dashboard") ? "text-primary" : "text-muted-foreground")}>
-            <LayoutDashboard size={20} />
-            <span className="text-[10px] font-medium">{t('main.dashboard')}</span>
+          <Link href={`/${locale}/dashboard`} className={cn("flex flex-col items-center justify-center gap-0.5 min-h-[44px] min-w-[44px]", pathname.includes("/dashboard") ? "text-primary" : "text-muted-foreground")}>
+            <LayoutDashboard size={22} />
+            <span className="text-xs font-medium">{t('main.dashboard')}</span>
           </Link>
-          <Link href={`/${locale}/consensus`} className={cn("flex flex-col items-center gap-1", pathname.includes("/consensus") ? "text-primary" : "text-muted-foreground")}>
-            <Brain size={20} />
-            <span className="text-[10px] font-medium">{t('main.consensus')}</span>
+          <Link href={`/${locale}/consensus`} className={cn("flex flex-col items-center justify-center gap-0.5 min-h-[44px] min-w-[44px]", pathname.includes("/consensus") ? "text-primary" : "text-muted-foreground")}>
+            <Brain size={22} />
+            <span className="text-xs font-medium">{t('main.consensus')}</span>
           </Link>
-          <Link href={`/${locale}/alerts`} className={cn("flex flex-col items-center gap-1", pathname.includes("/alerts") ? "text-primary" : "text-muted-foreground")}>
-            <Shield size={20} />
-            <span className="text-[10px] font-medium">{t('main.alerts')}</span>
+          <Link href={`/${locale}/alerts`} className={cn("flex flex-col items-center justify-center gap-0.5 min-h-[44px] min-w-[44px]", pathname.includes("/alerts") ? "text-primary" : "text-muted-foreground")}>
+            <Shield size={22} />
+            <span className="text-xs font-medium">{t('main.alerts')}</span>
           </Link>
-          <button 
+          <button
+            type="button"
             onClick={() => setMobileMenuOpen(true)}
-            className="flex flex-col items-center gap-1 text-muted-foreground"
+            className="flex flex-col items-center justify-center gap-0.5 min-h-[44px] min-w-[44px] text-muted-foreground"
           >
-            <MoreHorizontal size={20} />
-            <span className="text-[10px] font-medium">{t('common.menu')}</span>
+            <MoreHorizontal size={22} />
+            <span className="text-xs font-medium">{t('common.menu')}</span>
           </button>
         </div>
       </nav>
