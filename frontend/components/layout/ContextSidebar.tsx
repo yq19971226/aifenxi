@@ -1,16 +1,35 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { Activity, Server, Database, Wifi, Cpu, Clock } from "lucide-react";
-import { motion } from "framer-motion";
 import { fetchDashboardOverview } from "@/lib/api/dashboard";
+import { getDataSourceStatus } from "@/lib/api/datasources";
+import type { SymbolOverview } from "@/lib/api/dashboard";
 
 export function ContextSidebar() {
+  const t = useTranslations("common.sidebar");
   const { data: dashboardData } = useQuery({
     queryKey: ["dashboard-overview"],
     queryFn: fetchDashboardOverview,
     refetchInterval: 30000,
   });
+
+  const { data: dsStatus } = useQuery({
+    queryKey: ["datasources-status"],
+    queryFn: getDataSourceStatus,
+    refetchInterval: 30000,
+  });
+
+  const score = dsStatus?.domain_completeness ?? dsStatus?.completeness_score ?? 1;
+  const scorePercent = Math.round(score * 100);
+  const offlineExchanges = (dsStatus?.exchanges ?? []).filter(
+    (e) => e.enabled && (e.status === "error" || e.status === "stale")
+  );
+  const missingDomains = dsStatus?.missing_domains ?? [];
+  const dataFeedOk = scorePercent >= 100 && offlineExchanges.length === 0 && missingDomains.length === 0;
+  const dataFeedStatus = dataFeedOk ? "active" : "warning";
+  const dataFeedValue = dataFeedOk ? t("connected") : scorePercent >= 50 ? t("partial") : t("degraded");
 
   return (
     <div className="space-y-8">
@@ -18,49 +37,54 @@ export function ContextSidebar() {
       <section>
         <div className="flex items-center gap-2 mb-4 text-xs font-mono text-muted-foreground uppercase tracking-wider">
           <Activity size={12} />
-          <span>System Status</span>
+          <span>{t("systemStatus")}</span>
         </div>
         
         <div className="space-y-3">
           <StatusItem 
             icon={Server} 
-            label="NSED Engine" 
+            label={t("nsedEngine")} 
             status="active" 
-            value="Online" 
+            value={t("online")} 
           />
           <StatusItem 
             icon={Database} 
-            label="Data Feed" 
-            status="active" 
-            value="Connected" 
+            label={t("dataFeed")} 
+            status={dataFeedStatus} 
+            value={dataFeedValue} 
           />
           <StatusItem 
             icon={Cpu} 
-            label="Active Agents" 
+            label={t("activeAgents")} 
             status="active" 
-            value="11/11" 
+            value={t("agentsCount")} 
           />
           <StatusItem 
             icon={Wifi} 
-            label="Network Latency" 
+            label={t("networkLatency")} 
             status="active" 
-            value="45ms" 
+            value={t("latencyMs")} 
           />
         </div>
       </section>
 
-      {/* Watchlist Section */}
+      {/* Market Pulse: 数据来自 GET /api/dashboard/overview，每币种 latest_price 由 Redis latest_price:{symbol} 提供，无硬编码价格 */}
       <section>
         <div className="flex items-center gap-2 mb-4 text-xs font-mono text-muted-foreground uppercase tracking-wider">
           <Clock size={12} />
-          <span>Market Pulse</span>
+          <span>{t("marketPulse")}</span>
         </div>
         
         <div className="space-y-2">
           {(() => {
-            const symbolList = (dashboardData?.symbols ?? []).slice(0, 5).map((s) => s.symbol);
-            const displaySymbols = symbolList.length > 0 ? symbolList : ["BTCUSDT", "ETHUSDT", "SOLUSDT"];
-            return displaySymbols.map((symbol) => <WatchlistItem key={symbol} symbol={symbol} />);
+            const symbols = (dashboardData?.symbols ?? []).slice(0, 5);
+            const fallbackSymbols: SymbolOverview[] = [
+              { symbol: "BTCUSDT", display_name: "BTC", latest_price: null, direction: "neutral", confidence: 0, alert_level: "none", dealer_intent: "", collusion_detected: false, entry_low: null, entry_high: null, stop_loss: null, reasoning: "", targets: [], risk_reward_ratio: 0, is_worth_taking: false, strategy_updated_at: null },
+              { symbol: "ETHUSDT", display_name: "ETH", latest_price: null, direction: "neutral", confidence: 0, alert_level: "none", dealer_intent: "", collusion_detected: false, entry_low: null, entry_high: null, stop_loss: null, reasoning: "", targets: [], risk_reward_ratio: 0, is_worth_taking: false, strategy_updated_at: null },
+              { symbol: "SOLUSDT", display_name: "SOL", latest_price: null, direction: "neutral", confidence: 0, alert_level: "none", dealer_intent: "", collusion_detected: false, entry_low: null, entry_high: null, stop_loss: null, reasoning: "", targets: [], risk_reward_ratio: 0, is_worth_taking: false, strategy_updated_at: null },
+            ];
+            const list = symbols.length > 0 ? symbols : fallbackSymbols;
+            return list.map((item) => <WatchlistItem key={item.symbol} item={item} />);
           })()}
         </div>
       </section>
@@ -77,17 +101,25 @@ function StatusItem({ icon: Icon, label, status, value }: { icon: any, label: st
       </div>
       <div className="flex items-center gap-2">
         <span className="text-xs font-mono text-foreground">{value}</span>
-        <div className={`w-1.5 h-1.5 rounded-full ${status === 'active' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'bg-red-500'}`} />
+        <div className={`w-1.5 h-1.5 rounded-full ${
+          status === "active" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" :
+          status === "warning" ? "bg-amber-500" : "bg-red-500"
+        }`} />
       </div>
     </div>
   );
 }
 
-function WatchlistItem({ symbol }: { symbol: string }) {
-  // Mock data for visual structure - in real app would connect to price socket
-  const isUp = Math.random() > 0.5;
-  const change = (Math.random() * 5).toFixed(2);
-  
+function WatchlistItem({ item }: { item: SymbolOverview }) {
+  const { symbol, latest_price, direction } = item;
+  const priceStr = latest_price != null
+    ? `$${latest_price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    : "—";
+  const isLong = direction === "long";
+  const isShort = direction === "short";
+  const changeClass = isLong ? "text-bull" : isShort ? "text-bear" : "text-muted-foreground";
+  const changeLabel = isLong ? "+" : isShort ? "-" : "";
+
   return (
     <div className="group flex items-center justify-between p-3 rounded hover:bg-bg-surface border border-transparent hover:border-border transition-all cursor-pointer">
       <div className="flex items-center gap-3">
@@ -100,10 +132,10 @@ function WatchlistItem({ symbol }: { symbol: string }) {
         </div>
       </div>
       <div className="text-right">
-        <div className="text-sm font-mono">$64,230.50</div>
-        <div className={`text-[10px] font-mono ${isUp ? 'text-bull' : 'text-bear'}`}>
-          {isUp ? '+' : '-'}{change}%
-        </div>
+        <div className="text-sm font-mono">{priceStr}</div>
+        {(isLong || isShort) && (
+          <div className={`text-[10px] font-mono ${changeClass}`}>{changeLabel}—</div>
+        )}
       </div>
     </div>
   );

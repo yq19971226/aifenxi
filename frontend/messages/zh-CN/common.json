@@ -88,5 +88,19 @@
   "maintenance": "维护",
   "roleAdmin": "管理员",
   "roleOperator": "运营员",
-  "roleUser": "用户"
+  "roleUser": "用户",
+  "sidebar": {
+    "systemStatus": "系统状态",
+    "nsedEngine": "NSED 引擎",
+    "online": "在线",
+    "dataFeed": "数据源",
+    "connected": "已连接",
+    "partial": "部分连接",
+    "degraded": "降级",
+    "activeAgents": "活跃代理",
+    "agentsCount": "11/11",
+    "networkLatency": "网络延迟",
+    "latencyMs": "45ms",
+    "marketPulse": "市场脉搏"
+  }
 }

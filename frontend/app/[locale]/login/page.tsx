@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { ArrowRight, Loader2, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const locale = useLocale();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,7 +26,7 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      router.push("/dashboard");
+      router.push(`/${locale}/dashboard`);
     } catch (err) {
       setError("Invalid credentials. Please try again.");
     } finally {
@@ -57,7 +58,7 @@ export default function LoginPage() {
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Password</label>
-            <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <Link href={`/${locale}/forgot-password`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
               Forgot?
             </Link>
           </div>
@@ -86,7 +87,7 @@ export default function LoginPage() {
 
         <div className="text-center mt-6">
           <span className="text-sm text-muted-foreground">Don't have an account? </span>
-          <Link href="/register" className="text-sm font-medium text-foreground hover:underline underline-offset-4">
+          <Link href={`/${locale}/register`} className="text-sm font-medium text-foreground hover:underline underline-offset-4">
             Apply for access
           </Link>
         </div>

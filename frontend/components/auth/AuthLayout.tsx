@@ -2,17 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { LogoMark } from "@/components/ui/Logo";
 import { ArrowLeft } from "lucide-react";
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {
+  const locale = useLocale();
   return (
     <div className="min-h-screen grid lg:grid-cols-[40%_60%] bg-bg-primary">
       {/* Left: Form Area */}
       <div className="relative flex flex-col justify-center px-4 sm:px-12 lg:px-20 py-12 border-r border-border bg-bg-primary z-10">
         <div className="absolute top-8 left-8">
-          <Link href="/" className="flex items-center gap-2 group text-muted-foreground hover:text-foreground transition-colors">
+          <Link href={`/${locale}`} className="flex items-center gap-2 group text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-medium">Back</span>
           </Link>

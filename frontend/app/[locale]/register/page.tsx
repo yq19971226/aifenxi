@@ -3,12 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { ArrowRight, Loader2, AlertCircle } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const locale = useLocale();
   const { register } = useAuth(); // Assuming register function exists in auth-context
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -35,7 +37,7 @@ export default function RegisterPage() {
       // await register(username, email, password); 
       // For now, redirect to login as "Application Received" simulation
       await new Promise(resolve => setTimeout(resolve, 1500));
-      router.push("/login?registered=true");
+      router.push(`/${locale}/login?registered=true`);
     } catch (err) {
       setError("Registration failed. Please try again.");
     } finally {
@@ -114,7 +116,7 @@ export default function RegisterPage() {
 
         <div className="text-center mt-6">
           <span className="text-sm text-muted-foreground">Already have an account? </span>
-          <Link href="/login" className="text-sm font-medium text-foreground hover:underline underline-offset-4">
+          <Link href={`/${locale}/login`} className="text-sm font-medium text-foreground hover:underline underline-offset-4">
             Login
           </Link>
         </div>

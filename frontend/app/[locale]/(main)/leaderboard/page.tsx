@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { Trophy, BarChart2, History, AlertCircle } from "lucide-react";
 import {
@@ -31,6 +31,7 @@ type LeaderboardMode = (typeof MODE_KEYS)[number];
 
 export default function LeaderboardPage() {
   const t = useTranslations('leaderboard');
+  const locale = useLocale();
   const { getState } = useFeatureFlags();
   const [period, setPeriod] = useState<LeaderboardPeriod>("7d");
   const [mode, setMode] = useState<LeaderboardMode>("all");
@@ -97,7 +98,7 @@ export default function LeaderboardPage() {
           </div>
         </div>
         <Link
-          href="/performance"
+          href={`/${locale}/performance`}
           className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
         >
           <BarChart2 size={14} />

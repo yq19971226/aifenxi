@@ -29,7 +29,7 @@ export function TopNav() {
     <>
       {/* Mobile Top Bar */}
       <header className="md:hidden sticky top-0 z-50 flex h-14 w-full items-center justify-between border-b border-border bg-bg-primary/95 backdrop-blur-md px-4">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href={`/${locale}`} className="flex items-center gap-2">
           <LogoMark className="h-6 w-6 text-primary" />
           <span className="font-bold tracking-tight text-sm">AXIOM</span>
         </Link>

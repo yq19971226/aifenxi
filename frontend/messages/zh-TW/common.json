@@ -88,5 +88,19 @@
   "maintenance": "維護",
   "roleAdmin": "管理員",
   "roleOperator": "營運員",
-  "roleUser": "使用者"
+  "roleUser": "使用者",
+  "sidebar": {
+    "systemStatus": "系統狀態",
+    "nsedEngine": "NSED 引擎",
+    "online": "在線",
+    "dataFeed": "資料來源",
+    "connected": "已連線",
+    "partial": "部分連線",
+    "degraded": "降級",
+    "activeAgents": "活躍代理",
+    "agentsCount": "11/11",
+    "networkLatency": "網路延遲",
+    "latencyMs": "45ms",
+    "marketPulse": "市場脈搏"
+  }
 }

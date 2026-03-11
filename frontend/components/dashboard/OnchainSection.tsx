@@ -3,7 +3,7 @@
 import { useQueries } from "@tanstack/react-query";
 import { BarChart3, Lock, TrendingUp, Activity, Layers } from "lucide-react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import type { PlanCapabilities } from "@/lib/api/onchain";
 import { fetchOnchainData } from "@/lib/api/onchain";
 
@@ -34,6 +34,7 @@ interface OnchainSectionProps {
 
 export function OnchainSection({ symbol, capabilities }: OnchainSectionProps) {
   const t = useTranslations('onchain');
+  const locale = useLocale();
   const accessibleMetrics = capabilities?.metrics ?? [];
   const hasSymbolAccess = capabilities?.symbols?.some(
     (s) => s.toUpperCase() === symbol.toUpperCase()
@@ -66,7 +67,7 @@ export function OnchainSection({ symbol, capabilities }: OnchainSectionProps) {
           <Lock size={14} className="text-zinc-500" />
           <p className="text-xs text-zinc-500">{t('noAccess.message')}</p>
           <Link
-            href="/settings/membership"
+            href={`/${locale}/settings/membership`}
             className="text-xs text-accent hover:underline"
             onClick={(e) => e.stopPropagation()}
           >

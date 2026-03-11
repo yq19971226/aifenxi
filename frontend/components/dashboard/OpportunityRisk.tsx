@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import {
   Crosshair,
@@ -20,6 +21,7 @@ const ALERT_CONFIG: Record<string, { label: string; color: string; dot: string }
 };
 
 export function OpportunityRank({ symbols }: { symbols: SymbolOverview[] }) {
+  const locale = useLocale();
   const opportunities = symbols
     .filter((s) => s.is_worth_taking && s.direction !== "neutral")
     .sort((a, b) => b.risk_reward_ratio - a.risk_reward_ratio);
@@ -46,7 +48,7 @@ export function OpportunityRank({ symbols }: { symbols: SymbolOverview[] }) {
               transition={{ duration: 0.2, delay: idx * 0.05 }}
             >
               <Link
-                href={`/consensus?symbol=${item.symbol}`}
+                href={`/${locale}/consensus?symbol=${item.symbol}`}
                 className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-white/[0.03] transition-colors group"
               >
                 <div className="min-w-0">
@@ -93,6 +95,7 @@ export function OpportunityRank({ symbols }: { symbols: SymbolOverview[] }) {
 }
 
 export function RiskRadar({ symbols }: { symbols: SymbolOverview[] }) {
+  const locale = useLocale();
   return (
     <div className="card p-5 h-full">
       <div className="flex items-center gap-2 mb-4">
@@ -114,7 +117,7 @@ export function RiskRadar({ symbols }: { symbols: SymbolOverview[] }) {
                 transition={{ duration: 0.2, delay: idx * 0.04 }}
               >
                 <Link
-                  href={`/consensus?symbol=${item.symbol}`}
+                  href={`/${locale}/consensus?symbol=${item.symbol}`}
                   className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-white/[0.03] transition-colors group"
                 >
                   <div className="flex items-center gap-2.5">

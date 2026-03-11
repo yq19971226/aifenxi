@@ -88,5 +88,19 @@
   "maintenance": "Maintenance",
   "roleAdmin": "Admin",
   "roleOperator": "Operator",
-  "roleUser": "User"
+  "roleUser": "User",
+  "sidebar": {
+    "systemStatus": "System Status",
+    "nsedEngine": "NSED Engine",
+    "online": "Online",
+    "dataFeed": "Data Feed",
+    "connected": "Connected",
+    "partial": "Partial",
+    "degraded": "Degraded",
+    "activeAgents": "Active Agents",
+    "agentsCount": "11/11",
+    "networkLatency": "Network Latency",
+    "latencyMs": "45ms",
+    "marketPulse": "Market Pulse"
+  }
 }

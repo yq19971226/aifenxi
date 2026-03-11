@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
   ArrowLeft,
   Lightbulb,
@@ -369,6 +369,7 @@ function FAQSection() {
 
 export function GuideContent() {
   const t = useTranslations("guide.nav");
+  const locale = useLocale();
   const [activeSection, setActiveSection] = useState("quickStart");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -409,7 +410,7 @@ export function GuideContent() {
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-4">
             <Link
-              href="/"
+              href={`/${locale}`}
               className="flex items-center gap-2 text-zinc-500 hover:text-zinc-300 transition-colors"
             >
               <LogoMark size={20} />
@@ -425,7 +426,7 @@ export function GuideContent() {
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
             <Link
-              href="/"
+              href={`/${locale}`}
               className="hidden sm:inline-flex text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
             >
               <ArrowLeft size={14} className="mr-1.5" />

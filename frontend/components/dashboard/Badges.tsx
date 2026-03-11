@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
   TrendingUp,
   TrendingDown,
@@ -105,6 +105,7 @@ export function OnchainBadge({
   capabilities: PlanCapabilities["user_capabilities"] | null;
 }) {
   const t = useTranslations('onchain');
+  const locale = useLocale();
   const hasAccess = capabilities?.symbols?.some(
     (s) => s.toUpperCase() === symbol.toUpperCase()
   );
@@ -129,7 +130,7 @@ export function OnchainBadge({
 
   return (
     <Link
-      href="/settings/membership"
+      href={`/${locale}/settings/membership`}
       className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-400 transition-colors"
       onClick={(e) => e.stopPropagation()}
     >

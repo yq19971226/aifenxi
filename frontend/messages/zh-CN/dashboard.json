@@ -5,6 +5,25 @@
   "guideBanner": "第一次用？花两分钟看看使用指南，快速上手。",
   "guideBannerLink": "查看指南",
   "onlineLabel": "人在线",
+  "commandCenter": "指挥中心",
+  "welcomeBack": "欢迎回来",
+  "credits": "积分",
+  "rank": "排名",
+  "topPercent": "前 5%",
+  "liveAnalysisFeed": "全币种规则研判",
+  "autoRefreshHint": "后台每 30 秒自动刷新，按规则引擎展示",
+  "noActiveSessions": "暂无概览数据，请确保已启用币种并稍后刷新。",
+  "ruleVerdict": {
+    "opportunity": "可操作",
+    "risk": "风险",
+    "neutral": "观望"
+  },
+  "goConsensus": "深度分析",
+  "noSymbolsHint": "请在后台「币种管理」中启用交易对，概览将基于规则引擎展示研判结果（不调用分析 API）。",
+  "initializingEngine": "正在初始化 NSED 引擎…",
+  "connectionFailed": "系统连接失败",
+  "connectionFailedDesc": "无法与分析节点建立安全连接。",
+  "retryConnection": "重试连接",
   "error": {
     "loadFailed": "加载失败",
     "fetchFailed": "获取概览数据失败，30s 后自动重试"

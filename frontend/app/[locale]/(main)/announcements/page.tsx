@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import {
   BellRing,
@@ -61,6 +61,7 @@ function getEventMeta(item: AnnouncementHistoryItem, t: (key: string) => string)
 
 function AnnouncementHistoryCard({ item, index }: { item: AnnouncementHistoryItem; index: number }) {
   const t = useTranslations('announcements');
+  const locale = useLocale();
   const eventMeta = getEventMeta(item, t);
   const EventIcon = eventMeta.icon;
 
@@ -118,7 +119,7 @@ function AnnouncementHistoryCard({ item, index }: { item: AnnouncementHistoryIte
 
         <div className="flex shrink-0 items-center gap-2">
           <Link
-            href="/dashboard"
+            href={`/${locale}/dashboard`}
             className="btn-ghost inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs"
           >
             <ExternalLink size={13} />

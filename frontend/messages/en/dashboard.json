@@ -5,6 +5,25 @@
   "guideBanner": "First time here? Check out the guide to get started in 2 minutes.",
   "guideBannerLink": "View Guide",
   "onlineLabel": "online",
+  "commandCenter": "Command Center",
+  "welcomeBack": "Welcome back",
+  "credits": "Credits",
+  "rank": "Rank",
+  "topPercent": "Top 5%",
+  "liveAnalysisFeed": "Rule-based overview",
+  "autoRefreshHint": "Auto-refresh every 30s in background, rule engine display",
+  "noActiveSessions": "No overview data yet. Enable symbols and refresh.",
+  "ruleVerdict": {
+    "opportunity": "Opportunity",
+    "risk": "Risk",
+    "neutral": "Neutral"
+  },
+  "goConsensus": "Deep analysis",
+  "noSymbolsHint": "Enable symbols in admin to see rule-based verdicts (no analysis API).",
+  "initializingEngine": "Initializing NSED Engine…",
+  "connectionFailed": "System Connection Failed",
+  "connectionFailedDesc": "Unable to establish secure link with analysis nodes.",
+  "retryConnection": "Retry Connection",
   "error": {
     "loadFailed": "Load Failed",
     "fetchFailed": "Failed to fetch overview data, will retry in 30s"

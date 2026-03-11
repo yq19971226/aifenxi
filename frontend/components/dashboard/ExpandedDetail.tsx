@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import { Target, Shield, Zap, Brain, Activity, Clock } from "lucide-react";
 import { PositionSummary } from "@/components/trade/PositionSummary";
@@ -16,6 +19,7 @@ interface ExpandedDetailProps {
 }
 
 export function ExpandedDetail({ item, capabilities = null }: ExpandedDetailProps) {
+  const locale = useLocale();
   const { formatDateTime } = useDateFormatter();
   const { formatNumber } = useNumberFormatter();
   
@@ -115,7 +119,7 @@ export function ExpandedDetail({ item, capabilities = null }: ExpandedDetailProp
                 </div>
                 <div className="flex gap-2">
                   <Link
-                    href={`/consensus?symbol=${item.symbol}`}
+                    href={`/${locale}/consensus?symbol=${item.symbol}`}
                     className="btn-primary flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg"
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -123,7 +127,7 @@ export function ExpandedDetail({ item, capabilities = null }: ExpandedDetailProp
                     {"综合分析"}
                   </Link>
                   <Link
-                    href={`/playbook-sim?symbol=${item.symbol}`}
+                    href={`/${locale}/playbook-sim?symbol=${item.symbol}`}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-white/[0.08] text-zinc-300 hover:bg-white/[0.04] transition-colors"
                     onClick={(e) => e.stopPropagation()}
                   >
