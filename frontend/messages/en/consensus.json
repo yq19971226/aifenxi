@@ -54,8 +54,27 @@
   "minority": {
     "title": "Minority Warnings"
   },
+  "tabs": {
+    "agents": "Consensus",
+    "structure": "Structure",
+    "adversarial": "AI Duel"
+  },
   "empty": {
-    "message": "Select analysis mode, click 'Start Analysis' to get AI report"
+    "message": "Consensus engine ready",
+    "subtitle": "Select symbol and mode, then click above button to start"
+  },
+  "progress": {
+    "preparing": "Initializing",
+    "connecting": "Connecting to analysis engine...",
+    "entering": "Entering workspace...",
+    "collecting": "Data Collection",
+    "collectingDesc": "Gathering multi-dim market data...",
+    "analyzing": "Expert Analysis",
+    "analyzingGeneral": "Agents",
+    "wait": "Please wait...",
+    "synthesis": "Synthesis",
+    "synthesisDesc": "Consolidating expert conclusions...",
+    "team": "EXPERT TEAM"
   },
   "card": {
     "consensus": "Consensus",
@@ -70,7 +89,93 @@
     "updated": "Sync Time",
     "engine": "Axiom v4 Protocol",
     "id": "ID",
-    "perp": "PERP"
+    "perp": "PERP",
+    "detailedData": "Detailed Data",
+    "share": "Share",
+    "deepAnalysis": "DEEP ANALYSIS",
+    "confidence": "Confidence",
+    "noData": "No Data",
+    "latency": "LATENCY",
+    "decision": "DECISION",
+    "score": "SCORE",
+    "riskReward": "Risk/Reward",
+    "entryZone": "Entry Zone",
+    "entryRange": "Entry Range",
+    "stopLoss": "Stop Loss",
+    "safetyLevel": "Safety Level",
+    "validUntil": "Valid Until",
+    "source": "Source",
+    "tpTargets": "TP Targets",
+    "initialResistance": "Initial Resistance",
+    "secondaryExtension": "Secondary Extension",
+    "trendObjective": "Trend Objective",
+    "activeTracking": "Active Tracking"
+  },
+  "renderers": {
+    "adversarial": {
+      "intent": "Strategic Intent",
+      "intentSubtitle": "DEALER INTENT",
+      "forecast": "Tactical Forecast",
+      "forecastSubtitle": "PREDICTED MOVES",
+      "prob": "PROB",
+      "dangerZone": "Danger Zone",
+      "safeZone": "Safe Zone",
+      "dangerSubtitle": "DANGER",
+      "safeSubtitle": "SAFETY",
+      "counterPlan": "Counter-Defense Plan",
+      "counterPlanSubtitle": "REACTION PROTOCOL"
+    },
+    "collusion": {
+      "title": "Collusion Detection Cycle",
+      "titleSubtitle": "COLLUSION ANALYSIS CYCLE",
+      "detected": "COLLUSION DETECTED",
+      "notDetected": "NO COLLUSION FOUND",
+      "riskLevel": "Risk Level",
+      "patterns": "Detected Clusters",
+      "patternsSubtitle": "PATTERNS",
+      "entities": "Entities",
+      "vol": "Vol",
+      "washTrading": "Wash Trading Indicators",
+      "washTradingSubtitle": "WASH TRADING",
+      "whaleSync": "Whale Coordination",
+      "whaleSyncSubtitle": "WHALE SYNC",
+      "syncMovement": "Synchronized Movement",
+      "netDirection": "Net Dynamic Direction",
+      "statusActive": "Active",
+      "statusStable": "Stable",
+      "desc": "Current on-chain addresses and order flow show no high-overlap synchronization.",
+      "footer": "Cryptographic Consensus Enforcement Enabled"
+    },
+    "playbook": {
+      "title": "Playbook Match",
+      "titleSubtitle": "PLAYBOOK MATCH",
+      "stage": "Stage",
+      "nextMove": "Next Move",
+      "nextMoveSubtitle": "NEXT MOVE",
+      "distribution": "Probability Distribution",
+      "distributionSubtitle": "PROBABILITY DISTRIBUTION",
+      "probabilityDistribution": "Probability Distribution",
+      "counterStrategy": "Counter Strategy",
+      "counterStrategySubtitle": "COUNTER STRATEGY",
+      "entry": "Entry Trigger",
+      "stopLoss": "Invalid At",
+      "tp1": "TP1 Target",
+      "tp2": "TP2 Target",
+      "waitSignal": "Wait Signal",
+      "riskWarning": "Risk Profile",
+      "phases": {
+        "accumulation": "Accumulation",
+        "markup": "Markup",
+        "distribution": "Distribution",
+        "markdown": "Markdown",
+        "escape": "Escape"
+      },
+      "risks": {
+        "aggressive": "Aggressive",
+        "moderate": "Moderate",
+        "conservative": "Conservative"
+      }
+    }
   },
   "flow": {
     "coreAnalysis": "Core AI Analysis",

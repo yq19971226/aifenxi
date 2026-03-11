@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 
 import type { ProgressEvent, ProgressStatus } from "@/lib/api/analysis";
+import { useTranslations } from "next-intl";
 import { localizeText } from "./helpers";
 
 // ── Types ────────────────────────────────────────────────────
@@ -143,38 +144,37 @@ function useElapsedTime(startTime: number | undefined) {
   return elapsed;
 }
 
-// ── Phase text mapping ──────────────────────────────────────
-
-function getPhaseText(steps: ProgressEvent[]): { title: string; subtitle: string } {
+// ── Phase text fetching component (helper) ──
+function getPhaseLabel(steps: ProgressEvent[], t: any): { title: string; subtitle: string } {
   const len = steps.length;
   const completedCount = steps.filter(s => s.status === "completed").length;
   const hasRunning = steps.some(s => s.status === "running");
 
-  if (len === 0) return { title: "准备启动", subtitle: "正在连接分析引擎..." };
+  if (len === 0) return { title: t("progress.preparing"), subtitle: t("progress.connecting") };
 
   // Early initialization phase
   if (len <= 3 && completedCount <= 2) {
-    return { title: "准备启动", subtitle: "进入分析工作区..." };
+    return { title: t("progress.preparing"), subtitle: t("progress.entering") };
   }
 
   // Data collection phase
   if (completedCount <= 5) {
-    return { title: "数据采集中", subtitle: "正在收集多维市场数据..." };
+    return { title: t("progress.collecting"), subtitle: t("progress.collectingDesc") };
   }
 
   // Agents running phase
   if (hasRunning) {
     const runningStep = steps.find(s => s.status === "running");
-    const agentName = runningStep?.step || "智能体";
-    return { title: "专家分析中", subtitle: `${agentName}` };
+    const agentName = runningStep?.step || t("progress.analyzingGeneral");
+    return { title: t("progress.analyzing"), subtitle: `${agentName}` };
   }
 
   // Final synthesis
   if (completedCount > 8) {
-    return { title: "生成共识", subtitle: "综合各专家结论..." };
+    return { title: t("progress.synthesis"), subtitle: t("progress.synthesisDesc") };
   }
 
-  return { title: "分析中", subtitle: "请稍候..." };
+  return { title: t("progress.analyzingGeneral"), subtitle: t("progress.wait") };
 }
 
 // ── Circular Spinner SVG ────────────────────────────────────
@@ -241,13 +241,14 @@ function OrbitalSpinner({ progress }: { progress: number }) {
 // ── Main Component ──────────────────────────────────────────
 
 export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
+  const t = useTranslations("consensus");
   const bottomRef = useRef<HTMLDivElement>(null);
   const elapsed = useElapsedTime(startTime);
 
   const completedCount = steps.filter((s) => s.status === "completed").length;
   const totalCount = Math.max(steps.length, 1);
   const progressPct = Math.min((completedCount / totalCount) * 100, 100);
-  const phase = getPhaseText(steps);
+  const phase = getPhaseLabel(steps, t);
 
   const lastStepStatus = steps[steps.length - 1]?.status;
 
@@ -343,7 +344,7 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
       {/* ── Expert Team Status Bar ── */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-white/[0.04] bg-white/[0.01] overflow-x-auto">
         <Bot size={12} className="text-zinc-600 shrink-0" />
-        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 shrink-0 mr-1">TEAM</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 shrink-0 mr-1">{t("progress.team")}</span>
         {Object.entries(AGENT_ICONS).slice(0, 8).map(([name, { icon: Icon, color }]) => {
           const isActive = steps.some(s => s.step.includes(name) && s.status === 'running');
           const isDone = steps.some(s => s.step.includes(name) && s.status === 'completed');

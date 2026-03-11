@@ -11,6 +11,7 @@ import {
   Lock,
   Search
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { localizeText } from "./helpers";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +37,8 @@ interface CollusionData {
 }
 
 export function CollusionRenderer({ data }: { data: CollusionData }) {
+  const t = useTranslations("consensus");
+
   const riskColor = {
     none: "text-zinc-500 border-zinc-500/20 bg-zinc-500/5",
     low: "text-blue-400 border-blue-500/20 bg-blue-500/5",
@@ -63,20 +66,20 @@ export function CollusionRenderer({ data }: { data: CollusionData }) {
           <div className="flex items-center gap-2 mb-3">
              <Fingerprint size={16} className="animate-pulse" />
              <h4 className="text-[10px] font-black uppercase tracking-[0.3em]">
-               网络合谋检测周期 / COLLUSION ANALYSIS CYCLE
+               {t("renderers.collusion.title")} / {t("renderers.collusion.titleSubtitle")}
              </h4>
           </div>
           
           <div className="flex items-baseline gap-3">
             <span className="text-2xl font-black tracking-tight uppercase">
-              {data.collusion_detected ? "检测到协同操纵" : "未发现合谋迹象"}
+              {data.collusion_detected ? t("renderers.collusion.detected") : t("renderers.collusion.notDetected")}
             </span>
-            <span className="text-xs opacity-60 font-mono">Risk Level: {data.risk_level.toUpperCase()}</span>
+            <span className="text-xs opacity-60 font-mono">{t("renderers.collusion.riskLevel")}: {data.risk_level.toUpperCase()}</span>
           </div>
 
           {!data.collusion_detected && (
              <p className="mt-2 text-xs opacity-70 leading-relaxed">
-               当前链上地址与订单流未见高度重合的同步行为，多方协同概率处于基准线以下。
+               {t("renderers.collusion.desc")}
              </p>
           )}
         </div>
@@ -91,7 +94,7 @@ export function CollusionRenderer({ data }: { data: CollusionData }) {
       {data.patterns && data.patterns.length > 0 && (
         <div className="space-y-3">
           <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
-            <Link2 size={12} /> 已识别协同模式 / DETECTED CLUSTERS
+            <Link2 size={12} /> {t("renderers.collusion.patterns")} / {t("renderers.collusion.patternsSubtitle")}
           </h4>
           <div className="grid grid-cols-1 gap-3">
             {data.patterns.map((pattern, idx) => (
@@ -112,7 +115,7 @@ export function CollusionRenderer({ data }: { data: CollusionData }) {
                         {localizeText(pattern.pattern_type)}
                       </span>
                       <span className="text-[9px] text-zinc-500 font-mono uppercase tracking-tighter">
-                        ENTITIES: {pattern.involved_entities} • VOL: {pattern.estimated_volume}
+                        {t("renderers.collusion.entities").toUpperCase()}: {pattern.involved_entities} • {t("renderers.collusion.vol").toUpperCase()}: {pattern.estimated_volume}
                       </span>
                     </div>
                   </div>
@@ -147,7 +150,7 @@ export function CollusionRenderer({ data }: { data: CollusionData }) {
         {data.wash_trading_indicators && (
           <div className="rounded-lg border border-white/[0.05] bg-white/[0.02] p-4">
             <h5 className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-3 flex items-center gap-1.5">
-              <Share2 size={10} /> 对倒交易特征 / WASH TRADING
+              <Share2 size={10} /> {t("renderers.collusion.washTrading")} / {t("renderers.collusion.washTradingSubtitle")}
             </h5>
             <div className="space-y-2">
               {Object.entries(data.wash_trading_indicators).map(([key, val]) => (
@@ -167,21 +170,21 @@ export function CollusionRenderer({ data }: { data: CollusionData }) {
         {data.whale_coordination && (
           <div className="rounded-lg border border-white/[0.05] bg-white/[0.02] p-4">
             <h5 className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-3 flex items-center gap-1.5">
-               <Database size={10} /> 巨鲸联动状态 / WHALE SYNC
+               <Database size={10} /> {t("renderers.collusion.whaleSync")} / {t("renderers.collusion.whaleSyncSubtitle")}
             </h5>
             <div className="space-y-3">
                <div className="flex justify-between text-xs">
-                 <span className="text-zinc-500">同步运动检测</span>
+                 <span className="text-zinc-500">{t("renderers.collusion.syncMovement")}</span>
                  <span className={cn("font-bold font-mono", data.whale_coordination.synchronized_movements ? "text-emerald-400" : "text-zinc-600")}>
-                    {data.whale_coordination.synchronized_movements ? "ACTIVE" : "STABLE"}
+                    {data.whale_coordination.synchronized_movements ? t("renderers.collusion.statusActive").toUpperCase() : t("renderers.collusion.statusStable").toUpperCase()}
                  </span>
                </div>
                <div className="flex justify-between text-xs">
-                 <span className="text-zinc-500">净动态方向</span>
+                 <span className="text-zinc-500">{t("renderers.collusion.netDirection")}</span>
                  <span className="text-zinc-300 font-bold uppercase">{localizeText(data.whale_coordination.direction)}</span>
                </div>
                <div className="pt-2 border-t border-white/[0.03] flex justify-between items-end">
-                  <span className="text-[10px] text-zinc-600 uppercase font-mono">涉及实体数量</span>
+                  <span className="text-[10px] text-zinc-600 uppercase font-mono">{t("renderers.collusion.entities")}</span>
                   <span className="text-xl font-black font-mono leading-none">{data.whale_coordination.entity_count}</span>
                </div>
             </div>
@@ -193,7 +196,7 @@ export function CollusionRenderer({ data }: { data: CollusionData }) {
       <div className="flex items-center justify-center gap-2 pt-2 border-t border-white/[0.02]">
          <Lock size={10} className="text-zinc-700" />
          <span className="text-[9px] text-zinc-700 uppercase tracking-[0.2em] font-medium">
-           Cryptographic Consensus Enforcement Enabled
+           {t("renderers.collusion.footer")}
          </span>
       </div>
     </div>

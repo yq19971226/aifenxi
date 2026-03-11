@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { AlertTriangle, ShieldCheck, Target, Zap, TrendingDown, TrendingUp, Skull } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { localizeText } from "./helpers";
 
 interface AdversarialMove {
@@ -21,6 +22,8 @@ interface AdversarialData {
 }
 
 export function AdversarialRenderer({ data }: { data: AdversarialData }) {
+  const t = useTranslations("consensus");
+
   return (
     <div className="space-y-6 relative">
       {/* ── Combat Background Overlay ── */}
@@ -40,9 +43,9 @@ export function AdversarialRenderer({ data }: { data: AdversarialData }) {
             <Skull size={100} className="text-red-500" />
           </div>
           
-          <h4 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-red-500 mb-3 animate-glitch">
+          <h4 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-red-500 mb-3 animate-glitch">
             <AlertTriangle size={14} className="animate-pulse" />
-            庄家核心意图 / STRATEGIC INTENT
+            {t("renderers.adversarial.intent")} / {t("renderers.adversarial.intentSubtitle")}
           </h4>
           
           <p className="relative z-10 text-lg font-black text-white leading-tight tracking-tight">
@@ -60,7 +63,7 @@ export function AdversarialRenderer({ data }: { data: AdversarialData }) {
       {data.predicted_moves && data.predicted_moves.length > 0 && (
         <div className="space-y-3">
           <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest pl-1">
-            下阶段推演 / Tactical Forecast
+            {t("renderers.adversarial.forecast")} / {t("renderers.adversarial.forecastSubtitle")}
           </h4>
           <div className="grid grid-cols-1 gap-2">
             {data.predicted_moves.map((move, idx) => (
@@ -70,7 +73,7 @@ export function AdversarialRenderer({ data }: { data: AdversarialData }) {
               >
                 <div className="flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-md border border-red-500/30 bg-red-500/10 text-red-400">
                   <span className="text-[10px] font-black leading-none">{(move.probability * 100).toFixed(0)}%</span>
-                  <span className="mt-0.5 text-[8px] opacity-60">PROB</span>
+                  <span className="mt-0.5 text-[8px] opacity-60 uppercase">{t("renderers.adversarial.prob")}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -105,7 +108,7 @@ export function AdversarialRenderer({ data }: { data: AdversarialData }) {
         {data.danger_zones && data.danger_zones.length > 0 && (
           <div className="space-y-2">
             <h4 className="flex items-center gap-1.5 text-[10px] font-bold text-red-500/80 uppercase tracking-widest">
-              <TrendingDown size={12} /> 风险区 / Danger
+              <TrendingDown size={12} /> {t("renderers.adversarial.dangerZone")} / {t("renderers.adversarial.dangerSubtitle")}
             </h4>
             <div className="flex flex-wrap gap-1.5">
               {data.danger_zones.map((zone, i) => (
@@ -119,7 +122,7 @@ export function AdversarialRenderer({ data }: { data: AdversarialData }) {
         {data.safe_zones && data.safe_zones.length > 0 && (
           <div className="space-y-2">
             <h4 className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-500/80 uppercase tracking-widest">
-              <TrendingUp size={12} /> 安全区 / Safety
+              <TrendingUp size={12} /> {t("renderers.adversarial.safeZone")} / {t("renderers.adversarial.safeSubtitle")}
             </h4>
             <div className="flex flex-wrap gap-1.5">
               {data.safe_zones.map((zone, i) => (
@@ -137,7 +140,7 @@ export function AdversarialRenderer({ data }: { data: AdversarialData }) {
         <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4">
           <h4 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 mb-3">
             <ShieldCheck size={14} />
-            反制防御计划 / Counter-Defense Plan
+            {t("renderers.adversarial.counterPlan")} / {t("renderers.adversarial.counterPlanSubtitle")}
           </h4>
           <ul className="space-y-2">
             {data.defense_plan.map((item, i) => (

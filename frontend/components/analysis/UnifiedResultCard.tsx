@@ -58,7 +58,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
     label: t("signals.neutral")
   };
 
-  const confidenceValue = Math.round((report.confidence ?? 0) * 100);
+  const confidenceValue = Math.min(95, Math.round((report.confidence ?? 0) * 100));
   const confidence = confidenceValue.toString();
   const { avgConf } = useConsensusData(report.sections);
 
@@ -87,13 +87,13 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
                 {report.symbol}
               </h3>
               <span className="text-[10px] text-zinc-500 px-1.5 py-0.5 rounded border border-white/[0.06] bg-white/[0.02] font-bold uppercase tracking-widest">
-                PERPETUAL
+                {t("card.perp")}
               </span>
             </div>
             <div className="flex items-center gap-2 text-xs text-zinc-500 mt-1">
               <span className="bg-zinc-800/50 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">{modeLabel(report.mode)}</span>
               <span className="opacity-30">•</span>
-              <span className="font-mono text-[10px] opacity-70">LATENCY: {(report.execution_time_ms / 1000).toFixed(2)}s</span>
+              <span className="font-mono text-[10px] opacity-70">{t("card.latency").toUpperCase()}: {(report.execution_time_ms / 1000).toFixed(2)}s</span>
             </div>
           </div>
         </div>
@@ -107,12 +107,12 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
         )}>
           <signalConfig.icon size={18} strokeWidth={3} className="animate-pulse" />
           <div className="flex flex-col leading-none">
-            <span className="text-xs opacity-70 mb-0.5">DECISION</span>
+            <span className="text-xs opacity-70 mb-0.5">{t("card.decision").toUpperCase()}</span>
             <span className="text-base">{signalConfig.label}</span>
           </div>
           <div className="h-8 w-px bg-current opacity-20 mx-1" />
           <div className="flex flex-col leading-none">
-            <span className="text-xs opacity-70 mb-0.5">SCORE</span>
+            <span className="text-xs opacity-70 mb-0.5">{t("card.score").toUpperCase()}</span>
             <span className="text-base font-mono">{confidence}%</span>
           </div>
         </div>
@@ -127,21 +127,21 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
           fontMono
         />
         <MetricItem
-          label="Risk/Reward"
+          label={t("card.riskReward")}
           value={report.strategy?.risk_reward_ratio ? `${report.strategy.risk_reward_ratio}` : "—"}
-          sub="R:R Ratio"
+          sub={t("card.riskReward")}
           fontMono
         />
         <MetricItem
-          label="Entry Zone"
+          label={t("card.entryZone")}
           value={report.strategy?.entry_low ? `${formatPrice(report.strategy.entry_low)} - ${formatPrice(report.strategy.entry_high)}` : "—"}
-          sub="Entry Range"
+          sub={t("card.entryRange")}
           fontMono
         />
         <MetricItem
-          label="Stop-Loss"
+          label={t("card.stopLoss")}
           value={formatPrice(report.strategy?.stop_loss)}
-          sub="Safety Level"
+          sub={t("card.safetyLevel")}
           valueColor="text-bear"
           fontMono
         />
@@ -158,7 +158,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
             </h4>
             <div className="bg-white/[0.02] border border-white/[0.05] p-4 rounded-lg">
               <p className="text-sm leading-relaxed text-zinc-300 whitespace-pre-wrap">
-                {report.strategy?.reasoning || "Analyzing market conditions..."}
+                {report.strategy?.reasoning || t("progress.analyzing")}
               </p>
             </div>
           </div>
@@ -166,7 +166,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                <Shield size={10} /> Valid Until
+                <Shield size={10} /> {t("card.validUntil")}
               </p>
               <p className="text-xs font-mono text-zinc-400">
                 {report.strategy?.valid_until ? new Date(report.strategy.valid_until).toLocaleString() : "—"}
@@ -174,7 +174,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
             </div>
             <div>
               <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                <Database size={10} /> Source
+                <Database size={10} /> {t("card.source")}
               </p>
               <p className="text-xs font-mono text-zinc-400">
                 Axiom Swarm • Epoch V5
@@ -187,7 +187,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
         <div className="bg-zinc-950/50 rounded-xl border border-white/[0.05] p-5 flex flex-col justify-between">
            <div>
              <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4">
-               Take-Profit Targets
+               {t("card.tpTargets")}
              </h4>
              <div className="space-y-4">
                {report.strategy?.targets?.map((target: number, idx: number) => (
@@ -201,11 +201,11 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
                      {formatPrice(target)}
                    </div>
                    <p className="text-[8px] text-zinc-500 uppercase mt-1">
-                     {idx === 0 ? "Initial Resistance" : idx === 1 ? "Secondary Extension" : "Trend Objective"}
+                     {idx === 0 ? t("card.initialResistance") : idx === 1 ? t("card.secondaryExtension") : t("card.trendObjective")}
                    </p>
                  </div>
                )) || (
-                 <div className="text-xs text-zinc-700 italic">No targets defined</div>
+                 <div className="text-xs text-zinc-700 italic">{t("card.noData")}</div>
                )}
              </div>
            </div>
@@ -213,11 +213,11 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
            <div className="mt-6 pt-4 border-t border-white/[0.05]">
               <div className="flex justify-between items-end">
                 <div>
-                  <p className="text-[9px] text-zinc-600 uppercase font-bold mb-1">Status</p>
-                  <p className="text-xs font-mono text-emerald-500 uppercase tracking-widest">Active Tracking</p>
+                  <p className="text-[9px] text-zinc-600 uppercase font-bold mb-1">{t("card.assessment")}</p>
+                  <p className="text-xs font-mono text-emerald-500 uppercase tracking-widest">{t("card.activeTracking")}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[9px] text-zinc-600 uppercase font-bold mb-1">Confidence</p>
+                  <p className="text-[9px] text-zinc-600 uppercase font-bold mb-1">{t("card.confidence")}</p>
                   <div className="flex items-center gap-2">
                     <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
                       <div className="h-full bg-bull" style={{ width: `${confidence}%` }} />

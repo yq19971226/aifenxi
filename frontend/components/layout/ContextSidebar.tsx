@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { Activity, Server, Database, Wifi, Cpu, Clock } from "lucide-react";
+import { Activity, Server, Database, Wifi, Cpu, Clock, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { fetchDashboardOverview } from "@/lib/api/dashboard";
 import { getDataSourceStatus } from "@/lib/api/datasources";
 import type { SymbolOverview } from "@/lib/api/dashboard";
@@ -115,27 +115,32 @@ function WatchlistItem({ item }: { item: SymbolOverview }) {
   const priceStr = latest_price != null
     ? `$${latest_price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     : "—";
-  const isLong = direction === "long";
-  const isShort = direction === "short";
+  const isLong = direction === "long" || direction === "bullish";
+  const isShort = direction === "short" || direction === "bearish";
   const changeClass = isLong ? "text-bull" : isShort ? "text-bear" : "text-muted-foreground";
-  const changeLabel = isLong ? "+" : isShort ? "-" : "";
 
   return (
     <div className="group flex items-center justify-between p-3 rounded hover:bg-bg-surface border border-transparent hover:border-border transition-all cursor-pointer">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-[10px] font-bold">
+        <div className="w-8 h-8 rounded-full bg-zinc-900 border border-white/[0.08] flex items-center justify-center text-xs font-bold font-mono text-zinc-300">
            {symbol.substring(0, 1)}
         </div>
         <div>
-          <div className="text-sm font-bold">{symbol.replace("USDT", "")}</div>
-          <div className="text-[10px] text-muted-foreground">PERP</div>
+          <div className="text-sm font-bold tracking-tight">{symbol.replace("USDT", "")}</div>
+          <div className="text-[9px] text-muted-foreground uppercase tracking-widest">PERP</div>
         </div>
       </div>
       <div className="text-right">
-        <div className="text-sm font-mono">{priceStr}</div>
-        {(isLong || isShort) && (
-          <div className={`text-[10px] font-mono ${changeClass}`}>{changeLabel}—</div>
-        )}
+        <div className="text-sm font-mono font-medium">{priceStr}</div>
+        <div className={`flex items-center justify-end gap-1 mt-0.5 text-[9px] font-mono font-bold tracking-widest ${changeClass}`}>
+          {isLong ? (
+            <><TrendingUp size={10} strokeWidth={3} /> BULL</>
+          ) : isShort ? (
+            <><TrendingDown size={10} strokeWidth={3} /> BEAR</>
+          ) : (
+             <><Minus size={10} strokeWidth={3} /> NEUTRAL</>
+          )}
+        </div>
       </div>
     </div>
   );

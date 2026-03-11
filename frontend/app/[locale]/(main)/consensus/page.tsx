@@ -246,21 +246,43 @@ export default function ConsensusPage() {
       )}
 
       {!running && !displayReport && !displayConsensus && !error && (
-        <div className="flex flex-col items-center justify-center py-24 relative z-10">
-          <div className="relative h-16 w-16 mb-5">
-            <svg className="absolute inset-0" viewBox="0 0 64 64">
-              <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="2" strokeDasharray="6 4" />
+        <div className="flex flex-col items-center justify-center py-24 relative z-10 w-full max-w-lg mx-auto">
+          <div className="relative h-28 w-28 mb-8">
+            {/* Outer spinning ring */}
+            <div 
+              className="absolute inset-0 border-[0.5px] border-indigo-500/30 rounded-full animate-[spin_8s_linear_infinite]" 
+              style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }} 
+            />
+            {/* Inner reverse spinning ring */}
+            <div 
+              className="absolute inset-2 border-[0.5px] border-violet-500/30 rounded-full animate-[spin_12s_linear_infinite_reverse]" 
+              style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' }} 
+            />
+            {/* Dashed circular track */}
+            <svg className="absolute inset-0 w-full h-full animate-[spin_20s_linear_infinite]" viewBox="0 0 100 100">
+               <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" className="text-indigo-400/10" strokeWidth="1" strokeDasharray="4 6" />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <Brain size={24} className="text-zinc-600" />
+              <Brain size={32} className="text-indigo-400/50 animate-pulse" />
             </div>
           </div>
-          <p className="text-base text-zinc-400 font-medium">
-            {t("empty.message")}
-          </p>
-          <p className="mt-1 text-xs text-zinc-600">
-            选择币对和分析模式，点击上方按钮开始
-          </p>
+          <div className="text-center font-mono w-full">
+            <p className="text-xs text-indigo-400/70 mb-3 flex items-center justify-center gap-2 font-bold tracking-[0.2em]">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping" />
+              SYSTEM.READY
+            </p>
+            <p className="text-xl text-zinc-300 font-semibold tracking-tight shadow-sm">
+              {t("empty.message")}
+            </p>
+            <p className="mt-3 text-[10px] text-zinc-500 tracking-[0.15em] uppercase max-w-xs mx-auto leading-relaxed">
+              {t("empty.subtitle")}
+            </p>
+            <div className="mt-8 flex justify-center gap-2 opacity-30">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-0.5 w-6 bg-indigo-500" />
+              ))}
+            </div>
+          </div>
         </div>
       )}
       </div>

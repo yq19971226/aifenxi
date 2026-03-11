@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Info, Share2, Zap } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import type { AnalysisReport as AnalysisReportType } from "@/lib/api/analysis";
 import { UnifiedResultCard } from "./UnifiedResultCard";
@@ -22,6 +23,7 @@ const ENGINE_LABELS: Record<string, string> = {
 };
 
 export function AnalysisReport({ report }: AnalysisReportProps) {
+  const t = useTranslations("consensus");
   const isBlocked = report.status === "blocked";
   const [showShare, setShowShare] = useState(false);
   const { data: shareConfig } = useShareCardConfig();
@@ -37,7 +39,7 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
             className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors"
           >
             <Share2 size={14} />
-            分享
+            {t("card.share")}
           </button>
         </div>
       )}
@@ -53,7 +55,9 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
         <>
           <div className="flex items-center gap-4 pt-2">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
-            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] shrink-0">详细分析 / DEEP ANALYSIS</span>
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] shrink-0">
+              {t("card.deepAnalysis")} / DEEP ANALYSIS
+            </span>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
           </div>
           <DeepAnalysis sections={report.sections} reportKey={report.timestamp} />

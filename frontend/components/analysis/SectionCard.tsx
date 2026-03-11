@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import type { ReportSection } from "@/lib/api/analysis";
 import { HIDDEN_FIELDS, COLLAPSED_FIELDS } from "./constants";
@@ -33,6 +34,7 @@ import { PlaybookRenderer } from "./PlaybookRenderer";
 // ── Data pairs renderer ──────────────────────────────────────
 
 export function DataPairs({ data, hideEmpty = true }: { data: Record<string, unknown>; hideEmpty?: boolean }) {
+  const t = useTranslations("consensus");
   const entries = Object.entries(data).filter(([key]) => !HIDDEN_FIELDS.has(key));
 
   const filtered = entries.filter(([key, value]) => {
@@ -42,7 +44,7 @@ export function DataPairs({ data, hideEmpty = true }: { data: Record<string, unk
   });
 
   if (filtered.length === 0) {
-    return <p className="text-xs text-zinc-500">暂无数据</p>;
+    return <p className="text-xs text-zinc-500">{t("card.noData") || "暂无数据"}</p>;
   }
 
   const hasSignalRow = "signal" in data || "confidence" in data || "trend" in data;
@@ -185,6 +187,7 @@ export function SectionCard({
   defaultExpanded?: boolean;
   forceExpandToken?: number;
 }) {
+  const t = useTranslations("consensus");
   const [expanded, setExpanded] = useState(defaultExpanded);
   const statusStyle = getSectionStatusStyle(section.status);
   const sectionIcon = getSectionIcon(section.title);
@@ -304,7 +307,7 @@ export function SectionCard({
                     Object.keys(
                       section.data.raw_data as Record<string, unknown>,
                     ).length > 0 && (
-                      <CollapsibleSection label="详细数据">
+                      <CollapsibleSection label={t("card.detailedData")}>
                         <DataPairs
                           data={
                             section.data.raw_data as Record<string, unknown>

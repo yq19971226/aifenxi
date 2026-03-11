@@ -54,8 +54,27 @@
   "minority": {
     "title": "少數派警告"
   },
+  "tabs": {
+    "agents": "共識分析",
+    "structure": "市場結構",
+    "adversarial": "AI 對抗"
+  },
   "empty": {
-    "message": "選擇分析模式，點擊「開始分析」獲取AI報告"
+    "message": "共識引擎已就緒",
+    "subtitle": "選擇幣對和分析模式，點擊上方按鈕開始"
+  },
+  "progress": {
+    "preparing": "準備啟動",
+    "connecting": "正在連接分析引擎...",
+    "entering": "進入分析工作區...",
+    "collecting": "數據采集中",
+    "collectingDesc": "正在收集多維市場數據...",
+    "analyzing": "專家分析中",
+    "analyzingGeneral": "智能體",
+    "wait": "請稍候...",
+    "synthesis": "生成共識",
+    "synthesisDesc": "綜合各專家結論...",
+    "team": "專家團隊"
   },
   "card": {
     "consensus": "共識",
@@ -70,7 +89,93 @@
     "updated": "同步時間",
     "engine": "Axiom v4 Protocol",
     "id": "ID",
-    "perp": "永續"
+    "perp": "永續",
+    "detailedData": "詳細數據",
+    "share": "分享",
+    "deepAnalysis": "深度研究報告",
+    "confidence": "置信度",
+    "noData": "暫無數據",
+    "decision": "決策矩陣",
+    "score": "綜合得分",
+    "latency": "延遲",
+    "riskReward": "盈虧比",
+    "entryZone": "入場區間",
+    "entryRange": "建議買入範圍",
+    "stopLoss": "止損位",
+    "safetyLevel": "安全底線",
+    "validUntil": "有效期至",
+    "source": "數據源",
+    "tpTargets": "預期止盈目標",
+    "initialResistance": "初始阻力位",
+    "secondaryExtension": "次級延伸位",
+    "trendObjective": "趨勢終極目標",
+    "activeTracking": "活躍追蹤中"
+  },
+  "renderers": {
+    "adversarial": {
+      "intent": "莊家意圖",
+      "intentSubtitle": "DEALER INTENT",
+      "forecast": "戰術預測",
+      "forecastSubtitle": "PREDICTED MOVES",
+      "prob": "概率",
+      "dangerZone": "風險區",
+      "safeZone": "安全區",
+      "dangerSubtitle": "DANGER",
+      "safeSubtitle": "SAFETY",
+      "counterPlan": "反制防禦計劃",
+      "counterPlanSubtitle": "REACTION PROTOCOL"
+    },
+    "collusion": {
+      "title": "網絡合謀檢測周期",
+      "titleSubtitle": "COLLUSION ANALYSIS CYCLE",
+      "detected": "檢測到協同操縱",
+      "notDetected": "未發現合謀跡象",
+      "riskLevel": "風險等級",
+      "patterns": "已識別協同模式",
+      "patternsSubtitle": "PATTERNS",
+      "entities": "涉及實體",
+      "vol": "成交量",
+      "washTrading": "對倒交易特徵",
+      "washTradingSubtitle": "WASH TRADING",
+      "whaleSync": "巨鯨聯動狀態",
+      "whaleSyncSubtitle": "WHALE SYNC",
+      "syncMovement": "同步運動檢測",
+      "netDirection": "凈動態方向",
+      "statusActive": "活躍",
+      "statusStable": "穩定",
+      "desc": "當前鏈上地址與訂單流未見高度重合的同步行為，多方協同概率處於基準線以下。",
+      "footer": "Cryptographic Consensus Enforcement Enabled"
+    },
+    "playbook": {
+      "title": "劇本匹配成功",
+      "titleSubtitle": "PLAYBOOK MATCH",
+      "stage": "階段",
+      "nextMove": "下一步推演",
+      "nextMoveSubtitle": "NEXT MOVE",
+      "distribution": "劇本概率分布",
+      "distributionSubtitle": "PROBABILITY DISTRIBUTION",
+      "probabilityDistribution": "劇本概率分布",
+      "counterStrategy": "反制策略",
+      "counterStrategySubtitle": "COUNTER STRATEGY",
+      "entry": "入場觸發",
+      "stopLoss": "失效止損位",
+      "tp1": "止盈目標①",
+      "tp2": "止盈目標②",
+      "waitSignal": "確認信號",
+      "riskWarning": "風險偏好",
+      "phases": {
+        "accumulation": "吸籌期",
+        "markup": "拉升期",
+        "distribution": "派發期",
+        "markdown": "下跌期",
+        "escape": "出逃期"
+      },
+      "risks": {
+        "aggressive": "激進",
+        "moderate": "穩健",
+        "conservative": "保守"
+      }
+    }
   },
   "flow": {
     "coreAnalysis": "核心AI分析",

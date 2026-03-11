@@ -54,8 +54,14 @@
   "minority": {
     "title": "少数派警告"
   },
+  "tabs": {
+    "agents": "共识分析",
+    "structure": "市场结构",
+    "adversarial": "AI 对抗"
+  },
   "empty": {
-    "message": "选择分析模式，点击「开始分析」获取AI报告"
+    "message": "共识引擎已就绪",
+    "subtitle": "选择币对和分析模式，点击上方按钮开始"
   },
   "card": {
     "consensus": "共识",
@@ -70,7 +76,27 @@
     "updated": "同步时间",
     "engine": "Axiom v4 Protocol",
     "id": "ID",
-    "perp": "永续"
+    "perp": "永续",
+    "latency": "延迟",
+    "decision": "决策",
+    "score": "评分",
+    "riskReward": "盈亏比",
+    "entryZone": "入场区间",
+    "entryRange": "入场范围",
+    "stopLoss": "止损位",
+    "safetyLevel": "止损保护",
+    "validUntil": "有效期至",
+    "source": "数据来源",
+    "tpTargets": "预期止盈目标",
+    "initialResistance": "初始阻力位",
+    "secondaryExtension": "次级扩展位",
+    "trendObjective": "趋势目标位",
+    "activeTracking": "实时追踪中",
+    "detailedData": "详细数据",
+    "share": "分享",
+    "deepAnalysis": "深度研究报告",
+    "confidence": "置信度",
+    "noData": "暂无数据"
   },
   "flow": {
     "coreAnalysis": "核心AI分析",
@@ -85,5 +111,85 @@
     "analysisFlow": "AI 分析流程",
     "makerPerspective": "庄家 AI 视角",
     "makerCompleted": "庄家AI已完成反向推演"
+  },
+  "progress": {
+    "preparing": "准备启动",
+    "connecting": "正在连接分析引擎...",
+    "entering": "进入分析工作区...",
+    "collecting": "数据采集中",
+    "collectingDesc": "正在收集多维市场数据...",
+    "analyzing": "专家分析中",
+    "analyzingGeneral": "分析中",
+    "wait": "请稍候...",
+    "synthesis": "生成共识",
+    "synthesisDesc": "综合各专家结论...",
+    "team": "专家组状态"
+  },
+  "renderers": {
+    "adversarial": {
+      "intent": "庄家核心意图",
+      "intentSubtitle": "STRATEGIC INTENT",
+      "forecast": "下阶段推演",
+      "forecastSubtitle": "Tactical Forecast",
+      "prob": "概率",
+      "dangerZone": "风险区",
+      "safeZone": "安全区",
+      "dangerSubtitle": "Danger",
+      "safeSubtitle": "Safety",
+      "counterPlan": "反制防御计划",
+      "counterPlanSubtitle": "Counter-Defense Plan"
+    },
+    "collusion": {
+      "title": "网络合谋检测周期",
+      "titleSubtitle": "COLLUSION ANALYSIS CYCLE",
+      "detected": "检测到协同操纵",
+      "notDetected": "未发现合谋迹象",
+      "riskLevel": "风险等级",
+      "patterns": "已识别协同模式",
+      "patternsSubtitle": "DETECTED CLUSTERS",
+      "entities": "涉及实体",
+      "vol": "预估成交量",
+      "washTrading": "对倒交易特征",
+      "washTradingSubtitle": "WASH TRADING",
+      "whaleSync": "巨鲸联动状态",
+      "whaleSyncSubtitle": "WHALE SYNC",
+      "syncMovement": "同步运动检测",
+      "netDirection": "净动态方向",
+      "statusActive": "活跃",
+      "statusStable": "平稳",
+      "desc": "当前链上地址与订单流未见高度重合的同步行为，多方协同概率处于基准线以下。",
+      "footer": "加密共识执行引擎已启用"
+    },
+    "playbook": {
+      "title": "剧本匹配成功",
+      "titleSubtitle": "PLAYBOOK MATCH",
+      "stage": "阶段",
+      "nextMove": "下一步推演",
+      "nextMoveSubtitle": "NEXT MOVE",
+      "distribution": "剧本概率分布",
+      "distributionSubtitle": "PROBABILITY DISTRIBUTION",
+      "probabilityDistribution": "剧本概率分布",
+      "probabilityDistributionSubtitle": "PROBABILITY DISTRIBUTION",
+      "counterStrategy": "反制策略",
+      "counterStrategySubtitle": "COUNTER STRATEGY",
+      "entry": "入场",
+      "stopLoss": "止损位",
+      "tp1": "止盈①",
+      "tp2": "止盈②",
+      "waitSignal": "确认信号",
+      "riskWarning": "风险提醒",
+      "phases": {
+        "accumulation": "吸筹期",
+        "markup": "拉升期",
+        "distribution": "派发期",
+        "markdown": "下跌期",
+        "escape": "出逃期"
+      },
+      "risks": {
+        "aggressive": "激进",
+        "moderate": "稳健",
+        "conservative": "保守"
+      }
+    }
   }
 }

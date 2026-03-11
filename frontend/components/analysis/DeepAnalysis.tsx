@@ -3,19 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BarChart3, Brain, Swords } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import type { ReportSection } from "@/lib/api/analysis";
 import { groupSections } from "./helpers";
 import { SectionCard } from "./SectionCard";
 import { cn } from "@/lib/utils";
-
-// ── Tab configuration ────────────────────────────────────────
-
-const REPORT_TABS = [
-  { key: "agents" as const, label: "智能体", icon: Brain },
-  { key: "structure" as const, label: "市场结构", icon: BarChart3 },
-  { key: "adversarial" as const, label: "AI 对抗", icon: Swords },
-];
 
 type TabKey = "agents" | "structure" | "adversarial";
 
@@ -34,6 +27,13 @@ export function DeepAnalysis({
   sections: ReportSection[];
   reportKey: string;
 }) {
+  const t = useTranslations("consensus");
+
+  const REPORT_TABS = [
+    { key: "agents" as const, label: t("tabs.agents"), icon: Brain },
+    { key: "structure" as const, label: t("tabs.structure"), icon: BarChart3 },
+    { key: "adversarial" as const, label: t("tabs.adversarial"), icon: Swords },
+  ];
   const [activeTab, setActiveTab] = useState<TabKey>("agents");
   const [jumpTarget, setJumpTarget] = useState<{ title: string; token: number } | null>(null);
   const { tabGroups, visibleTabs } = useMemo(() => {
