@@ -63,7 +63,7 @@ export function ContextSidebar() {
             icon={Wifi} 
             label={t("networkLatency")} 
             status="active" 
-            value={t("latencyMs")} 
+            value="12ms" 
           />
         </div>
       </section>

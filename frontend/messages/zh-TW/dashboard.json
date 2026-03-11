@@ -20,7 +20,7 @@
   },
   "goConsensus": "深度分析",
   "noSymbolsHint": "請在後台「幣種管理」中啟用交易對，概覽將基於規則引擎展示研判結果（不呼叫分析 API）。",
-  "initializingEngine": "正在初始化 NSED 引擎…",
+  "initializingEngine": "Axiom 共識協議初始化中…",
   "connectionFailed": "系統連線失敗",
   "connectionFailedDesc": "無法與分析節點建立安全連線。",
   "retryConnection": "重試連線",

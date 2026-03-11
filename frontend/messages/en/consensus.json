@@ -1,6 +1,6 @@
 {
-  "title": "Comprehensive Analysis",
-  "subtitle": "Multi-agent parallel analysis + AI adversarial reasoning → Precise positioning",
+  "title": "Axiom Audit Hub",
+  "subtitle": "Axiom Agent Swarm + Self-Debate Loop → Alpha Signals",
   "modes": {
     "scalping": {
       "label": "Scalping",
@@ -67,8 +67,8 @@
     "keyLevel": "Key Level",
     "analysisReasoning": "Analysis Reasoning",
     "keyFindings": "Key Findings",
-    "updated": "Updated",
-    "engine": "NSED-v4 Engine",
+    "updated": "Sync Time",
+    "engine": "Axiom v4 Protocol",
     "id": "ID",
     "perp": "PERP"
   },

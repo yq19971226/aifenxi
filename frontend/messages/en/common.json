@@ -95,17 +95,17 @@
   "roleOperator": "Operator",
   "roleUser": "User",
   "sidebar": {
-    "systemStatus": "System Status",
-    "nsedEngine": "NSED Engine",
-    "online": "Online",
-    "dataFeed": "Data Feed",
-    "connected": "Connected",
-    "partial": "Partial",
-    "degraded": "Degraded",
-    "activeAgents": "Active Agents",
-    "agentsCount": "11/11",
-    "networkLatency": "Network Latency",
-    "latencyMs": "45ms",
+    "systemStatus": "SYSTEM STATUS",
+    "nsedEngine": "Axiom Consensus Protocol",
+    "online": "NODE ONLINE",
+    "dataFeed": "DATA FEED",
+    "connected": "SYNCED",
+    "partial": "PARTIAL SYNC",
+    "degraded": "DEGRADED",
+    "activeAgents": "Agent Swarm",
+    "agentsCount": "11/11 ACTIVE",
+    "networkLatency": "Link Latency",
+    "latencyMs": "12ms",
     "marketPulse": "Market Pulse"
   }
 }

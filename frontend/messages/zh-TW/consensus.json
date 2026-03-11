@@ -1,6 +1,6 @@
 {
-  "title": "綜合分析",
-  "subtitle": "多智能體並行分析 + AI對抗推演 → 精準點位",
+  "title": "Axiom 複合審計",
+  "subtitle": "Axiom 智能體蜂群並行審計 + 自辯證對沖推演",
   "modes": {
     "scalping": {
       "label": "超短線",
@@ -67,8 +67,8 @@
     "keyLevel": "關鍵位",
     "analysisReasoning": "分析推理",
     "keyFindings": "關鍵發現",
-    "updated": "更新",
-    "engine": "NSED-v4 引擎",
+    "updated": "同步時間",
+    "engine": "Axiom v4 Protocol",
     "id": "ID",
     "perp": "永續"
   },

@@ -1,6 +1,6 @@
 {
-  "title": "综合分析",
-  "subtitle": "多智能体并行分析 + AI对抗推演 → 精准点位",
+  "title": "Axiom 复合审计",
+  "subtitle": "Axiom 智能体蜂群并行审计 + 自辩证对冲推演",
   "modes": {
     "scalping": {
       "label": "超短线",
@@ -67,8 +67,8 @@
     "keyLevel": "关键位",
     "analysisReasoning": "分析推理",
     "keyFindings": "关键发现",
-    "updated": "更新",
-    "engine": "NSED-v4 引擎",
+    "updated": "同步时间",
+    "engine": "Axiom v4 Protocol",
     "id": "ID",
     "perp": "永续"
   },

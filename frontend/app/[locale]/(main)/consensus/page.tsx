@@ -21,6 +21,7 @@ import { DEFAULT_SYMBOL, MODE_CONFIGS } from "./_components/consensus-config";
 import { AdversarialFlow } from "./_components/AdversarialFlow";
 import { ConsensusCache } from "./_components/ConsensusCache";
 import { useAnalysis } from "./_hooks/useAnalysis";
+import { JSONLD } from "@/components/seo/JSONLD";
 
 export default function ConsensusPage() {
   const t = useTranslations("consensus");
@@ -76,6 +77,7 @@ export default function ConsensusPage() {
 
   return (
     <div className="mx-auto max-w-[1500px] px-4 md:px-8 py-8 space-y-6">
+      <JSONLD report={displayReport || displayConsensus} />
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-semibold text-white">{t("title")}</h1>

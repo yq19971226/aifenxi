@@ -20,7 +20,7 @@
   },
   "goConsensus": "Deep analysis",
   "noSymbolsHint": "Enable symbols in admin to see rule-based verdicts (no analysis API).",
-  "initializingEngine": "Initializing NSED Engine…",
+  "initializingEngine": "Initiating Axiom Consensus Protocol…",
   "connectionFailed": "System Connection Failed",
   "connectionFailedDesc": "Unable to establish secure link with analysis nodes.",
   "retryConnection": "Retry Connection",

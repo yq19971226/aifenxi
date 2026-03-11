@@ -96,16 +96,16 @@
   "roleUser": "使用者",
   "sidebar": {
     "systemStatus": "系統狀態",
-    "nsedEngine": "NSED 引擎",
-    "online": "在線",
-    "dataFeed": "資料來源",
-    "connected": "已連線",
-    "partial": "部分連線",
-    "degraded": "降級",
-    "activeAgents": "活躍代理",
-    "agentsCount": "11/11",
-    "networkLatency": "網路延遲",
-    "latencyMs": "45ms",
-    "marketPulse": "市場脈搏"
+    "nsedEngine": "Axiom 共識協議",
+    "online": "NODE ONLINE",
+    "dataFeed": "DATA FEED",
+    "connected": "同步中",
+    "partial": "部分同步",
+    "degraded": "降級運行",
+    "activeAgents": "智能體蜂群",
+    "agentsCount": "11/11 ACTIVE",
+    "networkLatency": "鏈路延遲",
+    "latencyMs": "12ms",
+    "marketPulse": "市場脈衝"
   }
 }

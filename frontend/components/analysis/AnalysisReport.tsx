@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -8,6 +8,7 @@ import type { AnalysisReport as AnalysisReportType } from "@/lib/api/analysis";
 import { UnifiedResultCard } from "./UnifiedResultCard";
 import { DeepAnalysis } from "./DeepAnalysis";
 import { ShareModal } from "./ShareModal";
+import { AICitationSnippet } from "./AICitationSnippet";
 import { useShareCardConfig } from "@/lib/hooks/useShareCardConfig";
 
 interface AnalysisReportProps {
@@ -43,6 +44,9 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
 
       {/* Unified result card: signal → prices → consensus → findings → risk */}
       <UnifiedResultCard report={report} />
+
+      {/* AI Citation Snippet for GEO */}
+      {!isBlocked && <AICitationSnippet report={report} />}
 
       {/* Deep Analysis (Tab system) — separate below */}
       {!isBlocked && (
