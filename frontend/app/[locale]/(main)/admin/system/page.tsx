@@ -96,7 +96,7 @@ export default function AdminSystemPage() {
     setDeploying(false);
   }, [queryClient]);
 
-  const handleAction = useCallback(async () => {
+  const handleAction = useCallback(async (targetCommit?: string) => {
     if (deploying) return;
     setShowConfirm(false);
     setDeploying(true);
@@ -106,9 +106,8 @@ export default function AdminSystemPage() {
 
     try {
       if (actionMode === "rollback") {
-        const target = window.prompt("可选：输入回退目标 commit/tag（留空=回退到上一个版本）", "")?.trim();
         await startRollback(
-          target ? { target } : {},
+          targetCommit ? { target: targetCommit } : {},
           (event: DeployEvent) => {
             setLogs((prev) => [...prev, `[${event.type}] ${event.data}`]);
             if (event.type === "done") {
@@ -125,9 +124,8 @@ export default function AdminSystemPage() {
         return;
       }
 
-      const target = window.prompt("可选：输入更新目标 commit/tag（留空=拉最新）", "")?.trim();
       await startDeploy(
-        target ? { target } : {},
+        targetCommit ? { target: targetCommit } : {},
         (event: DeployEvent) => {
           setLogs((prev) => [...prev, `[${event.type}] ${event.data}`]);
           if (event.type === "done") {

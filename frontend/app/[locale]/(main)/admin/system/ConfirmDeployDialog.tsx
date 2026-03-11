@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 
 interface ConfirmDeployDialogProps {
   open: boolean;
   mode: "deploy" | "rollback";
-  onConfirm: () => void;
+  onConfirm: (target?: string) => void;
   onCancel: () => void;
 }
 
@@ -16,20 +16,39 @@ export function ConfirmDeployDialog({
   onConfirm,
   onCancel,
 }: ConfirmDeployDialogProps) {
+  const [target, setTarget] = useState("");
+  const [confirmText, setConfirmText] = useState("");
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCancel();
+      if (e.key === "Escape") {
+        setTarget("");
+        setConfirmText("");
+        onCancel();
+      }
     },
     [onCancel],
   );
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setTarget("");
+      setConfirmText("");
+      return;
+    }
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [open, handleKeyDown]);
 
   if (!open) return null;
+
+  const isConfirmed = confirmText === "CONFIRM";
+  
+  const handleConfirmAction = () => {
+    if (isConfirmed) {
+      onConfirm(target.trim() || undefined);
+    }
+  };
 
   return (
     <div
@@ -64,18 +83,52 @@ export function ConfirmDeployDialog({
             ⚠ 更新期间所有用户将暂时无法访问系统
           </p>
         </div>
+
+        <div className="mb-6 space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-zinc-300">
+              目标 Commit/Tag（可选）
+            </label>
+            <input
+              type="text"
+              className="w-full rounded bg-black/40 px-3 py-2 text-sm text-zinc-200 outline-none border border-white/[0.08] focus:border-amber-500/50"
+              placeholder={mode === "deploy" ? "留空则拉取最新代码" : "留空则回退到上个版本"}
+              value={target}
+              onChange={(e) => setTarget(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-zinc-300">
+              为防止手滑，请输入 <span className="text-white font-mono bg-white/[0.1] px-1 rounded">CONFIRM</span> 以确认
+            </label>
+            <input
+              type="text"
+              className="w-full rounded bg-black/40 px-3 py-2 text-sm text-zinc-200 outline-none border border-white/[0.08] focus:border-amber-500/50"
+              placeholder="CONFIRM"
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+            />
+          </div>
+        </div>
+
         <div className="flex justify-end gap-3">
           <button
             type="button"
-            onClick={onCancel}
+            onClick={() => {
+              setTarget("");
+              setConfirmText("");
+              onCancel();
+            }}
             className="rounded-md bg-white/[0.06] px-4 py-2 text-sm text-zinc-400 hover:bg-white/[0.1]"
           >
             取消
           </button>
           <button
             type="button"
-            onClick={onConfirm}
-            className="rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-500"
+            onClick={handleConfirmAction}
+            disabled={!isConfirmed}
+            className="rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-500 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {mode === "deploy" ? "确认更新" : "确认回退"}
           </button>

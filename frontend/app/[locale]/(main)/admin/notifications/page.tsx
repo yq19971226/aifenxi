@@ -8,14 +8,11 @@ import {
   type NotificationLogListResponse,
 } from "@/lib/api/admin-notifications";
 import { EmptyNotifications } from "@/components/ui/EmptyState";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 
 // ── Constants ────────────────────────────────────────────────
 
-const CHANNEL_LABEL: Record<string, string> = {
-  email: "邮件",
-  telegram: "Telegram",
-};
 
 const CHANNEL_STYLE: Record<string, string> = {
   email: "bg-[var(--color-accent)]/15 text-accent",
@@ -38,6 +35,8 @@ function formatDate(iso: string): string {
 
 export default function AdminNotificationsPage() {
   const { user } = useAuth();
+  const t = useTranslations("admin.notifications");
+  
   if (!user || user.role !== "admin") return null;
   const [data, setData] = useState<NotificationLogListResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,7 +61,7 @@ export default function AdminNotificationsPage() {
       });
       setData(res);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "查询通知历史失败");
+      setError(err instanceof Error ? err.message : t("fetchFailed"));
     } finally {
       setLoading(false);
     }
@@ -92,7 +91,7 @@ export default function AdminNotificationsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        通知历史
+        {t("title")}
       </motion.h1>
 
       {/* ── Filters ──────────────────────────────────────── */}
@@ -105,21 +104,21 @@ export default function AdminNotificationsPage() {
       >
         <div className="flex flex-col gap-1.5 min-w-[200px] flex-1">
           <label htmlFor="notif-search" className="text-xs text-zinc-400">
-            搜索
+            {t("searchLabel")}
           </label>
           <input
             id="notif-search"
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="收件人或主题关键词"
+            placeholder={t("searchPlaceholder")}
             className="h-9 rounded-lg bg-white/[0.06] border border-white/[0.1] px-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-accent transition-colors"
           />
         </div>
 
         <div className="flex flex-col gap-1.5 min-w-[120px]">
           <label htmlFor="channel-filter" className="text-xs text-zinc-400">
-            渠道
+            {t("channelLabel")}
           </label>
           <select
             id="channel-filter"
@@ -130,15 +129,15 @@ export default function AdminNotificationsPage() {
             }}
             className="h-9 rounded-lg bg-white/[0.06] border border-white/[0.1] px-3 text-sm text-white outline-none focus:border-accent transition-colors"
           >
-            <option value="">全部</option>
-            <option value="email">邮件</option>
-            <option value="telegram">Telegram</option>
+            <option value="">{t("all")}</option>
+            <option value="email">{t("channels.email")}</option>
+            <option value="telegram">{t("channels.telegram")}</option>
           </select>
         </div>
 
         <div className="flex flex-col gap-1.5 min-w-[120px]">
           <label htmlFor="status-filter" className="text-xs text-zinc-400">
-            状态
+            {t("statusLabel")}
           </label>
           <select
             id="status-filter"
@@ -149,9 +148,9 @@ export default function AdminNotificationsPage() {
             }}
             className="h-9 rounded-lg bg-white/[0.06] border border-white/[0.1] px-3 text-sm text-white outline-none focus:border-accent transition-colors"
           >
-            <option value="">全部</option>
-            <option value="sent">已发送</option>
-            <option value="failed">失败</option>
+            <option value="">{t("all")}</option>
+            <option value="sent">{t("statuses.sent")}</option>
+            <option value="failed">{t("statuses.failed")}</option>
           </select>
         </div>
 
@@ -159,7 +158,7 @@ export default function AdminNotificationsPage() {
           type="submit"
           className="h-9 px-5 rounded-lg bg-white text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors shrink-0"
         >
-          搜索
+          {t("searchButton")}
         </button>
       </motion.form>
 
@@ -199,13 +198,13 @@ export default function AdminNotificationsPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/[0.08] text-left text-xs text-zinc-500">
-                    <th className="px-5 py-3 font-medium">收件人</th>
-                    <th className="px-5 py-3 font-medium">用户邮箱</th>
-                    <th className="px-5 py-3 font-medium">渠道</th>
-                    <th className="px-5 py-3 font-medium">事件类型</th>
-                    <th className="px-5 py-3 font-medium">主题</th>
-                    <th className="px-5 py-3 font-medium">状态</th>
-                    <th className="px-5 py-3 font-medium">时间</th>
+                    <th className="px-5 py-3 font-medium">{t("table.recipient")}</th>
+                    <th className="px-5 py-3 font-medium">{t("table.userEmail")}</th>
+                    <th className="px-5 py-3 font-medium">{t("table.channel")}</th>
+                    <th className="px-5 py-3 font-medium">{t("table.eventType")}</th>
+                    <th className="px-5 py-3 font-medium">{t("table.subject")}</th>
+                    <th className="px-5 py-3 font-medium">{t("table.status")}</th>
+                    <th className="px-5 py-3 font-medium">{t("table.time")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -224,7 +223,7 @@ export default function AdminNotificationsPage() {
                         <span
                           className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${CHANNEL_STYLE[n.channel] || "bg-white/[0.06] text-zinc-400"}`}
                         >
-                          {CHANNEL_LABEL[n.channel] || n.channel}
+                          {n.channel === "email" ? t("channels.email") : n.channel === "telegram" ? t("channels.telegram") : n.channel}
                         </span>
                       </td>
                       <td className="px-5 py-3 text-zinc-300">{n.event_type}</td>
@@ -235,7 +234,7 @@ export default function AdminNotificationsPage() {
                         {n.status === "sent" ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-bull)]/15 px-2.5 py-0.5 text-xs font-medium text-bull">
                             <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-bull)]" />
-                            已发送
+                            {t("statuses.sent")}
                           </span>
                         ) : (
                           <span
@@ -243,7 +242,7 @@ export default function AdminNotificationsPage() {
                             title={n.error_message || ""}
                           >
                             <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-bear)]" />
-                            失败
+                            {t("statuses.failed")}
                           </span>
                         )}
                       </td>
@@ -261,7 +260,7 @@ export default function AdminNotificationsPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between border-t border-white/[0.08] px-5 py-3">
               <span className="text-xs text-zinc-500">
-                共 {data.total} 条，第 {data.page}/{totalPages} 页
+                {t("pagination.summary", { total: data.total, page: data.page, totalPages })}
               </span>
               <div className="flex gap-2">
                 <button
@@ -269,14 +268,14 @@ export default function AdminNotificationsPage() {
                   disabled={page <= 1}
                   className="rounded-lg px-3 py-1 text-xs font-medium bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] transition-colors disabled:opacity-30"
                 >
-                  上一页
+                  {t("pagination.prevPage")}
                 </button>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
                   className="rounded-lg px-3 py-1 text-xs font-medium bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] transition-colors disabled:opacity-30"
                 >
-                  下一页
+                  {t("pagination.nextPage")}
                 </button>
               </div>
             </div>

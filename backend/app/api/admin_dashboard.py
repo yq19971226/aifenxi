@@ -9,7 +9,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.deps import UserInfo, require_admin
+from app.core.deps import UserInfo, require_admin, require_operator_or_admin
 from app.core.redis import get_redis_pool
 
 logger = logging.getLogger(__name__)
@@ -225,3 +225,40 @@ async def get_capability_matrix(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="获取能力矩阵失败",
         )
+
+@router.get("/badges")
+async def get_sidebar_badges(
+    user: UserInfo = Depends(require_operator_or_admin),
+    session: AsyncSession = Depends(get_db),
+) -> dict:
+    """获取侧边栏各模块的待处理项数量（Badge计数）。"""
+    badges = {
+        "playbookReview": 0,
+        "taskReview": 0,
+        "withdrawals": 0
+    }
+    
+    try:
+        # playbookReview: playbook_predictions WHERE published = false
+        row = (await session.execute(text(
+            "SELECT COUNT(*) AS cnt FROM playbook_predictions WHERE published = false"
+        ))).scalar_one()
+        badges["playbookReview"] = row
+
+        # taskReview: task_submissions WHERE status = 'pending'
+        row = (await session.execute(text(
+            "SELECT COUNT(*) AS cnt FROM task_submissions WHERE status = 'pending'"
+        ))).scalar_one()
+        badges["taskReview"] = row
+
+        # withdrawals: withdrawals WHERE status = 'pending'
+        row = (await session.execute(text(
+            "SELECT COUNT(*) AS cnt FROM withdrawals WHERE status = 'pending'"
+        ))).scalar_one()
+        badges["withdrawals"] = row
+
+    except Exception as exc:
+        logger.error("获取侧边栏徽标计数失败: %s", exc)
+        # 忽略错误返回全0以避免中断前端渲染
+    
+    return badges

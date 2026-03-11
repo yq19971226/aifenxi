@@ -2,19 +2,15 @@
   "sidebar": {
     "groups": {
       "overview": "Overview",
-      "config": "Configuration",
-      "users": "User Operations",
+      "system": "System",
+      "users": "Users & Operations",
       "review": "Content Review",
-      "finance": "Finance",
-      "ai": "AI",
-      "system": "System"
+      "finance": "Finance"
     },
     "items": {
       "dashboard": "Dashboard",
       "monitor": "System Monitor",
-      "setup": "Quick Setup",
-      "configs": "Parameters",
-      "maintenance": "Maintenance",
+      "setup": "Feature Toggles",
       "apiKeys": "API Keys",
       "datasources": "Data Sources",
       "models": "Model Assignment",
@@ -23,7 +19,7 @@
       "operators": "Operators",
       "orders": "Orders",
       "notifications": "Notifications",
-      "push": "Push Management",
+
       "announcements": "Announcements",
       "playbookReview": "Playbook Review",
       "taskReview": "Task Review",
@@ -52,6 +48,38 @@
     "enabled": "Enabled",
     "disabled": "Disabled",
     "processing": "Processing…"
+  },
+  "notifications": {
+    "title": "Notification History",
+    "searchLabel": "Search",
+    "searchPlaceholder": "Recipient or subject keywords",
+    "channelLabel": "Channel",
+    "statusLabel": "Status",
+    "all": "All",
+    "searchButton": "Search",
+    "fetchFailed": "Failed to fetch notification history",
+    "channels": {
+      "email": "Email",
+      "telegram": "Telegram"
+    },
+    "statuses": {
+      "sent": "Sent",
+      "failed": "Failed"
+    },
+    "table": {
+      "recipient": "Recipient",
+      "userEmail": "User Email",
+      "channel": "Channel",
+      "eventType": "Event Type",
+      "subject": "Subject",
+      "status": "Status",
+      "time": "Time"
+    },
+    "pagination": {
+      "summary": "{total} total, Page {page}/{totalPages}",
+      "prevPage": "Previous",
+      "nextPage": "Next"
+    }
   },
   "permissionDenied": "Access denied",
   "maintenance": {
@@ -501,6 +529,24 @@
         "label": "Online Count Display",
         "desc": "Show online user count on landing page and dashboard"
       }
+    },
+    "auditLog": {
+      "title": "Audit Logs",
+      "openTitle": "Collapse Audit Logs",
+      "time": "Time",
+      "configKey": "Config Key",
+      "action": "Action",
+      "oldValue": "Old Value",
+      "newValue": "New Value",
+      "actions": {
+        "update": "Update",
+        "create": "Create",
+        "delete": "Delete"
+      },
+      "pagination": "Page {page}/{total} (Total {count})",
+      "prev": "Prev",
+      "next": "Next",
+      "empty": "No audit logs found"
     }
   },
   "dashboard": {

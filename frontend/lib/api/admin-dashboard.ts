@@ -44,3 +44,14 @@ export async function fetchLLMCost(): Promise<LLMCostSummary> {
   const res = await authFetch(`${API}/api/admin/dashboard/llm-cost`);
   return handleApiResponse(res, "获取 LLM 成本数据失败");
 }
+
+export interface AdminBadges {
+  playbookReview: number;
+  taskReview: number;
+  withdrawals: number;
+}
+
+export async function fetchAdminBadges(): Promise<AdminBadges> {
+  const res = await authFetch(`${API}/api/admin/dashboard/badges`);
+  return handleApiResponse(res, "获取后台徽标计数失败");
+}

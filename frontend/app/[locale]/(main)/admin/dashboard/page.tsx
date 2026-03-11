@@ -29,6 +29,7 @@ import { SystemHealthGrid } from "@/components/admin/SystemHealthGrid";
 import { AdminUserTable } from "@/components/admin/AdminUserTable";
 import { ApiCallChart } from "@/components/admin/ApiCallChart";
 import { useAuth } from "@/lib/auth-context";
+import { useAdminOnlineStats } from "@/lib/hooks/useAdminMonitor";
 
 /* ── 系统体检项定义 ──────────────────────────────────────────── */
 
@@ -368,6 +369,9 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // Use the shared live hook for WebSocket stats
+  const { data: onlineStats } = useAdminOnlineStats();
+
   const healthData = undefined;
   const apiCallData = undefined;
 
@@ -463,10 +467,10 @@ export default function AdminDashboardPage() {
         />
         <KpiCard
           label="在线用户"
-          value={stats.online_ws_total ?? 0}
-          sub={`价格${stats.online_ws_price ?? 0} / 预警${stats.online_ws_alerts ?? 0}`}
+          value={onlineStats?.total ?? 0}
+          sub={`价格${onlineStats?.price ?? 0} / 预警${onlineStats?.alerts ?? 0}`}
           icon={Wifi}
-          color="bg-emerald-500/10 text-emerald-400"
+          color={(onlineStats?.total ?? 0) > 50 ? "bg-emerald-500/10 text-emerald-400" : "bg-blue-500/10 text-blue-400"}
         />
       </div>
 

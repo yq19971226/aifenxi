@@ -37,6 +37,10 @@ export function stripLocalePrefix(pathname: string): string {
 const ADMIN_WHITELIST: Record<string, UserRole[]> = {
   "/admin/orders": ["admin", "operator"],
   "/admin/users": ["admin", "operator"],
+  "/admin/announcements": ["admin", "operator"],
+  "/admin/notifications": ["admin", "operator"],
+  "/admin/task-review": ["admin", "operator"],
+  "/admin/playbook-review": ["admin", "operator"],
 };
 
 const EXTRA_PROTECTED: Record<string, UserRole[]> = {

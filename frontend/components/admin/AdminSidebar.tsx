@@ -8,6 +8,8 @@ import { ChevronLeft, ChevronRight, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { isNavItemVisible, stripLocalePrefix, type UserRole } from "@/lib/route-permissions";
 import { ADMIN_MENU_GROUPS, type AdminMenuGroup } from "./AdminSidebar.config";
+import { useQuery } from "@tanstack/react-query";
+import { fetchAdminBadges } from "@/lib/api/admin-dashboard";
 
 function useFilteredGroups(userRole: UserRole): AdminMenuGroup[] {
   return ADMIN_MENU_GROUPS
@@ -96,6 +98,12 @@ function SidebarNav({
 }) {
   const t = useTranslations("admin.sidebar");
 
+  const { data: badges } = useQuery({
+    queryKey: ["adminBadges"],
+    queryFn: fetchAdminBadges,
+    refetchInterval: 30000, // 轮询: 30s
+  });
+
   return (
     <nav className="flex-1 overflow-y-auto px-2 pb-4 space-y-4">
       {groups.map((group) => (
@@ -113,20 +121,36 @@ function SidebarNav({
                 normalizedPath.startsWith(item.href + "/");
               const Icon = item.icon;
               const label = t(`items.${item.labelKey}`);
+              const badgeCount = item.badgeKey && badges ? badges[item.badgeKey] : 0;
+              const hasBadge = badgeCount > 0;
+              const badgeColorClass = item.badgeColor === "red" ? "bg-red-500/10 text-red-500" :
+                                      item.badgeColor === "amber" ? "bg-amber-500/10 text-amber-500" :
+                                      item.badgeColor === "blue" ? "bg-blue-500/10 text-blue-500" :
+                                      "bg-white/10 text-white";
 
               return (
                 <Link key={item.href} href={item.href}>
                   <div
-                    className={`flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors ${
+                    className={`flex items-center rounded-md px-2 py-1.5 text-sm transition-colors relative ${
                       active
                         ? "text-zinc-100 bg-white/[0.08]"
                         : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]"
-                    } ${collapsed ? "justify-center" : ""}`}
+                    } ${collapsed ? "justify-center" : "justify-between"}`}
                     title={collapsed ? label : undefined}
                   >
-                    <Icon size={15} className="flex-shrink-0" />
-                    {!collapsed && (
-                      <span className="truncate">{label}</span>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <Icon size={15} className="flex-shrink-0" />
+                      {!collapsed && (
+                        <span className="truncate">{label}</span>
+                      )}
+                    </div>
+                    {!collapsed && hasBadge && (
+                      <span className={`ml-2 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full text-[10px] font-medium leading-none ${badgeColorClass}`}>
+                        {badgeCount > 99 ? "99+" : badgeCount}
+                      </span>
+                    )}
+                    {collapsed && hasBadge && (
+                      <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-amber-500" />
                     )}
                   </div>
                 </Link>

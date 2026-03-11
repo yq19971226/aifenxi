@@ -24,6 +24,7 @@ import {
   Timer,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { useAdminOnlineStats, useSystemHealth } from "@/lib/hooks/useAdminMonitor";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -98,23 +99,6 @@ const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
 
 // ── 系统健康数据 ──────────────────────────────────────────
 
-interface HealthData {
-  status: string;
-  env: string;
-}
-
-async function fetchHealth(): Promise<HealthData> {
-  try {
-    const url = API_BASE ? `${API_BASE}/health` : "/health";
-    const res = await fetch(url, { headers: authHeaders() });
-    if (!res.ok) throw new Error(`health_status_${res.status}`);
-    const data = await res.json();
-    return data;
-  } catch {
-    return { status: "error", env: "unknown" };
-  }
-}
-
 interface KlineSchedulerStatus {
   running: boolean;
   symbols: string[];
@@ -182,20 +166,7 @@ async function fetchDefenseStatus(symbol: string): Promise<DefenseStatus> {
 // ── 在线用户卡片 ────────────────────────────────────────
 
 function OnlineUsersCard() {
-  const { data } = useQuery({
-    queryKey: ["admin-online-stats"],
-    queryFn: async () => {
-      try {
-        const res = await fetch(`${API_BASE}/api/admin/stats/online`, { headers: authHeaders() });
-        if (!res.ok) return { total: 0, price: 0, alerts: 0 };
-        const d = await res.json();
-        return { total: d.count ?? 0, price: d.price ?? 0, alerts: d.alerts ?? 0 };
-      } catch {
-        return { total: 0, price: 0, alerts: 0 };
-      }
-    },
-    refetchInterval: 15_000,
-  });
+  const { data } = useAdminOnlineStats();
 
   return (
     <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5">
@@ -237,11 +208,7 @@ export default function AdminMonitorPage() {
   if (!user || user.role !== "admin") return null;
   const [monitorSymbol, setMonitorSymbol] = useState("BTCUSDT");
 
-  const { data: health } = useQuery({
-    queryKey: ["health"],
-    queryFn: fetchHealth,
-    refetchInterval: 15_000,
-  });
+  const { data: health } = useSystemHealth();
 
   const { data: modelAssignments } = useQuery({
     queryKey: ["model-assignments"],
