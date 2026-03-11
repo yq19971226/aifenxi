@@ -131,17 +131,22 @@ function SidebarNav({
               return (
                 <Link key={item.href} href={item.href}>
                   <div
-                    className={`flex items-center rounded-md px-2 py-1.5 text-sm transition-colors relative ${
+                    className={`flex items-center rounded-md px-2 py-1.5 text-sm transition-all relative ${
                       active
                         ? "text-zinc-100 bg-white/[0.08]"
+                        : item.frequency === "high"
+                        ? "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
                         : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]"
                     } ${collapsed ? "justify-center" : "justify-between"}`}
                     title={collapsed ? label : undefined}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <Icon size={15} className="flex-shrink-0" />
+                      <Icon size={15} className={`flex-shrink-0 ${item.frequency === "high" && !active ? "text-zinc-400" : ""}`} />
                       {!collapsed && (
                         <span className="truncate">{label}</span>
+                      )}
+                      {item.frequency === "high" && !collapsed && !active && (
+                        <div className="w-1 h-1 rounded-full bg-emerald-500/30 ml-1" />
                       )}
                     </div>
                     {!collapsed && hasBadge && (

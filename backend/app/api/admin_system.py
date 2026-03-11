@@ -9,9 +9,10 @@ import logging
 import os
 
 import httpx
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
+from collections import deque
 
 from app.core.config import settings
 from app.core.deps import UserInfo, require_admin
@@ -174,3 +175,45 @@ async def trigger_rollback(
             "X-Accel-Buffering": "no",
         },
     )
+
+
+@router.get("/logs/{log_type}")
+async def get_system_logs(
+    log_type: str,
+    lines: int = Query(default=100, ge=10, le=500),
+    admin: UserInfo = Depends(require_admin),
+) -> dict:
+    """获取系统日志内容。"""
+    log_files = {
+        "stdout": "uvicorn_8000_stdout.log",
+        "stderr": "uvicorn_8000_stderr.log",
+        "backend_stdout": "backend_uvicorn_stdout.log",
+        "backend_stderr": "backend_uvicorn_stderr.log",
+    }
+
+    file_name = log_files.get(log_type)
+    if not file_name:
+        raise HTTPException(status_code=400, detail="无效的日志类型")
+
+    # 获取 backend 目录路径 (假设此文件在 app/api/)
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    file_path = os.path.join(base_dir, file_name)
+
+    if not os.path.exists(file_path):
+        return {
+            "log_type": log_type,
+            "content": f"日志文件 {file_name} 不存在于 {base_dir}",
+            "lines": 0,
+        }
+
+    try:
+        with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+            content = "".join(deque(f, maxlen=lines))
+            return {
+                "log_type": log_type,
+                "content": content,
+                "lines": len(content.splitlines()),
+            }
+    except Exception as exc:
+        logger.error("读取日志失败", log_type=log_type, error=str(exc))
+        raise HTTPException(status_code=500, detail=f"读取日志失败: {exc}")

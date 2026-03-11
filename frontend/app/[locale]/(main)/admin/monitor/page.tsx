@@ -24,7 +24,7 @@ import {
   Timer,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { useAdminOnlineStats, useSystemHealth } from "@/lib/hooks/useAdminMonitor";
+import { useAdminOnlineStats, useSystemHealth, useDataSourceHealth } from "@/lib/hooks/useAdminMonitor";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -201,6 +201,55 @@ function OnlineUsersCard() {
   );
 }
 
+// ── 数据源健康卡片 ──
+function DataSourceHealthCard() {
+  const { data } = useDataSourceHealth();
+  const sources = data?.sources || {};
+
+  return (
+    <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5 shadow-inner">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+            <Database className="text-emerald-500" size={20} />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-white">数据源健康度</h2>
+            <p className="text-xs text-zinc-500">实时连接状态与成功率</p>
+          </div>
+        </div>
+        <div className="text-right">
+           <div className="text-xl font-bold text-emerald-400">{(data?.completeness_score || 0).toFixed(1)}%</div>
+           <div className="text-[10px] text-zinc-600 uppercase font-bold tracking-tighter">Completeness</div>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {Object.entries(sources).slice(0, 6).map(([id, s]: [string, any]) => (
+          <div key={id} className="p-3 bg-white/[0.02] border border-white/[0.04] rounded-xl hover:bg-white/[0.04] transition-all group">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold text-zinc-300 uppercase tracking-tight truncate max-w-[120px]" title={id}>{id.replace('_', ' ')}</span>
+              <div className={`h-1.5 w-1.5 rounded-full ${s.connected ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"}`} />
+            </div>
+            <div className="flex items-center justify-between">
+               <div className="flex items-center gap-1.5">
+                  <Activity size={10} className="text-zinc-500" />
+                  <span className="text-[10px] font-mono text-zinc-400">{s.message_rate?.toFixed(2) || "0.00"} msg/s</span>
+               </div>
+               <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${
+                 s.status === 'enabled' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 
+                 s.status === 'error' ? 'bg-red-500/10 text-red-500 border border-red-500/20' :
+                 'bg-zinc-500/10 text-zinc-500 border border-zinc-500/20'
+               }`}>
+                 {s.status.toUpperCase()}
+               </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── 页面组件 ──────────────────────────────────────────────
 
 export default function AdminMonitorPage() {
@@ -353,8 +402,11 @@ export default function AdminMonitorPage() {
         </div>
       </div>
 
-      {/* 在线用户 */}
-      <OnlineUsersCard />
+      {/* 实时状态概览 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <OnlineUsersCard />
+        <DataSourceHealthCard />
+      </div>
 
       {/* K 线采集调度器 */}
       <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5">

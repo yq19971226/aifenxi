@@ -63,3 +63,21 @@ export function useConfigHealth() {
     refetchInterval: 60_000,
   });
 }
+// ── 数据源健康检查 ──
+export function useDataSourceHealth() {
+  return useQuery({
+    queryKey: ["admin-datasource-health"],
+    queryFn: async () => {
+      try {
+        const res = await fetch(`${API}/api/admin/datasources/health`, {
+          headers: authHeaders(),
+        });
+        if (!res.ok) throw new Error("datasource_health_failed");
+        return await res.json();
+      } catch {
+        return { sources: {}, completeness_score: 0 };
+      }
+    },
+    refetchInterval: 30_000,
+  });
+}

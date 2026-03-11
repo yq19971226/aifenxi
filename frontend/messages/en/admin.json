@@ -26,8 +26,9 @@
       "taskTemplates": "Task Templates",
       "withdrawals": "Withdrawals",
       "partnerStats": "Partner Stats",
-      "learning": "AI Learning",
-      "systemMgmt": "System Management"
+      "logs": "System Logs",
+      "learning": "Deep Learning",
+      "systemMgmt": "System Ops"
     },
     "mobileMenu": "Admin Menu"
   },
@@ -531,22 +532,43 @@
       }
     },
     "auditLog": {
-      "title": "Audit Logs",
-      "openTitle": "Collapse Audit Logs",
+      "title": "Config Audit Log",
       "time": "Time",
-      "configKey": "Config Key",
+      "admin": "Admin",
       "action": "Action",
+      "configKey": "Key",
       "oldValue": "Old Value",
       "newValue": "New Value",
       "actions": {
-        "update": "Update",
         "create": "Create",
+        "update": "Update",
         "delete": "Delete"
       },
-      "pagination": "Page {page}/{total} (Total {count})",
-      "prev": "Prev",
+      "empty": "No audit records",
+      "error": "Failed to load audit logs"
+    },
+    "wizard": {
+      "title": "System Setup Wizard",
+      "welcome": "Welcome to Axiom System Setup Wizard",
+      "welcomeDesc": "This wizard will guide you through the core configuration of the system to ensure all agents and data sources are running properly.",
+      "step1": "Core API Keys",
+      "step1Desc": "Configure API keys for exchanges, data sources, and AI interfaces.",
+      "step2": "AI Model Routing",
+      "step2Desc": "Set the default AI models used by each agent.",
+      "step3": "Feature Toggles",
+      "step3Desc": "Enable or disable core system modules as needed.",
+      "step4": "Finish Setup",
+      "step4Desc": "Verify and apply all configurations.",
       "next": "Next",
-      "empty": "No audit logs found"
+      "prev": "Previous",
+      "finish": "Finish and Save",
+      "saving": "Saving configuration...",
+      "success": "Configuration applied successfully!",
+      "error": "Failed to save configuration, please check your network.",
+      "verify": "Verify Now",
+      "verifying": "Verifying connection...",
+      "verifySuccess": "Connection verified",
+      "verifyFailed": "Connection verification failed"
     }
   },
   "dashboard": {

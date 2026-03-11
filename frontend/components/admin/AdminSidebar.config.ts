@@ -27,6 +27,7 @@ export interface AdminMenuItem {
   icon: LucideIcon;
   badgeKey?: "playbookReview" | "taskReview" | "withdrawals";
   badgeColor?: "red" | "amber" | "blue";
+  frequency?: "high" | "low";
 }
 
 export interface AdminMenuGroup {
@@ -38,19 +39,20 @@ export const ADMIN_MENU_GROUPS: AdminMenuGroup[] = [
   {
     labelKey: "overview",
     items: [
-      { labelKey: "dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+      { labelKey: "dashboard", href: "/admin/dashboard", icon: LayoutDashboard, frequency: "high" },
     ],
   },
   {
     labelKey: "system",
     items: [
-      { labelKey: "monitor", href: "/admin/monitor", icon: Activity },
-      { labelKey: "setup", href: "/admin/setup", icon: Settings },
+      { labelKey: "monitor", href: "/admin/monitor", icon: Activity, frequency: "high" },
+      { labelKey: "setup", href: "/admin/setup", icon: Settings, frequency: "high" },
       { labelKey: "models", href: "/admin/models", icon: Brain },
+      { labelKey: "logs", href: "/admin/system/logs", icon: FileText },
       { labelKey: "datasources", href: "/admin/datasources", icon: Database },
       { labelKey: "apiKeys", href: "/admin/api-keys", icon: Key },
-      { labelKey: "symbols", href: "/admin/symbols", icon: Coins },
-      { labelKey: "learning", href: "/admin/learning", icon: GraduationCap },
+      { labelKey: "symbols", href: "/admin/symbols", icon: Coins, frequency: "high" },
+      { labelKey: "learning", href: "/admin/learning", icon: GraduationCap, frequency: "high" },
       { labelKey: "systemMgmt", href: "/admin/system", icon: Server },
     ],
   },
@@ -67,7 +69,7 @@ export const ADMIN_MENU_GROUPS: AdminMenuGroup[] = [
   {
     labelKey: "review",
     items: [
-      { labelKey: "playbookReview", href: "/admin/playbook-review", icon: FileCheck, badgeKey: "playbookReview", badgeColor: "amber" },
+      { labelKey: "playbookReview", href: "/admin/playbook-review", icon: FileCheck, badgeKey: "playbookReview", badgeColor: "amber", frequency: "high" },
       { labelKey: "taskReview", href: "/admin/task-review", icon: ClipboardCheck, badgeKey: "taskReview", badgeColor: "amber" },
       { labelKey: "taskTemplates", href: "/admin/task-templates", icon: FileText },
     ],

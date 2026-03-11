@@ -7,6 +7,7 @@ import { Settings, ToggleLeft, Loader2, AlertTriangle, CheckCircle2, ClipboardLi
 import { useAuth } from "@/lib/auth-context";
 import { authFetch } from "@/lib/api/auth";
 import { fetchAuditLogs, type AuditLogEntry, type AuditLogPage } from "@/lib/api/configs";
+import SetupWizard from "@/components/admin/SetupWizard";
 
 type FeatureState = "active" | "maintenance" | "hidden";
 
@@ -97,6 +98,7 @@ export default function AdminSetupPage() {
   });
 
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [showWizard, setShowWizard] = useState(false);
 
   const mutation = useMutation({
     mutationFn: ({
@@ -173,12 +175,21 @@ export default function AdminSetupPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 md:px-8 py-8 space-y-8">
-      <div>
-        <h1 className="flex items-center gap-2 text-lg font-semibold text-white">
-          <Settings size={20} className="text-zinc-400" />
-          {t("setup.title")}
-        </h1>
-        <p className="mt-1 text-sm text-zinc-500">{t("setup.subtitle")}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="flex items-center gap-2 text-lg font-semibold text-white">
+            <Settings size={20} className="text-zinc-400" />
+            {t("setup.title")}
+          </h1>
+          <p className="mt-1 text-sm text-zinc-500">{t("setup.subtitle")}</p>
+        </div>
+        <button
+          onClick={() => setShowWizard(true)}
+          className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg hover:bg-emerald-500/20 transition-all text-xs font-medium"
+        >
+          <ClipboardList size={14} />
+          {t('wizard.title')}
+        </button>
       </div>
 
       {/* Batch Maintenance Toggle (merged from maintenance page) */}
@@ -331,6 +342,21 @@ export default function AdminSetupPage() {
 
       {/* Audit Logs */}
       <AuditLogSection />
+
+      {/* Setup Wizard Modal */}
+      {showWizard && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="w-full max-w-2xl">
+            <SetupWizard onFinish={() => setShowWizard(false)} />
+            <button 
+              onClick={() => setShowWizard(false)}
+              className="mt-4 mx-auto block text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+            >
+              × 关闭向导
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
