@@ -21,14 +21,21 @@ import {
   AlertTriangle,
   Sparkles,
   Zap,
+  RefreshCw,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import {
   fetchAvailableModels,
   fetchModelAssignments,
   updateModelAssignment,
   resetAllAssignments,
+  fetchDmxapiSync,
+  refreshDmxapiSync,
   type AvailableModel,
   type ModelAssignment,
+  type DmxapiSyncResult,
+  type DmxapiModelStatus,
 } from "@/lib/api/admin-models";
 import { useAuth } from "@/lib/auth-context";
 
@@ -175,6 +182,9 @@ export default function AdminModelsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [dmxapiSync, setDmxapiSync] = useState<DmxapiSyncResult | null>(null);
+  const [syncLoading, setSyncLoading] = useState(false);
+  const [syncError, setSyncError] = useState("");
 
   const loadData = useCallback(async () => {
     try {
@@ -241,6 +251,27 @@ export default function AdminModelsPage() {
   const hasCustom = assignments.some((a) => a.is_custom);
   const changeCount = Object.keys(pendingChanges).length;
 
+  // DMXAPI 模型可用性映射
+  const dmxapiStatusMap: Record<string, DmxapiModelStatus> = {};
+  if (dmxapiSync) {
+    for (const r of dmxapiSync.results) {
+      dmxapiStatusMap[r.model_key] = r;
+    }
+  }
+
+  const handleDmxapiSync = async (force = false) => {
+    setSyncLoading(true);
+    setSyncError("");
+    try {
+      const result = force ? await refreshDmxapiSync() : await fetchDmxapiSync();
+      setDmxapiSync(result);
+    } catch (e: any) {
+      setSyncError(e.message || "DMXAPI 同步失败");
+    } finally {
+      setSyncLoading(false);
+    }
+  };
+
   // 按 phase 分组
   const grouped: Record<string, ModelAssignment[]> = {};
   for (const a of assignments) {
@@ -288,6 +319,14 @@ export default function AdminModelsPage() {
             </button>
           )}
           <button
+            onClick={() => handleDmxapiSync(false)}
+            disabled={syncLoading}
+            className="flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-400 transition-colors hover:bg-emerald-500/10 disabled:opacity-50"
+          >
+            <RefreshCw size={12} className={syncLoading ? "animate-spin" : ""} />
+            {syncLoading ? "同步中..." : "同步 DMXAPI"}
+          </button>
+          <button
             onClick={handleSave}
             disabled={changeCount === 0 || saving}
             className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-medium transition-colors disabled:opacity-50 ${
@@ -317,6 +356,71 @@ export default function AdminModelsPage() {
         <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-400 flex items-center gap-2">
           <AlertTriangle size={14} />
           有 {changeCount} 项未保存的模型变更，点击「保存」生效
+        </div>
+      )}
+      {syncError && (
+        <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-xs text-red-400">
+          DMXAPI 同步失败: {syncError}
+        </div>
+      )}
+
+      {/* DMXAPI 同步状态概览 */}
+      {dmxapiSync && (
+        <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Wifi size={14} className="text-emerald-400" />
+              <span className="text-sm font-medium text-white">DMXAPI 模型可用性</span>
+              <span className="text-xs text-zinc-500">
+                DMXAPI 共 {dmxapiSync.dmxapi_total_models} 个模型
+              </span>
+            </div>
+            <button
+              onClick={() => handleDmxapiSync(true)}
+              disabled={syncLoading}
+              className="text-xs text-zinc-400 hover:text-white transition-colors"
+            >
+              <RefreshCw size={12} className={syncLoading ? "animate-spin" : ""} />
+            </button>
+          </div>
+          <div className="flex gap-4 text-xs">
+            <span className="text-emerald-400">
+              ✅ {dmxapiSync.system_available} 个可用
+            </span>
+            {dmxapiSync.system_unavailable > 0 && (
+              <span className="text-red-400 font-medium">
+                ❌ {dmxapiSync.system_unavailable} 个已下架
+              </span>
+            )}
+          </div>
+          {dmxapiSync.system_unavailable > 0 && (
+            <div className="mt-3 space-y-2">
+              {dmxapiSync.results
+                .filter((r) => !r.available)
+                .map((r) => (
+                  <div
+                    key={r.model_key}
+                    className="rounded-lg border border-red-500/20 bg-red-500/5 px-3 py-2"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <WifiOff size={12} className="text-red-400" />
+                      <span className="text-xs font-medium text-red-300">
+                        {r.display_name}
+                      </span>
+                      <span className="text-xs text-red-400/60 font-mono">{r.model_name}</span>
+                    </div>
+                    {r.suggestions.length > 0 && (
+                      <div className="mt-1">
+                        <span className="text-xs text-zinc-500">可能的替代: </span>
+                        <span className="text-xs text-zinc-400">
+                          {r.suggestions.slice(0, 5).join(", ")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -397,7 +501,18 @@ export default function AdminModelsPage() {
                 <span className={`text-sm font-medium ${MODEL_COLORS[m.model_key] || "text-zinc-300"}`}>
                   {m.display_name}
                 </span>
-                <span className="text-xs text-zinc-500 font-mono">{m.model_name}</span>
+                <div className="flex items-center gap-2">
+                  {dmxapiStatusMap[m.model_key] && (
+                    <span className={`text-xs px-1.5 py-0.5 rounded ${
+                      dmxapiStatusMap[m.model_key].available
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : "bg-red-500/20 text-red-400"
+                    }`}>
+                      {dmxapiStatusMap[m.model_key].available ? "在线" : "已下架"}
+                    </span>
+                  )}
+                  <span className="text-xs text-zinc-500 font-mono">{m.model_name}</span>
+                </div>
               </div>
               <p className="text-xs text-zinc-500 mb-2">{m.description}</p>
               <div className="flex items-center justify-between">

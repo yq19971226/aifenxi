@@ -72,3 +72,33 @@ export async function resetAllAssignments(): Promise<void> {
   });
   await handleApiResponse<void>(res, "重置全部失败");
 }
+
+/* ── DMXAPI 实时模型同步 ─────────────────────────────────────── */
+
+export interface DmxapiModelStatus {
+  model_key: string;
+  model_name: string;
+  display_name: string;
+  available: boolean;
+  suggestions: string[];
+}
+
+export interface DmxapiSyncResult {
+  dmxapi_total_models: number;
+  system_total: number;
+  system_available: number;
+  system_unavailable: number;
+  results: DmxapiModelStatus[];
+}
+
+export async function fetchDmxapiSync(): Promise<DmxapiSyncResult> {
+  const res = await authFetch(`${API}/api/admin/models/dmxapi-sync`);
+  return handleApiResponse<DmxapiSyncResult>(res, "DMXAPI 同步失败");
+}
+
+export async function refreshDmxapiSync(): Promise<DmxapiSyncResult> {
+  const res = await authFetch(`${API}/api/admin/models/dmxapi-sync/refresh`, {
+    method: "POST",
+  });
+  return handleApiResponse<DmxapiSyncResult>(res, "DMXAPI 刷新失败");
+}
