@@ -10,6 +10,10 @@ const nextConfig = {
   async rewrites() {
     return [
       {
+        source: "/favicon.ico",
+        destination: "/favicon.svg",
+      },
+      {
         source: "/api/:path*",
         destination: `${process.env.API_PROXY_URL || "http://localhost:8000"}/api/:path*`,
       },
