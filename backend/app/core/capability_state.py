@@ -45,8 +45,8 @@ _CAPABILITY_REGISTRY: dict[str, dict[str, Any]] = {
     "cg_fr_arb":         {"status": CapabilityStatus.AVAILABLE,   "reason": "", "domain": "derivatives", "owner": "CoinGlass",    "cache_key": "cg_fr_arb:{symbol}"},
     "cg_large_orders":   {"status": CapabilityStatus.AVAILABLE,   "reason": "", "domain": "derivatives", "owner": "CoinGlass",    "cache_key": "cg_large_orders:{symbol}"},
     "cg_option_maxpain": {"status": CapabilityStatus.AVAILABLE,   "reason": "", "domain": "derivatives", "owner": "CoinGlass",    "cache_key": "cg_option_maxpain:{symbol}"},
-    # ── onchain 域 · owner: CryptoQuant（当前 fallback: Alternative.me / GlassNode）
-    "onchain":           {"status": CapabilityStatus.AVAILABLE,   "reason": "", "domain": "onchain",     "owner": "CryptoQuant",  "cache_key": "onchain:{symbol}"},
+    # ── onchain 域 · owner: GlassNode (Professional T3)（fallback: CryptoQuant / Alternative.me）
+    "onchain":           {"status": CapabilityStatus.AVAILABLE,   "reason": "", "domain": "onchain",     "owner": "GlassNode",    "cache_key": "onchain:{symbol}"},
     "sentiment:fear_greed": {"status": CapabilityStatus.AVAILABLE, "reason": "", "domain": "onchain",    "owner": "Alternative.me", "cache_key": "sentiment:fear_greed"},
     # ── macro 域 · owner: FRED（主源） + CoinGecko（辅助/fallback） ──
     "fred_macro":        {"status": CapabilityStatus.AVAILABLE,   "reason": "", "domain": "macro",       "owner": "FRED",         "cache_key": "fred_snapshot"},
@@ -56,7 +56,7 @@ _CAPABILITY_REGISTRY: dict[str, dict[str, Any]] = {
     "gecko_global":      {"status": CapabilityStatus.AVAILABLE,   "reason": "", "domain": "macro",       "owner": "CoinGecko",    "cache_key": "gecko_global"},
     "gecko_trending":    {"status": CapabilityStatus.AVAILABLE,   "reason": "", "domain": "macro",       "owner": "CoinGecko",    "cache_key": "gecko_trending"},
     # ── 辅助能力（不属于四主域，保留兼容） ──────────────────────
-    "news:feed":         {"status": CapabilityStatus.AVAILABLE,   "reason": "", "domain": "auxiliary",   "owner": "CryptoPanic/BlockBeats", "cache_key": "news:feed:{symbol}"},
+    "news:feed":         {"status": CapabilityStatus.AVAILABLE,   "reason": "", "domain": "auxiliary",   "owner": "Finnhub/BlockBeats", "cache_key": "news:feed:{symbol}"},
     "calendar":          {"status": CapabilityStatus.AVAILABLE,   "reason": "", "domain": "auxiliary",   "owner": "CoinMarketCal", "cache_key": "calendar_events:{symbol}"},
     "sentiment:kol":      {"status": CapabilityStatus.UNAVAILABLE, "reason": "需接入 LunarCrush/Twitter API", "domain": "auxiliary", "owner": "—", "cache_key": ""},
     "sentiment:mentions": {"status": CapabilityStatus.UNAVAILABLE, "reason": "需接入 LunarCrush/Twitter API", "domain": "auxiliary", "owner": "—", "cache_key": ""},

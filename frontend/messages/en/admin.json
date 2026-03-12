@@ -347,7 +347,7 @@
       "q3": "Q: Are keys stored securely?",
       "a3": "All API keys are encrypted in the database. The frontend only shows masked values (e.g. sk-****abc), never plain text.",
       "q4": "Q: Are free data sources sufficient?",
-      "a4": "Free sources (Binance + Alternative.me + BlockBeats + CryptoPanic + CoinGecko Demo) cover K-line, futures, fear index, news, and fundamentals. Paid sources (CoinGlass, GlassNode, CoinGecko Pro) add derivatives, on-chain depth, and community sentiment."
+      "a4": "Free sources (Binance + Alternative.me + BlockBeats + Finnhub + CoinGecko Demo) cover K-line, futures, fear index, news, earnings calendar, US stock quotes, and fundamentals. Paid sources (CoinGlass, GlassNode, CoinGecko Pro) add derivatives, on-chain depth, and community sentiment."
     },
     "toast": {
       "testSuccess": "{name} connection test succeeded",
@@ -364,10 +364,10 @@
         "howToGet": "Register → Top up → Copy API Key",
         "cost": "Pay-as-you-go"
       },
-      "cryptopanic_api_token": {
-        "name": "News Data Key",
-        "description": "Global crypto news for NewsAnalystAgent.",
-        "howToGet": "Register → API page → Copy Auth Token",
+      "finnhub_api_key": {
+        "name": "News + US Stock Data Key",
+        "description": "Crypto financial news, earnings calendar, US stock quotes, insider trading.",
+        "howToGet": "Register → Dashboard → Copy API Key",
         "cost": "Free"
       },
       "coinglass_api_key": {
@@ -619,8 +619,8 @@
         },
         "newsKey": {
           "label": "News Data",
-          "ok": "CryptoPanic connected",
-          "warn": "CryptoPanic not configured, using BlockBeats (free) only"
+          "ok": "Finnhub connected",
+          "warn": "Finnhub not configured, using BlockBeats (free) only"
         },
         "onchainKey": {
           "label": "On-chain Data",

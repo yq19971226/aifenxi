@@ -193,6 +193,7 @@
       "tp2": "止盈②",
       "waitSignal": "确认信号",
       "riskWarning": "风险提醒",
+      "plainSummary": "白话解读",
       "phases": {
         "accumulation": "吸筹期",
         "markup": "拉升期",

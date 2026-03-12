@@ -108,6 +108,20 @@ async def playbook_simulate(
         except Exception:
             user_level = 0
 
+    # 配额检查：免费用户每日 3 次
+    from app.services.playbook_quota import check_playbook_sim_quota
+    allowed, remaining = await check_playbook_sim_quota(str(user.id), user_level)
+    if not allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail={
+                "error": "quota_exceeded",
+                "message": "今日剧本推演次数已用完，升级会员可无限使用",
+                "remaining": 0,
+                "upgrade_url": "/settings/membership",
+            },
+        )
+
     try:
         await ensure_playbook_prediction_columns(session)
         await backfill_playbook_prediction_market_structures(session)
@@ -144,6 +158,20 @@ async def playbook_simulate_stream(
             user_level = membership.level
         except Exception:
             user_level = 0
+
+    # 配额检查：免费用户每日 3 次（与非流式共享计数）
+    from app.services.playbook_quota import check_playbook_sim_quota
+    allowed, remaining = await check_playbook_sim_quota(str(user.id), user_level)
+    if not allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail={
+                "error": "quota_exceeded",
+                "message": "今日剧本推演次数已用完，升级会员可无限使用",
+                "remaining": 0,
+                "upgrade_url": "/settings/membership",
+            },
+        )
 
     return StreamingResponse(
         simulate_stream(symbol, user_level=user_level),

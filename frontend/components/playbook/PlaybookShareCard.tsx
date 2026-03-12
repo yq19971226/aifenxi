@@ -161,6 +161,43 @@ export const PlaybookShareCard = forwardRef<HTMLDivElement, PlaybookShareCardPro
         </div>
 
         <div style={{ padding: "14px 0 0" }}>
+          {/* ── Plain Language Summary ── */}
+          {judge?.plain_summary && (
+            <div style={{
+              margin: "0 20px 14px",
+              background: "#f5f3ff",
+              border: "1px solid #ddd6fe",
+              borderLeft: "3px solid #8b5cf6",
+              borderRadius: 8,
+              padding: "14px 16px",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#6d28d9" }}>
+                  💬 白话解读
+                </span>
+                {judge.confidence_level && (
+                  <span style={{
+                    fontSize: 11, fontWeight: 700,
+                    color: judge.confidence_level === "high" ? "#16a34a"
+                         : judge.confidence_level === "medium" ? "#d97706"
+                         : "#71717a",
+                    background: judge.confidence_level === "high" ? "#dcfce7"
+                              : judge.confidence_level === "medium" ? "#fef3c7"
+                              : "#f4f4f5",
+                    borderRadius: 4, padding: "2px 8px",
+                  }}>
+                    {judge.confidence_level === "high" ? "🔥 高度匹配"
+                     : judge.confidence_level === "medium" ? "⚡ 中度匹配"
+                     : judge.confidence_level === "low" ? "💡 弱匹配"
+                     : "— 证据不足"}
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#1f2937", lineHeight: 1.6 }}>
+                {judge.plain_summary}
+              </div>
+            </div>
+          )}
           {bestMatch && (
             <div style={S.section("#6366f1")}>
               <div style={{ fontSize: 13, fontWeight: 700, color: "#4338ca", marginBottom: 10 }}>

@@ -1,0 +1,75 @@
+{
+  "title": "部署自動駕駛",
+  "subtitle": "配置自主多智能體分析實例，將訊號管道接入你的基礎設施。",
+  "steps": {
+    "target": "目標資產",
+    "engine": "智能體引擎",
+    "delivery": "投遞通道",
+    "review": "確認部署"
+  },
+  "step1": {
+    "title": "選擇目標資產",
+    "desc": "自主智能體將監控哪個交易對？",
+    "tip": "不同資產需要不同的拓撲模型。系統會自動切換向量資料庫索引以匹配所選資產。",
+    "tipLabel": "專業技巧："
+  },
+  "step2": {
+    "title": "智能體架構配置",
+    "desc": "選擇此自動駕駛的計算深度。",
+    "nsed": {
+      "pipeline": "L1-L4 流水線",
+      "name": "全能 NSED",
+      "desc": "完整多智能體流水線，包含莊家對抗和風險防禦。最高準確度，最大算力消耗。"
+    },
+    "scalping": {
+      "pipeline": "L1-L2 流水線",
+      "name": "狙擊超短線",
+      "desc": "速度優先。跳過深度 L4 共識，以毫秒級速度輸出結構性訊號。適合高頻交易整合。"
+    }
+  },
+  "step3": {
+    "title": "出站投遞通道",
+    "desc": "智能體達成共識後，將研判結果投遞至何處？",
+    "discord": {
+      "name": "Discord / Slack",
+      "desc": "將富文本分析推送至你的團隊頻道。"
+    },
+    "webhook": {
+      "name": "自訂 HTTP Webhook",
+      "desc": "將純 JSON 訊號直接 POST 至你的交易演算法。",
+      "placeholder": "https://your-server.com/api/axiom-signals"
+    },
+    "selected": "已選擇",
+    "select": "選擇"
+  },
+  "step4": {
+    "title": "系統就緒，準備啟動",
+    "desc": "你的自主駕駛儀已設定完畢，將持續監控結構性變動。",
+    "labelTarget": "目標",
+    "labelArch": "架構",
+    "labelChannels": "通道",
+    "dashboardOnly": "無（僅儀表盤）",
+    "goCommand": "前往即時指揮室"
+  },
+  "controls": {
+    "back": "返回",
+    "continue": "繼續",
+    "deploy": "部署自動駕駛",
+    "deploying": "部署中...",
+    "deployed": "部署成功"
+  },
+  "terminal": {
+    "title": "部署終端"
+  },
+  "active": {
+    "title": "活躍運行",
+    "scanning": "掃描活躍節點中...",
+    "empty": "目前沒有活躍的自動駕駛。",
+    "emptyHint": "在上方部署一個自主駕駛儀以開始監控。",
+    "online": "線上",
+    "channels": "通道",
+    "uptime": "運行時間",
+    "delete": "終止",
+    "deleteConfirm": "確定要終止此自動駕駛嗎？"
+  }
+}

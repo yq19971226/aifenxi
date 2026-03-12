@@ -1,11 +1,11 @@
-"""新闻数据采集模块 — CryptoPanic + 缓存。
+"""新闻数据采集模块 — Finnhub + 缓存。
 
 数据源：
-- CryptoPanic API（免费层可用，支持币种过滤）
-- Redis 缓存（news:feed:{symbol}，TTL 10min）
+- Finnhub Market News (category=crypto)（免费层可用，主流财经媒体来源）
+- Redis 缓存（news:feed:{symbol}，TTL 15min）
 
 输出：标准化的新闻条目列表，每条包含标题、来源、发布时间、
-投票数据（正面/负面/重要/有毒）和原始 URL。
+投票数据和原始 URL。
 """
 
 import asyncio
@@ -13,19 +13,17 @@ import logging
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-import httpx
 from pydantic import BaseModel, Field
 
 from app.core.redis import get_json, set_with_ttl
 
 logger = logging.getLogger(__name__)
 
-_CRYPTOPANIC_API = "https://cryptopanic.com/api/free/v1/posts/"
 _CACHE_PREFIX = "news:feed"
-_CACHE_TTL = 600  # 10 minutes
+_CACHE_TTL = 900  # 15 minutes
 _REQUEST_TIMEOUT = 20.0
 
-# CryptoPanic 币种代码映射（去掉 USDT 后缀）
+# 币种符号映射（Binance 对 → 通用符号）
 _SYMBOL_MAP: dict[str, str] = {
     "BTCUSDT": "BTC",
     "ETHUSDT": "ETH",
@@ -49,10 +47,10 @@ class NewsItem(BaseModel):
 
 
 class NewsCollector:
-    """新闻数据采集器 — CryptoPanic API + Redis 缓存。"""
+    """新闻数据采集器 — Finnhub Market News + Redis 缓存。"""
 
-    def __init__(self, api_token: Optional[str] = None) -> None:
-        self._api_token = api_token
+    def __init__(self) -> None:
+        pass
 
     async def fetch_news(
         self,
@@ -61,15 +59,15 @@ class NewsCollector:
     ) -> list[NewsItem]:
         """获取指定交易对的最新新闻。
 
-        优先从 Redis 缓存读取，缓存未命中时调用 CryptoPanic API。
+        优先从 Redis 缓存读取，缓存未命中时调用 Finnhub API。
         """
         symbol = symbol.upper()
         cache_key = f"{_CACHE_PREFIX}:{symbol}"
 
         # 0. 检查数据源开关
         from app.data.source_gate import is_enabled
-        if not await is_enabled("cryptopanic"):
-            logger.debug("CryptoPanic source disabled, skipping", extra={"symbol": symbol})
+        if not await is_enabled("finnhub"):
+            logger.debug("Finnhub source disabled, skipping", extra={"symbol": symbol})
             return []
 
         # 1. 尝试读取缓存
@@ -81,19 +79,10 @@ class NewsCollector:
         except Exception:
             pass
 
-        # 2. 获取 API Token
-        api_token = self._api_token
-        if not api_token:
-            try:
-                from app.services.config_service import get_config_value
-                api_token = await get_config_value("cryptopanic_api_token")
-            except Exception:
-                pass
+        # 2. 调用 Finnhub API
+        items = await self._fetch_from_finnhub(symbol, limit)
 
-        # 3. 调用 CryptoPanic API
-        items = await self._fetch_from_cryptopanic(symbol, api_token, limit)
-
-        # 4. 缓存结果
+        # 3. 缓存结果
         if items:
             try:
                 cache_data = [item.model_dump() for item in items]
@@ -103,68 +92,69 @@ class NewsCollector:
 
         return items
 
-    async def _fetch_from_cryptopanic(
+    async def _fetch_from_finnhub(
         self,
         symbol: str,
-        api_token: Optional[str],
         limit: int,
     ) -> list[NewsItem]:
-        """从 CryptoPanic API 获取新闻。"""
-        if not api_token:
-            logger.warning("CryptoPanic API token not configured, returning empty")
-            return []
-
-        currency = _SYMBOL_MAP.get(symbol, symbol.replace("USDT", ""))
-        params: dict[str, Any] = {
-            "auth_token": api_token,
-            "currencies": currency,
-            "kind": "news",
-            "public": "true",
-        }
-
+        """从 Finnhub Market News API 获取新闻。"""
         try:
-            async with httpx.AsyncClient(timeout=_REQUEST_TIMEOUT) as client:
-                resp = await asyncio.wait_for(
-                    client.get(_CRYPTOPANIC_API, params=params),
-                    timeout=_REQUEST_TIMEOUT,
-                )
-                resp.raise_for_status()
-                data = resp.json()
+            from app.data.finnhub_client import FinnhubClient
+            client = FinnhubClient()
+            raw_news = await client.fetch_market_news(category="crypto")
 
-            results = data.get("results", [])
+            if not raw_news:
+                logger.info("Finnhub returned no crypto news")
+                return []
+
+            currency = _SYMBOL_MAP.get(symbol, symbol.replace("USDT", ""))
             items: list[NewsItem] = []
-            for entry in results[:limit]:
-                source_info = entry.get("source", {})
-                currencies = [
-                    c.get("code", "")
-                    for c in entry.get("currencies", [])
-                    if isinstance(c, dict)
-                ]
-                votes = entry.get("votes", {})
+
+            for entry in raw_news[:limit]:
+                # 按币种过滤（相关字段匹配）
+                related = str(entry.get("related", "")).upper()
+                headline = str(entry.get("headline", "")).upper()
+                summary = str(entry.get("summary", "")).upper()
+
+                # 如果有 related 字段，优先使用；否则模糊匹配标题/摘要
+                is_relevant = (
+                    currency in related
+                    or currency in headline
+                    or currency in summary
+                    or symbol == "BTCUSDT"  # BTC 新闻默认全部相关
+                )
+
+                if not is_relevant and symbol != "BTCUSDT":
+                    continue
+
+                # 转换时间戳
+                ts = entry.get("datetime", 0)
+                published_at = ""
+                if ts:
+                    try:
+                        published_at = datetime.fromtimestamp(ts, tz=timezone.utc).isoformat()
+                    except Exception:
+                        published_at = str(ts)
+
                 items.append(
                     NewsItem(
-                        title=entry.get("title", ""),
-                        source=source_info.get("title", "") if isinstance(source_info, dict) else str(source_info),
-                        published_at=entry.get("published_at", ""),
+                        title=entry.get("headline", ""),
+                        source=entry.get("source", ""),
+                        published_at=published_at,
                         url=entry.get("url", ""),
-                        kind=entry.get("kind", "news"),
-                        currencies=currencies,
-                        votes={
-                            "positive": votes.get("positive", 0),
-                            "negative": votes.get("negative", 0),
-                            "important": votes.get("important", 0),
-                            "toxic": votes.get("toxic", 0),
-                        } if isinstance(votes, dict) else {},
-                        domain=entry.get("domain", ""),
+                        kind="news",
+                        currencies=[currency] if is_relevant else [],
+                        votes={},
+                        domain=entry.get("source", ""),
                     )
                 )
 
             logger.info(
-                "CryptoPanic news fetched",
+                "Finnhub crypto news fetched",
                 extra={"symbol": symbol, "count": len(items)},
             )
             return items
 
         except Exception:
-            logger.warning("CryptoPanic API request failed", exc_info=True)
+            logger.warning("Finnhub news API request failed", exc_info=True)
             return []

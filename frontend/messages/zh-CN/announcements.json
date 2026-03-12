@@ -58,5 +58,13 @@
   },
   "error": {
     "loadFailed": "公告数据加载失败"
+  },
+  "runtime": {
+    "badge": "站内公告",
+    "closeAria": "关闭公告",
+    "snooze": "24 小时后提醒",
+    "viewDetail": "查看详情",
+    "acknowledged": "我已知晓",
+    "dismiss": "关闭提醒"
   }
 }

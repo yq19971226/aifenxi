@@ -16,7 +16,7 @@
 8. Government crypto policy changes
 
 Data flow:
-- NewsAnalystAgent already ingests CryptoPanic + BlockBeats news
+- NewsAnalystAgent already ingests Finnhub + BlockBeats news
 - This module scans those news items for macro keywords,
   classifies them, and outputs a risk-adjusted impact score.
 - The orchestrator uses this to inject a "macro_events" section
@@ -186,7 +186,7 @@ def detect_macro_events(
     """Scan news items and findings for macro event signals.
 
     Args:
-        news_items: Raw news items (from CryptoPanic/BlockBeats cache)
+        news_items: Raw news items (from Finnhub/BlockBeats cache)
         news_report_findings: key_findings from NewsAnalystAgent report
 
     Returns:

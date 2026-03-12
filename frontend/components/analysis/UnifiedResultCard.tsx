@@ -196,13 +196,13 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
                  <div key={idx} className="relative pl-4 border-l-2 border-bull/30 py-0.5">
                    <div className="absolute -left-[5px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-bull" />
                    <div className="flex justify-between items-baseline mb-0.5">
-                     <span className="text-[9px] font-bold text-zinc-600 uppercase">TP{idx+1}</span>
-                     <span className="text-[9px] text-bull/60 font-mono">+{(((target / (report.strategy?.entry_high || target)) - 1) * 100).toFixed(1)}%</span>
+                     <span className="text-[11px] font-bold text-zinc-500 uppercase">TP{idx+1}</span>
+                     <span className="text-[11px] text-bull/70 font-mono">+{(((target / (report.strategy?.entry_high || target)) - 1) * 100).toFixed(1)}%</span>
                    </div>
                    <div className="text-lg font-mono font-bold leading-none tracking-tight text-white">
                      {formatPrice(target)}
                    </div>
-                   <p className="text-[8px] text-zinc-500 uppercase mt-1">
+                   <p className="text-[11px] text-zinc-500 mt-1">
                      {idx === 0 ? t("card.initialResistance") : idx === 1 ? t("card.secondaryExtension") : t("card.trendObjective")}
                    </p>
                  </div>
@@ -215,16 +215,16 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
            <div className="mt-6 pt-4 border-t border-white/[0.05]">
               <div className="flex justify-between items-end">
                 <div>
-                  <p className="text-[9px] text-zinc-600 uppercase font-bold mb-1">{t("card.assessment")}</p>
+                  <p className="text-[11px] text-zinc-500 uppercase font-bold mb-1">{t("card.assessment")}</p>
                   <p className="text-xs font-mono text-emerald-500 uppercase tracking-widest">{t("card.activeTracking")}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[9px] text-zinc-600 uppercase font-bold mb-1">{t("card.confidence")}</p>
+                  <p className="text-[11px] text-zinc-500 uppercase font-bold mb-1">{t("card.confidence")}</p>
                   <div className="flex items-center gap-2">
                     <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
                       <div className="h-full bg-bull" style={{ width: `${confidence}%` }} />
                     </div>
-                    <span className="text-[10px] font-mono font-bold">{confidence}%</span>
+                    <span className="text-[11px] font-mono font-bold">{confidence}%</span>
                   </div>
                 </div>
               </div>

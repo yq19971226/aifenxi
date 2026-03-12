@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -51,6 +52,7 @@ function formatPublishTime(value: string | null) {
 interface AnnouncementCardProps {
   announcement: ActiveAnnouncement;
   actioning: boolean;
+  labels: { badge: string; closeAria: string; snooze: string; viewDetail: string; acknowledged: string; dismiss: string };
   onClose: (announcement: ActiveAnnouncement) => void;
   onConfirm: (announcement: ActiveAnnouncement) => void;
   onSnooze: (announcement: ActiveAnnouncement) => void;
@@ -60,6 +62,7 @@ interface AnnouncementCardProps {
 function AnnouncementCard({
   announcement,
   actioning,
+  labels,
   onClose,
   onConfirm,
   onSnooze,
@@ -72,7 +75,7 @@ function AnnouncementCard({
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-zinc-500">
               <Megaphone size={13} className="text-indigo-400" />
-              <span>站内公告</span>
+              <span>{labels.badge}</span>
               {announcement.published_at ? (
                 <span className="text-zinc-500 normal-case tracking-normal">
                   {formatPublishTime(announcement.published_at)}
@@ -92,7 +95,7 @@ function AnnouncementCard({
               onClick={() => onClose(announcement)}
               disabled={actioning}
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-200 disabled:opacity-40"
-              aria-label="关闭公告"
+              aria-label={labels.closeAria}
             >
               <X size={16} />
             </button>
@@ -106,7 +109,7 @@ function AnnouncementCard({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 border-t border-white/[0.06] px-4 py-3 md:flex-row md:flex-wrap md:items-center md:justify-end md:px-5">
+      <div className="flex flex-col gap-2 border-t border-white/[0.04] px-5 py-4 bg-black/20 md:flex-row md:flex-wrap md:items-center md:justify-end">
         {announcement.allow_snooze ? (
           <Button
             type="button"
@@ -115,9 +118,9 @@ function AnnouncementCard({
             icon={Clock3}
             disabled={actioning}
             onClick={() => onSnooze(announcement)}
-            className="justify-center"
+            className="justify-center text-zinc-400 hover:text-zinc-200"
           >
-            24 小时后提醒
+            {labels.snooze}
           </Button>
         ) : null}
 
@@ -129,9 +132,9 @@ function AnnouncementCard({
             icon={ExternalLink}
             disabled={actioning}
             onClick={() => onAction(announcement)}
-            className="justify-center"
+            className="justify-center bg-white/[0.05] hover:bg-white/[0.1] text-zinc-300 border-white/[0.1]"
           >
-            {announcement.action_text || "查看详情"}
+            {announcement.action_text || labels.viewDetail}
           </Button>
         ) : null}
 
@@ -142,9 +145,9 @@ function AnnouncementCard({
             icon={Check}
             disabled={actioning}
             onClick={() => onConfirm(announcement)}
-            className="justify-center"
+            className="justify-center bg-indigo-500 hover:bg-indigo-400 text-white shadow-[0_0_15px_rgba(99,102,241,0.3)]"
           >
-            我已知晓
+            {labels.acknowledged}
           </Button>
         ) : (
           <Button
@@ -153,9 +156,9 @@ function AnnouncementCard({
             size="sm"
             disabled={actioning}
             onClick={() => onClose(announcement)}
-            className="justify-center"
+            className="justify-center bg-white/[0.05] hover:bg-white/[0.1] text-zinc-300 border-white/[0.1]"
           >
-            关闭
+            {labels.dismiss}
           </Button>
         )}
       </div>
@@ -164,6 +167,7 @@ function AnnouncementCard({
 }
 
 export function AnnouncementRuntime() {
+  const t = useTranslations("announcements.runtime");
   const pathname = usePathname() || "/";
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -179,10 +183,19 @@ export function AnnouncementRuntime() {
     refetchOnWindowFocus: true,
   });
 
-  const visibleAnnouncements = useMemo(
-    () => data.filter((item) => !hiddenIds.includes(item.id)),
-    [data, hiddenIds]
-  );
+  const visibleAnnouncements = useMemo(() => {
+    let storedDismissed: string[] = [];
+    if (typeof window !== "undefined") {
+      try {
+        storedDismissed = JSON.parse(localStorage.getItem("dismissed_announcements") || "[]");
+      } catch (e) {
+        storedDismissed = [];
+      }
+    }
+    return data.filter(
+      (item) => !hiddenIds.includes(item.id) && !storedDismissed.includes(item.id)
+    );
+  }, [data, hiddenIds]);
 
   const banners = useMemo(
     () => visibleAnnouncements.filter((item) => item.display_mode === "banner"),
@@ -243,6 +256,14 @@ export function AnnouncementRuntime() {
 
   const hideAnnouncement = (announcementId: string) => {
     setHiddenIds((prev) => (prev.includes(announcementId) ? prev : [...prev, announcementId]));
+    if (typeof window !== "undefined") {
+      try {
+        const stored = JSON.parse(localStorage.getItem("dismissed_announcements") || "[]");
+        if (!stored.includes(announcementId)) {
+          localStorage.setItem("dismissed_announcements", JSON.stringify([...stored, announcementId]));
+        }
+      } catch (e) {}
+    }
   };
 
   const refreshAnnouncementQueries = () => {
@@ -257,60 +278,18 @@ export function AnnouncementRuntime() {
   ) => {
     const shouldHide = event_type !== "clicked" || !announcement.strong_ack_required;
     if (shouldHide) hideAnnouncement(announcement.id);
-    // #region agent log
-    fetch("http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "22da79" },
-      body: JSON.stringify({
-        sessionId: "22da79",
-        location: "AnnouncementRuntime.tsx:sendEvent:entry",
-        message: "sendEvent called",
-        data: { announcementId: announcement.id, event_type, shouldHide },
-        timestamp: Date.now(),
-        hypothesisId: "H2",
-      }),
-    }).catch(() => {});
-    // #endregion
     setActioningId(announcement.id);
     try {
-      const apiResult = await postAnnouncementEvent(announcement.id, {
+      await postAnnouncementEvent(announcement.id, {
         event_type,
         pathname,
         occurred_at: nowIso(),
         metadata: { source: "announcement_runtime" },
         ...extra,
       });
-      // #region agent log
-      fetch("http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "22da79" },
-        body: JSON.stringify({
-          sessionId: "22da79",
-          location: "AnnouncementRuntime.tsx:sendEvent:success",
-          message: "postAnnouncementEvent ok",
-          data: { announcementId: announcement.id, event_type, recorded: (apiResult as { recorded?: boolean })?.recorded },
-          timestamp: Date.now(),
-          hypothesisId: "H1",
-        }),
-      }).catch(() => {});
-      // #endregion
       refreshAnnouncementQueries();
       return true;
     } catch (error) {
-      // #region agent log
-      fetch("http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "22da79" },
-        body: JSON.stringify({
-          sessionId: "22da79",
-          location: "AnnouncementRuntime.tsx:sendEvent:catch",
-          message: "postAnnouncementEvent failed",
-          data: { announcementId: announcement.id, event_type, err: String(error) },
-          timestamp: Date.now(),
-          hypothesisId: "H1",
-        }),
-      }).catch(() => {});
-      // #endregion
       console.error("announcement event write failed", {
         announcementId: announcement.id,
         eventType: event_type,
@@ -318,22 +297,6 @@ export function AnnouncementRuntime() {
       });
       return false;
     } finally {
-      // #region agent log
-      if (shouldHide) {
-        fetch("http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "22da79" },
-          body: JSON.stringify({
-            sessionId: "22da79",
-            location: "AnnouncementRuntime.tsx:sendEvent:finally",
-            message: "sendEvent finished (hide already done optimistically)",
-            data: { announcementId: announcement.id },
-            timestamp: Date.now(),
-            hypothesisId: "H2",
-          }),
-        }).catch(() => {});
-      }
-      // #endregion
       setActioningId(null);
     }
   };
@@ -355,58 +318,40 @@ export function AnnouncementRuntime() {
 
   return (
     <>
-      {banners.length > 0 ? (
-        <div className="sticky top-14 z-30 mx-auto w-full max-w-[1400px] px-3 pt-3 md:px-6">
-          <div className="space-y-3">
-            <AnimatePresence initial={false}>
-              {banners.map((announcement) => (
-                <motion.div
-                  key={announcement.id}
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <AnnouncementCard
-                    announcement={announcement}
-                    actioning={actioningId === announcement.id}
-                    onClose={(item) => void sendEvent(item, "closed")}
-                    onConfirm={(item) => void sendEvent(item, "confirmed")}
-                    onSnooze={(item) => void sendEvent(item, "snoozed", { snooze_until: snoozeIso() })}
-                    onAction={(item) => void handleAction(item)}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        </div>
-      ) : null}
-
       <AnimatePresence>
-        {activeModal ? (
+        {activeModal || banners.length > 0 ? (
           <motion.div
-            key={activeModal.id}
+            key={(activeModal || banners[0])?.id}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 px-3 py-6 backdrop-blur-sm md:px-6"
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 px-4 py-6 backdrop-blur-md"
             onClick={() => {
-              if (!activeModal.strong_ack_required) {
-                void sendEvent(activeModal, "closed");
+              const active = activeModal || banners[0];
+              if (active && !active.strong_ack_required) {
+                void sendEvent(active, "closed");
               }
             }}
           >
             <motion.div
-              initial={{ opacity: 0, y: 12, scale: 0.98 }}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 12, scale: 0.98 }}
-              transition={{ duration: 0.2 }}
-              className="w-full max-w-2xl"
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
+              className="w-full max-w-xl shadow-[0_0_50px_rgba(0,0,0,0.8)] rounded-2xl border border-white/[0.08]"
               onClick={(event) => event.stopPropagation()}
             >
               <AnnouncementCard
-                announcement={activeModal}
-                actioning={actioningId === activeModal.id}
+                announcement={activeModal || banners[0]}
+                actioning={actioningId === (activeModal || banners[0])?.id}
+                labels={{
+                  badge: t("badge"),
+                  closeAria: t("closeAria"),
+                  snooze: t("snooze"),
+                  viewDetail: t("viewDetail"),
+                  acknowledged: t("acknowledged"),
+                  dismiss: t("dismiss"),
+                }}
                 onClose={(item) => void sendEvent(item, "closed")}
                 onConfirm={(item) => void sendEvent(item, "confirmed")}
                 onSnooze={(item) => void sendEvent(item, "snoozed", { snooze_until: snoozeIso() })}

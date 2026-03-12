@@ -31,15 +31,17 @@ export function AdminSidebar({ userRole }: AdminSidebarProps) {
 
   return (
     <aside
-      className={`hidden md:flex flex-col flex-shrink-0 border-r border-white/[0.06] bg-black/20 transition-[width] duration-200 ${
-        collapsed ? "w-14" : "w-52"
+      className={`hidden md:flex flex-col flex-shrink-0 border-r border-white/[0.06] bg-[#09090b]/95 backdrop-blur-xl transition-[width] duration-300 ease-in-out relative ${
+        collapsed ? "w-[72px]" : "w-64"
       }`}
     >
+      {/* Background decoration */}
+      <div className="absolute top-0 left-0 w-full h-32 bg-indigo-500/5 blur-[50px] pointer-events-none" />
       <div className="flex items-center justify-end px-2 py-2">
         <button
           type="button"
           onClick={() => setCollapsed((v) => !v)}
-          className="flex h-6 w-6 items-center justify-center rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04] transition-colors"
+          className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-500 hover:text-white hover:bg-white/[0.06] transition-all hover:shadow-[0_0_15px_rgba(255,255,255,0.05)]"
           aria-label={collapsed ? "展开侧边栏" : "收起侧边栏"}
         >
           {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
@@ -58,14 +60,19 @@ export function AdminMobileNav({ userRole }: AdminSidebarProps) {
   const t = useTranslations("admin.sidebar");
 
   return (
-    <div className="md:hidden border-b border-white/[0.06] bg-black/20">
+    <div className="md:hidden border-b border-white/[0.06] bg-[#09090b]/95 backdrop-blur-xl sticky top-0 z-50">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-zinc-400 hover:text-zinc-200"
+        className="flex w-full items-center justify-between px-5 py-3.5 text-sm text-zinc-300 hover:text-white transition-colors group"
       >
-        {open ? <X size={15} /> : <Menu size={15} />}
-        <span>{t("mobileMenu")}</span>
+        <div className="flex items-center gap-3">
+          <div className="p-1.5 rounded-md bg-white/[0.04] border border-white/[0.06] group-hover:bg-indigo-500/10 group-hover:border-indigo-500/20 group-hover:text-indigo-400 transition-all">
+            {open ? <X size={16} /> : <Menu size={16} />}
+          </div>
+          <span className="font-bold tracking-wide uppercase text-xs">{t("mobileMenu")}</span>
+        </div>
+        <div className="h-[1px] flex-1 bg-gradient-to-r from-white/[0.08] to-transparent mx-4" />
       </button>
 
       <AnimatePresence>
@@ -109,7 +116,7 @@ function SidebarNav({
       {groups.map((group) => (
         <div key={group.labelKey}>
           {!collapsed && (
-            <div className="px-2 pb-1 text-xs font-medium uppercase tracking-wider text-zinc-500">
+            <div className="px-4 pb-2 pt-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500/80">
               {t(`groups.${group.labelKey}`)}
             </div>
           )}
@@ -131,31 +138,34 @@ function SidebarNav({
               return (
                 <Link key={item.href} href={item.href}>
                   <div
-                    className={`flex items-center rounded-md px-2 py-1.5 text-sm transition-all relative ${
+                    className={`flex items-center rounded-xl px-3 py-2.5 text-sm transition-all relative overflow-hidden group ${
                       active
-                        ? "text-zinc-100 bg-white/[0.08]"
+                        ? "text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.1)] font-bold"
                         : item.frequency === "high"
-                        ? "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
-                        : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]"
-                    } ${collapsed ? "justify-center" : "justify-between"}`}
+                        ? "text-zinc-300 hover:text-white hover:bg-white/[0.06] border border-transparent font-medium"
+                        : "text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.04] border border-transparent font-medium"
+                    } ${collapsed ? "justify-center mx-2" : "justify-between mx-3"}`}
                     title={collapsed ? label : undefined}
                   >
+                    {active && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-indigo-500/5 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    )}
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <Icon size={15} className={`flex-shrink-0 ${item.frequency === "high" && !active ? "text-zinc-400" : ""}`} />
+                      <Icon size={16} className={`flex-shrink-0 transition-transform group-hover:scale-110 ${active ? "text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]" : item.frequency === "high" ? "text-zinc-400 group-hover:text-zinc-300" : ""}`} />
                       {!collapsed && (
                         <span className="truncate">{label}</span>
                       )}
                       {item.frequency === "high" && !collapsed && !active && (
-                        <div className="w-1 h-1 rounded-full bg-emerald-500/30 ml-1" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 ml-2 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                       )}
                     </div>
                     {!collapsed && hasBadge && (
-                      <span className={`ml-2 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full text-[10px] font-medium leading-none ${badgeColorClass}`}>
+                      <span className={`ml-2 flex h-5 min-w-[20px] px-1.5 items-center justify-center rounded-md text-[10px] font-black font-mono leading-none border border-current/[0.15] tracking-tight ${badgeColorClass}`}>
                         {badgeCount > 99 ? "99+" : badgeCount}
                       </span>
                     )}
                     {collapsed && hasBadge && (
-                      <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-amber-500" />
+                      <span className={`absolute right-1 top-1 h-2 w-2 rounded-full shadow-[0_0_5px_currentColor] ${badgeColorClass}`} />
                     )}
                   </div>
                 </Link>

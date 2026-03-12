@@ -57,7 +57,7 @@ const HEALTH_ITEMS: HealthItem[] = [
   {
     id: "news_key",
     itemKey: "newsKey",
-    checkFn: (c) => c.some((x) => x.config_key === "cryptopanic_api_token") ? "ok" : "warn",
+    checkFn: (c) => c.some((x) => x.config_key === "finnhub_api_key") ? "ok" : "warn",
     href: "/admin/api-keys",
   },
   {

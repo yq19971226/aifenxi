@@ -47,10 +47,15 @@ class IndicatorResult(BaseModel):
 
 
 class OnchainSnapshot(BaseModel):
-    """链上数据快照 — 对应 TimescaleDB onchain_snapshots 表。"""
+    """链上数据快照 — 对应 TimescaleDB onchain_snapshots 表。
+
+    基础字段由 CryptoQuant / Alternative.me 提供，
+    T3 扩展字段由 Glassnode Professional 提供。
+    """
 
     time: datetime
     symbol: str
+    # ── 基础字段 ──
     exchange_netflow: Optional[float] = None
     whale_change_24h: Optional[float] = None
     fear_greed_index: Optional[int] = None
@@ -61,6 +66,28 @@ class OnchainSnapshot(BaseModel):
     large_tx_count: Optional[int] = None
     large_tx_volume: Optional[float] = None
     miner_reserve_change: Optional[float] = None
+
+    # ── Glassnode T3 扩展字段 ──
+    nupl: Optional[float] = None                    # 净未实现盈亏（周期判断核心）
+    sopr: Optional[float] = None                    # 已实现盈亏比（短线顶底）
+    asopr: Optional[float] = None                   # 调整版 SOPR
+    lth_sopr: Optional[float] = None                # 长期持有者 SOPR
+    sth_sopr: Optional[float] = None                # 短期持有者 SOPR
+    lth_nupl: Optional[float] = None                # 长期持有者 NUPL
+    sth_nupl: Optional[float] = None                # 短期持有者 NUPL
+    puell_multiple: Optional[float] = None           # 矿工收入估值
+    reserve_risk: Optional[float] = None             # 持有者信心/价格比
+    accumulation_score: Optional[float] = None       # 积累趋势评分 (T3独占)
+    hodler_net_change: Optional[float] = None        # HODLer 净仓位变化
+    net_realized_pl: Optional[float] = None          # 净已实现盈亏
+    ssr: Optional[float] = None                      # 稳定币供应比
+    addresses_in_profit_pct: Optional[float] = None  # 盈利地址占比
+    hash_ribbon: Optional[float] = None              # 矿工投降/复苏信号 (T3独占)
+    mvrv_entity_adj: Optional[float] = None          # Entity-Adjusted MVRV (T3独占)
+    nvt_signal: Optional[float] = None               # NVT Signal 改进版
+    liveliness: Optional[float] = None               # 持有 vs 消费倾向
+    rhodl_ratio: Optional[float] = None              # RHODL 长短期比 (T3独占)
+    exchange_inflow: Optional[float] = None          # 交易所流入总量
 
 
 class DerivativesData(BaseModel):

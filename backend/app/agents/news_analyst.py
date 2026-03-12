@@ -5,7 +5,7 @@
 - NewsAnalystAgent 偏事实（新闻事件量化、监管含义、时间效应）
 
 数据来源：
-- CryptoPanic API（通过 app.data.news.NewsCollector）
+- Finnhub Market News（通过 app.data.news.NewsCollector，主流财经媒体）
 - BlockBeats 律动 API（通过 app.data.blockbeats.BlockBeatsCollector）
 - Redis 缓存的新闻数据（news:feed:{symbol}、news:blockbeats:{symbol}）
 
@@ -107,7 +107,7 @@ class NewsAnalystAgent(BaseAgent):
                 signal="neutral",
                 confidence=0.0,
                 reasoning="新闻数据不可用",
-                key_findings=["无法获取新闻数据，建议配置 CryptoPanic API Token"],
+                key_findings=["无法获取新闻数据，建议配置 Finnhub API Key"],
                 raw_data={},
             )
 
@@ -161,14 +161,14 @@ class NewsAnalystAgent(BaseAgent):
 
     @staticmethod
     async def _load_news(symbol: str) -> list[NewsItem]:
-        """获取指定交易对的最新新闻（合并 CryptoPanic + BlockBeats）。"""
+        """获取指定交易对的最新新闻（合并 Finnhub + BlockBeats）。"""
         import asyncio
 
-        async def _cp() -> list[NewsItem]:
+        async def _fh() -> list[NewsItem]:
             try:
                 return await _collector.fetch_news(symbol=symbol, limit=20)
             except Exception as exc:
-                logger.warning("CryptoPanic load failed", extra={"error": str(exc)})
+                logger.warning("Finnhub news load failed", extra={"error": str(exc)})
                 return []
 
         async def _bb() -> list[NewsItem]:
@@ -178,8 +178,8 @@ class NewsAnalystAgent(BaseAgent):
                 logger.warning("BlockBeats load failed", extra={"error": str(exc)})
                 return []
 
-        cp_items, bb_items = await asyncio.gather(_cp(), _bb())
-        merged = cp_items + bb_items
+        fh_items, bb_items = await asyncio.gather(_fh(), _bb())
+        merged = fh_items + bb_items
         # 去重（按标题前20字符）
         seen: set[str] = set()
         unique: list[NewsItem] = []

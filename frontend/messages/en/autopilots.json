@@ -1,0 +1,75 @@
+{
+  "title": "Deploy Autopilot",
+  "subtitle": "Configure an autonomous multi-agent analysis instance and pipe signals to your infrastructure.",
+  "steps": {
+    "target": "Target Asset",
+    "engine": "Agent Engine",
+    "delivery": "Delivery Channel",
+    "review": "Review & Deploy"
+  },
+  "step1": {
+    "title": "Select Target Asset",
+    "desc": "Which pair should the autonomous agents monitor?",
+    "tip": "Different assets require different topological models. The system will automatically switch the vector database index to match the selected asset.",
+    "tipLabel": "Pro Tip: "
+  },
+  "step2": {
+    "title": "Agent Architecture Configuration",
+    "desc": "Select the computation depth for this autopilot.",
+    "nsed": {
+      "pipeline": "L1-L4 Pipeline",
+      "name": "Omni NSED Full",
+      "desc": "Complete multi-agent pipeline including Dealer Adversarial and Risk Defense. Highest accuracy, utilizes maximum compute."
+    },
+    "scalping": {
+      "pipeline": "L1-L2 Pipeline",
+      "name": "Sniper Scalping",
+      "desc": "Optimized for speed. Bypasses deep L4 consensus to deliver structural signals in milliseconds. Ideal for HFT integration."
+    }
+  },
+  "step3": {
+    "title": "Outbound Delivery Channels",
+    "desc": "Where should the agents stream their verdict once consensus is reached?",
+    "discord": {
+      "name": "Discord / Slack",
+      "desc": "Pipe rich-text analysis to your team's channel."
+    },
+    "webhook": {
+      "name": "Custom HTTP Webhook",
+      "desc": "Post pure JSON signals directly to your trading algorithm.",
+      "placeholder": "https://your-server.com/api/axiom-signals"
+    },
+    "selected": "Selected",
+    "select": "Select"
+  },
+  "step4": {
+    "title": "System Ready for Launch",
+    "desc": "Your autonomous pilot is configured. It will continuously monitor structure variations.",
+    "labelTarget": "Target",
+    "labelArch": "Architecture",
+    "labelChannels": "Channels",
+    "dashboardOnly": "None (Dashboard Only)",
+    "goCommand": "Go to Live Command Room"
+  },
+  "controls": {
+    "back": "Back",
+    "continue": "Continue",
+    "deploy": "Deploy Autopilot",
+    "deploying": "Deploying...",
+    "deployed": "Deployed Successfully"
+  },
+  "terminal": {
+    "title": "Deployment Terminal"
+  },
+  "active": {
+    "title": "Active Operations",
+    "scanning": "Scanning active nodes...",
+    "empty": "No active autopilots found.",
+    "emptyHint": "Deploy an autonomous pilot above to begin monitoring.",
+    "online": "Online",
+    "channels": "Channels",
+    "uptime": "Uptime",
+    "delete": "Terminate",
+    "deleteConfirm": "Are you sure you want to terminate this autopilot?"
+  }
+}

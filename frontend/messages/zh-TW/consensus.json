@@ -178,6 +178,7 @@
       "tp2": "止盈目標②",
       "waitSignal": "確認信號",
       "riskWarning": "風險偏好",
+      "plainSummary": "白話解讀",
       "phases": {
         "accumulation": "吸籌期",
         "markup": "拉升期",

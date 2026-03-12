@@ -32,6 +32,7 @@ celery_app = Celery(
         "workers.cryptoquant_worker",
         "workers.fred_worker",
         "workers.snapshot_cleanup_worker",
+        "workers.reconcile_worker",
     ],
 )
 
@@ -144,6 +145,10 @@ celery_app.conf.update(
         "cleanup-old-calendar-events-daily": {
             "task": "calendar_worker.cleanup_old_events",
             "schedule": 86400.0,  # 24 小时（每天一次）
+        },
+        "reconcile-balances-every-6h": {
+            "task": "workers.reconcile_worker.reconcile_balances_task",
+            "schedule": 21600.0,  # 6 小时（对账合伙人余额+奖励次数）
         },
     },
 )

@@ -21,6 +21,8 @@ class MetricType(str, Enum):
     FEAR_GREED_INDEX = "fear_greed_index"
     MVRV = "mvrv"
     FUNDING_RATE = "funding_rate"
+    AI_CONSENSUS = "ai_consensus"
+    SCALPING_SIGNAL = "scalping_signal"
 
 
 class Operator(str, Enum):

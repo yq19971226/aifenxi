@@ -204,8 +204,8 @@ async def test_connection(
             "headers": {"Authorization": f"Bearer {data.api_key}"},
             "timeout": 10,
         },
-        "cryptopanic_api_token": {
-            "url": f"https://cryptopanic.com/api/free/v1/posts/?auth_token={data.api_key}&public=true",
+        "finnhub_api_key": {
+            "url": f"https://finnhub.io/api/v1/news?category=crypto&token={data.api_key}",
             "method": "GET",
             "timeout": 10,
         },
@@ -315,13 +315,6 @@ async def test_connection(
                     "status_code": response.status_code,
                 }
             elif response.status_code == 404:
-                # CryptoPanic 等 API 对无效 token 返回 404
-                if data.config_key in ("cryptopanic_api_token",):
-                    return {
-                        "success": False,
-                        "message": "API Key 无效或已过期（CryptoPanic 返回 404）",
-                        "status_code": response.status_code,
-                    }
                 return {
                     "success": False,
                     "message": f"API 端点不存在（HTTP 404），请检查配置",

@@ -34,9 +34,10 @@ services:
     command: >
       redis-server
         --maxmemory 512mb
-        --maxmemory-policy allkeys-lru
+        --maxmemory-policy volatile-lru
         --save 60 1000
         --appendonly yes
+        --appendfsync everysec
     deploy:
       resources:
         limits:

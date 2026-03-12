@@ -38,11 +38,11 @@ _EXCHANGE_SOURCES: list[dict] = [
 
 _NEWS_SOURCES: list[dict] = [
     {
-        "source_id": "cryptopanic",
-        "name": "CryptoPanic",
+        "source_id": "finnhub_news",
+        "name": "Finnhub News",
         "source_type": DataSourceType.REST,
-        "base_url": "https://cryptopanic.com/api/v1",
-        "channels": ["news", "media"],
+        "base_url": "https://finnhub.io/api/v1",
+        "channels": ["crypto", "general", "company"],
         "auth_method": "api_key",
         "weight": 0.40,
     },
@@ -58,18 +58,37 @@ _NEWS_SOURCES: list[dict] = [
 ]
 
 # ── 链上数据源 ────────────────────────────────────────────────────
-# 主源: CryptoQuant（已接入，Professional $109，20 req/min）
-# 辅助 / fallback: Alternative.me + GlassNode
+# 主源: GlassNode（Professional $999，T3 全量，140k req/month）
+# 备源/fallback: CryptoQuant（降级备源，Professional $109）
+# 辅助: Alternative.me（免费恐慌贪婪指数）
 
 _ONCHAIN_SOURCES: list[dict] = [
     {
+        "source_id": "glassnode",
+        "name": "GlassNode (Primary)",
+        "source_type": DataSourceType.REST,
+        "base_url": "https://api.glassnode.com/v1",
+        "channels": [
+            "sopr", "asopr", "nupl", "mvrv", "mvrv_entity_adj",
+            "lth_sopr", "sth_sopr", "lth_nupl", "sth_nupl",
+            "accumulation_score", "reserve_risk", "puell_multiple",
+            "hash_ribbon", "difficulty_ribbon", "s2f_ratio", "pi_cycle_top",
+            "rhodl_ratio", "nvt_signal", "liveliness", "ssr",
+            "exchange_netflow", "exchange_balance", "exchange_inflow",
+            "active_addresses", "new_addresses", "addresses_in_profit_pct",
+            "hodler_net_change", "net_realized_pl", "velocity", "fear_greed",
+        ],
+        "auth_method": "api_key",
+        "weight": 0.70,
+    },
+    {
         "source_id": "cryptoquant",
-        "name": "CryptoQuant",
+        "name": "CryptoQuant (Fallback)",
         "source_type": DataSourceType.REST,
         "base_url": "https://api.cryptoquant.com/v1",
         "channels": ["exchange_flows", "miner_flows", "flow_indicator", "market_indicator", "network_data"],
         "auth_method": "api_key",
-        "weight": 0.70,
+        "weight": 0.30,
     },
     {
         "source_id": "alternative_me",
@@ -79,15 +98,6 @@ _ONCHAIN_SOURCES: list[dict] = [
         "channels": ["fear_greed_index"],
         "auth_method": "none",
         "weight": 0.15,
-    },
-    {
-        "source_id": "glassnode",
-        "name": "GlassNode",
-        "source_type": DataSourceType.REST,
-        "base_url": "https://api.glassnode.com/v1",
-        "channels": ["mvrv", "nvt", "stock_to_flow", "active_addresses", "exchange_flow", "exchange_volume", "price", "market_cap", "transaction_count"],
-        "auth_method": "api_key",
-        "weight": 0.50,
     },
 ]
 
@@ -149,6 +159,22 @@ _FRED_SOURCE: dict = {
     ],
     "auth_method": "api_key",
     "weight": 0.60,
+}
+
+# ── Finnhub 美股 + 加密市场数据源 ──────────────────────────────
+
+_FINNHUB_SOURCE: dict = {
+    "source_id": "finnhub",
+    "name": "Finnhub",
+    "source_type": DataSourceType.REST,
+    "base_url": "https://finnhub.io/api/v1",
+    "channels": [
+        "earnings_calendar", "market_news", "company_news",
+        "quote", "insider_sentiment", "basic_financials",
+        "crypto_candles", "ipo_calendar",
+    ],
+    "auth_method": "api_key",
+    "weight": 0.50,
 }
 
 
@@ -309,6 +335,25 @@ class DataSourceRegistry:
         )
         self._groups["fred_source"] = fred_group
 
+        # ── 加载 Finnhub 数据源 ────────────────────────────────
+        finnhub_enabled_str = await get_config_value("ds:finnhub:enabled", "true")
+        finnhub_enabled = finnhub_enabled_str.lower() == "true"
+        finnhub_src = DataSourceInfo(
+            **_FINNHUB_SOURCE,
+            enabled=finnhub_enabled,
+            status=DataSourceStatus.DISABLED,
+        )
+        self._sources["finnhub"] = finnhub_src
+
+        finnhub_group = DataSourceGroup(
+            group_id="finnhub_source",
+            name="Finnhub US Stock & Crypto",
+            group_type=GroupType.FREE,
+            enabled=finnhub_enabled,
+            sources=[finnhub_src],
+        )
+        self._groups["finnhub_source"] = finnhub_group
+
         self._initialized = True
         logger.info(
             "datasource_registry_loaded",
@@ -318,6 +363,7 @@ class DataSourceRegistry:
             onchain_enabled=onchain_enabled,
             news_enabled=news_enabled,
             fred_enabled=fred_enabled,
+            finnhub_enabled=finnhub_enabled,
             exchange_count=len(exchange_sources),
             news_count=len(news_sources),
         )
@@ -488,6 +534,7 @@ class DataSourceRegistry:
             "news_sources": "ds:news",
             "coingecko_source": "ds:coingecko",
             "fred_source": "ds:fred",
+            "finnhub_source": "ds:finnhub",
         }
         prefix = prefix_map.get(group_id)
         if prefix is None:

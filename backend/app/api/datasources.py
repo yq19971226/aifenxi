@@ -448,12 +448,12 @@ async def test_datasource_connection(source_id: str) -> OperationResult:
             "key_header": "x-cg-demo-api-key",
             "label": "CoinGecko API",
         },
-        "cryptopanic": {
-            "url": "https://cryptopanic.com/api/free/v1/posts/",
+        "finnhub": {
+            "url": "https://finnhub.io/api/v1/news?category=crypto",
             "headers": {},
-            "key_config": "cryptopanic_api_token",
-            "key_param": "auth_token",
-            "label": "CryptoPanic API",
+            "key_config": "finnhub_api_key",
+            "key_param": "token",
+            "label": "Finnhub API",
         },
         "blockbeats": {
             "url": "https://api.theblockbeats.news/v1/open-api/open-flash?size=1&page=1&type=push",
@@ -508,11 +508,6 @@ async def test_datasource_connection(source_id: str) -> OperationResult:
                 return OperationResult(
                     success=True,
                     message=f"{label} 连接成功（HTTP {resp.status_code}）",
-                )
-            elif resp.status_code == 404 and source_id == "cryptopanic":
-                return OperationResult(
-                    success=False,
-                    message=f"{label} API Key 无效或已过期（CryptoPanic 返回 404）",
                 )
             else:
                 body_preview = resp.text[:200] if resp.text else ""

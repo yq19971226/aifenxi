@@ -33,6 +33,7 @@ import PlaybookStoryline from "./PlaybookStoryline";
 import MatchCard from "./MatchCard";
 import PlazaSection from "./PlazaSection";
 import AnalysisColumn from "./AnalysisColumn";
+import LiveCommandSidebar from "./LiveCommandSidebar";
 import { PlaybookShareModal } from "@/components/playbook/PlaybookShareModal";
 
 export default function PlaybookSimPage() {
@@ -143,13 +144,6 @@ export default function PlaybookSimPage() {
         </div>
       </div>
 
-      {isInitialLoading && (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 size={24} className="animate-spin text-zinc-500" />
-          <span className="ml-3 text-sm text-zinc-500">{t('loading', { symbol })}</span>
-        </div>
-      )}
-
       {simError && (
         <div className="card p-5 flex items-center gap-3">
           <AlertTriangle size={18} className="text-amber-400 shrink-0" />
@@ -160,127 +154,152 @@ export default function PlaybookSimPage() {
         </div>
       )}
 
-      {sim && !simError && (isLowConfidence || isCrowdedMatch) && (
-        <div className="card p-4 flex items-start gap-3 border-amber-500/20">
-          <AlertTriangle size={16} className="text-amber-400 mt-0.5 shrink-0" />
-          <div className="space-y-1">
-            <span className="text-xs font-semibold text-amber-400">{t('lowConfidence.title')}</span>
-            {isLowConfidence && (
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                {t('lowConfidence.lowMatch', { pct: bestMatch!.match_pct.toFixed(1) })}
-              </p>
-            )}
-            {isCrowdedMatch && (
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                {t('lowConfidence.crowded')}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
+      {(sim || streaming) && !simError && (
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start mt-4">
+          {/* Main Left Content Context */}
+          <div className="xl:col-span-8 flex flex-col space-y-6">
 
-      {sim && !simError && (
-        <div className="space-y-6">
-          <AdversarialL4 sim={sim} latest={latest ?? null} stepStatus={stepStatus} />
-
-          {bestMatch && bestMatch.stages && bestMatch.stages.length > 0 && (
-            <PlaybookStoryline
-              match={bestMatch}
-              status={storylinePred?.status}
-              riskFlag={storylinePred?.risk_flag}
-              riskNote={storylinePred?.risk_note}
-              failureReason={storylinePred?.failure_reason}
-              verifiedStages={storylinePred?.verified_stages}
-              finalAccuracy={storylinePred?.final_accuracy}
-            />
-          )}
-
-          {sim.defense_strategy && (
-            <PositionCalculator
-              input={fromDefenseStrategy(sim.defense_strategy)}
-              confidence={sim.defense_strategy.confidence}
-              isWorthTaking={sim.judge_adoption?.adoption !== "wait"}
-            />
-          )}
-
-          {/* Overview cards */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-            <div className="card p-5">
-              <span className="text-xs uppercase tracking-widest text-zinc-500">{t('overview.currentPhase')}</span>
-              <p className="text-lg font-semibold text-white mt-1">{localizeText(sim.current_phase)}</p>
-              {phaseHistory && (
-                <p className="text-xs text-indigo-400 mt-1">{phaseHistory.current_phase_label}</p>
-              )}
-            </div>
-            <div className="card p-5">
-              <span className="text-xs uppercase tracking-widest text-zinc-500">{t('overview.currentPlaybook')}</span>
-              <p className="text-lg font-semibold text-white mt-1">{activeMatch?.name || "---"}</p>
-              <p className={`text-xs mt-1 ${activeMatch?.match_pct && activeMatch.match_pct >= 70 ? "text-red-400" : activeMatch?.match_pct && activeMatch.match_pct >= 40 ? "text-amber-400" : "text-zinc-500"}`}>
-                {t('overview.matchPct', { pct: activeMatch?.match_pct?.toFixed(1) || '0' })}
-              </p>
-            </div>
-            <div className="card p-5">
-              <span className="text-xs uppercase tracking-widest text-zinc-500">市场结构</span>
-              <p className="text-lg font-semibold text-white mt-1">{activeMarketStructureLabel || "—"}</p>
-              <p className="text-xs text-zinc-500 mt-1">
-                {activeMatch?.matched_domains != null && activeMatch?.total_domains != null
-                  ? `数据域 ${activeMatch.matched_domains}/${activeMatch.total_domains}`
-                  : "等待结构匹配"}
-                {activeMatch?.matched_regimes != null && activeMatch?.total_regimes != null
-                  ? ` · 环境 ${activeMatch.matched_regimes}/${activeMatch.total_regimes}`
-                  : ""}
-              </p>
-            </div>
-            <div className="card p-5">
-              <span className="text-xs uppercase tracking-widest text-zinc-500">{t('overview.signalDirection')}</span>
-              <div className="flex items-center gap-2 mt-1">
-                <SignalIcon size={18} className={signalInfo.color} />
-                <span className={`text-lg font-semibold ${signalInfo.color}`}>{signalInfo.label}</span>
-              </div>
-              {latest && (
-                <p className="text-xs text-zinc-500 mt-1">{t('overview.confidence', { pct: (latest.confidence * 100).toFixed(0) })}</p>
-              )}
-            </div>
-            <div className="card p-5">
-              <span className="text-xs uppercase tracking-widest text-zinc-500">{t('overview.scannedPlaybooks')}</span>
-              <p className="text-lg font-semibold text-white mt-1">{sim.total_playbooks}</p>
-              <p className="text-xs text-zinc-500 mt-1">
-                {t('overview.matched', { count: sim.top_matches.length })}
-              </p>
-            </div>
-          </div>
-
-          {/* Two-column layout */}
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
-            <div className="xl:col-span-5 space-y-5">
-              <div className="card overflow-hidden">
-                <div className="px-5 py-4 border-b border-white/[0.06] flex items-center gap-2">
-                  <Target size={14} className="text-indigo-400" />
-                  <span className="text-sm font-semibold text-white">{t('matchedPlaybooks')}</span>
-                </div>
-                <div className="divide-y divide-white/[0.04]">
-                  {sim.top_matches.map((match, idx) => (
-                    <MatchCard
-                      key={match.name}
-                      match={match}
-                      rank={idx + 1}
-                      expanded={expandedMatch === idx}
-                      onToggle={() => setExpandedMatch(expandedMatch === idx ? -1 : idx)}
-                    />
-                  ))}
-                  {sim.top_matches.length === 0 && (
-                    <div className="flex items-center justify-center py-12">
-                      <span className="text-sm text-zinc-500">{t('noMatches')}</span>
-                    </div>
+            {sim && (isLowConfidence || isCrowdedMatch) && (
+              <div className="card p-4 flex items-start gap-3 border-amber-500/20">
+                <AlertTriangle size={16} className="text-amber-400 mt-0.5 shrink-0" />
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold text-amber-400">{t('lowConfidence.title')}</span>
+                  {isLowConfidence && (
+                    <p className="text-xs text-zinc-400 leading-relaxed">
+                      {t('lowConfidence.lowMatch', { pct: bestMatch!.match_pct.toFixed(1) })}
+                    </p>
+                  )}
+                  {isCrowdedMatch && (
+                    <p className="text-xs text-zinc-400 leading-relaxed">
+                      {t('lowConfidence.crowded')}
+                    </p>
                   )}
                 </div>
               </div>
-            </div>
+            )}
 
-            <AnalysisColumn sim={sim} activeMatch={activeMatch} latest={latest} phaseHistory={phaseHistory} />
+            {!sim && streaming && (
+              <div className="flex flex-col items-center justify-center py-32 border border-dashed border-white/[0.05] rounded-xl bg-white/[0.01]">
+                <div className="relative flex h-10 w-10 mb-4 items-center justify-center">
+                   <div className="absolute inline-flex h-full w-full rounded-full bg-emerald-500/20 animate-ping"></div>
+                   <Target size={20} className="text-emerald-500 relative z-10" />
+                </div>
+                <h3 className="text-lg font-mono text-emerald-400 uppercase tracking-widest">Intercepting Data</h3>
+                <p className="text-sm text-zinc-500 mt-2">Awaiting target topological structure from {symbol}...</p>
+              </div>
+            )}
+
+            {sim && (
+              <>
+                <AdversarialL4 sim={sim} latest={latest ?? null} stepStatus={stepStatus} />
+
+                {bestMatch && bestMatch.stages && bestMatch.stages.length > 0 && (
+                  <PlaybookStoryline
+                    match={bestMatch}
+                    status={storylinePred?.status}
+                    riskFlag={storylinePred?.risk_flag}
+                    riskNote={storylinePred?.risk_note}
+                    failureReason={storylinePred?.failure_reason}
+                    verifiedStages={storylinePred?.verified_stages}
+                    finalAccuracy={storylinePred?.final_accuracy}
+                  />
+                )}
+
+                {sim.defense_strategy && (
+                  <PositionCalculator
+                    input={fromDefenseStrategy(sim.defense_strategy)}
+                    confidence={sim.defense_strategy.confidence}
+                    isWorthTaking={sim.judge_adoption?.adoption !== "wait"}
+                  />
+                )}
+
+                {/* Overview cards */}
+                <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+                  <div className="card p-5">
+                    <span className="text-xs uppercase tracking-widest text-zinc-500">{t('overview.currentPhase')}</span>
+                    <p className="text-lg font-semibold text-white mt-1">{localizeText(sim.current_phase)}</p>
+                    {phaseHistory && (
+                      <p className="text-xs text-indigo-400 mt-1">{phaseHistory.current_phase_label}</p>
+                    )}
+                  </div>
+                  <div className="card p-5">
+                    <span className="text-xs uppercase tracking-widest text-zinc-500">{t('overview.currentPlaybook')}</span>
+                    <p className="text-lg font-semibold text-white mt-1">{activeMatch?.name || "---"}</p>
+                    <p className={`text-xs mt-1 ${activeMatch?.match_pct && activeMatch.match_pct >= 70 ? "text-red-400" : activeMatch?.match_pct && activeMatch.match_pct >= 40 ? "text-amber-400" : "text-zinc-500"}`}>
+                      {t('overview.matchPct', { pct: activeMatch?.match_pct?.toFixed(1) || '0' })}
+                    </p>
+                  </div>
+                  <div className="card p-5">
+                    <span className="text-xs uppercase tracking-widest text-zinc-500">市场结构</span>
+                    <p className="text-lg font-semibold text-white mt-1">{activeMarketStructureLabel || "—"}</p>
+                    <p className="text-xs text-zinc-500 mt-1">
+                      {activeMatch?.matched_domains != null && activeMatch?.total_domains != null
+                        ? `数据域 ${activeMatch.matched_domains}/${activeMatch.total_domains}`
+                        : "等待结构匹配"}
+                      {activeMatch?.matched_regimes != null && activeMatch?.total_regimes != null
+                        ? ` · 环境 ${activeMatch.matched_regimes}/${activeMatch.total_regimes}`
+                        : ""}
+                    </p>
+                  </div>
+                  <div className="card p-5">
+                    <span className="text-xs uppercase tracking-widest text-zinc-500">{t('overview.signalDirection')}</span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <SignalIcon size={18} className={signalInfo.color} />
+                      <span className={`text-lg font-semibold ${signalInfo.color}`}>{signalInfo.label}</span>
+                    </div>
+                    {latest && (
+                      <p className="text-xs text-zinc-500 mt-1">{t('overview.confidence', { pct: (latest.confidence * 100).toFixed(0) })}</p>
+                    )}
+                  </div>
+                  <div className="card p-5">
+                    <span className="text-xs uppercase tracking-widest text-zinc-500">{t('overview.scannedPlaybooks')}</span>
+                    <p className="text-lg font-semibold text-white mt-1">{sim.total_playbooks}</p>
+                    <p className="text-xs text-zinc-500 mt-1">
+                      {t('overview.matched', { count: sim.top_matches.length })}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Two-column layout */}
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+                  <div className="lg:col-span-5 space-y-5">
+                    <div className="card overflow-hidden">
+                      <div className="px-5 py-4 border-b border-white/[0.06] flex items-center gap-2">
+                        <Target size={14} className="text-indigo-400" />
+                        <span className="text-sm font-semibold text-white">{t('matchedPlaybooks')}</span>
+                      </div>
+                      <div className="divide-y divide-white/[0.04]">
+                        {sim.top_matches.map((match, idx) => (
+                          <MatchCard
+                            key={match.name}
+                            match={match}
+                            rank={idx + 1}
+                            expanded={expandedMatch === idx}
+                            onToggle={() => setExpandedMatch(expandedMatch === idx ? -1 : idx)}
+                          />
+                        ))}
+                        {sim.top_matches.length === 0 && (
+                          <div className="flex items-center justify-center py-12">
+                            <span className="text-sm text-zinc-500">{t('noMatches')}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <AnalysisColumn sim={sim} activeMatch={activeMatch} latest={latest} phaseHistory={phaseHistory} />
+                </div>
+
+                <PlazaSection plaza={plaza} plazaLoading={plazaLoading} plazaStats={plazaStats} />
+              </>
+            )}
           </div>
 
-          <PlazaSection plaza={plaza} plazaLoading={plazaLoading} plazaStats={plazaStats} />
+          {/* Right Sticky Sidebar: Command Room */}
+          <div className="xl:col-span-4 sticky top-[80px] z-10 w-full">
+             <LiveCommandSidebar sim={sim} stepStatus={stepStatus} streaming={streaming} />
+          </div>
+
         </div>
       )}
 

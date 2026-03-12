@@ -241,16 +241,18 @@ async def llm_judge_adoption(
 3. 做出最终采纳决定：采纳防御策略 / 部分采纳 / 建议观望
 4. 最终操作建议（一句话）
 5. 关键风险提醒
+6. 用最通俗的大白话（像跟朋友聊天一样），30字内总结：现在市场在玩什么把戏，普通人应该怎么做。不要用任何专业术语。
+7. 综合判断信心等级：high（高度确信此剧本正在上演）/ medium（有一定可能性）/ low（仅供参考）/ none（证据不足）
 
 以 JSON 格式回复:
-{{"dealer_credibility": 0.7, "defense_feasibility": 0.8, "adoption": "adopt|partial|wait", "final_recommendation": "最终一句话建议", "next_move": "具体下一步操作", "risk_alerts": ["风险提醒1"], "reasoning": "裁判推理过程"}}"""
+{{"dealer_credibility": 0.7, "defense_feasibility": 0.8, "adoption": "adopt|partial|wait", "final_recommendation": "最终一句话建议", "next_move": "具体下一步操作", "risk_alerts": ["风险提醒1"], "reasoning": "裁判推理过程", "plain_summary": "大白话总结，如：大户在故意砸盘吓你卖，别慌，等跌到xx再考虑接", "confidence_level": "high|medium|low|none"}}"""
 
     try:
         from app.core.model_router import get_model_for_agent
         model_key = await get_model_for_agent("playbook_judge")
         result = await llm_client.call_model(
             model_key=model_key,
-            system_prompt="你是独立裁判分析师，负责综合庄家AI和防御AI的输出，做出最终采纳决定。你必须客观公正，不偏向任何一方。输出严格 JSON 格式。",
+            system_prompt="你是独立裁判分析师，负责综合庄家AI和防御AI的输出，做出最终采纳决定。你必须客观公正，不偏向任何一方。特别注意：你的 plain_summary 字段必须用最通俗易懂的大白话写，像朋友之间聊天一样，绝对不能出现任何专业术语。输出严格 JSON 格式。",
             user_prompt=prompt,
             timeout_s=60.0,
         )
@@ -260,3 +262,4 @@ async def llm_judge_adoption(
     except Exception as exc:
         logger.error("L4 裁判采纳失败: %s", exc)
         return {}
+

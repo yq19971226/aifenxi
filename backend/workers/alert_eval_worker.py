@@ -13,7 +13,7 @@ from workers.db import worker_session
 logger = logging.getLogger(__name__)
 
 # 消费的 Stream 列表
-_STREAMS = ["kline_updates", "indicator_updates", "onchain_updates"]
+_STREAMS = ["kline_updates", "indicator_updates", "onchain_updates", "ai_signal_updates"]
 _CONSUMER_GROUP = "alert_eval_workers"
 _CONSUMER_NAME = "alert_eval_worker_1"
 
@@ -82,6 +82,10 @@ def _normalize_message(stream_name: str, msg_data: dict) -> list[dict]:
                 "current_value": json.dumps(value),
             })
         return results
+
+    # ai_signal_updates 已经是标准格式 {symbol, metric_type, current_value}
+    if stream_name == "ai_signal_updates":
+        return [msg_data]
 
     return []
 

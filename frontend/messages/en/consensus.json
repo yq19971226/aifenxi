@@ -172,6 +172,7 @@
       "tp2": "TP2 Target",
       "waitSignal": "Wait Signal",
       "riskWarning": "Risk Profile",
+      "plainSummary": "Plain Summary",
       "phases": {
         "accumulation": "Accumulation",
         "markup": "Markup",

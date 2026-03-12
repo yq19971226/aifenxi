@@ -213,7 +213,7 @@ class DataSourceManager:
         onchain_enabled = bool(
             onchain_group
             and onchain_group.enabled
-            and any(src.enabled for src in onchain_group.sources if src.source_id == "cryptoquant")
+            and any(src.enabled for src in onchain_group.sources if src.source_id == "glassnode")
         )
         macro_enabled = bool(
             fred_group
@@ -266,10 +266,10 @@ class DataSourceManager:
                 detail=f"增强缓存 {derivatives_ready}/{target_count}，Binance 基础合约回退 {derivatives_fallback_ready}/{target_count}" if target_count else "暂无启用币种",
             ),
             PrimarySourceStatusItem(
-                source_id="cryptoquant",
-                name="CryptoQuant",
+                source_id="glassnode",
+                name="GlassNode (T3)",
                 domain="onchain",
-                owner="CryptoQuant",
+                owner="GlassNode",
                 enabled=onchain_enabled,
                 status=self._derive_primary_status(
                     onchain_enabled,
@@ -279,7 +279,7 @@ class DataSourceManager:
                 ),
                 ready_count=onchain_ready,
                 target_count=target_count,
-                detail=f"CryptoQuant 主源缓存 {onchain_ready}/{target_count}，兼容回退 {onchain_fallback_ready}/{target_count}" if target_count else "暂无启用币种",
+                detail=f"GlassNode T3 主源缓存 {onchain_ready}/{target_count}，CryptoQuant 备源回退 {onchain_fallback_ready}/{target_count}" if target_count else "暂无启用币种",
             ),
             PrimarySourceStatusItem(
                 source_id="fred",

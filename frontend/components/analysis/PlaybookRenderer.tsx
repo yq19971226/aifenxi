@@ -53,6 +53,10 @@ interface PlaybookData {
   name?: string;
   stage?: string;
   predicted_next_move?: string;
+
+  // L4 judge plain language output
+  plain_summary?: string;
+  confidence_level?: "high" | "medium" | "low" | "none";
 }
 
 // ── Phase colors ──────────────────────────────────────────────
@@ -63,6 +67,13 @@ const PHASE_COLORS: Record<string, string> = {
   distribution: "text-amber-400 border-amber-500/30 bg-amber-500/10",
   markdown: "text-red-400 border-red-500/30 bg-red-500/10",
   escape: "text-rose-400 border-rose-500/30 bg-rose-500/10",
+};
+
+const CONFIDENCE_STYLES: Record<string, { emoji: string; label: string; color: string }> = {
+  high:   { emoji: "🔥", label: "高度匹配",  color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" },
+  medium: { emoji: "⚡", label: "中度匹配",  color: "text-amber-400 bg-amber-500/10 border-amber-500/30" },
+  low:    { emoji: "💡", label: "弱匹配",    color: "text-zinc-400 bg-zinc-500/10 border-zinc-500/30" },
+  none:   { emoji: "—",  label: "证据不足",  color: "text-zinc-600 bg-zinc-500/5 border-zinc-500/20" },
 };
 
 const RISK_COLORS: Record<string, string> = {
@@ -162,6 +173,39 @@ export function PlaybookRenderer({ data }: { data: PlaybookData }) {
           {/* Corner Decals */}
           <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-violet-500/30" />
           <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-violet-500/30" />
+        </motion.div>
+      )}
+
+      {/* 1.5 Plain Language Summary + Confidence Level */}
+      {data.plain_summary && (
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="relative rounded-xl border-2 border-violet-500/30 bg-gradient-to-r from-violet-500/[0.08] via-transparent to-indigo-500/[0.06] p-4"
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-2xl shrink-0 mt-0.5">💬</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-[9px] font-black text-violet-400/70 uppercase tracking-[0.25em]">
+                  {t("renderers.playbook.plainSummary")}
+                </span>
+                {data.confidence_level && CONFIDENCE_STYLES[data.confidence_level] && (
+                  <span className={cn(
+                    "rounded-md border px-2 py-0.5 text-[9px] font-black uppercase",
+                    CONFIDENCE_STYLES[data.confidence_level].color,
+                  )}>
+                    {CONFIDENCE_STYLES[data.confidence_level].emoji}{" "}
+                    {CONFIDENCE_STYLES[data.confidence_level].label}
+                  </span>
+                )}
+              </div>
+              <p className="text-[15px] font-bold text-white leading-relaxed tracking-tight">
+                {localizeText(data.plain_summary)}
+              </p>
+            </div>
+          </div>
         </motion.div>
       )}
 

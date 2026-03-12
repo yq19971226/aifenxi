@@ -29,9 +29,9 @@ interface ShareCardProps {
 // ── Helpers ──────────────────────────────────────────────────
 
 const THEME = {
-  bullish: { primary: "#16a34a", bg: "#f0fdf4", emoji: "📈", dirEmoji: "🟢", label: "做多", headerBg: "linear-gradient(135deg, #16a34a 0%, #15803d 100%)" },
-  bearish: { primary: "#dc2626", bg: "#fef2f2", emoji: "📉", dirEmoji: "🔴", label: "做空", headerBg: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)" },
-  neutral: { primary: "#71717a", bg: "#fafafa", emoji: "⏸️", dirEmoji: "⚪", label: "观望", headerBg: "linear-gradient(135deg, #52525b 0%, #3f3f46 100%)" },
+  bullish: { primary: "#34d399", bg: "rgba(16, 185, 129, 0.05)", emoji: "📈", dirEmoji: "🟢", label: "做多", headerBg: "linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.05) 100%)", glow: "0 0 40px rgba(16,185,129,0.15)" },
+  bearish: { primary: "#f87171", bg: "rgba(239, 68, 68, 0.05)", emoji: "📉", dirEmoji: "🔴", label: "做空", headerBg: "linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.05) 100%)", glow: "0 0 40px rgba(239,68,68,0.15)" },
+  neutral: { primary: "#a1a1aa", bg: "rgba(255, 255, 255, 0.02)", emoji: "⏸️", dirEmoji: "⚪", label: "观望", headerBg: "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%)", glow: "none" },
 } as const;
 
 function getTheme(signal: string) {
@@ -74,12 +74,13 @@ function regimeLabel(r: string | null): string {
 }
 
 const S = {
-  card: { width: 420, maxWidth: "100%", background: "#ffffff", borderRadius: 16, overflow: "hidden" as const, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif', color: "#1f2937", boxShadow: "0 2px 16px rgba(0,0,0,0.06)" },
-  sectionBox: (borderColor: string) => ({ margin: "0 20px", border: "1px solid #e5e7eb", borderLeft: `3px solid ${borderColor}`, borderRadius: 8, padding: "14px 16px", marginBottom: 14, background: "#ffffff" }),
-  row: { display: "flex" as const, justifyContent: "space-between" as const, alignItems: "center" as const, padding: "7px 0", borderBottom: "1px solid #f3f4f6" },
-  rowLast: { display: "flex" as const, justifyContent: "space-between" as const, alignItems: "center" as const, padding: "7px 0" },
-  label: { fontSize: 13, color: "#6b7280", fontWeight: 500 as const },
-  value: { fontSize: 13, fontWeight: 600 as const, color: "#111827", textAlign: "right" as const },
+  card: { width: 420, maxWidth: "100%", background: "#09090b", borderRadius: 20, overflow: "hidden" as const, fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: "#e4e4e7", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255,255,255,0.08)", position: "relative" as const },
+  gridBg: { position: "absolute" as const, inset: 0, backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)", backgroundSize: "20px 20px", pointerEvents: "none" as const },
+  sectionBox: (borderColor: string, bg: string) => ({ position: "relative" as const, zIndex: 10, margin: "0 24px", border: "1px solid rgba(255,255,255,0.06)", borderLeft: `3px solid ${borderColor}`, borderRadius: 12, padding: "16px 20px", marginBottom: 16, background: bg, backdropFilter: "blur(10px)" }),
+  row: { display: "flex" as const, justifyContent: "space-between" as const, alignItems: "center" as const, padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" },
+  rowLast: { display: "flex" as const, justifyContent: "space-between" as const, alignItems: "center" as const, padding: "8px 0" },
+  label: { fontSize: 13, color: "#a1a1aa", fontWeight: 500 as const, letterSpacing: "0.01em" },
+  value: { fontSize: 13, fontWeight: 700 as const, color: "#ffffff", textAlign: "right" as const },
 };
 
 // ── ShareCard ────────────────────────────────────────────────
@@ -122,34 +123,35 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
     const dirLabel = displayDirection === "long" ? "做多 BUY" : displayDirection === "short" ? "做空 SELL" : "观望";
 
     return (
-      <div ref={ref} style={S.card}>
+      <div ref={ref} style={{...S.card, boxShadow: t.glow}}>
+        <div style={S.gridBg} />
         {/* ── Header ── */}
-        <div style={{ background: t.headerBg, padding: "20px 24px", textAlign: "center" as const }}>
-          <div style={{ fontSize: 22, fontWeight: 800, color: "#ffffff", letterSpacing: "0.02em" }}>
-            {t.emoji} {report.symbol}{displayDirection !== "neutral" ? t.label : "观望"}交易信号 {t.emoji}
+        <div style={{ background: t.headerBg, padding: "28px 24px 24px", textAlign: "center" as const, position: "relative", zIndex: 10, borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#ffffff", letterSpacing: "0.04em", textTransform: "uppercase" }}>
+            {t.emoji} {report.symbol} {displayDirection !== "neutral" ? t.label : "观望"} {t.emoji}
           </div>
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", marginTop: 6 }}>
+          <div style={{ fontSize: 13, color: t.primary, marginTop: 8, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase" }}>
             {subtitle}
           </div>
         </div>
 
-        <div style={{ padding: "14px 0 0" }}>
+        <div style={{ padding: "16px 0 0", position: "relative", zIndex: 10 }}>
           {/* ── Section 1: 信号概览 ── */}
-          <div style={S.sectionBox(t.primary)}>
+          <div style={S.sectionBox(t.primary, "rgba(255,255,255,0.02)")}>
             <div style={S.row}>
               <span style={S.label}>交易标的</span>
-              <span style={{ ...S.value, color: t.primary }}>{report.symbol}</span>
+              <span style={{ ...S.value, color: "#ffffff", fontSize: 16 }}>{report.symbol}</span>
             </div>
             <div style={S.row}>
               <span style={S.label}>交易方向</span>
-              <span style={{ ...S.value, color: t.primary, fontSize: 14, fontWeight: 700 }}>
+              <span style={{ ...S.value, color: t.primary, fontSize: 15, fontWeight: 800, letterSpacing: "0.05em" }}>
                 {t.dirEmoji} {dirLabel}
               </span>
             </div>
             <div style={S.row}>
               <span style={S.label}>AI 置信度</span>
-              <span style={S.value}>
-                {Math.round(report.confidence * 100)}% {"⭐".repeat(Math.min(5, Math.ceil(report.confidence * 5)))}
+              <span style={{ ...S.value, color: "#fbbf24", fontFamily: 'monospace', fontSize: 15 }}>
+                {Math.round(report.confidence * 100)}%
               </span>
             </div>
             <div style={S.rowLast}>
@@ -160,45 +162,45 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
 
           {/* ── Section 2: 策略摘要（含进场/止损/止盈点位） ── */}
           {report.strategy && isLlmDegraded ? (
-            <div style={S.sectionBox("#f59e0b")}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#9a3412", marginBottom: 4 }}>
-                策略生成异常
+            <div style={S.sectionBox("#f59e0b", "rgba(245,158,11,0.05)")}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#fbbf24", marginBottom: 4 }}>
+                ⚠️ 策略生成异常
               </div>
-              <div style={{ fontSize: 12, color: "#78716c", lineHeight: 1.6 }}>
+              <div style={{ fontSize: 12, color: "#a1a1aa", lineHeight: 1.6 }}>
                 智能体返回了降级响应，建议重新分析后再分享策略摘要。
               </div>
             </div>
           ) : report.strategy && displayDirection !== "neutral" && (
-            <div style={S.sectionBox("#6366f1")}>
+            <div style={S.sectionBox("#818cf8", "rgba(99,102,241,0.03)")}>
               <div style={S.row}>
-                <span style={S.label}>策略类型</span>
-                <span style={S.value}>{report.strategy.is_fallback ? "估算策略" : "标准策略"}</span>
+                <span style={S.label}>策略层级</span>
+                <span style={{...S.value, color: "#c7d2fe", fontSize: 12}}>{report.strategy.is_fallback ? "HFT 估算策略" : "NSED 标准策略"}</span>
               </div>
               {(report.strategy.entry_low != null || report.strategy.entry_high != null || report.strategy.stop_loss != null || (report.strategy.targets && report.strategy.targets.length > 0)) ? (
                 <>
               {(report.strategy.entry_low != null || report.strategy.entry_high != null) && (
                 <div style={S.row}>
-                  <span style={S.label}>进场点位</span>
-                  <span style={S.value}>
+                  <span style={S.label}>进场区间 (Entry)</span>
+                  <span style={{ ...S.value, fontFamily: 'monospace', fontSize: 14, color: "#60a5fa" }}>
                     {report.strategy.entry_low != null ? report.strategy.entry_low.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
-                    {" ~ "}
+                    {" - "}
                     {report.strategy.entry_high != null ? report.strategy.entry_high.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
                   </span>
                 </div>
               )}
               {report.strategy.stop_loss != null && (
                 <div style={S.row}>
-                  <span style={S.label}>止损</span>
-                  <span style={{ ...S.value, color: "#dc2626", fontWeight: 700 }}>
+                  <span style={S.label}>防守位 (Stop Loss)</span>
+                  <span style={{ ...S.value, color: "#f87171", fontWeight: 800, fontFamily: 'monospace', fontSize: 14 }}>
                     {report.strategy.stop_loss.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               )}
               {report.strategy.targets && report.strategy.targets.length > 0 && (
                 <div style={S.row}>
-                  <span style={S.label}>止盈/目标位</span>
-                  <span style={{ ...S.value, color: "#16a34a", fontWeight: 600 }}>
-                    {report.strategy.targets.slice(0, 3).map((t, i) => `T${i + 1}:${t.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`).join(" ")}
+                  <span style={S.label}>目标位 (Target)</span>
+                  <span style={{ ...S.value, color: "#34d399", fontWeight: 800, fontFamily: 'monospace', fontSize: 14 }}>
+                    {report.strategy.targets.slice(0, 3).map((t, i) => `T${i + 1}:${t.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`).join("  ")}
                   </span>
                 </div>
               )}
@@ -206,107 +208,107 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               ) : (
                 <div style={S.row}>
                   <span style={S.label}>进场/止损/止盈</span>
-                  <span style={{ ...S.value, color: "#78716c", fontSize: 12 }}>本次分析未返回点位，请重试或切换模式</span>
+                  <span style={{ ...S.value, color: "#71717a", fontSize: 12 }}>本次分析未返回精密点位</span>
                 </div>
               )}
               {(report.strategy.risk_reward_ratio ?? 0) > 0 && (
                 <div style={S.row}>
-                  <span style={S.label}>盈亏比 📊</span>
-                  <span style={{ ...S.value, color: "#6366f1", fontWeight: 700 }}>
-                    {(report.strategy.risk_reward_ratio ?? 0).toFixed(2)}
+                  <span style={S.label}>盈亏比评估 (R/R)</span>
+                  <span style={{ ...S.value, color: "#a78bfa", fontWeight: 800, fontFamily: 'monospace', fontSize: 14 }}>
+                    1 : {(report.strategy.risk_reward_ratio ?? 0).toFixed(2)}
                   </span>
                 </div>
               )}
               <div style={S.row}>
-                <span style={S.label}>策略置信度</span>
-                <span style={S.value}>
+                <span style={S.label}>策略评分</span>
+                <span style={{...S.value, fontFamily: 'monospace', color: "#fbbf24"}}>
                   {typeof report.strategy.confidence === "number"
                     ? `${Math.round(report.strategy.confidence * 100)}%`
                     : "—"}
                 </span>
               </div>
               <div style={S.row}>
-                <span style={S.label}>值得操作</span>
+                <span style={S.label}>动能验证</span>
                 <span style={S.value}>
-                  {report.strategy.is_worth_taking ? "✅ 推荐" : "⚠️ 谨慎"}
+                  {report.strategy.is_worth_taking ? "✅ 符合预期" : "⚠️ 动能不足"}
                 </span>
               </div>
               <div style={S.row}>
-                <span style={S.label}>市场状态</span>
+                <span style={S.label}>环境侦测</span>
                 <span style={S.value}>{regimeText}</span>
               </div>
               <div style={S.rowLast}>
-                <span style={S.label}>信号时效</span>
-                <span style={S.value}>{validUntilText}</span>
+                <span style={S.label}>周期失效</span>
+                <span style={{...S.value, color: "#a1a1aa", fontSize: 12}}>{validUntilText}</span>
               </div>
             </div>
           )}
 
           {/* ── Section 3: AI 共识 ── */}
           {consensus.total > 0 && (
-            <div style={S.sectionBox("#f59e0b")}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "#92400e", marginBottom: 10 }}>
-                🤖 AI 共识详情
+            <div style={S.sectionBox("#f59e0b", "rgba(245,158,11,0.03)")}>
+              <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 700, color: "#fbbf24", marginBottom: 12 }}>
+                🤖 Swarm Consensus
               </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const }}>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" as const }}>
                 {consensus.bullish > 0 && (
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#16a34a", background: "#f0fdf4", borderRadius: 6, padding: "4px 12px", border: "1px solid #bbf7d0" }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#34d399", background: "rgba(16,185,129,0.1)", borderRadius: 6, padding: "4px 12px", border: "1px solid rgba(16,185,129,0.2)" }}>
                     📈 看涨 {consensus.bullish}
                   </span>
                 )}
                 {consensus.bearish > 0 && (
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#dc2626", background: "#fef2f2", borderRadius: 6, padding: "4px 12px", border: "1px solid #fecaca" }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#f87171", background: "rgba(239,68,68,0.1)", borderRadius: 6, padding: "4px 12px", border: "1px solid rgba(239,68,68,0.2)" }}>
                     📉 看跌 {consensus.bearish}
                   </span>
                 )}
                 {consensus.neutral > 0 && (
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#71717a", background: "#f4f4f5", borderRadius: 6, padding: "4px 12px", border: "1px solid #e4e4e7" }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#a1a1aa", background: "rgba(255,255,255,0.05)", borderRadius: 6, padding: "4px 12px", border: "1px solid rgba(255,255,255,0.1)" }}>
                     ⏸️ 中性 {consensus.neutral}
                   </span>
                 )}
               </div>
-              <div style={{ marginTop: 10, fontSize: 12, color: "#78716c" }}>
-                共 {consensus.total} 个智能体参与分析，
-                {consensusSummaryText(consensus)}
+              <div style={{ marginTop: 12, fontSize: 12, color: "#a1a1aa" }}>
+                共 {consensus.total} 个高阶智能体已完成网格计算
+                <br />
+                <span style={{ color: "#d4d4d8", fontWeight: 600 }}>{consensusSummaryText(consensus)}</span>
               </div>
             </div>
           )}
 
           {/* ── Scalping warning ── */}
           {report.mode === "scalping" && (
-            <div style={{ margin: "0 20px 14px", background: "#fff7ed", border: "1px solid #fed7aa", borderLeft: "3px solid #f59e0b", borderRadius: 8, padding: "12px 16px" }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#9a3412", marginBottom: 4 }}>
-                ⚡ 实时短线提示
+            <div style={{ margin: "0 24px 16px", background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.2)", borderLeft: "3px solid #f59e0b", borderRadius: 12, padding: "12px 16px", position: "relative", zIndex: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#fbbf24", marginBottom: 4 }}>
+                ⚡ 毫米级超频警告
               </div>
-              <div style={{ fontSize: 11, color: "#78716c", lineHeight: 1.6 }}>
-                实时短线分析基于技术指标快速判断，假信号较多，仅供辅助参考，请结合自身经验与盘面情况自行决策。
+              <div style={{ fontSize: 11, color: "#a1a1aa", lineHeight: 1.6 }}>
+                当前分析处于 HFT (高频交易) 环境。信号波动极大，请配合 L2 订单流严格止损。
               </div>
             </div>
           )}
 
           {/* ── Disclaimer ── */}
-          <div style={{ margin: "0 20px 14px", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 8, padding: "12px 16px" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#92400e", marginBottom: 4 }}>
-              ⚠️ 重要免责声明
+          <div style={{ margin: "0 24px 16px", background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.1)", borderRadius: 12, padding: "12px 16px", position: "relative", zIndex: 10 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#71717a", marginBottom: 4 }}>
+              DISCLAIMER 免责声明
             </div>
-            <div style={{ fontSize: 11, color: "#78716c", lineHeight: 1.6 }}>
-              此信号由 AI 多智能体分析生成，仅供参考，不构成投资建议。加密货币交易存在极高风险，请谨慎决策，自负盈亏。
+            <div style={{ fontSize: 11, color: "#71717a", lineHeight: 1.6 }}>
+              此报告由多智能体深度网络推理生成。仅作研究用途，不构成直接财务建议。DYOR。
             </div>
           </div>
         </div>
 
         {/* ── Brand footer ── */}
-        <div style={{ background: "#f9fafb", borderTop: "1px solid #e5e7eb", padding: "10px 24px", textAlign: "center" as const, fontSize: 12, color: "#9ca3af" }}>
-          <span>本图由 </span>
-          <span style={{ fontWeight: 700, color: "#6b7280" }}>{cfg.brandName}</span>
-          <span> 生成</span>
+        <div style={{ background: "rgba(0,0,0,0.4)", borderTop: "1px solid rgba(255,255,255,0.05)", padding: "12px 24px", textAlign: "center" as const, fontSize: 11, color: "#71717a", position: "relative", zIndex: 10 }}>
+          <span>Powered by </span>
+          <span style={{ fontWeight: 800, color: "#d4d4d8", letterSpacing: "0.05em" }}>{cfg.brandName}™</span>
           {cfg.brandLevel >= 2 && cfg.domain && (
             <span> | {cfg.domain}</span>
           )}
           {cfg.brandLevel >= 3 && cfg.description && (
             <span> · {cfg.description}</span>
           )}
-          <div style={{ fontSize: 11, color: "#d1d5db", marginTop: 2 }}>{timeStr}</div>
+          <div style={{ fontSize: 11, color: "#71717a", marginTop: 4, fontFamily: 'monospace' }}>{timeStr}</div>
         </div>
       </div>
     );

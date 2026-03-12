@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from app.agents.base import AgentReport
-from app.core.redis import get_redis_pool
+from app.core.redis import get_redis_pool, publish_stream
 from app.models.analysis import AnalysisMode, AnalysisReport, ReportSection
 from app.services.analysis_aggregation import _weighted_average_fallback
 from app.services.push_dispatcher import dispatch_fire_and_forget
@@ -232,3 +232,46 @@ async def run_post_complete_tasks(
         )
     except Exception as exc:
         logger.warning("策略持久化后置任务失败或超时: %s", exc)
+
+    try:
+        await asyncio.wait_for(
+            _publish_signal_to_alert_stream(symbol, mode, report),
+            timeout=3.0,
+        )
+    except Exception as exc:
+        logger.warning("AI 信号发布到预警流失败或超时: %s", exc)
+
+
+async def _publish_signal_to_alert_stream(
+    symbol: str,
+    mode: AnalysisMode,
+    report: AnalysisReport,
+) -> None:
+    """将分析信号写入 ai_signal_updates Stream，供 alert_eval_worker 消费。
+
+    这是 Autopilot 功能的关键链路：
+    Autopilot 部署时创建的 AlertRule 使用 AI_CONSENSUS / SCALPING_SIGNAL 指标，
+    只有将分析置信度 publish 到 Stream，评估 Worker 才能匹配到这些规则并触发通知。
+    """
+    if report.is_partial or report.signal == "neutral":
+        return
+
+    from app.models.alert import MetricType
+
+    if mode == AnalysisMode.SCALPING:
+        metric = MetricType.SCALPING_SIGNAL.value
+    else:
+        metric = MetricType.AI_CONSENSUS.value
+
+    try:
+        await publish_stream("ai_signal_updates", {
+            "symbol": json.dumps(symbol),
+            "metric_type": json.dumps(metric),
+            "current_value": json.dumps(report.confidence),
+        })
+        logger.debug(
+            "AI 信号已发布: symbol=%s metric=%s confidence=%.2f",
+            symbol, metric, report.confidence,
+        )
+    except Exception as exc:
+        logger.error("AI 信号发布失败: %s", exc)

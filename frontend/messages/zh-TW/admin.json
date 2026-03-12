@@ -286,7 +286,7 @@
       "q3": "Q: Key 安全嗎？",
       "a3": "所有 API Key 在資料庫中加密儲存，前端只能看到脫敏後的值（如 sk-****abc），不會明文顯示。",
       "q4": "Q: 免費的資料源夠用嗎？",
-      "a4": "免費資料源（Binance + Alternative.me + BlockBeats + CryptoPanic + CoinGecko Demo）已涵蓋 K 線、合約、恐慌指數、新聞、基本面資料，對於基礎分析足夠。付費資料源（CoinGlass、GlassNode、CoinGecko 高級套餐）主要增強衍生品、鏈上深度和社群情緒維度。"
+      "a4": "免費資料源（Binance + Alternative.me + BlockBeats + Finnhub + CoinGecko Demo）已涵蓋 K 線、合約、恐慌指數、新聞、財報日曆、美股關聯報價、基本面資料，對於基礎分析足夠。付費資料源（CoinGlass、GlassNode、CoinGecko 高級套餐）主要增強衍生品、鏈上深度和社群情緒維度。"
     },
     "toast": {
       "testSuccess": "{name} 連線測試成功",
@@ -303,10 +303,10 @@
         "howToGet": "註冊 → 儲值 → 複製 API Key",
         "cost": "按量付費"
       },
-      "cryptopanic_api_token": {
-        "name": "新聞資料密鑰",
-        "description": "取得全球加密貨幣新聞，為 NewsAnalystAgent 提供英文新聞資料。",
-        "howToGet": "註冊帳號 → 進入 API 頁面 → 複製 Auth Token",
+      "finnhub_api_key": {
+        "name": "新聞 + 美股資料密鑰",
+        "description": "取得加密貨幣主流財經新聞、加密概念股財報日曆、美股報價、內部人交易等。",
+        "howToGet": "註冊帳號 → Dashboard → 複製 API Key",
         "cost": "免費"
       },
       "coinglass_api_key": {
@@ -560,8 +560,8 @@
         },
         "newsKey": {
           "label": "新聞數據",
-          "ok": "CryptoPanic 已接入",
-          "warn": "CryptoPanic 未配置，僅使用 BlockBeats（免費）"
+          "ok": "Finnhub 已接入",
+          "warn": "Finnhub 未配置，僅使用 BlockBeats（免費）"
         },
         "onchainKey": {
           "label": "鏈上深度數據",

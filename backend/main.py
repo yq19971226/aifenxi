@@ -52,6 +52,7 @@ from app.api.admin_system import router as admin_system_router
 from app.api.webhooks_resend import router as webhooks_resend_router
 from app.api.dashboard_overview import router as dashboard_overview_router
 from app.api.leaderboard import router as leaderboard_router
+from app.api.autopilots import router as autopilots_router
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.redis import init_redis, close_redis
@@ -214,8 +215,30 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     except Exception as exc:
         import logging
         logging.getLogger(__name__).warning("KlineScheduler 启动失败: %s", exc)
+    # Finnhub 数据自动采集调度器
+    try:
+        from app.services.finnhub_scheduler import FinnhubScheduler
+        finnhub_scheduler = FinnhubScheduler()
+        await finnhub_scheduler.start()
+        app.state.finnhub_scheduler = finnhub_scheduler
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning("FinnhubScheduler 启动失败: %s", exc)
+    # Glassnode 链上数据自动采集调度器
+    try:
+        from app.services.glassnode_scheduler import GlassnodeScheduler
+        glassnode_scheduler = GlassnodeScheduler()
+        await glassnode_scheduler.start()
+        app.state.glassnode_scheduler = glassnode_scheduler
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning("GlassnodeScheduler 启动失败: %s", exc)
     yield
     # shutdown
+    if hasattr(app.state, "glassnode_scheduler"):
+        await app.state.glassnode_scheduler.stop()
+    if hasattr(app.state, "finnhub_scheduler"):
+        await app.state.finnhub_scheduler.stop()
     if hasattr(app.state, "kline_scheduler"):
         await app.state.kline_scheduler.stop()
     if hasattr(app.state, "health_monitor"):
@@ -293,6 +316,7 @@ app.include_router(admin_system_router)
 app.include_router(webhooks_resend_router)
 app.include_router(dashboard_overview_router)
 app.include_router(leaderboard_router)
+app.include_router(autopilots_router)
 
 
 @app.get("/health", tags=["system"])

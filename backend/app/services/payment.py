@@ -639,19 +639,27 @@ async def handle_webhook(
 
             await session.flush()
 
-            # DB 事务已 flush，现在安全同步佣金到 Redis
+            # DB 事务已 flush，现在安全同步佣金到 Redis（3次重试）
             if commission_result:
-                try:
-                    from app.services.partner_service import sync_commission_to_redis
-                    await sync_commission_to_redis(
-                        commission_result["partner_id"],
-                        commission_result["commission"],
-                    )
-                except Exception as redis_exc:
-                    logger.warning(
-                        "Commission Redis sync failed (reconcile will fix): %s",
-                        redis_exc,
-                    )
+                for _attempt in range(3):
+                    try:
+                        from app.services.partner_service import sync_commission_to_redis
+                        await sync_commission_to_redis(
+                            commission_result["partner_id"],
+                            commission_result["commission"],
+                        )
+                        break
+                    except Exception as redis_exc:
+                        if _attempt == 2:
+                            logger.error(
+                                "Commission Redis sync failed after 3 retries "
+                                "(reconcile job will fix): partner=%s amount=%s error=%s",
+                                commission_result["partner_id"],
+                                commission_result["commission"],
+                                redis_exc,
+                            )
+                        else:
+                            await asyncio.sleep(0.5 * (_attempt + 1))
             logger.info(
                 "Payment completed: payment_id=%s, user_id=%s, plan=%d, provider_status=%s",
                 payment_id,

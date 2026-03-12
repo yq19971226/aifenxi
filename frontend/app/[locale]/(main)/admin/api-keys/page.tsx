@@ -51,12 +51,12 @@ const API_KEYS: ApiKeyDef[] = [
     category: "ai_model",
   },
   {
-    key: "cryptopanic_api_token",
-    name: "新闻数据密钥",
-    provider: "CryptoPanic",
-    description: "获取全球加密货币新闻，为 NewsAnalystAgent 提供英文新闻数据。",
-    howToGet: "注册账号 → 进入 API 页面 → 复制 Auth Token",
-    registerUrl: "https://cryptopanic.com/developers/api/",
+    key: "finnhub_api_key",
+    name: "新闻 + 美股数据密钥",
+    provider: "Finnhub",
+    description: "获取加密货币主流财经新闻、加密概念股财报日历、美股报价、内部人交易等。",
+    howToGet: "注册账号 → Dashboard → 复制 API Key",
+    registerUrl: "https://finnhub.io/register",
     cost: "免费",
     required: false,
     category: "data_source",
@@ -599,7 +599,7 @@ export default function ApiKeysPage() {
           <div>
             <span className="text-zinc-300 font-medium">Q: 免费的数据源够用吗？</span>
             <p className="mt-0.5">
-              免费数据源（Binance + Alternative.me + BlockBeats + CryptoPanic + CoinGecko Demo）已经覆盖了 K 线、合约、恐慌指数、新闻、基本面数据，
+              免费数据源（Binance + Alternative.me + BlockBeats + Finnhub + CoinGecko Demo）已经覆盖了 K 线、合约、恐慌指数、新闻、财报日历、美股关联报价、基本面数据，
               对于基础分析足够。付费数据源（CoinGlass、GlassNode、CoinGecko 高级套餐）主要增强衡生品、链上深度和社区情绪维度。
             </p>
           </div>

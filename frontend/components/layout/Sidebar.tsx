@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   ChevronDown,
   LogOut,
+  Rocket,
   type LucideIcon,
   Settings,
 } from "lucide-react";
@@ -44,6 +45,7 @@ const navItems: NavItem[] = [
   { key: "dashboard", href: "/dashboard", icon: LayoutDashboard, minRole: "user" },
   { key: "consensus", href: "/consensus", icon: Brain, minRole: "user" },
   { key: "playbook", href: "/playbook-sim", icon: History, minRole: "user", featureFlag: "playbook" },
+  { key: "autopilots", href: "/autopilots", icon: Rocket, minRole: "user" },
   { key: "leaderboard", href: "/leaderboard", icon: TrendingUp, minRole: "user", featureFlag: "leaderboard" },
   { key: "alerts", href: "/alerts", icon: Shield, minRole: "user", featureFlag: "alerts" },
   {

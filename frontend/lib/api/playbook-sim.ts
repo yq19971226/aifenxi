@@ -98,6 +98,8 @@ export interface JudgeAdoption {
   next_move: string;
   risk_alerts: string[];
   reasoning: string;
+  plain_summary?: string;
+  confidence_level?: "high" | "medium" | "low" | "none";
 }
 
 export interface SimResult {

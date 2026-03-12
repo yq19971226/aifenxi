@@ -663,10 +663,10 @@ class AnalysisOrchestrator:
         # │ indicators           │ presence   │ 本地 ta-lib 计算，无 registry │
         # │ derivatives          │ presence   │ Binance REST，无 registry     │
         # ├──────────────────────┼────────────┼───────────────────────────────┤
-        # │ onchain              │ runtime    │ CryptoQuant/Alt.me 采集       │
+        # │ onchain              │ runtime    │ GlassNode T3(主) / CQ(备)    │
         # │ calendar             │ runtime    │ CoinMarketCal API + DB       │
         # │ orderbook            │ runtime    │ Binance REST 深度快照         │
-        # │ news:feed            │ runtime    │ CryptoPanic + BlockBeats     │
+        # │ news:feed            │ runtime    │ Finnhub + BlockBeats         │
         # │ sentiment:fear_greed │ runtime    │ Alternative.me               │
         # ├──────────────────────┼────────────┼───────────────────────────────┤
         # │ cg_orderbook         │ runtime    │ CoinGlass REST（独立于上方    │

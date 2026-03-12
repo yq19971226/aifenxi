@@ -215,10 +215,10 @@ const GROUP_META: Record<string, {
     bgColor: "bg-amber-500/20",
     desc: "新闻资讯采集，为 NewsAnalystAgent 和 SentimentAgent 提供实时新闻数据。",
     sources: {
-      cryptopanic: {
-        desc: "全球加密新闻聚合平台，英文为主，支持币种过滤和投票数据。",
-        impact: "关闭后 NewsAnalystAgent 英文新闻源缺失。",
-        cost: "免费层可用，需 API Key",
+      finnhub_news: {
+        desc: "主流财经媒体加密新闻（CNBC/Bloomberg/Reuters），支持加密概念股新闻。",
+        impact: "关闭后主流财经新闻源缺失，仅剩 BlockBeats 中文新闻。",
+        cost: "免费，需 Finnhub API Key",
       },
       blockbeats: {
         desc: "华语区最大区块链媒体，提供快讯和深度文章，中文原生。",

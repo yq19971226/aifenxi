@@ -58,5 +58,13 @@
   },
   "error": {
     "loadFailed": "Failed to load announcement data"
+  },
+  "runtime": {
+    "badge": "Announcement",
+    "closeAria": "Close announcement",
+    "snooze": "Remind me in 24h",
+    "viewDetail": "View Details",
+    "acknowledged": "I Acknowledge",
+    "dismiss": "Dismiss"
   }
 }

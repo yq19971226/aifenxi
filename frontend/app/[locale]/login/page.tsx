@@ -54,27 +54,27 @@ export default function LoginPage() {
     <AuthLayout>
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
-          <div className="p-3 rounded border border-bear/20 bg-bear/10 text-bear text-sm flex items-center gap-2">
-            <AlertCircle size={16} />
-            {error}
+          <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 text-sm flex items-center gap-3 backdrop-blur-md">
+            <AlertCircle size={18} className="shrink-0" />
+            <span className="font-medium tracking-tight">{error}</span>
           </div>
         )}
 
         <div className="space-y-2">
-          <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">{t("fields.email")}</label>
+          <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.15em] ml-1">{t("fields.email")}</label>
           <input
             name="email"
             type="email"
             required
-            className="w-full h-12 bg-transparent border-b border-border focus:border-foreground outline-none transition-colors font-mono text-sm placeholder:text-muted-foreground/50"
+            className="w-full h-12 bg-white/[0.02] border border-white/[0.06] focus:border-indigo-500/50 focus:bg-indigo-500/[0.02] hover:border-white/[0.1] rounded-xl px-4 outline-none transition-all font-mono text-sm text-white placeholder:text-zinc-600 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)]"
             placeholder={t("placeholders.email")}
           />
         </div>
 
         <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">{t("fields.password")}</label>
-            <Link href={`/${locale}/forgot-password`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+          <div className="flex justify-between items-center ml-1">
+            <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.15em]">{t("fields.password")}</label>
+            <Link href={`/${locale}/forgot-password`} className="text-[11px] font-bold text-indigo-400/80 hover:text-indigo-400 transition-colors uppercase tracking-widest">
               {t("page.forgotLink")}
             </Link>
           </div>
@@ -82,7 +82,7 @@ export default function LoginPage() {
             name="password"
             type="password"
             required
-            className="w-full h-12 bg-transparent border-b border-border focus:border-foreground outline-none transition-colors font-mono text-sm placeholder:text-muted-foreground/50"
+            className="w-full h-12 bg-white/[0.02] border border-white/[0.06] focus:border-indigo-500/50 focus:bg-indigo-500/[0.02] hover:border-white/[0.1] rounded-xl px-4 outline-none transition-all font-mono text-sm text-white placeholder:text-zinc-600 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)] tracking-[0.2em]"
             placeholder="••••••••"
           />
         </div>
@@ -90,7 +90,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full h-12 bg-foreground text-bg-primary font-bold text-sm hover:bg-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 mt-8"
+          className="w-full h-12 bg-indigo-500 border border-indigo-400/50 text-white rounded-xl font-black text-sm uppercase tracking-widest hover:bg-indigo-400 hover:shadow-[0_0_25px_rgba(99,102,241,0.4)] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3 mt-8 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
         >
           {loading ? (
             <Loader2 size={18} className="animate-spin" />
@@ -101,9 +101,9 @@ export default function LoginPage() {
           )}
         </button>
 
-        <div className="text-center mt-6">
-          <span className="text-sm text-muted-foreground">{t("page.noAccount")}</span>
-          <Link href={`/${locale}/register`} className="text-sm font-medium text-foreground hover:underline underline-offset-4">
+        <div className="text-center mt-6 pt-6 border-t border-white/[0.06]">
+          <span className="text-sm font-medium text-zinc-500">{t("page.noAccount")}</span>
+          <Link href={`/${locale}/register`} className="ml-2 text-sm font-bold text-white hover:text-indigo-400 hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.5)] transition-all">
             {t("page.applyForAccess")}
           </Link>
         </div>

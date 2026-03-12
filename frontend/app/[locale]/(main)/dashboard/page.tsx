@@ -63,27 +63,28 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.01] p-6 md:p-8">
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-black/60 shadow-[0_8px_32px_rgba(0,0,0,0.5)] p-6 md:p-8 backdrop-blur-xl">
         {/* Background ambient glow */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[300px] h-[300px] rounded-full bg-indigo-500/[0.03] blur-[80px]" />
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-indigo-500/10 blur-[100px] -mr-32 -mt-32" />
+          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] rounded-full bg-emerald-500/5 blur-[80px] -ml-20 -mb-20" />
         </div>
-        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight mb-1 text-white">{t("commandCenter")}</h1>
-            <p className="text-sm text-zinc-500 font-mono">
-              {">"} {t("welcomeBack")}, {user?.email?.split("@")[0]?.toUpperCase() ?? "USER"}
+            <h1 className="text-2xl md:text-3xl font-black tracking-widest mb-1.5 text-white drop-shadow-sm uppercase">{t("commandCenter")}</h1>
+            <p className="text-sm md:text-base text-zinc-400 font-mono tracking-tight flex items-center gap-2">
+              <span className="text-indigo-400">{">"}</span> {t("welcomeBack")}, <span className="text-zinc-200">{user?.email?.split("@")[0]?.toUpperCase() ?? "USER"}</span>
             </p>
           </div>
-          <div className="flex items-center gap-6 px-5 py-2.5 rounded-lg glass-card text-xs font-mono">
-            <div>
-              <span className="text-zinc-600 mr-2 text-[10px] uppercase tracking-wider">{t("credits").toUpperCase()}</span>
-              <span className="text-white font-bold text-base">{overview?.credits_remaining ?? 0}</span>
+          <div className="flex items-center gap-6 px-6 py-3.5 rounded-xl border border-white/[0.06] bg-white/[0.02] shadow-inner text-xs font-mono backdrop-blur-md">
+            <div className="flex flex-col">
+              <span className="text-zinc-500 mb-0.5 text-[11px] font-bold uppercase tracking-[0.2em]">{t("credits").toUpperCase()}</span>
+              <span className="text-white font-black text-[17px] tracking-tight">{overview?.credits_remaining ?? 0}</span>
             </div>
-            <div className="w-px h-5 bg-white/[0.06]" />
-            <div>
-              <span className="text-zinc-600 mr-2 text-[10px] uppercase tracking-wider">{t("rank").toUpperCase()}</span>
-              <span className="text-emerald-400 font-bold text-base">{t("topPercent")}</span>
+            <div className="w-px h-8 bg-zinc-800" />
+            <div className="flex flex-col">
+              <span className="text-zinc-500 mb-0.5 text-[11px] font-bold uppercase tracking-[0.2em]">{t("rank").toUpperCase()}</span>
+              <span className="text-emerald-400 font-black text-[17px] tracking-tight drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]">{t("topPercent")}</span>
             </div>
           </div>
         </div>
@@ -93,11 +94,14 @@ export default function DashboardPage() {
       <section>
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-bull animate-pulse" />
+            <h2 className="text-sm font-black text-zinc-300 uppercase tracking-[0.15em] flex items-center gap-2">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500"></span>
+              </span>
               {t("liveAnalysisFeed")}
             </h2>
-            <span className="text-[10px] font-mono text-muted-foreground/80 hidden sm:inline">
+            <span className="text-[11px] font-mono font-bold text-zinc-600 uppercase tracking-widest hidden sm:inline ml-2 pl-3 border-l border-zinc-800">
               {t("autoRefreshHint")}
             </span>
           </div>
@@ -159,31 +163,44 @@ function RuleResultRow({
   return (
     <Link
       href={`/${locale}/consensus?symbol=${row.symbol}`}
-      className="flex items-center justify-between glass-card glass-card-hover px-4 py-3"
+      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 bg-white/[0.01] hover:bg-white/[0.03] border border-white/[0.04] hover:border-white/[0.08] px-5 py-3.5 rounded-xl transition-all group shadow-sm"
     >
-      <div className="flex items-center gap-3 min-w-0">
-        <span className="text-sm font-semibold text-foreground shrink-0">
+      <div className="flex items-center gap-4 min-w-0">
+        <span className="text-[15px] font-black text-white shrink-0 tracking-tight">
           {row.display_name}
         </span>
-        <span className="text-xs font-mono text-muted-foreground">{priceStr}</span>
-        {isLong && <TrendingUp size={12} className="text-bull shrink-0" />}
-        {isShort && <TrendingDown size={12} className="text-bear shrink-0" />}
-        {row.direction === "neutral" && <Minus size={12} className="text-muted-foreground shrink-0" />}
-        <span
-          className={`text-xs font-medium shrink-0 ${
-            row.verdict === "opportunity"
-              ? "text-bull"
-              : row.verdict === "risk"
-                ? "text-bear"
-                : "text-muted-foreground"
-          }`}
-        >
-          {t(verdictKey)}
-        </span>
+        <span className="text-xs sm:text-sm font-mono font-bold text-zinc-500 tracking-tight">{priceStr}</span>
+        
+        <div className="h-4 w-px bg-white/[0.08] hidden sm:block" />
+        
+        <div className="flex items-center gap-2 shrink-0">
+          <div className={`p-1 rounded bg-white/[0.03] ${isLong ? 'text-emerald-400' : isShort ? 'text-red-400' : 'text-zinc-500'}`}>
+            {isLong && <TrendingUp size={14} />}
+            {isShort && <TrendingDown size={14} />}
+            {row.direction === "neutral" && <Minus size={14} />}
+          </div>
+          <span
+            className={`text-[11px] sm:text-xs font-bold uppercase tracking-widest ${
+              row.verdict === "opportunity"
+                ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]"
+                : row.verdict === "risk"
+                  ? "text-red-400 drop-shadow-[0_0_8px_rgba(248,113,113,0.3)]"
+                  : "text-zinc-500"
+            }`}
+          >
+            {t(verdictKey)}
+          </span>
+        </div>
       </div>
-      <div className="flex items-center gap-1 text-muted-foreground shrink-0">
-        <span className="text-[10px] font-mono">{(row.confidence * 100).toFixed(0)}%</span>
-        <ChevronRight size={14} />
+      
+      <div className="flex items-center justify-end sm:justify-start gap-3 text-zinc-500 shrink-0">
+        <div className="flex flex-col items-end sm:items-center">
+          <span className="text-[10px] font-bold uppercase tracking-widest mb-0.5">{t("table.confidence")}</span>
+          <span className="text-xs sm:text-sm font-mono font-black text-zinc-300">{(row.confidence * 100).toFixed(0)}%</span>
+        </div>
+        <div className="p-1 rounded-md group-hover:bg-white/[0.05] group-hover:text-white transition-colors ml-2">
+          <ChevronRight size={16} />
+        </div>
       </div>
     </Link>
   );
