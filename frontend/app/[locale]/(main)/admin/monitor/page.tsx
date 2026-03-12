@@ -173,7 +173,7 @@ function OnlineUsersCard() {
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h2 className="mb-1 text-sm font-semibold text-white">在线用户</h2>
-          <p className="text-xs text-zinc-500">WebSocket 实时连接（30s 刷新）</p>
+          <p className="text-xs text-zinc-500">登录在线（心跳） / WebSocket 连接，约 15s 刷新</p>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="relative flex h-2 w-2">
@@ -183,10 +183,14 @@ function OnlineUsersCard() {
           <span className="text-xs text-zinc-500">实时</span>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="text-center">
-          <p className="text-2xl font-bold text-accent">{data?.total ?? 0}</p>
-          <p className="mt-1 text-xs text-zinc-500">总连接</p>
+          <p className="text-2xl font-bold text-accent">{data?.logged_in_online ?? 0}</p>
+          <p className="mt-1 text-xs text-zinc-500">登录在线</p>
+        </div>
+        <div className="text-center">
+          <p className="text-2xl font-bold text-zinc-300">{data?.total ?? 0}</p>
+          <p className="mt-1 text-xs text-zinc-500">WS 总连接</p>
         </div>
         <div className="text-center">
           <p className="text-2xl font-bold text-blue-400">{data?.price ?? 0}</p>

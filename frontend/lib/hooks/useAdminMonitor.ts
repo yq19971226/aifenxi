@@ -10,6 +10,8 @@ export interface AdminOnlineStats {
   total: number;
   price: number;
   alerts: number;
+  /** 登录在线：最近 3 分钟内上报过心跳的登录用户数 */
+  logged_in_online: number;
 }
 
 export function useAdminOnlineStats() {
@@ -18,11 +20,16 @@ export function useAdminOnlineStats() {
     queryFn: async () => {
       try {
         const res = await fetch(`${API}/api/admin/stats/online`, { headers: authHeaders() });
-        if (!res.ok) return { total: 0, price: 0, alerts: 0 };
+        if (!res.ok) return { total: 0, price: 0, alerts: 0, logged_in_online: 0 };
         const d = await res.json();
-        return { total: d.count ?? 0, price: d.price ?? 0, alerts: d.alerts ?? 0 };
+        return {
+          total: d.count ?? 0,
+          price: d.price ?? 0,
+          alerts: d.alerts ?? 0,
+          logged_in_online: d.logged_in_online ?? 0,
+        };
       } catch {
-        return { total: 0, price: 0, alerts: 0 };
+        return { total: 0, price: 0, alerts: 0, logged_in_online: 0 };
       }
     },
     refetchInterval: 15_000,

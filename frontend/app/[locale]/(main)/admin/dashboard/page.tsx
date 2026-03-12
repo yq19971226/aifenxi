@@ -535,11 +535,11 @@ export default function AdminDashboardPage() {
             color="bg-purple-500/10 text-purple-400"
           />
           <KpiCard
-            label="在线用户"
-            value={onlineStats?.total ?? 0}
-            sub={`价格${onlineStats?.price ?? 0} / 预警${onlineStats?.alerts ?? 0}`}
+            label="登录在线"
+            value={onlineStats?.logged_in_online ?? 0}
+            sub={`WS 价格${onlineStats?.price ?? 0} / 预警${onlineStats?.alerts ?? 0}`}
             icon={Wifi}
-            color={(onlineStats?.total ?? 0) > 50 ? "bg-emerald-500/10 text-emerald-400" : "bg-blue-500/10 text-blue-400"}
+            color={(onlineStats?.logged_in_online ?? 0) > 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-blue-500/10 text-blue-400"}
           />
         </div>
 

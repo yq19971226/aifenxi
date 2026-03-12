@@ -3,6 +3,7 @@
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopNav } from "@/components/layout/TopNav";
 import { AuthGuard } from "@/components/layout/AuthGuard";
+import { PresenceHeartbeat } from "@/components/layout/PresenceHeartbeat";
 import { AnnouncementRuntime } from "@/components/announcements/AnnouncementRuntime";
 import { DataSourceBanner } from "@/components/cards/DataSourceBanner";
 import { OfflineBanner } from "@/components/ui/OfflineBanner";
@@ -17,6 +18,7 @@ interface MainLayoutProps {
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
     <AuthGuard>
+      <PresenceHeartbeat />
       {/* 移动端 flex-col 纵向堆叠避免左侧留白；桌面端 flex-row 左侧 Sidebar */}
       <div className="flex min-h-screen w-full flex-col overflow-x-hidden bg-bg-primary text-foreground font-sans selection:bg-primary/20 md:flex-row">
         <ErrorBoundary name="OfflineBanner">

@@ -32,6 +32,8 @@ HEARTBEAT_INTERVAL: int = 30  # 秒
 HEARTBEAT_TIMEOUT: int = 10   # 等待 pong 超时
 REDIS_KEY_WS_ONLINE: str = "ws:online:{channel}"
 REDIS_ONLINE_TTL: int = 120   # 在线状态 TTL（秒）
+REDIS_KEY_PRESENCE: str = "presence:{user_id}"
+PRESENCE_TTL: int = 180      # 登录在线心跳 TTL（秒）
 STREAM_BLOCK_MS: int = 2000   # xread 阻塞时间
 STREAM_BATCH: int = 50        # 每次读取最大消息数
 DEFAULT_SYMBOL: str = "BTCUSDT"  # 免费用户默认订阅
@@ -123,6 +125,30 @@ async def _unregister_online(channel: str, user_id: str) -> None:
         await redis.hdel(key, user_id)
     except Exception as exc:
         logger.warning("Failed to unregister online status: %s", exc)
+
+
+async def register_presence(user_id: str) -> None:
+    """登记登录用户在线（心跳）。用于「登录在线」统计。"""
+    try:
+        redis = get_redis_pool()
+        key = REDIS_KEY_PRESENCE.format(user_id=user_id)
+        await redis.set(key, str(int(time.time())), ex=PRESENCE_TTL)
+    except Exception as exc:
+        logger.warning("Failed to register presence: %s", exc)
+
+
+async def get_logged_in_online_count() -> int:
+    """统计最近 PRESENCE_TTL 秒内上报过心跳的登录用户数。"""
+    try:
+        redis = get_redis_pool()
+        pattern = REDIS_KEY_PRESENCE.replace("{user_id}", "*")
+        n = 0
+        async for _ in redis.scan_iter(match=pattern, count=200):
+            n += 1
+        return n
+    except Exception as exc:
+        logger.warning("Failed to get logged-in online count: %s", exc)
+        return 0
 
 
 async def get_online_count(channel: str) -> int:

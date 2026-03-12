@@ -6,7 +6,7 @@ from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.core.deps import UserInfo, require_admin
+from app.core.deps import UserInfo, get_current_user, require_admin
 
 from app.core.mode_contract import ALL_MODE_KLINE_INTERVALS
 from app.core.sql_compat import serial_pk, varchar, timestamptz_default
@@ -633,19 +633,32 @@ async def online_stats() -> dict:
     return {"enabled": True, "count": total}
 
 
+@app.post("/api/presence", tags=["system"])
+async def presence_heartbeat(
+    user: UserInfo = Depends(get_current_user),
+) -> dict:
+    """登录用户心跳，用于「登录在线」统计（最近 3 分钟内有请求视为在线）。"""
+    from app.api.ws import register_presence
+
+    await register_presence(str(user.id))
+    return {"ok": True}
+
+
 @app.get("/api/admin/stats/online", tags=["admin"])
 async def admin_online_stats(
     admin: UserInfo = Depends(require_admin),
 ) -> dict:
-    """返回分频道在线用户明细（仅管理员）。"""
-    from app.api.ws import get_online_count
+    """返回分频道 WebSocket 在线 + 登录在线人数（仅管理员）。"""
+    from app.api.ws import get_online_count, get_logged_in_online_count
 
     price_count = await get_online_count("price")
     alerts_count = await get_online_count("alerts")
+    logged_in_online = await get_logged_in_online_count()
     return {
         "count": max(price_count, alerts_count),
         "price": price_count,
         "alerts": alerts_count,
+        "logged_in_online": logged_in_online,
     }
 
 
