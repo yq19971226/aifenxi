@@ -180,7 +180,7 @@
       "createDraft": "新建公告草稿",
       "createNewVersion": "创建新版本草稿",
       "editAnnouncement": "编辑公告",
-      "createSubtitle": "超简版默认只填标题和正文，直接发布；其他规则收进高级设置",
+      "createSubtitle": "填写标题与正文即可发布，高级规则可展开设置",
       "saveDraft": "保存草稿",
       "saveNewVersion": "保存为新版本草稿",
       "save": "保存",
@@ -188,7 +188,7 @@
       "publishNewVersion": "保存并发布新版本",
       "saveAndPublish": "保存并发布",
       "collapse": "收起",
-      "simpleHint": "超简版默认只需填写标题和正文。",
+      "simpleHint": "需要排期、定向、弹窗等时点击右侧展开。",
       "collapseAdvanced": "收起高级设置",
       "expandAdvanced": "展开高级设置",
       "labelTitle": "标题",
@@ -206,10 +206,43 @@
       "labelTargetPaths": "目标路径前缀",
       "labelStartsAt": "开始时间",
       "labelEndsAt": "结束时间",
-      "defaultHint": "默认流程就是标题、正文、发布；高级规则按需展开。",
+      "defaultHint": "标题、正文、发布",
       "cancel": "取消",
       "saving": "保存中",
       "publishing": "发布中"
+    },
+    "table": {
+      "title": "标题",
+      "version": "版本",
+      "displayMode": "展示方式",
+      "status": "状态",
+      "priority": "优先级",
+      "time": "时间",
+      "actions": "操作",
+      "timeUpdated": "更新",
+      "timePublished": "发布",
+      "timeScheduled": "排期"
+    },
+    "empty": {
+      "title": "暂无公告",
+      "hint": "新建一条公告，保存草稿或立即发布"
+    },
+    "actions": {
+      "edit": "编辑",
+      "newVersion": "新版本草稿",
+      "schedule": "排期",
+      "unschedule": "取消排期",
+      "publish": "发布",
+      "publishing": "发布中",
+      "archive": "归档",
+      "archiving": "归档中",
+      "trace": "留痕",
+      "processing": "处理中"
+    },
+    "pagination": {
+      "summary": "共 {total} 条，第 {page}/{totalPages} 页",
+      "prev": "上一页",
+      "next": "下一页"
     }
   },
   "apiKeys": {

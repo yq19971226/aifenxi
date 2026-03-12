@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { BellRing, CalendarClock, Eye, PencilLine, Send } from "lucide-react";
 import type { AdminAnnouncementInfo, AdminAnnouncementListResponse } from "@/lib/api/admin-announcements";
 import {
@@ -36,13 +37,15 @@ export function AnnouncementTable({
   onArchive,
   onOpenDeliveries,
 }: AnnouncementTableProps) {
+  const t = useTranslations("admin.announcements");
+
   if (data.items.length === 0) {
     return (
       <div className="card-surface flex flex-col items-center justify-center gap-3 rounded-lg px-6 py-14 text-center">
         <BellRing size={22} className="text-zinc-500" />
         <div>
-          <p className="text-sm font-medium text-zinc-200">暂无公告</p>
-          <p className="mt-1 text-sm text-zinc-500">可以直接新建一条公告，保存草稿或立即发布</p>
+          <p className="text-sm font-medium text-zinc-200">{t("empty.title")}</p>
+          <p className="mt-1 text-sm text-zinc-500">{t("empty.hint")}</p>
         </div>
       </div>
     );
@@ -54,19 +57,19 @@ export function AnnouncementTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-white/[0.08] text-left text-xs text-zinc-500">
-              <th className="px-5 py-3 font-medium">标题</th>
-              <th className="px-5 py-3 font-medium">版本</th>
-              <th className="px-5 py-3 font-medium">展示方式</th>
-              <th className="px-5 py-3 font-medium">状态</th>
-              <th className="px-5 py-3 font-medium">优先级</th>
-              <th className="px-5 py-3 font-medium">时间</th>
-              <th className="px-5 py-3 font-medium text-right">操作</th>
+              <th className="px-5 py-3 font-medium">{t("table.title")}</th>
+              <th className="px-5 py-3 font-medium">{t("table.version")}</th>
+              <th className="px-5 py-3 font-medium">{t("table.displayMode")}</th>
+              <th className="px-5 py-3 font-medium">{t("table.status")}</th>
+              <th className="px-5 py-3 font-medium">{t("table.priority")}</th>
+              <th className="px-5 py-3 font-medium">{t("table.time")}</th>
+              <th className="px-5 py-3 font-medium text-right">{t("table.actions")}</th>
             </tr>
           </thead>
           <tbody>
             {data.items.map((item) => {
               const editLabel =
-                item.status === "published" || item.status === "archived" ? "新版本草稿" : "编辑";
+                item.status === "published" || item.status === "archived" ? t("actions.newVersion") : t("actions.edit");
               const canEdit = item.status !== "scheduled";
 
               return (
@@ -97,9 +100,10 @@ export function AnnouncementTable({
                   <td className="px-5 py-4 align-top text-zinc-300">{item.priority}</td>
                   <td className="px-5 py-4 align-top text-xs text-zinc-400">
                     <div className="space-y-1">
-                      <p>更新：{formatDateTime(item.updated_at)}</p>
-                      <p>发布：{formatDateTime(item.published_at)}</p>
-                      <p>排期：{formatDateTime(item.scheduled_at)}</p>
+                      {item.updated_at ? <p>{t("table.timeUpdated")}：{formatDateTime(item.updated_at)}</p> : null}
+                      {item.published_at ? <p>{t("table.timePublished")}：{formatDateTime(item.published_at)}</p> : null}
+                      {item.scheduled_at ? <p>{t("table.timeScheduled")}：{formatDateTime(item.scheduled_at)}</p> : null}
+                      {!item.updated_at && !item.published_at && !item.scheduled_at ? <p>—</p> : null}
                     </div>
                   </td>
                   <td className="px-5 py-4 align-top">
@@ -117,7 +121,7 @@ export function AnnouncementTable({
                         <button type="button" onClick={() => onSchedule(item)} className={actionClass("ghost")}>
                           <span className="inline-flex items-center gap-1">
                             <CalendarClock size={12} />
-                            排期
+                            {t("actions.schedule")}
                           </span>
                         </button>
                       ) : null}
@@ -129,7 +133,7 @@ export function AnnouncementTable({
                           onClick={() => onUnschedule(item)}
                           className={actionClass("ghost")}
                         >
-                          {actingKey === `${item.id}:unschedule` ? "处理中" : "取消排期"}
+                          {actingKey === `${item.id}:unschedule` ? t("actions.processing") : t("actions.unschedule")}
                         </button>
                       ) : null}
 
@@ -142,7 +146,7 @@ export function AnnouncementTable({
                         >
                           <span className="inline-flex items-center gap-1">
                             <Send size={12} />
-                            {actingKey === `${item.id}:publish` ? "发布中" : "发布"}
+                            {actingKey === `${item.id}:publish` ? t("actions.publishing") : t("actions.publish")}
                           </span>
                         </button>
                       ) : null}
@@ -154,14 +158,14 @@ export function AnnouncementTable({
                           onClick={() => onArchive(item)}
                           className={actionClass("danger")}
                         >
-                          {actingKey === `${item.id}:archive` ? "归档中" : "归档"}
+                          {actingKey === `${item.id}:archive` ? t("actions.archiving") : t("actions.archive")}
                         </button>
                       ) : null}
 
                       <button type="button" onClick={() => onOpenDeliveries(item)} className={actionClass("ghost")}>
                         <span className="inline-flex items-center gap-1">
                           <Eye size={12} />
-                          留痕
+                          {t("actions.trace")}
                         </span>
                       </button>
                     </div>
@@ -176,7 +180,7 @@ export function AnnouncementTable({
       {totalPages > 1 ? (
         <div className="flex items-center justify-between border-t border-white/[0.08] px-5 py-3">
           <span className="text-xs text-zinc-500">
-            共 {data.total} 条，第 {data.page}/{totalPages} 页
+            {t("pagination.summary", { total: data.total, page: data.page, totalPages })}
           </span>
           <div className="flex gap-2">
             <button
@@ -185,7 +189,7 @@ export function AnnouncementTable({
               disabled={page <= 1}
               className="rounded-lg bg-white/[0.06] px-3 py-1 text-xs font-medium text-zinc-400 transition-colors hover:bg-white/[0.1] disabled:opacity-30"
             >
-              上一页
+              {t("pagination.prev")}
             </button>
             <button
               type="button"
@@ -193,7 +197,7 @@ export function AnnouncementTable({
               disabled={page >= totalPages}
               className="rounded-lg bg-white/[0.06] px-3 py-1 text-xs font-medium text-zinc-400 transition-colors hover:bg-white/[0.1] disabled:opacity-30"
             >
-              下一页
+              {t("pagination.next")}
             </button>
           </div>
         </div>

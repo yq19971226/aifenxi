@@ -179,7 +179,7 @@
       "createDraft": "New Announcement Draft",
       "createNewVersion": "Create New Version Draft",
       "editAnnouncement": "Edit Announcement",
-      "createSubtitle": "Simple mode: just fill in title and content, then publish; other rules are in advanced settings",
+      "createSubtitle": "Fill in title and content to publish; expand for advanced rules.",
       "saveDraft": "Save Draft",
       "saveNewVersion": "Save as New Version Draft",
       "save": "Save",
@@ -187,7 +187,7 @@
       "publishNewVersion": "Save & Publish New Version",
       "saveAndPublish": "Save & Publish",
       "collapse": "Collapse",
-      "simpleHint": "Simple mode: just fill in title and content.",
+      "simpleHint": "Expand for scheduling, targeting, or modal options.",
       "collapseAdvanced": "Collapse Advanced",
       "expandAdvanced": "Expand Advanced",
       "labelTitle": "Title",
@@ -205,10 +205,43 @@
       "labelTargetPaths": "Target Path Prefixes",
       "labelStartsAt": "Start Time",
       "labelEndsAt": "End Time",
-      "defaultHint": "Default flow: title, content, publish. Expand for advanced rules.",
+      "defaultHint": "Title, content, publish",
       "cancel": "Cancel",
       "saving": "Saving",
       "publishing": "Publishing"
+    },
+    "table": {
+      "title": "Title",
+      "version": "Version",
+      "displayMode": "Display",
+      "status": "Status",
+      "priority": "Priority",
+      "time": "Time",
+      "actions": "Actions",
+      "timeUpdated": "Updated",
+      "timePublished": "Published",
+      "timeScheduled": "Scheduled"
+    },
+    "empty": {
+      "title": "No announcements",
+      "hint": "Create one, save as draft or publish now"
+    },
+    "actions": {
+      "edit": "Edit",
+      "newVersion": "New version",
+      "schedule": "Schedule",
+      "unschedule": "Unschedule",
+      "publish": "Publish",
+      "publishing": "Publishing",
+      "archive": "Archive",
+      "archiving": "Archiving",
+      "trace": "Trace",
+      "processing": "Processing"
+    },
+    "pagination": {
+      "summary": "{total} items, page {page}/{totalPages}",
+      "prev": "Previous",
+      "next": "Next"
     }
   },
   "users": {
