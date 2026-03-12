@@ -37,7 +37,7 @@
     "webhook": {
       "name": "Custom HTTP Webhook",
       "desc": "Post pure JSON signals directly to your trading algorithm.",
-      "placeholder": "https://your-server.com/api/axiom-signals"
+      "placeholder": "https://api.example.com/webhook/signals"
     },
     "selected": "Selected",
     "select": "Select"

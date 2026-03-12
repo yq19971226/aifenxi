@@ -37,7 +37,7 @@
     "webhook": {
       "name": "自定义 HTTP Webhook",
       "desc": "将纯 JSON 信号直接 POST 至你的交易算法。",
-      "placeholder": "https://your-server.com/api/axiom-signals"
+      "placeholder": "https://api.example.com/webhook/signals"
     },
     "selected": "已选择",
     "select": "选择"

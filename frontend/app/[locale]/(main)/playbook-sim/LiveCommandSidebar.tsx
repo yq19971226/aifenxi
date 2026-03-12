@@ -37,6 +37,7 @@ interface BlockProps {
 }
 
 function TerminalBlock({ title, icon, status, children }: BlockProps) {
+  const t = useTranslations("playbook-sim.liveCommand");
   const isRunning = status === "running";
   const isDone = status === "done";
   const isFailed = status === "failed";
@@ -57,8 +58,8 @@ function TerminalBlock({ title, icon, status, children }: BlockProps) {
       
       <div className="text-[11px] font-semibold tracking-wider text-zinc-400 uppercase flex items-center gap-2">
         {title}
-        {isRunning && <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded">RUNNING</span>}
-        {isDone && <span className="text-[9px] bg-white/10 text-zinc-300 px-1.5 py-0.5 rounded">COMPLETED</span>}
+        {isRunning && <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded">{t("intercepting")}</span>}
+        {isDone && <span className="text-[9px] bg-white/10 text-zinc-300 px-1.5 py-0.5 rounded">✓</span>}
       </div>
 
       <div className="text-[12px] leading-relaxed text-zinc-300 bg-black/20 rounded-md p-3 border border-white/[0.04]">
@@ -77,7 +78,7 @@ export default function LiveCommandSidebar({
   stepStatus: StepStatuses;
   streaming: boolean;
 }) {
-  const t = useTranslations("playbook-sim");
+  const t = useTranslations("playbook-sim.liveCommand");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when content changes
@@ -93,7 +94,7 @@ export default function LiveCommandSidebar({
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] bg-white/[0.02]">
         <div className="flex items-center gap-2">
           <Terminal size={16} className="text-emerald-400" />
-          <span className="text-sm font-semibold text-white tracking-wide">Live Command Room</span>
+          <span className="text-sm font-semibold text-white tracking-wide">{t("header")}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="relative flex h-2 w-2">
@@ -101,7 +102,7 @@ export default function LiveCommandSidebar({
             <span className={`relative inline-flex rounded-full h-2 w-2 ${streaming ? 'bg-emerald-500' : 'bg-zinc-600'}`}></span>
           </span>
           <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
-            {streaming ? 'Intercepting' : 'Standby'}
+            {streaming ? t("intercepting") : t("standby")}
           </span>
         </div>
       </div>
@@ -111,33 +112,33 @@ export default function LiveCommandSidebar({
         <div className="space-y-2 pb-10">
           
           {(stepStatus.data !== "idle") && (
-            <TerminalBlock title="AGENT: DATA_PIPELINE" icon={<Database size={12}/>} status={stepStatus.data}>
+            <TerminalBlock title={t("dataPipeline")} icon={<Database size={12}/>} status={stepStatus.data}>
               {stepStatus.data === "running" ? (
-                <TypewriterText text="> Fetching live OHLCV ticks & on-chain mempool data..." />
+                <TypewriterText text={t("dataRunning")} />
               ) : (
                 <div className="space-y-1">
-                  <div className="text-emerald-400">✓ Market topological data synchronized.</div>
-                  <div className="text-zinc-500 text-[10px]">&gt; Latency: 42ms | Blocks: 18,204,410</div>
+                  <div className="text-emerald-400">{t("dataDone")}</div>
+                  <div className="text-zinc-500 text-[10px]">{t("dataLatency")}</div>
                 </div>
               )}
             </TerminalBlock>
           )}
 
           {(stepStatus.L1 !== "idle") && (
-            <TerminalBlock title="AGENT: TOPOLOGICAL_MATCHER" icon={<Cpu size={12}/>} status={stepStatus.L1}>
+            <TerminalBlock title={t("topoMatcher")} icon={<Cpu size={12}/>} status={stepStatus.L1}>
               {stepStatus.L1 === "running" ? (
-                 <TypewriterText text="> Scanning 10M+ historical playbooks via vector embedding..." />
+                 <TypewriterText text={t("topoRunning")} />
               ) : (
                 <div className="space-y-1.5">
-                  <div className="text-emerald-400">✓ L1 Similarity Match Found.</div>
+                  <div className="text-emerald-400">{t("topoDone")}</div>
                   {sim?.top_matches?.[0] ? (
                     <div className="pl-2 border-l-2 border-emerald-500/30 text-emerald-200">
-                      Primary Target: {localizeText(sim.top_matches[0].name)}
+                      {t("topoPrimary")}: {localizeText(sim.top_matches[0].name)}
                       <br/>
-                      <span className="text-emerald-400/60">Confidence Level: {sim.top_matches[0].match_pct.toFixed(1)}%</span>
+                      <span className="text-emerald-400/60">{t("topoConfidence")}: {sim.top_matches[0].match_pct.toFixed(1)}%</span>
                     </div>
                   ) : (
-                     <div className="text-amber-400">&gt; No high-confidence structure mapped.</div>
+                     <div className="text-amber-400">{t("topoNoMatch")}</div>
                   )}
                 </div>
               )}
@@ -145,15 +146,15 @@ export default function LiveCommandSidebar({
           )}
 
           {(stepStatus.L2 !== "idle") && (
-            <TerminalBlock title="AGENT: DEALER_ADVERSARIAL" icon={<Swords size={12}/>} status={stepStatus.L2}>
+            <TerminalBlock title={t("dealerAgent")} icon={<Swords size={12}/>} status={stepStatus.L2}>
               {stepStatus.L2 === "running" ? (
-                 <TypewriterText text="> Simulating dealer accumulation & distribution patterns... Analyzing order book spoofing likelihood." />
+                 <TypewriterText text={t("dealerRunning")} />
               ) : (
                 <div className="space-y-1.5">
-                  <div className="text-orange-400">✓ Counter-party Analysis Complete.</div>
+                  <div className="text-orange-400">{t("dealerDone")}</div>
                   {sim?.dealer_prediction?.dealer_plan && (
                      <div className="text-zinc-300">
-                       <TypewriterText text={`> Dealer Intent: ${localizeText(sim.dealer_prediction.dealer_plan)}`} />
+                       <TypewriterText text={`${t("dealerIntent")}: ${localizeText(sim.dealer_prediction.dealer_plan)}`} />
                      </div>
                   )}
                 </div>
@@ -162,15 +163,15 @@ export default function LiveCommandSidebar({
           )}
 
           {(stepStatus.L3 !== "idle") && (
-            <TerminalBlock title="AGENT: RISK_DEFENSE" icon={<Shield size={12}/>} status={stepStatus.L3}>
+            <TerminalBlock title={t("riskAgent")} icon={<Shield size={12}/>} status={stepStatus.L3}>
               {stepStatus.L3 === "running" ? (
-                 <TypewriterText text="> Formulating capital defense protocols. Estimating maximum drawdown paths." />
+                 <TypewriterText text={t("riskRunning")} />
               ) : (
                 <div className="space-y-1.5">
-                  <div className="text-blue-400">✓ Defensive Posture Established.</div>
+                  <div className="text-blue-400">{t("riskDone")}</div>
                   {sim?.defense_strategy?.defense_summary && (
                      <div className="text-zinc-300">
-                       <TypewriterText text={`> Strategy: ${localizeText(sim.defense_strategy.defense_summary)}`} />
+                       <TypewriterText text={`${t("riskStrategy")}: ${localizeText(sim.defense_strategy.defense_summary)}`} />
                      </div>
                   )}
                 </div>
@@ -179,15 +180,15 @@ export default function LiveCommandSidebar({
           )}
 
           {(stepStatus.L4 !== "idle") && (
-            <TerminalBlock title="AGENT: NSED_JUDGE" icon={<Gavel size={12}/>} status={stepStatus.L4}>
+            <TerminalBlock title={t("judgeAgent")} icon={<Gavel size={12}/>} status={stepStatus.L4}>
               {stepStatus.L4 === "running" ? (
-                 <TypewriterText text="> NSED Engine synthesizing multi-agent outputs. Reaching final consensus..." />
+                 <TypewriterText text={t("judgeRunning")} />
               ) : (
                 <div className="space-y-1.5">
-                  <div className="text-indigo-400">✓ Consensus Reached.</div>
+                  <div className="text-indigo-400">{t("judgeDone")}</div>
                   {sim?.judge_adoption && (
                      <div className="text-white bg-indigo-500/20 px-2 py-1.5 rounded border border-indigo-500/30">
-                       <TypewriterText text={`> Verdict: ${sim.judge_adoption.adoption.toUpperCase()} - ${sim.judge_adoption.next_move ? localizeText(sim.judge_adoption.next_move) : ''}`} />
+                       <TypewriterText text={`${t("judgeVerdict")}: ${sim.judge_adoption.adoption.toUpperCase()} - ${sim.judge_adoption.next_move ? localizeText(sim.judge_adoption.next_move) : ''}`} />
                      </div>
                   )}
                 </div>
@@ -218,9 +219,9 @@ export default function LiveCommandSidebar({
             <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full shadow-[0_0_8px_#34d399] relative z-10" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-[0.2em]">Autopilot Radar</span>
+            <span className="text-[10px] text-zinc-500 uppercase tracking-[0.2em]">{t("radarLabel")}</span>
             <span className={`text-[13px] font-semibold mt-0.5 ${streaming ? 'text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.4)]' : 'text-zinc-400'}`}>
-              {streaming ? 'Scanning Topologies...' : 'Idle / Synchronized'}
+              {streaming ? t("radarScanning") : t("radarIdle")}
             </span>
           </div>
         </div>
