@@ -544,3 +544,10 @@ async def fetch_onchain_data(
         return None
     finally:
         await client.close()
+
+
+# ── 向后兼容别名 ────────────────────────────────────────────
+# onchain.py 等模块仍使用旧名字导入
+METRIC_MAPPING = METRIC_REGISTRY
+SYMBOL_MAPPING = SYMBOL_TO_ASSET
+
