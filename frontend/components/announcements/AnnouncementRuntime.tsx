@@ -256,18 +256,61 @@ export function AnnouncementRuntime() {
     extra?: Partial<AnnouncementEventPayload>
   ) => {
     const shouldHide = event_type !== "clicked" || !announcement.strong_ack_required;
+    if (shouldHide) hideAnnouncement(announcement.id);
+    // #region agent log
+    fetch("http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "22da79" },
+      body: JSON.stringify({
+        sessionId: "22da79",
+        location: "AnnouncementRuntime.tsx:sendEvent:entry",
+        message: "sendEvent called",
+        data: { announcementId: announcement.id, event_type, shouldHide },
+        timestamp: Date.now(),
+        hypothesisId: "H2",
+      }),
+    }).catch(() => {});
+    // #endregion
     setActioningId(announcement.id);
     try {
-      await postAnnouncementEvent(announcement.id, {
+      const apiResult = await postAnnouncementEvent(announcement.id, {
         event_type,
         pathname,
         occurred_at: nowIso(),
         metadata: { source: "announcement_runtime" },
         ...extra,
       });
+      // #region agent log
+      fetch("http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "22da79" },
+        body: JSON.stringify({
+          sessionId: "22da79",
+          location: "AnnouncementRuntime.tsx:sendEvent:success",
+          message: "postAnnouncementEvent ok",
+          data: { announcementId: announcement.id, event_type, recorded: (apiResult as { recorded?: boolean })?.recorded },
+          timestamp: Date.now(),
+          hypothesisId: "H1",
+        }),
+      }).catch(() => {});
+      // #endregion
       refreshAnnouncementQueries();
       return true;
     } catch (error) {
+      // #region agent log
+      fetch("http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "22da79" },
+        body: JSON.stringify({
+          sessionId: "22da79",
+          location: "AnnouncementRuntime.tsx:sendEvent:catch",
+          message: "postAnnouncementEvent failed",
+          data: { announcementId: announcement.id, event_type, err: String(error) },
+          timestamp: Date.now(),
+          hypothesisId: "H1",
+        }),
+      }).catch(() => {});
+      // #endregion
       console.error("announcement event write failed", {
         announcementId: announcement.id,
         eventType: event_type,
@@ -275,9 +318,22 @@ export function AnnouncementRuntime() {
       });
       return false;
     } finally {
+      // #region agent log
       if (shouldHide) {
-        hideAnnouncement(announcement.id);
+        fetch("http://127.0.0.1:7463/ingest/17a3f00d-8f41-4ee8-acfa-f135822078c1", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "22da79" },
+          body: JSON.stringify({
+            sessionId: "22da79",
+            location: "AnnouncementRuntime.tsx:sendEvent:finally",
+            message: "sendEvent finished (hide already done optimistically)",
+            data: { announcementId: announcement.id },
+            timestamp: Date.now(),
+            hypothesisId: "H2",
+          }),
+        }).catch(() => {});
       }
+      // #endregion
       setActioningId(null);
     }
   };
