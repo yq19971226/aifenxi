@@ -158,7 +158,9 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
             </h4>
             <div className="bg-white/[0.02] border border-white/[0.05] p-4 rounded-lg">
               <p className="text-sm leading-relaxed text-zinc-300 whitespace-pre-wrap">
-                {report.strategy?.reasoning || t("progress.analyzing")}
+                {report.strategy?.reasoning === "Agent analysis failed to return valid data. A baseline safety strategy has been generated based on current market price levels."
+                  ? t("card.baselineSafetyReasoning")
+                  : (report.strategy?.reasoning || t("progress.analyzing"))}
               </p>
             </div>
           </div>
@@ -177,7 +179,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
                 <Database size={10} /> {t("card.source")}
               </p>
               <p className="text-xs font-mono text-zinc-400">
-                Axiom Swarm • Epoch V5
+                {t("card.sourceLabel")}
               </p>
             </div>
           </div>

@@ -230,7 +230,7 @@ class AnalysisQuotaService:
     async def get_all_quotas(
         self, user_id: UUID, level: int,
     ) -> dict[str, QuotaInfo]:
-        """查询所有模式的配额信息，包含锁定状态。"""
+        """查询所有模式的配额信息，包含锁定状态。奖励次数（如免费体验）计入 remaining。"""
         result: dict[str, QuotaInfo] = {}
 
         for mode in AnalysisMode:
@@ -240,6 +240,11 @@ class AnalysisQuotaService:
 
             if not locked and limit > 0:
                 remaining = await self.get_remaining(user_id, level, mode)
+
+            # 奖励次数（如日内免费体验）计入剩余，便于前端显示并允许发起分析
+            bonus = await self.get_bonus_remaining(user_id, mode)
+            if bonus > 0:
+                remaining += bonus
 
             result[mode.value] = QuotaInfo(
                 mode=mode,

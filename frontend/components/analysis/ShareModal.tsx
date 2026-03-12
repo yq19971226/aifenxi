@@ -51,8 +51,8 @@ export function ShareModal({ report, config, onClose }: ShareModalProps) {
         onClick={onClose}
       />
 
-      {/* Modal */}
-      <div className="relative z-10 flex max-h-[90vh] flex-col items-center gap-4 rounded-xl bg-zinc-900 border border-white/10 p-6 shadow-2xl">
+      {/* Modal：移动端限制宽度，避免卡片撑满整屏 */}
+      <div className="relative z-10 flex max-h-[90vh] w-full max-w-[92vw] sm:max-w-[420px] flex-col items-center gap-4 rounded-xl bg-zinc-900 border border-white/10 p-4 sm:p-6 shadow-2xl mx-3 sm:mx-0">
         {/* Header */}
         <div className="flex w-full items-center justify-between">
           <h3 className="text-sm font-semibold text-white">预览分享卡片</h3>
@@ -65,8 +65,8 @@ export function ShareModal({ report, config, onClose }: ShareModalProps) {
           </button>
         </div>
 
-        {/* Card preview */}
-        <div className="overflow-auto rounded-lg">
+        {/* Card preview：窄屏时卡片随容器收缩 */}
+        <div className="w-full overflow-auto rounded-lg flex justify-center">
           <ShareCard ref={cardRef} report={report} config={config} />
         </div>
 

@@ -47,8 +47,13 @@ export default function ConsensusPage() {
     const cfg = MODE_CONFIGS.find((c) => c.value === m);
     return (cfg?.minLevel ?? 0) > userLevel;
   }, [userLevel]);
+  /** 某模式是否有可用次数（含免费体验 bonus），有则允许选模式并允许开始 */
+  const hasQuotaForMode = useCallback((m: AnalysisMode) => (quota?.quotas?.[m]?.remaining ?? 0) > 0, [quota?.quotas]);
   const isQuotaExhausted = currentQuota !== null && currentQuota.remaining === 0;
-  const canStart = symbol.trim().length > 0 && !isModeLocked(mode) && !isQuotaExhausted;
+  const canStart =
+    symbol.trim().length > 0 &&
+    (!isModeLocked(mode) || hasQuotaForMode(mode)) &&
+    !isQuotaExhausted;
 
   const {
     running, startTime, progressSteps, analysisReport, error,
@@ -65,10 +70,11 @@ export default function ConsensusPage() {
 
   const handleModeSelect = useCallback(
     (m: AnalysisMode) => {
-      if (isModeLocked(m) || running) return;
+      if (running) return;
+      if (isModeLocked(m) && !hasQuotaForMode(m)) return;
       setMode(m);
     },
-    [isModeLocked, running],
+    [isModeLocked, hasQuotaForMode, running],
   );
 
   // Which report to display: analysis report (fresh) > consensus cache
@@ -96,6 +102,7 @@ export default function ConsensusPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {MODE_CONFIGS.map((cfg) => {
           const locked = isModeLocked(cfg.value);
+          const canUseMode = !locked || hasQuotaForMode(cfg.value);
           const selected = mode === cfg.value;
           return (
             <button
@@ -106,12 +113,12 @@ export default function ConsensusPage() {
               className={`relative glass-card glass-card-hover p-5 text-left transition-all ${
                 selected
                   ? "ring-1 ring-indigo-500/50 bg-indigo-500/[0.05] shadow-[0_0_25px_rgba(99,102,241,0.08)]"
-                  : locked
+                  : !canUseMode
                     ? "opacity-50 cursor-not-allowed"
                     : "cursor-pointer"
               }`}
             >
-              {locked && (
+              {locked && !hasQuotaForMode(cfg.value) && (
                 <div className="absolute top-3 right-3">
                   <Lock size={14} className="text-zinc-600" />
                 </div>
@@ -127,7 +134,7 @@ export default function ConsensusPage() {
                 </span>
                 <span className="text-zinc-500">{cfg.periods}</span>
               </div>
-              {locked && cfg.tierLabel && (
+              {locked && !hasQuotaForMode(cfg.value) && cfg.tierLabel && (
                 <span className="mt-2 inline-block rounded bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">
                   {t("modes.locked", { tier: cfg.tierLabel })}
                 </span>

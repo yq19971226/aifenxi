@@ -50,7 +50,7 @@ export function PlaybookShareModal({ sim, latest, onClose }: Props) {
         onClick={onClose}
       />
 
-      <div className="relative z-10 flex max-h-[90vh] flex-col items-center gap-4 rounded-xl bg-zinc-900 border border-white/10 p-6 shadow-2xl">
+      <div className="relative z-10 flex max-h-[90vh] w-full max-w-[92vw] sm:max-w-[420px] flex-col items-center gap-4 rounded-xl bg-zinc-900 border border-white/10 p-4 sm:p-6 shadow-2xl mx-3 sm:mx-0">
         <div className="flex w-full items-center justify-between">
           <h3 className="text-sm font-semibold text-white">预览剧本分享卡片</h3>
           <button
@@ -62,7 +62,7 @@ export function PlaybookShareModal({ sim, latest, onClose }: Props) {
           </button>
         </div>
 
-        <div className="overflow-auto rounded-lg">
+        <div className="w-full overflow-auto rounded-lg flex justify-center">
           <PlaybookShareCard ref={cardRef} sim={sim} latest={latest} />
         </div>
 

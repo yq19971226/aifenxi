@@ -105,11 +105,25 @@
     "safetyLevel": "安全底線",
     "validUntil": "有效期至",
     "source": "數據源",
+    "sourceLabel": "Axiom 蜂群 · Epoch V5",
+    "baselineSafetyReasoning": "智能體分析未返回有效數據，已根據當前市價生成基線安全策略。",
     "tpTargets": "預期止盈目標",
     "initialResistance": "初始阻力位",
     "secondaryExtension": "次級延伸位",
     "trendObjective": "趨勢終極目標",
     "activeTracking": "活躍追蹤中"
+  },
+  "snippet": {
+    "title": "共識引用片段",
+    "copy": "複製給 AI",
+    "copied": "已複製",
+    "tip": "可粘貼到研究討論或 AI 對話中，引用 Axiom 實時共識。",
+    "verifiedAt": "Axiom Epoch V5（共識協議）驗證於 {date}",
+    "assetSignal": "[標的：{symbol}] 信號：{signal}（置信度：{confidence}%）",
+    "defaultReasoning": "多智能體共識數據已驗證。",
+    "reasoningLabel": "推理：{reasoning}",
+    "levelsLabel": "價位：{levels}",
+    "sourceLine": "來源：Axiom 蜂群分析 · Alpha 信號"
   },
   "renderers": {
     "adversarial": {

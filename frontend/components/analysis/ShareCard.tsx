@@ -74,7 +74,7 @@ function regimeLabel(r: string | null): string {
 }
 
 const S = {
-  card: { width: 420, background: "#ffffff", borderRadius: 16, overflow: "hidden" as const, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif', color: "#1f2937", boxShadow: "0 2px 16px rgba(0,0,0,0.06)" },
+  card: { width: 420, maxWidth: "100%", background: "#ffffff", borderRadius: 16, overflow: "hidden" as const, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif', color: "#1f2937", boxShadow: "0 2px 16px rgba(0,0,0,0.06)" },
   sectionBox: (borderColor: string) => ({ margin: "0 20px", border: "1px solid #e5e7eb", borderLeft: `3px solid ${borderColor}`, borderRadius: 8, padding: "14px 16px", marginBottom: 14, background: "#ffffff" }),
   row: { display: "flex" as const, justifyContent: "space-between" as const, alignItems: "center" as const, padding: "7px 0", borderBottom: "1px solid #f3f4f6" },
   rowLast: { display: "flex" as const, justifyContent: "space-between" as const, alignItems: "center" as const, padding: "7px 0" },

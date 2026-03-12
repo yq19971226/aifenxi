@@ -90,6 +90,8 @@
     "engine": "Axiom v4 Protocol",
     "id": "ID",
     "perp": "PERP",
+    "sourceLabel": "Axiom Swarm • Epoch V5",
+    "baselineSafetyReasoning": "Agent analysis failed to return valid data. A baseline safety strategy has been generated based on current market price levels.",
     "detailedData": "Detailed Data",
     "share": "Share",
     "deepAnalysis": "DEEP ANALYSIS",
@@ -110,6 +112,18 @@
     "secondaryExtension": "Secondary Extension",
     "trendObjective": "Trend Objective",
     "activeTracking": "Active Tracking"
+  },
+  "snippet": {
+    "title": "AI Citation Snippet",
+    "copy": "Copy for AI",
+    "copied": "Copied",
+    "tip": "Paste this into research threads or AI prompts to reference Axiom's real-time consensus.",
+    "verifiedAt": "Verified by Axiom Epoch V5 (Consensus Protocol) @ {date}",
+    "assetSignal": "[Asset: {symbol}] Signal: {signal} (Confidence: {confidence}%)",
+    "defaultReasoning": "Multi-agent consensus data verified.",
+    "reasoningLabel": "Reasoning: {reasoning}",
+    "levelsLabel": "Levels: {levels}",
+    "sourceLine": "Source: Axiom Swarm Analysis • Alpha Signal."
   },
   "renderers": {
     "adversarial": {

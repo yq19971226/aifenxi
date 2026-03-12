@@ -87,6 +87,8 @@
     "safetyLevel": "止损保护",
     "validUntil": "有效期至",
     "source": "数据来源",
+    "sourceLabel": "Axiom 蜂群 · Epoch V5",
+    "baselineSafetyReasoning": "智能体分析未返回有效数据，已根据当前市价生成基线安全策略。",
     "tpTargets": "预期止盈目标",
     "initialResistance": "初始阻力位",
     "secondaryExtension": "次级扩展位",
@@ -97,6 +99,18 @@
     "deepAnalysis": "深度研究报告",
     "confidence": "置信度",
     "noData": "暂无数据"
+  },
+  "snippet": {
+    "title": "共识引用片段",
+    "copy": "复制给 AI",
+    "copied": "已复制",
+    "tip": "可粘贴到研究讨论或 AI 对话中，引用 Axiom 实时共识。",
+    "verifiedAt": "Axiom Epoch V5（共识协议）验证于 {date}",
+    "assetSignal": "[标的：{symbol}] 信号：{signal}（置信度：{confidence}%）",
+    "defaultReasoning": "多智能体共识数据已验证。",
+    "reasoningLabel": "推理：{reasoning}",
+    "levelsLabel": "价位：{levels}",
+    "sourceLine": "来源：Axiom 蜂群分析 · Alpha 信号"
   },
   "flow": {
     "coreAnalysis": "核心AI分析",

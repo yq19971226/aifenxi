@@ -52,6 +52,7 @@ function signalTheme(signal?: string) {
 const S = {
   card: {
     width: 420,
+    maxWidth: "100%",
     background: "#ffffff",
     borderRadius: 16,
     overflow: "hidden" as const,

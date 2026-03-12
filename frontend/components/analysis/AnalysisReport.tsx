@@ -56,7 +56,7 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
           <div className="flex items-center gap-4 pt-2">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] shrink-0">
-              {t("card.deepAnalysis")} / DEEP ANALYSIS
+              {t("card.deepAnalysis")}
             </span>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
           </div>
