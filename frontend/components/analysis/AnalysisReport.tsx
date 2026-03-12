@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Info, Share2, Zap } from "lucide-react";
+import { Info, Share2, Zap, ChevronDown, AlertTriangle } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import type { AnalysisReport as AnalysisReportType } from "@/lib/api/analysis";
@@ -26,6 +26,7 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
   const t = useTranslations("consensus");
   const isBlocked = report.status === "blocked";
   const [showShare, setShowShare] = useState(false);
+  const [showSnippet, setShowSnippet] = useState(false);
   const { data: shareConfig } = useShareCardConfig();
 
   return (
@@ -47,8 +48,27 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
       {/* Unified result card: signal → prices → consensus → findings → risk */}
       <UnifiedResultCard report={report} />
 
-      {/* AI Citation Snippet for GEO */}
-      {!isBlocked && <AICitationSnippet report={report} />}
+      {/* AI Citation Snippet — collapsible toggle, advanced/GEO feature */}
+      {!isBlocked && (
+        <div>
+          <button
+            type="button"
+            onClick={() => setShowSnippet(v => !v)}
+            className="flex items-center gap-2 text-[10px] font-mono text-indigo-400/50 hover:text-indigo-400 transition-colors px-1 py-0.5"
+          >
+            <ChevronDown
+              size={12}
+              className={`transition-transform duration-200 ${showSnippet ? "rotate-180" : ""}`}
+            />
+            {t("snippet.title")}
+          </button>
+          {showSnippet && (
+            <div className="mt-2">
+              <AICitationSnippet report={report} />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Deep Analysis (Tab system) — separate below */}
       {!isBlocked && (
@@ -96,6 +116,14 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
         )}
       </motion.div>
 
+      {/* ⚠️ Legal Disclaimer — 合规必须项 */}
+      <div className="flex items-start gap-2.5 border border-amber-500/15 bg-amber-500/[0.04] rounded-lg px-4 py-3">
+        <AlertTriangle size={13} className="text-amber-500/60 shrink-0 mt-0.5" />
+        <p className="text-[10px] text-zinc-600 leading-relaxed">
+          {t("disclaimer")}
+        </p>
+      </div>
+
       {/* Share modal */}
       {showShare && (
         <ShareModal report={report} config={shareConfig} onClose={() => setShowShare(false)} />
@@ -103,4 +131,3 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
     </div>
   );
 }
-
