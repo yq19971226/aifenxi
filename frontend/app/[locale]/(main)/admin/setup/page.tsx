@@ -188,7 +188,7 @@ export default function AdminSetupPage() {
           className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg hover:bg-emerald-500/20 transition-all text-xs font-medium"
         >
           <ClipboardList size={14} />
-          {t('wizard.title')}
+          {t('setup.wizard.title')}
         </button>
       </div>
 
@@ -362,7 +362,7 @@ export default function AdminSetupPage() {
 }
 
 function AuditLogSection() {
-  const t = useTranslations("admin.auditLog");
+  const t = useTranslations("admin.setup.auditLog");
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
 

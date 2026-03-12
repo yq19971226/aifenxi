@@ -455,6 +455,13 @@ async def test_datasource_connection(source_id: str) -> OperationResult:
             "key_param": "token",
             "label": "Finnhub API",
         },
+        "finnhub_news": {  # 前端别名
+            "url": "https://finnhub.io/api/v1/news?category=crypto",
+            "headers": {},
+            "key_config": "finnhub_api_key",
+            "key_param": "token",
+            "label": "Finnhub News API",
+        },
         "blockbeats": {
             "url": "https://api.theblockbeats.news/v1/open-api/open-flash?size=1&page=1&type=push",
             "headers": {},
