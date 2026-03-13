@@ -98,18 +98,6 @@ class ConfigService:
 
         if row is None:
             logger.warning("config_not_found", key=key, using_default=True)
-            # #region agent log
-            if key.startswith("plan_") or key.startswith("analysis_daily_limit_"):
-                try:
-                    import json
-                    import os
-                    _log_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "debug-22da79.log")
-                    _log_path = os.path.normpath(_log_path)
-                    with open(_log_path, "a", encoding="utf-8") as _f:
-                        _f.write(json.dumps({"sessionId": "22da79", "location": "config_service.get_config", "message": "config_not_found using default", "data": {"key": key, "default": default[:20] if len(default) > 20 else default, "hypothesisId": "H3"}, "timestamp": __import__("time").time()}, ensure_ascii=False) + "\n")
-                except Exception:
-                    pass
-            # #endregion
             return default
 
         encrypted_value = row["encrypted_value"]
@@ -126,20 +114,7 @@ class ConfigService:
             logger.warning("cache_write_failed", key=key, error=str(exc))
 
         # 4. 解密返回
-        out = self._enc.decrypt(encrypted_value)
-        # #region agent log
-        if key.startswith("plan_") or key.startswith("analysis_daily_limit_"):
-            try:
-                import json
-                import os
-                _log_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "debug-22da79.log")
-                _log_path = os.path.normpath(_log_path)
-                with open(_log_path, "a", encoding="utf-8") as _f:
-                    _f.write(json.dumps({"sessionId": "22da79", "location": "config_service.get_config", "message": "read quota/plan", "data": {"key": key, "valueLen": len(out), "hypothesisId": "H3"}, "timestamp": __import__("time").time()}, ensure_ascii=False) + "\n")
-            except Exception:
-                pass
-        # #endregion
-        return out
+        return self._enc.decrypt(encrypted_value)
 
     # ── API 列表查询（掩码） ──────────────────────────────
 
@@ -336,17 +311,6 @@ class ConfigService:
         # 清缓存
         await self._clear_cache(key)
 
-        # #region agent log
-        try:
-            import json
-            import os
-            _log_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "debug-22da79.log")
-            _log_path = os.path.normpath(_log_path)
-            with open(_log_path, "a", encoding="utf-8") as _f:
-                _f.write(json.dumps({"sessionId": "22da79", "location": "config_service.update_config", "message": "after clear_cache", "data": {"key": key, "hypothesisId": "H4"}, "timestamp": __import__("time").time()}, ensure_ascii=False) + "\n")
-        except Exception:
-            pass
-        # #endregion
 
         plaintext = self._enc.decrypt(row["encrypted_value"])
         value = self._enc.mask_value(plaintext) if row["is_secret"] else plaintext
