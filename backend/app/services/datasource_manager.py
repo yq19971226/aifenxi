@@ -290,12 +290,12 @@ class DataSourceManager:
                 status=self._derive_primary_status(
                     derivatives_enabled,
                     derivatives_ready,
-                    target_count,
+                    derivatives_target_count,
                     partial_ready=derivatives_fallback_ready > 0,
                 ),
                 ready_count=derivatives_ready,
-                target_count=target_count,
-                detail=f"增强缓存 {derivatives_ready}/{target_count}，Binance 基础合约回退 {derivatives_fallback_ready}/{target_count}" if target_count else "暂无启用币种",
+                target_count=derivatives_target_count,
+                detail=f"增强缓存 {derivatives_ready}/{derivatives_target_count}，Binance 基础合约回退 {derivatives_fallback_ready}/{target_count}" if derivatives_target_count else "无衍生品支持的币种",
             ),
             PrimarySourceStatusItem(
                 source_id="glassnode",
