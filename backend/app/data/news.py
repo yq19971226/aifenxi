@@ -66,7 +66,7 @@ class NewsCollector:
 
         # 0. 检查数据源开关
         from app.data.source_gate import is_enabled
-        if not await is_enabled("finnhub"):
+        if not await is_enabled("finnhub_news"):
             logger.debug("Finnhub source disabled, skipping", extra={"symbol": symbol})
             return []
 
