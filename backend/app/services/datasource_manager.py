@@ -153,6 +153,23 @@ class DataSourceManager:
         symbols = await get_active_symbols()
         target_count = len(symbols)
 
+        # ── 动态获取各域支持的币种数 ──
+        onchain_target_count = target_count  # 默认
+        derivatives_target_count = target_count
+        try:
+            from app.core.database import AsyncSessionLocal
+            from sqlalchemy import text as _text
+            async with AsyncSessionLocal() as _sess:
+                result = await _sess.execute(_text(
+                    "SELECT symbol, has_onchain, has_derivatives FROM symbol_registry WHERE enabled = true"
+                ))
+                rows = result.fetchall()
+                if rows:
+                    onchain_target_count = sum(1 for r in rows if r[1])
+                    derivatives_target_count = sum(1 for r in rows if r[2])
+        except Exception:
+            pass  # fallback to target_count
+
         market_ready = 0
         derivatives_ready = 0
         derivatives_fallback_ready = 0
@@ -289,12 +306,12 @@ class DataSourceManager:
                 status=self._derive_primary_status(
                     onchain_enabled,
                     onchain_ready,
-                    target_count,
+                    onchain_target_count,
                     partial_ready=onchain_fallback_ready > 0,
                 ),
                 ready_count=onchain_ready,
-                target_count=target_count,
-                detail=f"GlassNode T3 主源缓存 {onchain_ready}/{target_count}，CryptoQuant 备源回退 {onchain_fallback_ready}/{target_count}" if target_count else "暂无启用币种",
+                target_count=onchain_target_count,
+                detail=f"GlassNode T3 主源缓存 {onchain_ready}/{onchain_target_count}，CryptoQuant 备源回退 {onchain_fallback_ready}/{onchain_target_count}" if onchain_target_count else "无链上支持的币种",
             ),
             PrimarySourceStatusItem(
                 source_id="fred",
