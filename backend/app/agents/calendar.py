@@ -218,7 +218,7 @@ class CalendarAgent(BaseAgent):
     @staticmethod
     async def _load_upcoming_events(symbol: str) -> list[dict]:
         """从 Redis 缓存或数据库加载未来 30 天的事件"""
-        # 1. 优先从 Redis 读取
+        # 1. 优先从 Redis 读取币圈日历
         try:
             from app.core.redis import get_json
 
@@ -235,7 +235,7 @@ class CalendarAgent(BaseAgent):
                 extra={"error": str(exc)},
             )
 
-        # 2. 从数据库读取
+        # 2. 从数据库读取（如果 calendar_events 表存在）
         try:
             from app.core.database import AsyncSessionLocal
             from sqlalchemy import text
@@ -244,49 +244,94 @@ class CalendarAgent(BaseAgent):
             end = now + timedelta(days=30)
 
             async with AsyncSessionLocal() as session:
-                result = await session.execute(
-                    text("""
-                        SELECT event_id, title, description, event_date,
-                               categories, proof_link, source, vote_count,
-                               positive_vote_count, percentage, can_occur_before
-                        FROM calendar_events
-                        WHERE symbol = :symbol
-                          AND event_date BETWEEN :start AND :end
-                        ORDER BY event_date ASC
-                    """),
-                    {"symbol": symbol, "start": now, "end": end},
+                # 先检查表是否存在
+                check = await session.execute(
+                    text("SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='calendar_events')")
                 )
+                table_exists = check.scalar()
 
-                events = []
-                for row in result.fetchall():
-                    events.append(
-                        {
-                            "event_id": row[0],
-                            "title": row[1],
-                            "description": row[2],
-                            "event_date": row[3].isoformat(),
-                            "categories": row[4].split(",") if row[4] else [],
-                            "proof_link": row[5],
-                            "source": row[6],
-                            "vote_count": row[7],
-                            "positive_vote_count": row[8],
-                            "percentage": row[9],
-                            "can_occur_before": row[10],
-                        }
+                if table_exists:
+                    result = await session.execute(
+                        text("""
+                            SELECT event_id, title, description, event_date,
+                                   categories, proof_link, source, vote_count,
+                                   positive_vote_count, percentage, can_occur_before
+                            FROM calendar_events
+                            WHERE symbol = :symbol
+                              AND event_date BETWEEN :start AND :end
+                            ORDER BY event_date ASC
+                        """),
+                        {"symbol": symbol, "start": now, "end": end},
                     )
 
-                logger.info(
-                    "Calendar events loaded from DB",
-                    extra={"symbol": symbol, "count": len(events)},
-                )
-                return events
+                    events = []
+                    for row in result.fetchall():
+                        events.append(
+                            {
+                                "event_id": row[0],
+                                "title": row[1],
+                                "description": row[2],
+                                "event_date": row[3].isoformat(),
+                                "categories": row[4].split(",") if row[4] else [],
+                                "proof_link": row[5],
+                                "source": row[6],
+                                "vote_count": row[7],
+                                "positive_vote_count": row[8],
+                                "percentage": row[9],
+                                "can_occur_before": row[10],
+                            }
+                        )
+
+                    if events:
+                        logger.info(
+                            "Calendar events loaded from DB",
+                            extra={"symbol": symbol, "count": len(events)},
+                        )
+                        return events
 
         except Exception as exc:
-            logger.error(
+            logger.warning(
                 "Failed to load calendar events from DB",
                 extra={"symbol": symbol, "error": str(exc)},
             )
-            return []
+
+        # 3. Fallback: 从 Finnhub earnings 缓存读取加密关联股财报日历
+        try:
+            from app.core.redis import get_json
+
+            earnings = await get_json("finnhub_earnings")
+            if earnings and isinstance(earnings, dict):
+                raw_events = earnings.get("events", [])
+                if raw_events:
+                    events = []
+                    for e in raw_events:
+                        events.append({
+                            "event_id": f"finnhub_{e.get('symbol', '')}_{e.get('date', '')}",
+                            "title": f"{e.get('symbol', '')} 财报发布 (EPS预估: {e.get('epsEstimate', 'N/A')})",
+                            "description": f"加密关联股 {e.get('symbol', '')} Q{e.get('quarter', '?')}/{e.get('year', '')} 财报",
+                            "event_date": e.get("date", ""),
+                            "categories": ["Earnings"],
+                            "proof_link": None,
+                            "source": "finnhub",
+                            "vote_count": 80,
+                            "positive_vote_count": 50,
+                            "percentage": 70,
+                            "can_occur_before": False,
+                        })
+                    if events:
+                        logger.info(
+                            "Calendar events loaded from Finnhub earnings",
+                            extra={"symbol": symbol, "count": len(events)},
+                        )
+                        return events
+
+        except Exception as exc:
+            logger.warning(
+                "Failed to load Finnhub earnings",
+                extra={"error": str(exc)},
+            )
+
+        return []
 
     @staticmethod
     def _build_prompt(data: MarketData, events: list[dict]) -> str:

@@ -158,37 +158,71 @@ class GlassnodeCollector:
         if not merged:
             return None
 
-        snapshot = OnchainSnapshot(
-            time=datetime.now(timezone.utc),
-            symbol=symbol.upper(),
-            exchange_netflow=merged.get("exchange_netflow"),
-            exchange_balance=merged.get("exchange_balance"),
-            mvrv=merged.get("mvrv"),
-            active_addresses=int(merged["active_addresses"]) if merged.get("active_addresses") is not None else None,
-            new_addresses=int(merged["new_addresses"]) if merged.get("new_addresses") is not None else None,
-            miner_reserve_change=None,  # Glassnode 不直接提供此指标
-            # ── T3 新增字段 ──
-            nupl=merged.get("nupl"),
-            sopr=merged.get("sopr"),
-            asopr=merged.get("asopr"),
-            lth_sopr=merged.get("lth_sopr"),
-            sth_sopr=merged.get("sth_sopr"),
-            lth_nupl=merged.get("lth_nupl"),
-            sth_nupl=merged.get("sth_nupl"),
-            puell_multiple=merged.get("puell_multiple"),
-            reserve_risk=merged.get("reserve_risk"),
-            accumulation_score=merged.get("accumulation_score"),
-            hodler_net_change=merged.get("hodler_net_change"),
-            net_realized_pl=merged.get("net_realized_pl"),
-            ssr=merged.get("ssr"),
-            addresses_in_profit_pct=merged.get("addresses_in_profit_pct"),
-            hash_ribbon=merged.get("hash_ribbon"),
-            mvrv_entity_adj=merged.get("mvrv_entity_adj"),
-            nvt_signal=merged.get("nvt_signal"),
-            liveliness=merged.get("liveliness"),
-            rhodl_ratio=merged.get("rhodl_ratio"),
-            exchange_inflow=merged.get("exchange_inflow"),
-        )
+        def _safe_float(val) -> float | None:
+            """安全转换为 float — 处理 dict / list / None。"""
+            if val is None:
+                return None
+            if isinstance(val, (int, float)):
+                return float(val)
+            if isinstance(val, dict):
+                # 某些 GlassNode 指标返回 {"o": {...}} 结构，取第一个数值
+                for v in val.values():
+                    if isinstance(v, (int, float)):
+                        return float(v)
+                return None
+            try:
+                return float(val)
+            except (ValueError, TypeError):
+                return None
+
+        def _safe_int(val) -> int | None:
+            if val is None:
+                return None
+            try:
+                return int(float(val))
+            except (ValueError, TypeError):
+                return None
+
+        try:
+            snapshot = OnchainSnapshot(
+                time=datetime.now(timezone.utc),
+                symbol=symbol.upper(),
+                exchange_netflow=_safe_float(merged.get("exchange_netflow")),
+                exchange_balance=_safe_float(merged.get("exchange_balance")),
+                mvrv=_safe_float(merged.get("mvrv")),
+                active_addresses=_safe_int(merged.get("active_addresses")),
+                new_addresses=_safe_int(merged.get("new_addresses")),
+                miner_reserve_change=None,
+                # ── T3 新增字段 ──
+                nupl=_safe_float(merged.get("nupl")),
+                sopr=_safe_float(merged.get("sopr")),
+                asopr=_safe_float(merged.get("asopr")),
+                lth_sopr=_safe_float(merged.get("lth_sopr")),
+                sth_sopr=_safe_float(merged.get("sth_sopr")),
+                lth_nupl=_safe_float(merged.get("lth_nupl")),
+                sth_nupl=_safe_float(merged.get("sth_nupl")),
+                puell_multiple=_safe_float(merged.get("puell_multiple")),
+                reserve_risk=_safe_float(merged.get("reserve_risk")),
+                accumulation_score=_safe_float(merged.get("accumulation_score")),
+                hodler_net_change=_safe_float(merged.get("hodler_net_change")),
+                net_realized_pl=_safe_float(merged.get("net_realized_pl")),
+                ssr=_safe_float(merged.get("ssr")),
+                addresses_in_profit_pct=_safe_float(merged.get("addresses_in_profit_pct")),
+                hash_ribbon=_safe_float(merged.get("hash_ribbon")),
+                mvrv_entity_adj=_safe_float(merged.get("mvrv_entity_adj")),
+                nvt_signal=_safe_float(merged.get("nvt_signal")),
+                liveliness=_safe_float(merged.get("liveliness")),
+                rhodl_ratio=_safe_float(merged.get("rhodl_ratio")),
+                exchange_inflow=_safe_float(merged.get("exchange_inflow")),
+            )
+        except Exception as exc:
+            logger.error("gn_snapshot_build_failed", extra={
+                "symbol": symbol,
+                "error": str(exc),
+                "merged_keys": list(merged.keys()),
+                "sample_values": {k: type(v).__name__ for k, v in list(merged.items())[:5]},
+            })
+            return None
 
         # 写入兼容缓存键（供 OnchainAgent 读取）
         cache_data = snapshot.model_dump(mode="json")
