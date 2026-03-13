@@ -224,7 +224,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     except Exception as exc:
         import logging
         logging.getLogger(__name__).warning("FinnhubScheduler 启动失败: %s", exc)
-    # Glassnode 链上数据自动采集调度器
     try:
         from app.services.glassnode_scheduler import GlassnodeScheduler
         glassnode_scheduler = GlassnodeScheduler()
@@ -233,8 +232,34 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     except Exception as exc:
         import logging
         logging.getLogger(__name__).warning("GlassnodeScheduler 启动失败: %s", exc)
+    # 因子学习 — 建表 + 结果追踪后台任务
+    try:
+        from app.services.factor_learning import _ensure_tables, track_outcomes
+        await _ensure_tables()
+
+        async def _factor_tracking_loop():
+            import asyncio
+            import logging as _log
+            _logger = _log.getLogger("factor_tracking")
+            while True:
+                try:
+                    await asyncio.sleep(600)  # 每 10 分钟追踪一次
+                    await track_outcomes()
+                except asyncio.CancelledError:
+                    break
+                except Exception as exc:
+                    _logger.warning("factor_tracking_error: %s", exc)
+                    await asyncio.sleep(60)
+
+        import asyncio
+        app.state._factor_tracking_task = asyncio.create_task(_factor_tracking_loop())
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning("因子学习初始化失败: %s", exc)
     yield
     # shutdown
+    if hasattr(app.state, "_factor_tracking_task"):
+        app.state._factor_tracking_task.cancel()
     if hasattr(app.state, "glassnode_scheduler"):
         await app.state.glassnode_scheduler.stop()
     if hasattr(app.state, "finnhub_scheduler"):

@@ -1077,6 +1077,19 @@ class AnalysisOrchestrator:
                     data=vpd_data,
                     summary=vpd.description,
                 ))
+                # 记录因子快照（异步，不阻塞主流程）
+                try:
+                    from app.services.factor_learning import record_factor_snapshot
+                    await record_factor_snapshot(
+                        symbol=symbol, analysis_mode="scalping",
+                        signal_direction=final_signal,
+                        signal_confidence=final_confidence,
+                        vpd_result=vpd.model_dump(),
+                        price_at_signal=market_data.current_price,
+                        atr_at_signal=market_data.indicators.atr if market_data.indicators else None,
+                    )
+                except Exception:
+                    pass
         except Exception as exc:
             logger.warning("量价背离V2检测失败: %s", exc)
 
@@ -1394,6 +1407,18 @@ class AnalysisOrchestrator:
                     data=vpd_data,
                     summary=vpd.description,
                 ))
+                try:
+                    from app.services.factor_learning import record_factor_snapshot
+                    await record_factor_snapshot(
+                        symbol=symbol, analysis_mode="intraday",
+                        signal_direction=signal,
+                        signal_confidence=confidence,
+                        vpd_result=vpd.model_dump(),
+                        price_at_signal=market_data.current_price,
+                        atr_at_signal=market_data.indicators.atr if market_data.indicators else None,
+                    )
+                except Exception:
+                    pass
         except Exception as exc:
             logger.warning("量价背离V2检测失败: %s", exc)
 
@@ -2031,6 +2056,18 @@ class AnalysisOrchestrator:
                     data=vpd_data,
                     summary=vpd.description,
                 ))
+                try:
+                    from app.services.factor_learning import record_factor_snapshot
+                    await record_factor_snapshot(
+                        symbol=symbol, analysis_mode="trend",
+                        signal_direction=signal,
+                        signal_confidence=confidence,
+                        vpd_result=vpd.model_dump(),
+                        price_at_signal=market_data.current_price,
+                        atr_at_signal=market_data.indicators.atr if market_data.indicators else None,
+                    )
+                except Exception:
+                    pass
         except Exception as exc:
             logger.warning("量价背离V2检测失败: %s", exc)
 

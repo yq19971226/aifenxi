@@ -352,12 +352,12 @@ async def get_vpd_factors(_=Depends(require_admin)):
     import json
 
     # 读取数据库中保存的权重
-    raw = await get_config_value("vpd_factor_weights", default=None)
+    raw = await get_config_value("vpd_factor_weights", default="")
     current_weights = dict(DEFAULT_WEIGHTS)
     source = "default"
-    if raw:
+    if raw and raw.strip():
         try:
-            saved = json.loads(raw) if isinstance(raw, str) else raw
+            saved = json.loads(raw)
             if isinstance(saved, dict):
                 current_weights.update(saved)
                 source = "database"
@@ -386,7 +386,8 @@ async def get_vpd_factors(_=Depends(require_admin)):
 async def update_vpd_factors(body: FactorWeightUpdate, _=Depends(require_admin)):
     """管理员调整 VPD 因子权重。权重合计应接近 1.0。"""
     from app.services.volume_price_divergence_v2 import DEFAULT_WEIGHTS
-    from app.services.config_service import set_config_value
+    from app.services.config_service import get_config_value, set_config_value
+    from app.services.factor_learning import log_weight_change
     import json
 
     # 验证因子 ID
@@ -394,16 +395,36 @@ async def update_vpd_factors(body: FactorWeightUpdate, _=Depends(require_admin))
         if fid not in DEFAULT_WEIGHTS:
             raise HTTPException(400, f"未知因子: {fid}")
 
-    # 验证权重范围
+    # 验证权重范围 + 单因子上限
     for fid, w in body.weights.items():
         if w < 0 or w > 1.0:
             raise HTTPException(400, f"因子 {fid} 权重需在 0~1 之间")
+        if w > 0.40:
+            raise HTTPException(400, f"因子 {fid} 权重 {w:.2f} 超过上限 0.40")
 
     total = sum(body.weights.values())
     if total < 0.8 or total > 1.2:
         raise HTTPException(400, f"权重合计 {total:.2f} 应接近 1.0 (允许 0.8~1.2)")
 
+    # 读取旧权重用于审计
+    old_raw = await get_config_value("vpd_factor_weights", default="")
+    old_weights = json.loads(old_raw) if old_raw and old_raw.strip() else dict(DEFAULT_WEIGHTS)
+
     await set_config_value("vpd_factor_weights", json.dumps(body.weights))
+
+    # 清除权重缓存
+    try:
+        import app.services.volume_price_divergence_v2 as vpd_mod
+        vpd_mod._weight_cache = None
+        vpd_mod._weight_cache_ts = 0.0
+    except Exception:
+        pass
+
+    # 审计日志
+    await log_weight_change(
+        changed_by="admin", source="manual",
+        old_weights=old_weights, new_weights=body.weights,
+    )
 
     logger.info("VPD factor weights updated", extra={"weights": body.weights, "total": total})
     return {"ok": True, "message": f"因子权重已更新(合计{total:.2f})", "weights": body.weights}
@@ -412,10 +433,121 @@ async def update_vpd_factors(body: FactorWeightUpdate, _=Depends(require_admin))
 @router.post("/vpd-factors/reset")
 async def reset_vpd_factors(_=Depends(require_admin)):
     """重置 VPD 因子权重为默认值。"""
-    from app.services.config_service import set_config_value
+    from app.services.config_service import get_config_value, set_config_value
+    from app.services.factor_learning import log_weight_change
     import json
 
     from app.services.volume_price_divergence_v2 import DEFAULT_WEIGHTS
+
+    # 读取旧权重用于审计
+    old_raw = await get_config_value("vpd_factor_weights", default="")
+    old_weights = json.loads(old_raw) if old_raw and old_raw.strip() else dict(DEFAULT_WEIGHTS)
+
     await set_config_value("vpd_factor_weights", json.dumps(DEFAULT_WEIGHTS))
 
+    # 清除权重缓存
+    try:
+        import app.services.volume_price_divergence_v2 as vpd_mod
+        vpd_mod._weight_cache = None
+        vpd_mod._weight_cache_ts = 0.0
+    except Exception:
+        pass
+
+    # 审计日志
+    await log_weight_change(
+        changed_by="admin", source="reset",
+        old_weights=old_weights, new_weights=DEFAULT_WEIGHTS,
+    )
     return {"ok": True, "message": "因子权重已重置为默认值", "weights": DEFAULT_WEIGHTS}
+
+
+# ══════════════════════════════════════════════════════════════
+# 因子学习统计 & 训练
+# ══════════════════════════════════════════════════════════════
+
+
+@router.get("/vpd-stats")
+async def get_vpd_stats(
+    days: int = 7,
+    symbol: str | None = None,
+    mode: str | None = None,
+    _=Depends(require_admin),
+):
+    """获取 VPD 因子命中率统计。"""
+    from app.services.factor_learning import get_factor_stats
+    return await get_factor_stats(days=days, symbol=symbol, mode=mode)
+
+
+@router.get("/vpd-weight-history")
+async def get_weight_history(_=Depends(require_admin)):
+    """获取因子权重变更审计日志。"""
+    import json
+    from app.services.factor_learning import _ensure_tables
+    from app.core.database import AsyncSessionLocal
+    from sqlalchemy import text
+
+    await _ensure_tables()
+    async with AsyncSessionLocal() as session:
+        rows = await session.execute(
+            text("""
+                SELECT id, changed_at, changed_by, source,
+                       old_weights, new_weights, ai_accuracy, sample_count, notes
+                FROM vpd_weight_audit_log
+                ORDER BY changed_at DESC
+                LIMIT 20
+            """)
+        )
+        history = []
+        for r in rows.fetchall():
+            # old_weights / new_weights 可能是 dict 或 JSON 字符串，安全解析
+            old_w = r[4]
+            new_w = r[5]
+            if isinstance(old_w, str):
+                try:
+                    old_w = json.loads(old_w)
+                except Exception:
+                    old_w = {}
+            if isinstance(new_w, str):
+                try:
+                    new_w = json.loads(new_w)
+                except Exception:
+                    new_w = {}
+            history.append({
+                "id": r[0],
+                "changed_at": r[1].isoformat() if r[1] else None,
+                "changed_by": r[2],
+                "source": r[3],
+                "old_weights": old_w or {},
+                "new_weights": new_w or {},
+                "ai_accuracy": r[6],
+                "sample_count": r[7],
+                "notes": r[8],
+            })
+    return {"history": history}
+
+
+@router.post("/vpd-train")
+async def trigger_ai_training(
+    days: int = 14,
+    _=Depends(require_admin),
+):
+    """触发 AI 因子训练 — 调用 DeepSeek V3.2 分析因子表现并建议权重。
+
+    返回建议权重，不会自动生效，需管理员手动确认。
+    """
+    from app.services.factor_ai_trainer import run_ai_training
+    return await run_ai_training(days=days)
+
+
+class AISuggestionApply(BaseModel):
+    suggested_weights: dict[str, float]
+
+
+@router.post("/vpd-train/apply")
+async def apply_ai_weights(
+    body: AISuggestionApply,
+    _=Depends(require_admin),
+):
+    """管理员确认后应用 AI 建议的权重。"""
+    from app.services.factor_ai_trainer import apply_ai_suggestion
+    return await apply_ai_suggestion(body.suggested_weights)

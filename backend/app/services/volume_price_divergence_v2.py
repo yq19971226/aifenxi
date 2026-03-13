@@ -322,13 +322,13 @@ def _calc_f4_macd_rsi(
                 score = -min(drop_pct, 1.0) * 0.8
                 detail = f"MACD柱顶背离(柱降{drop_pct:.0%})"
 
-                # RSI 增强系数
-                if rsi is not None and rsi > 70:
-                    score *= 1.3
-                    detail += f" RSI超买({rsi:.0f})加权"
-                elif rsi is not None and rsi > 80:
+                # RSI 增强系数（先检查极端值）
+                if rsi is not None and rsi > 80:
                     score *= 1.5
                     detail += f" RSI极端超买({rsi:.0f})加权"
+                elif rsi is not None and rsi > 70:
+                    score *= 1.3
+                    detail += f" RSI超买({rsi:.0f})加权"
 
     # 底部 MACD 背离（对称检测）
     troughs = _find_local_troughs(closes, 5) if len(closes) > 15 else []
@@ -525,7 +525,7 @@ def _calc_f8_position(
     n_profile = min(len(closes), 100)
     for i in range(-n_profile, 0):
         idx = min(int((closes[i] - price_min) / bin_size), num_bins - 1)
-        vol_profile[idx] += volumes[i] if i < len(volumes) else 0.0
+        vol_profile[idx] += volumes[i] if abs(i) <= len(volumes) else 0.0
 
     # POC
     poc_bin = vol_profile.index(max(vol_profile))
@@ -562,18 +562,33 @@ def _calc_f8_position(
 # ══════════════════════════════════════════════════════════════
 
 
+_weight_cache: dict[str, float] | None = None
+_weight_cache_ts: float = 0.0
+
+
 async def _load_dynamic_weights() -> dict[str, float]:
-    """从数据库加载管理员调整过的因子权重。"""
+    """从数据库加载管理员调整过的因子权重（带 60 秒内存缓存）。"""
+    import time
+    global _weight_cache, _weight_cache_ts
+
+    now = time.monotonic()
+    if _weight_cache is not None and now - _weight_cache_ts < 60.0:
+        return dict(_weight_cache)
+
     try:
         from app.services.config_service import get_config_value
         import json
-        raw = await get_config_value("vpd_factor_weights", default=None)
-        if raw:
-            weights = json.loads(raw) if isinstance(raw, str) else raw
+        raw = await get_config_value("vpd_factor_weights", default="")
+        if raw and raw.strip():
+            weights = json.loads(raw)
             if isinstance(weights, dict):
+                _weight_cache = weights
+                _weight_cache_ts = now
                 return weights
     except Exception:
         pass
+    _weight_cache = dict(DEFAULT_WEIGHTS)
+    _weight_cache_ts = now
     return dict(DEFAULT_WEIGHTS)
 
 

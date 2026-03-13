@@ -17,6 +17,19 @@ import {
   type CalibrationParams,
   type DbTableStat,
 } from "@/lib/api/learning";
+import {
+  fetchVpdFactors,
+  fetchVpdStats,
+  fetchWeightHistory,
+  updateVpdFactors,
+  resetVpdFactors,
+  triggerAiTraining,
+  applyAiSuggestion,
+  type VpdFactorsResponse,
+  type VpdStatsResponse,
+  type AiTrainingResult,
+  type WeightAuditEntry,
+} from "@/lib/api/vpd-factors";
 import { useAuth } from "@/lib/auth-context";
 import { getMarketStructureLabel } from "../../playbook-sim/playbook-constants";
 
@@ -25,6 +38,7 @@ import { getMarketStructureLabel } from "../../playbook-sim/playbook-constants";
 const TABS = [
   { id: "perf", label: "绩效回顾" },
   { id: "weights", label: "权重迭代" },
+  { id: "factors", label: "因子分析" },
   { id: "calibration", label: "信号校准" },
   { id: "db", label: "数据维护" },
 ] as const;
@@ -729,6 +743,484 @@ function DbTab() {
   );
 }
 
+// ── 因子分析 Tab ──────────────────────────────────────────────
+
+const FACTOR_NAMES: Record<string, string> = {
+  f1_peak_divergence: "极值点背离",
+  f2_volume_zscore: "量能Z-Score",
+  f3_cmf_divergence: "CMF资金流",
+  f4_macd_rsi_divergence: "MACD+RSI动量",
+  f5_obv_divergence: "OBV趋势",
+  f6_derivatives_health: "衍生品健康度",
+  f7_vsa_efficiency: "VSA效率",
+};
+
+const FACTOR_COLORS: Record<string, string> = {
+  f1_peak_divergence: "#3B82F6",
+  f2_volume_zscore: "#8B5CF6",
+  f3_cmf_divergence: "#06B6D4",
+  f4_macd_rsi_divergence: "#F59E0B",
+  f5_obv_divergence: "#10B981",
+  f6_derivatives_health: "#EF4444",
+  f7_vsa_efficiency: "#EC4899",
+};
+
+function FactorTab() {
+  const queryClient = useQueryClient();
+  const [statsDays, setStatsDays] = useState(14);
+  const [editing, setEditing] = useState(false);
+  const [draftWeights, setDraftWeights] = useState<Record<string, number>>({});
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [aiResult, setAiResult] = useState<AiTrainingResult | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [applyingAi, setApplyingAi] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+
+  const { data: factors, isLoading: factorsLoading } = useQuery<VpdFactorsResponse>({
+    queryKey: ["vpdFactors"],
+    queryFn: fetchVpdFactors,
+  });
+
+  const { data: stats, isLoading: statsLoading } = useQuery<VpdStatsResponse>({
+    queryKey: ["vpdStats", statsDays],
+    queryFn: () => fetchVpdStats(statsDays),
+  });
+
+  const { data: historyData } = useQuery({
+    queryKey: ["vpdWeightHistory"],
+    queryFn: fetchWeightHistory,
+    enabled: showHistory,
+  });
+
+  const handleStartEdit = () => {
+    if (!factors) return;
+    const w: Record<string, number> = {};
+    factors.factors.forEach((f) => (w[f.factor_id] = f.weight));
+    setDraftWeights(w);
+    setEditing(true);
+    setMsg(null);
+  };
+
+  const handleSaveWeights = async () => {
+    setSaving(true);
+    setMsg(null);
+    try {
+      const res = await updateVpdFactors(draftWeights);
+      setMsg(res.message || "权重已更新");
+      setEditing(false);
+      queryClient.invalidateQueries({ queryKey: ["vpdFactors"] });
+    } catch (e: any) {
+      setMsg(e.message || "保存失败");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleReset = async () => {
+    if (!confirm("确定恢复默认因子权重？")) return;
+    setSaving(true);
+    try {
+      await resetVpdFactors();
+      setMsg("权重已重置为默认值");
+      setEditing(false);
+      queryClient.invalidateQueries({ queryKey: ["vpdFactors"] });
+    } catch (e: any) {
+      setMsg(e.message || "重置失败");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAiTrain = async () => {
+    setAiLoading(true);
+    setMsg(null);
+    setAiResult(null);
+    try {
+      const result = await triggerAiTraining(statsDays);
+      setAiResult(result);
+      if (!result.ok) setMsg(result.error || "训练失败");
+    } catch (e: any) {
+      setMsg(e.message || "AI 训练失败");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleApplyAi = async () => {
+    if (!aiResult?.suggested_weights) return;
+    setApplyingAi(true);
+    try {
+      const res = await applyAiSuggestion(aiResult.suggested_weights);
+      setMsg(res.message || "AI 建议已应用");
+      setAiResult(null);
+      queryClient.invalidateQueries({ queryKey: ["vpdFactors"] });
+      queryClient.invalidateQueries({ queryKey: ["vpdWeightHistory"] });
+    } catch (e: any) {
+      setMsg(e.message || "应用失败");
+    } finally {
+      setApplyingAi(false);
+    }
+  };
+
+  if (factorsLoading || statsLoading) return <Loading />;
+
+  const draftTotal = Object.values(draftWeights).reduce((a, b) => a + b, 0);
+
+  return (
+    <div className="space-y-4">
+      {/* 消息 */}
+      {msg && (
+        <p className={`text-xs rounded-lg px-4 py-2 ${
+          msg.includes("失败") || msg.includes("不足")
+            ? "bg-red-500/10 border border-red-500/20 text-red-400"
+            : "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"
+        }`}>
+          {msg}
+        </p>
+      )}
+
+      {/* 总体统计 */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatCard label="总分析" value={stats?.total_analyses ?? 0} />
+        <StatCard label="已追踪" value={stats?.tracked_count ?? 0} />
+        <StatCard
+          label="1h命中率"
+          value={`${stats?.overall_hit_rate_1h ?? 0}%`}
+          highlight={(stats?.overall_hit_rate_1h ?? 0) > 50}
+        />
+        <StatCard
+          label="4h命中率"
+          value={`${stats?.overall_hit_rate_4h ?? 0}%`}
+          highlight={(stats?.overall_hit_rate_4h ?? 0) > 50}
+        />
+      </div>
+
+      {/* 因子权重可视化 */}
+      <Card title="因子权重">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-zinc-500">
+              来源：{factors?.source === "database" ? "数据库（自定义）" : "默认"}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            {factors?.source === "database" && (
+              <button
+                onClick={handleReset}
+                disabled={saving}
+                className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+              >
+                恢复默认
+              </button>
+            )}
+            {!editing ? (
+              <button
+                onClick={handleStartEdit}
+                className="rounded-lg bg-[var(--color-accent)]/20 px-3 py-1.5 text-xs font-semibold text-accent transition-all hover:bg-[var(--color-accent)]/30"
+              >
+                手动调整
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-mono ${
+                  Math.abs(draftTotal - 1) < 0.05 ? "text-emerald-400" : "text-amber-400"
+                }`}>
+                  合计: {(draftTotal * 100).toFixed(1)}%
+                </span>
+                <button
+                  onClick={() => setEditing(false)}
+                  className="text-xs text-zinc-400 hover:text-zinc-200"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleSaveWeights}
+                  disabled={saving || draftTotal < 0.8 || draftTotal > 1.2}
+                  className="rounded-lg bg-emerald-500/20 px-3 py-1.5 text-xs font-semibold text-emerald-400 transition-all hover:bg-emerald-500/30 disabled:opacity-50"
+                >
+                  {saving ? "保存中..." : "保存"}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 权重条形图 */}
+        <div className="space-y-3">
+          {factors?.factors.map((f) => {
+            const w = editing ? (draftWeights[f.factor_id] ?? f.weight) : f.weight;
+            const stat = stats?.factor_stats.find((fs) => fs.factor_id === f.factor_id);
+            const color = FACTOR_COLORS[f.factor_id] || "#888";
+            return (
+              <div key={f.factor_id} className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                    <span className="text-xs text-zinc-200 font-medium">
+                      {FACTOR_NAMES[f.factor_id] || f.factor_id}
+                    </span>
+                    {stat && (
+                      <span className="text-[10px] text-zinc-500">
+                        1h:{stat.hit_rate_1h}% · 4h:{stat.hit_rate_4h}%
+                      </span>
+                    )}
+                  </div>
+                  {editing ? (
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="0.40"
+                      value={w}
+                      onChange={(e) =>
+                        setDraftWeights((prev) => ({
+                          ...prev,
+                          [f.factor_id]: parseFloat(e.target.value) || 0,
+                        }))
+                      }
+                      className="w-16 rounded border border-white/[0.1] bg-white/[0.04] px-2 py-1 text-right text-xs text-zinc-200 outline-none focus:border-accent/40"
+                    />
+                  ) : (
+                    <span className="text-xs font-mono text-zinc-400">
+                      {(w * 100).toFixed(1)}%
+                    </span>
+                  )}
+                </div>
+                <div className="h-2 rounded-full bg-white/[0.06]">
+                  <div
+                    className="h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${Math.max(w * 100 * 2.5, 2)}%`, background: color }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* 因子命中率详情 */}
+      <Card title="因子命中率详情">
+        <div className="flex items-center gap-3 mb-4">
+          <label className="text-xs text-zinc-400">统计天数</label>
+          <select
+            value={statsDays}
+            onChange={(e) => setStatsDays(Number(e.target.value))}
+            className="rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-xs text-zinc-200"
+          >
+            {[3, 7, 14, 30, 60].map((d) => (
+              <option key={d} value={d}>{d}天</option>
+            ))}
+          </select>
+        </div>
+        {!stats?.factor_stats.length ? (
+          <p className="text-xs text-zinc-500">暂无追踪数据，系统会在分析后自动记录。</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/[0.08]">
+                  <th className="pb-2 text-left text-xs font-medium text-zinc-500">因子</th>
+                  <th className="pb-2 text-right text-xs font-medium text-zinc-500">活跃次数</th>
+                  <th className="pb-2 text-right text-xs font-medium text-zinc-500">1h命中率</th>
+                  <th className="pb-2 text-right text-xs font-medium text-zinc-500">4h命中率</th>
+                  <th className="pb-2 text-right text-xs font-medium text-zinc-500">平均得分</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.factor_stats.map((fs) => (
+                  <tr key={fs.factor_id} className="border-b border-white/[0.04]">
+                    <td className="py-2 text-xs text-zinc-300">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-2 h-2 rounded-full shrink-0"
+                          style={{ background: FACTOR_COLORS[fs.factor_id] || "#888" }}
+                        />
+                        {FACTOR_NAMES[fs.factor_id] || fs.factor_id}
+                      </div>
+                    </td>
+                    <td className="py-2 text-right text-xs text-zinc-400 font-mono">
+                      {fs.active_count}
+                    </td>
+                    <td className={`py-2 text-right text-xs font-mono ${
+                      fs.hit_rate_1h > 55 ? "text-emerald-400" : fs.hit_rate_1h < 40 ? "text-red-400" : "text-zinc-400"
+                    }`}>
+                      {fs.hit_rate_1h}%
+                    </td>
+                    <td className={`py-2 text-right text-xs font-mono ${
+                      fs.hit_rate_4h > 55 ? "text-emerald-400" : fs.hit_rate_4h < 40 ? "text-red-400" : "text-zinc-400"
+                    }`}>
+                      {fs.hit_rate_4h}%
+                    </td>
+                    <td className="py-2 text-right text-xs text-zinc-400 font-mono">
+                      {fs.avg_score}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+
+      {/* AI 训练 */}
+      <Card title="DeepSeek V3.2 AI 训练">
+        <p className="text-xs text-zinc-500 mb-4">
+          使用独立的 DeepSeek API Key 分析因子表现并建议优化权重。AI 建议不会自动生效。
+        </p>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleAiTrain}
+            disabled={aiLoading}
+            className="rounded-lg bg-gradient-to-r from-[#00D4AA]/20 to-[#00D4AA]/10 border border-[#00D4AA]/20 px-4 py-2 text-xs font-semibold text-[#00D4AA] transition-all hover:from-[#00D4AA]/30 hover:to-[#00D4AA]/20 disabled:opacity-50"
+          >
+            {aiLoading ? (
+              <span className="flex items-center gap-2">
+                <span className="h-3 w-3 animate-spin rounded-full border-2 border-[#00D4AA] border-t-transparent" />
+                AI 分析中...
+              </span>
+            ) : (
+              "🤖 启动 AI 训练"
+            )}
+          </button>
+          <span className="text-[10px] text-zinc-600">分析近 {statsDays} 天数据</span>
+        </div>
+
+        {/* AI 结果 */}
+        {aiResult && aiResult.ok && aiResult.ai_result && (
+          <div className="mt-4 space-y-3">
+            <div className="rounded-lg border border-[#00D4AA]/20 bg-[#00D4AA]/5 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs font-bold text-[#00D4AA]">AI 分析结论</span>
+                <span className="text-[10px] text-zinc-500 font-mono">
+                  模型: {aiResult.model} · {aiResult.tokens_used} tokens
+                </span>
+              </div>
+              <p className="text-xs text-zinc-300 leading-relaxed">
+                {aiResult.ai_result.analysis}
+              </p>
+            </div>
+
+            {/* 权重对比 */}
+            {aiResult.ai_result.changes.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs text-zinc-400">建议调整：</p>
+                {aiResult.ai_result.changes.map((c) => (
+                  <div key={c.factor} className="flex items-center gap-3 text-xs">
+                    <div
+                      className="w-2 h-2 rounded-full shrink-0"
+                      style={{ background: FACTOR_COLORS[c.factor] || "#888" }}
+                    />
+                    <span className="text-zinc-300 min-w-[80px]">
+                      {FACTOR_NAMES[c.factor] || c.factor}
+                    </span>
+                    <span className="font-mono text-zinc-500">
+                      {(c.old * 100).toFixed(1)}%
+                    </span>
+                    <span className="text-zinc-600">→</span>
+                    <span className={`font-mono font-bold ${
+                      c.new > c.old ? "text-emerald-400" : c.new < c.old ? "text-red-400" : "text-zinc-400"
+                    }`}>
+                      {(c.new * 100).toFixed(1)}%
+                    </span>
+                    <span className="text-zinc-500 truncate">{c.reason}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 警告 */}
+            {aiResult.ai_result.warnings?.length > 0 && (
+              <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
+                {aiResult.ai_result.warnings.map((w, i) => (
+                  <p key={i} className="text-xs text-amber-400">⚠️ {w}</p>
+                ))}
+              </div>
+            )}
+
+            {/* 确认应用按钮 */}
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                onClick={handleApplyAi}
+                disabled={applyingAi}
+                className="rounded-lg bg-emerald-500/20 px-4 py-2 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/30 disabled:opacity-50"
+              >
+                {applyingAi ? "应用中..." : "✅ 确认应用 AI 建议"}
+              </button>
+              <button
+                onClick={() => setAiResult(null)}
+                className="text-xs text-zinc-400 hover:text-zinc-200"
+              >
+                忽略
+              </button>
+              <span className="text-[10px] text-zinc-600">
+                置信度: {((aiResult.ai_result.confidence || 0) * 100).toFixed(0)}%
+              </span>
+            </div>
+          </div>
+        )}
+      </Card>
+
+      {/* 审计日志 */}
+      <Card title="权重变更记录">
+        {!showHistory ? (
+          <button
+            onClick={() => setShowHistory(true)}
+            className="text-xs text-accent hover:underline"
+          >
+            加载变更历史
+          </button>
+        ) : !historyData?.history?.length ? (
+          <p className="text-xs text-zinc-500">暂无权重变更记录</p>
+        ) : (
+          <div className="space-y-3">
+            {historyData.history.map((h: WeightAuditEntry) => (
+              <div
+                key={h.id}
+                className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                      h.source === "ai_deepseek"
+                        ? "bg-[#00D4AA]/20 text-[#00D4AA]"
+                        : h.source === "manual"
+                        ? "bg-blue-500/20 text-blue-400"
+                        : "bg-zinc-500/20 text-zinc-400"
+                    }`}>
+                      {h.source === "ai_deepseek" ? "🤖 AI" : h.source === "manual" ? "✏️ 手动" : `🔄 ${h.source}`}
+                    </span>
+                    <span className="text-xs text-zinc-400">{h.changed_by}</span>
+                  </div>
+                  <span className="text-[10px] text-zinc-500">
+                    {h.changed_at ? new Date(h.changed_at).toLocaleString("zh-CN") : ""}
+                  </span>
+                </div>
+                {h.notes && <p className="text-xs text-zinc-500 mb-1">{h.notes}</p>}
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(h.new_weights).map(([fid, nw]) => {
+                    const ow = h.old_weights[fid] ?? 0;
+                    const diff = nw - ow;
+                    if (Math.abs(diff) < 0.001) return null;
+                    return (
+                      <span key={fid} className="text-[10px] text-zinc-500">
+                        {FACTOR_NAMES[fid] || fid}:{" "}
+                        <span className={diff > 0 ? "text-emerald-400" : "text-red-400"}>
+                          {diff > 0 ? "+" : ""}{(diff * 100).toFixed(1)}%
+                        </span>
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}
+
 // ── 通用组件 ──────────────────────────────────────────────────
 
 function StatCard({
@@ -809,6 +1301,7 @@ export default function LearningPage() {
       {/* Tab 内容 */}
       {activeTab === "perf" && <PerfTab />}
       {activeTab === "weights" && <WeightsTab />}
+      {activeTab === "factors" && <FactorTab />}
       {activeTab === "calibration" && <CalibrationTab />}
       {activeTab === "db" && <DbTab />}
     </div>
