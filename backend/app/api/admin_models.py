@@ -194,3 +194,132 @@ async def dmxapi_sync_refresh(_=Depends(require_admin)):
     redis = get_redis_pool()
     await redis.delete(_DMXAPI_CACHE_KEY)
     return await dmxapi_sync(_)
+
+
+# ── 动态模型增删 ─────────────────────────────────────────────
+
+
+class AddModelRequest(BaseModel):
+    model_key: str
+    model_name: str
+    display_name: str
+    description: str = ""
+    pricing_input: float = 0.001
+    pricing_output: float = 0.004
+    strengths: list[str] = []
+
+
+class RemoveModelRequest(BaseModel):
+    model_key: str
+
+
+@router.post("/add-model")
+async def add_model(body: AddModelRequest, _=Depends(require_admin)):
+    """动态添加一个新模型（从 DMXAPI 可用列表中选择后添加）。"""
+    from app.core.model_router import AVAILABLE_MODELS, ALL_MODEL_NAMES
+    from app.core.llm_client import MODELS, MODEL_PRICING
+
+    # 检查 model_key 是否已存在
+    if body.model_key in ALL_MODEL_NAMES:
+        raise HTTPException(status_code=400, detail=f"model_key '{body.model_key}' 已存在")
+
+    # 添加到 AVAILABLE_MODELS
+    new_model = {
+        "model_key": body.model_key,
+        "model_name": body.model_name,
+        "display_name": body.display_name,
+        "description": body.description,
+        "pricing": {"input": body.pricing_input, "output": body.pricing_output},
+        "strengths": body.strengths,
+    }
+    AVAILABLE_MODELS.append(new_model)
+    ALL_MODEL_NAMES[body.model_key] = body.model_name
+
+    # 同步到 llm_client 的 MODELS 映射
+    MODELS[body.model_key] = body.model_name
+    MODEL_PRICING[body.model_name] = (body.pricing_input, body.pricing_output)
+
+    logger.info("Model added dynamically", extra={
+        "model_key": body.model_key,
+        "model_name": body.model_name,
+    })
+
+    return {"ok": True, "message": f"模型 {body.display_name} 已添加", "model": new_model}
+
+
+@router.delete("/remove-model/{model_key}")
+async def remove_model(model_key: str, _=Depends(require_admin)):
+    """删除一个旧模型（不能删除正在被智能体使用的模型）。"""
+    from app.core.model_router import AVAILABLE_MODELS, ALL_MODEL_NAMES, DEFAULT_ROUTES
+    from app.core.llm_client import MODELS
+
+    # 检查是否被默认路由使用
+    agent_using = [aid for aid, mk in DEFAULT_ROUTES.items() if mk == model_key]
+    # 检查是否被自定义路由使用
+    assignments = await get_all_assignments()
+    custom_using = [a["agent_id"] for a in assignments if a["current_model_key"] == model_key]
+
+    if custom_using:
+        raise HTTPException(
+            status_code=400,
+            detail=f"模型 '{model_key}' 正被以下智能体使用: {', '.join(custom_using)}，请先切换后再删除",
+        )
+
+    if model_key not in ALL_MODEL_NAMES:
+        raise HTTPException(status_code=404, detail=f"模型 '{model_key}' 不存在")
+
+    # 从列表中移除
+    model_name = ALL_MODEL_NAMES.pop(model_key, None)
+    AVAILABLE_MODELS[:] = [m for m in AVAILABLE_MODELS if m["model_key"] != model_key]
+    MODELS.pop(model_key, None)
+
+    logger.info("Model removed", extra={"model_key": model_key, "model_name": model_name})
+
+    return {
+        "ok": True,
+        "message": f"模型 {model_key} 已删除",
+        "warning": f"注意: 以下智能体的默认值使用此模型: {agent_using}" if agent_using else None,
+    }
+
+
+@router.put("/update-model/{model_key}")
+async def update_model_name(
+    model_key: str,
+    body: AddModelRequest,
+    _=Depends(require_admin),
+):
+    """更新已有模型的 model_name（用于切换到 DMXAPI 的新版本模型）。"""
+    from app.core.model_router import AVAILABLE_MODELS, ALL_MODEL_NAMES
+    from app.core.llm_client import MODELS, MODEL_PRICING
+
+    if model_key not in ALL_MODEL_NAMES:
+        raise HTTPException(status_code=404, detail=f"模型 '{model_key}' 不存在")
+
+    # 更新 ALL_MODEL_NAMES
+    old_name = ALL_MODEL_NAMES[model_key]
+    ALL_MODEL_NAMES[model_key] = body.model_name
+
+    # 更新 AVAILABLE_MODELS
+    for m in AVAILABLE_MODELS:
+        if m["model_key"] == model_key:
+            m["model_name"] = body.model_name
+            m["display_name"] = body.display_name
+            if body.description:
+                m["description"] = body.description
+            m["pricing"] = {"input": body.pricing_input, "output": body.pricing_output}
+            if body.strengths:
+                m["strengths"] = body.strengths
+            break
+
+    # 同步 llm_client
+    MODELS[model_key] = body.model_name
+    MODEL_PRICING[body.model_name] = (body.pricing_input, body.pricing_output)
+
+    logger.info("Model updated", extra={
+        "model_key": model_key,
+        "old_name": old_name,
+        "new_name": body.model_name,
+    })
+
+    return {"ok": True, "message": f"模型 {model_key} 已更新: {old_name} → {body.model_name}"}
+

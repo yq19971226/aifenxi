@@ -65,7 +65,7 @@ AVAILABLE_MODELS: list[dict[str, Any]] = [
     },
     {
         "model_key": "claude-sonnet",
-        "model_name": "claude-sonnet-4-5-20250514",
+        "model_name": "claude-sonnet-4-5-20250929",
         "display_name": "Claude Sonnet 4.5",
         "description": "逻辑推理最强，适合技术分析、合谋检测",
         "pricing": {"input": 0.003, "output": 0.015},
@@ -227,8 +227,11 @@ async def set_model_for_agent(agent_id: str, model_key: str) -> bool:
         logger.warning("Unknown agent_id", extra={"agent_id": agent_id})
         return False
     if model_key not in ALL_MODEL_NAMES:
-        logger.warning("Unknown model_key", extra={"model_key": model_key})
-        return False
+        # 也检查 llm_client 的动态 MODELS 字典
+        from app.core.llm_client import MODELS as _LLM_MODELS
+        if model_key not in _LLM_MODELS:
+            logger.warning("Unknown model_key", extra={"model_key": model_key})
+            return False
 
     try:
         from app.services.config_service import set_config_value
