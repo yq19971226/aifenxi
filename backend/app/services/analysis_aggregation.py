@@ -170,8 +170,8 @@ def get_regime_weights(
     """
     if mode == "trend":
         matrix = _REGIME_TREND_WEIGHTS
-        default = {  # trend 模式默认权重
-            "technical": 0.25, "onchain": 0.25, "risk": 0.15,
+        default = {  # trend 模式默认权重 (sum = 1.00)
+            "technical": 0.22, "onchain": 0.20, "risk": 0.15,
             "orderbook": 0.10, "sentiment": 0.10, "news_analyst": 0.08,
             "adversarial": 0.05, "collusion_detector": 0.05, "calendar": 0.05,
         }

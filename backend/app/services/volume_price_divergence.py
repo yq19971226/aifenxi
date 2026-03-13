@@ -75,9 +75,9 @@ def detect_volume_price_divergence(
     # 计算近期价格趋势（最近 5 根 K 线）
     recent_closes = closes[-5:]
     price_change_pct = (recent_closes[-1] - recent_closes[0]) / recent_closes[0] * 100
-    if price_change_pct > 0.5:
+    if price_change_pct >= 0.3:
         price_trend = "up"
-    elif price_change_pct < -0.5:
+    elif price_change_pct <= -0.3:
         price_trend = "down"
     else:
         price_trend = "flat"

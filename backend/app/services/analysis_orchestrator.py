@@ -1398,18 +1398,22 @@ class AnalysisOrchestrator:
                 r = agent_results.get(aid)
                 if r is not None:
                     model_votes.append(ModelVote(
-                        model_id=aid,
+                        model_key=aid,
                         signal=r.signal,
                         confidence=r.confidence,
                         reasoning=r.reasoning[:200] if r.reasoning else "",
                     ))
             if model_votes:
+                # 构造权重字典供 ConsensusReport
+                _regime_weights = get_regime_weights(regime_val, mode="intraday")
+                _vote_weights = {aid: _regime_weights.get(aid, 0.10) for aid in intraday_agg_ids}
                 pseudo_consensus = ConsensusReport(
                     symbol=symbol,
                     consensus_signal=signal,
                     consensus_confidence=confidence,
                     divergence=0.0,  # intraday 不使用 divergence gate
                     model_votes=model_votes,
+                    weights=_vote_weights,
                     minority_warnings=[],
                 )
                 strategy = self._strategy_svc.generate_from_consensus(
