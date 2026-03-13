@@ -76,7 +76,7 @@ def _weighted_average_fallback(
 # intraday 聚合：signal × confidence × agent_weight × reliability_weight
 # ---------------------------------------------------------------------------
 
-# V1 agent 权重（可由 mode_contract 或 config 未来覆盖）
+# 默认权重（trending / 无 regime 时使用）
 _INTRADAY_AGENT_WEIGHTS: dict[str, float] = {
     "technical": 0.25,
     "onchain": 0.20,
@@ -85,6 +85,103 @@ _INTRADAY_AGENT_WEIGHTS: dict[str, float] = {
     "news_analyst": 0.15,
     "calendar": 0.10,
 }
+
+# ── 市场状态感知权重矩阵 ─────────────────────────────────────
+# trending:  技术趋势指标 + 链上周期指标权重最高，订单簿降权（易被打穿）
+# ranging:   订单簿 + 风控权重最高（支撑阻力有效），趋势指标降权（频繁假信号）
+# volatile:  风控权重最高 + 新闻事件权重提升，整体保守
+_REGIME_INTRADAY_WEIGHTS: dict[str, dict[str, float]] = {
+    "trending": {
+        "technical": 0.30,
+        "onchain": 0.25,
+        "risk": 0.10,
+        "orderbook": 0.10,
+        "news_analyst": 0.15,
+        "calendar": 0.10,
+    },
+    "ranging": {
+        "technical": 0.15,
+        "onchain": 0.15,
+        "risk": 0.20,
+        "orderbook": 0.25,
+        "news_analyst": 0.15,
+        "calendar": 0.10,
+    },
+    "volatile": {
+        "technical": 0.15,
+        "onchain": 0.15,
+        "risk": 0.25,
+        "orderbook": 0.10,
+        "news_analyst": 0.20,
+        "calendar": 0.15,
+    },
+}
+
+# Trend 模式权重矩阵（包含更多 agent）
+_REGIME_TREND_WEIGHTS: dict[str, dict[str, float]] = {
+    "trending": {
+        "technical": 0.25,
+        "onchain": 0.25,
+        "risk": 0.10,
+        "orderbook": 0.08,
+        "sentiment": 0.10,
+        "news_analyst": 0.08,
+        "adversarial": 0.04,
+        "collusion_detector": 0.04,
+        "calendar": 0.06,
+    },
+    "ranging": {
+        "technical": 0.15,
+        "onchain": 0.15,
+        "risk": 0.20,
+        "orderbook": 0.20,
+        "sentiment": 0.08,
+        "news_analyst": 0.08,
+        "adversarial": 0.04,
+        "collusion_detector": 0.04,
+        "calendar": 0.06,
+    },
+    "volatile": {
+        "technical": 0.15,
+        "onchain": 0.15,
+        "risk": 0.20,
+        "orderbook": 0.08,
+        "sentiment": 0.10,
+        "news_analyst": 0.15,
+        "adversarial": 0.05,
+        "collusion_detector": 0.05,
+        "calendar": 0.07,
+    },
+}
+
+
+def get_regime_weights(
+    regime: str | None,
+    mode: str = "intraday",
+) -> dict[str, float]:
+    """根据市场状态返回适配的 agent 权重。
+
+    Args:
+        regime: "trending" / "ranging" / "volatile" / None
+        mode: "intraday" / "trend"
+
+    Returns:
+        agent_id → weight 字典
+    """
+    if mode == "trend":
+        matrix = _REGIME_TREND_WEIGHTS
+        default = {  # trend 模式默认权重
+            "technical": 0.25, "onchain": 0.25, "risk": 0.15,
+            "orderbook": 0.10, "sentiment": 0.10, "news_analyst": 0.08,
+            "adversarial": 0.05, "collusion_detector": 0.05, "calendar": 0.05,
+        }
+    else:
+        matrix = _REGIME_INTRADAY_WEIGHTS
+        default = _INTRADAY_AGENT_WEIGHTS
+
+    if regime and regime in matrix:
+        return matrix[regime]
+    return default
 
 
 def _compute_reliability_weight(report: AgentReport | None) -> float:
@@ -108,16 +205,21 @@ def _compute_reliability_weight(report: AgentReport | None) -> float:
 def _intraday_aggregate(
     reports: list[AgentReport | None],
     agent_ids: list[str],
+    regime: str | None = None,
 ) -> tuple[str, float]:
     """intraday 聚合：signal_value × confidence × agent_weight × reliability_weight。
 
     Args:
         reports: agent 结果列表（可能含 None）
         agent_ids: 与 reports 一一对应的 agent_id 列表
+        regime: 市场状态 ("trending" / "ranging" / "volatile" / None)
 
     Returns:
         (signal, confidence) 元组
     """
+    # 根据市场状态选择权重
+    weights = get_regime_weights(regime, mode="intraday")
+
     signal_scores: dict[str, float] = {
         "bullish": 1.0,
         "neutral": 0.0,
@@ -129,7 +231,7 @@ def _intraday_aggregate(
     total_effective_weight = 0.0
 
     for report, agent_id in zip(reports, agent_ids):
-        agent_weight = _INTRADAY_AGENT_WEIGHTS.get(agent_id, 0.10)
+        agent_weight = weights.get(agent_id, 0.10)
         reliability = _compute_reliability_weight(report)
 
         if report is None or reliability == 0.0:

@@ -122,6 +122,7 @@ from app.services.analysis_aggregation import (  # noqa: E402
     _extract_weekly_bias,
     _evaluate_defense_risk,
     _is_comprehensive_mode,
+    get_regime_weights,
 )
 from app.services.analysis_helpers import (  # noqa: E402
     build_agent_section,
@@ -1046,12 +1047,38 @@ class AnalysisOrchestrator:
         except Exception as exc:
             logger.warning("市场状态检测失败: %s", exc)
 
+        # --- 量价背离检测 ---
+        final_signal = signal_result.direction
+        final_confidence = signal_result.confidence
+        try:
+            from app.services.volume_price_divergence import detect_volume_price_divergence
+            vpd_klines = market_data.klines_15m or market_data.klines_5m
+            if vpd_klines and len(vpd_klines) >= 25:
+                vpd = detect_volume_price_divergence(vpd_klines, final_signal)
+                if vpd.confidence_modifier != 1.0:
+                    final_confidence *= vpd.confidence_modifier
+                    sections.append(ReportSection(
+                        title="量价验证",
+                        data={
+                            "divergence_type": vpd.divergence_type.value,
+                            "volume_ratio": f"{vpd.volume_ratio:.0%}",
+                            "confidence_modifier": vpd.confidence_modifier,
+                        },
+                        summary=vpd.description,
+                    ))
+                    # 量价背离 + 信号冲突 → 降级为观望
+                    if vpd.confidence_modifier < 0.6 and final_signal != "neutral":
+                        final_signal = "neutral"
+                        final_confidence = min(final_confidence, 0.3)
+        except Exception as exc:
+            logger.warning("量价背离检测失败: %s", exc)
+
         return AnalysisReport(
             symbol=symbol,
             mode=AnalysisMode.SCALPING,
             timestamp=datetime.now(timezone.utc),
-            signal=signal_result.direction,
-            confidence=signal_result.confidence,
+            signal=final_signal,
+            confidence=final_confidence,
             sections=sections,
             strategy=strategy_data,
             market_regime=regime_info.regime.value if regime_info else None,
@@ -1258,46 +1285,18 @@ class AnalysisOrchestrator:
             logger.warning("宏观事件检测失败，跳过: %s", exc)
 
         # --- 策略 ---
-        primary_report = tech_report or onchain_report or risk_report
+        # 注意：Intraday 策略生成已移到信号聚合之后，以使用聚合信号
+        # 先占位，下方聚合信号后再生成
         strategy_data: dict | None = None
-        if primary_report is not None:
-            try:
-                strategy = self._strategy_svc.generate_from_report(primary_report, current_price=market_data.current_price)
-                # 点位吸附 + 策略缓存
-                try:
-                    strategy = await self._point_snapper.snap(strategy, symbol)
-                    await set_with_ttl(
-                        f"strategy:latest:{symbol.upper()}",
-                        strategy.model_dump(mode="json"),
-                        900,
-                    )
-                except Exception as snap_exc:
-                    logger.warning("点位吸附或策略缓存失败，使用原始策略: %s", snap_exc)
-                strategy_data = strategy.model_dump(mode="json")
-            except Exception as exc:
-                logger.warning("策略生成失败: %s", exc)
-
-        # 回退策略：确保策略卡片始终显示
-        if strategy_data is None and market_data.current_price > 0:
-            try:
-                _fb_signal = "neutral"
-                if primary_report:
-                    _fb_signal = primary_report.signal
-                fallback = self._strategy_svc.generate_fallback(
-                    symbol, market_data.current_price, signal=_fb_signal,
-                )
-                strategy_data = fallback.model_dump(mode="json")
-            except Exception as fb_exc:
-                logger.warning("回退策略生成失败: %s", fb_exc)
 
         sections.append(ReportSection(
             title="策略建议",
-            data={"strategy": strategy_data} if strategy_data else {},
-            status="completed" if strategy_data else "failed",
-            note=None if strategy_data else "策略生成失败",
+            data={},  # 占位，下方聚合信号后更新
+            status="pending",
         ))
+        strategy_section_idx = len(sections) - 1
 
-        # --- 市场状态检测 ---
+        # --- 市场状态检测（移到信号聚合前，供权重矩阵使用）---
         regime_info = None
         try:
             regime_klines = market_data.klines_1h or market_data.klines_4h or market_data.klines_15m
@@ -1305,6 +1304,8 @@ class AnalysisOrchestrator:
                 regime_info = detect_market_regime(regime_klines, symbol)
         except Exception as exc:
             logger.warning("市场状态检测失败，跳过: %s", exc)
+
+        regime_val = regime_info.regime.value if regime_info else None
 
         # --- 汇总信号 ---
         # 消息-资金验证：调整新闻信号置信度
@@ -1334,6 +1335,7 @@ class AnalysisOrchestrator:
         signal, confidence = _intraday_aggregate(
             intraday_agg_reports,
             intraday_agg_ids,
+            regime=regime_val,  # ← 传入 regime 以使用动态权重
         )
         confidence = confidence * trial_penalty
 
@@ -1357,6 +1359,96 @@ class AnalysisOrchestrator:
                 status="completed",
             ))
 
+        # --- 量价背离检测 ---
+        try:
+            from app.services.volume_price_divergence import detect_volume_price_divergence
+            vpd_klines = market_data.klines_1h or market_data.klines_4h or market_data.klines_15m
+            if vpd_klines and len(vpd_klines) >= 25:
+                vpd = detect_volume_price_divergence(vpd_klines, signal)
+                if vpd.confidence_modifier != 1.0:
+                    confidence *= vpd.confidence_modifier
+                    sections.append(ReportSection(
+                        title="量价验证",
+                        data={
+                            "divergence_type": vpd.divergence_type.value,
+                            "volume_ratio": f"{vpd.volume_ratio:.0%}",
+                            "confidence_modifier": vpd.confidence_modifier,
+                        },
+                        summary=vpd.description,
+                    ))
+                    # 量价背离严重 + 信号冲突 → 降级为观望
+                    if vpd.confidence_modifier < 0.6 and signal != "neutral":
+                        signal = "neutral"
+                        confidence = min(confidence, 0.3)
+        except Exception as exc:
+            logger.warning("量价背离检测失败: %s", exc)
+
+        # --- 策略生成（使用聚合信号而非单一 agent）---
+        try:
+            _atr = (
+                market_data.indicators.atr
+                if market_data.indicators is not None
+                else None
+            )
+            # 构造 ConsensusReport-like 输入以使用 generate_from_consensus
+            from app.consensus.engine import ConsensusReport, ModelVote
+            # 收集所有有效 agent 的投票
+            model_votes = []
+            for aid in intraday_agg_ids:
+                r = agent_results.get(aid)
+                if r is not None:
+                    model_votes.append(ModelVote(
+                        model_id=aid,
+                        signal=r.signal,
+                        confidence=r.confidence,
+                        reasoning=r.reasoning[:200] if r.reasoning else "",
+                    ))
+            if model_votes:
+                pseudo_consensus = ConsensusReport(
+                    symbol=symbol,
+                    consensus_signal=signal,
+                    consensus_confidence=confidence,
+                    divergence=0.0,  # intraday 不使用 divergence gate
+                    model_votes=model_votes,
+                    minority_warnings=[],
+                )
+                strategy = self._strategy_svc.generate_from_consensus(
+                    pseudo_consensus, market_data.current_price, atr=_atr,
+                    market_regime=regime_val,
+                    regime_support=regime_info.support if regime_info else None,
+                    regime_resistance=regime_info.resistance if regime_info else None,
+                )
+                try:
+                    strategy = await self._point_snapper.snap(strategy, symbol)
+                    await set_with_ttl(
+                        f"strategy:latest:{symbol.upper()}",
+                        strategy.model_dump(mode="json"),
+                        900,
+                    )
+                except Exception as snap_exc:
+                    logger.warning("点位吸附或策略缓存失败，使用原始策略: %s", snap_exc)
+                strategy_data = strategy.model_dump(mode="json")
+        except Exception as exc:
+            logger.warning("策略生成失败: %s", exc)
+
+        # 回退策略：确保策略卡片始终显示
+        if strategy_data is None and market_data.current_price > 0:
+            try:
+                fallback = self._strategy_svc.generate_fallback(
+                    symbol, market_data.current_price, signal=signal,
+                )
+                strategy_data = fallback.model_dump(mode="json")
+            except Exception as fb_exc:
+                logger.warning("回退策略生成失败: %s", fb_exc)
+
+        # 更新策略占位 section
+        sections[strategy_section_idx] = ReportSection(
+            title="策略建议",
+            data={"strategy": strategy_data} if strategy_data else {},
+            status="completed" if strategy_data else "failed",
+            note=None if strategy_data else "策略生成失败",
+        )
+
         return AnalysisReport(
             symbol=symbol,
             mode=AnalysisMode.INTRADAY,
@@ -1365,7 +1457,7 @@ class AnalysisOrchestrator:
             confidence=confidence,
             sections=sections,
             strategy=strategy_data,
-            market_regime=regime_info.regime.value if regime_info else None,
+            market_regime=regime_val,
             regime_suggestion=regime_info.suggestion if regime_info else None,
             regime_support=regime_info.support if regime_info else None,
             regime_resistance=regime_info.resistance if regime_info else None,
@@ -1892,6 +1984,32 @@ class AnalysisOrchestrator:
                 },
                 status="completed",
             ))
+
+        # --- 量价背离检测 ---
+        try:
+            from app.services.volume_price_divergence import detect_volume_price_divergence
+            vpd_klines = market_data.klines_4h or market_data.klines_1d or market_data.klines_1h
+            if vpd_klines and len(vpd_klines) >= 25:
+                vpd = detect_volume_price_divergence(vpd_klines, signal)
+                if vpd.confidence_modifier != 1.0:
+                    confidence *= vpd.confidence_modifier
+                    sections.append(ReportSection(
+                        title="量价验证",
+                        data={
+                            "divergence_type": vpd.divergence_type.value,
+                            "volume_ratio": f"{vpd.volume_ratio:.0%}",
+                            "confidence_modifier": vpd.confidence_modifier,
+                        },
+                        summary=vpd.description,
+                    ))
+                    # 量价背离严重 + 信号冲突 → 降级为观望
+                    if vpd.confidence_modifier < 0.6 and signal != "neutral":
+                        signal = "neutral"
+                        confidence = min(confidence, 0.3)
+                        trend_status = "degraded"
+                        trend_blocked_reason = "volume_price_divergence"
+        except Exception as exc:
+            logger.warning("量价背离检测失败: %s", exc)
 
         # =================================================================
         # 策略生成 — 仅在 gates 通过 + 信号聚合完成后执行
