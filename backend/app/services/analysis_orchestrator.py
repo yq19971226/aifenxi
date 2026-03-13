@@ -1292,7 +1292,7 @@ class AnalysisOrchestrator:
         sections.append(ReportSection(
             title="策略建议",
             data={},  # 占位，下方聚合信号后更新
-            status="pending",
+            status="missing",
         ))
         strategy_section_idx = len(sections) - 1
 
