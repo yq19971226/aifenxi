@@ -164,17 +164,32 @@ class DataSourceManager:
             price_task = redis.get(f"latest_price:{symbol}")
             kline_task = get_json(f"klines:{symbol}:15m")
             deriv_task = get_json(f"derivatives:{symbol}")
-            onchain_primary_task = get_json(f"cq_onchain:{symbol}")
-            onchain_fallback_task = get_json(f"onchain:{symbol}")
+            # GlassNode 主源写入 gn_onchain:{symbol}
+            onchain_gn_task = get_json(f"gn_onchain:{symbol}")
+            # CryptoQuant 备源写入 cq_onchain:{symbol}
+            onchain_cq_task = get_json(f"cq_onchain:{symbol}")
+            # 通用兼容键 onchain:{symbol}（由 GlassNode 或 CryptoQuant 聚合快照写入）
+            onchain_compat_task = get_json(f"onchain:{symbol}")
             cg_first_task = get_json(f"cg_cvd:{symbol}")
 
-            price, kline, deriv, onchain_primary, onchain_fallback, cg_first = await _aio.gather(
-                price_task, kline_task, deriv_task, onchain_primary_task, onchain_fallback_task, cg_first_task,
+            price, kline, deriv, onchain_gn, onchain_cq, onchain_compat, cg_first = await _aio.gather(
+                price_task, kline_task, deriv_task, onchain_gn_task, onchain_cq_task, onchain_compat_task, cg_first_task,
             )
             has_market = price is not None and kline is not None
             has_deriv_fallback = deriv is not None
-            has_onchain_primary = onchain_primary is not None
-            has_onchain_fallback = onchain_fallback is not None and onchain_primary is None
+
+            # 主源就绪：GlassNode gn_onchain 存在，或者 onchain 兼容键的 _source == "glassnode"
+            has_onchain_primary = onchain_gn is not None
+            if not has_onchain_primary and isinstance(onchain_compat, dict):
+                has_onchain_primary = onchain_compat.get("_source") == "glassnode"
+
+            # 备源就绪：CryptoQuant cq_onchain 存在，
+            # 或者 onchain 兼容键的 _source == "cryptoquant"，且主源不就绪
+            has_onchain_fallback = False
+            if not has_onchain_primary:
+                has_onchain_fallback = onchain_cq is not None
+                if not has_onchain_fallback and isinstance(onchain_compat, dict):
+                    has_onchain_fallback = onchain_compat.get("_source") == "cryptoquant"
 
             # CoinGlass 增强：第一个 key 命中即算有，否则再探剩余
             if cg_first is not None:
