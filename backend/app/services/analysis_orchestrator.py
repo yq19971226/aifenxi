@@ -1060,9 +1060,9 @@ class AnalysisOrchestrator:
                     sections.append(ReportSection(
                         title="量价验证",
                         data={
-                            "divergence_type": vpd.divergence_type.value,
-                            "volume_ratio": f"{vpd.volume_ratio:.0%}",
-                            "confidence_modifier": vpd.confidence_modifier,
+                            "背离类型": vpd.divergence_type.value,
+                            "量比": f"{vpd.volume_ratio:.0%}",
+                            "置信度修正": vpd.confidence_modifier,
                         },
                         summary=vpd.description,
                     ))
@@ -1370,9 +1370,9 @@ class AnalysisOrchestrator:
                     sections.append(ReportSection(
                         title="量价验证",
                         data={
-                            "divergence_type": vpd.divergence_type.value,
-                            "volume_ratio": f"{vpd.volume_ratio:.0%}",
-                            "confidence_modifier": vpd.confidence_modifier,
+                            "背离类型": vpd.divergence_type.value,
+                            "量比": f"{vpd.volume_ratio:.0%}",
+                            "置信度修正": vpd.confidence_modifier,
                         },
                         summary=vpd.description,
                     ))
@@ -2000,9 +2000,9 @@ class AnalysisOrchestrator:
                     sections.append(ReportSection(
                         title="量价验证",
                         data={
-                            "divergence_type": vpd.divergence_type.value,
-                            "volume_ratio": f"{vpd.volume_ratio:.0%}",
-                            "confidence_modifier": vpd.confidence_modifier,
+                            "背离类型": vpd.divergence_type.value,
+                            "量比": f"{vpd.volume_ratio:.0%}",
+                            "置信度修正": vpd.confidence_modifier,
                         },
                         summary=vpd.description,
                     ))

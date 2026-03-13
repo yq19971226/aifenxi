@@ -30,11 +30,11 @@ _VOLUME_MA_PERIOD = 20
 
 class DivergenceType(str, Enum):
     """量价背离类型。"""
-    NONE = "none"                       # 无背离
-    BEARISH_DIVERGENCE = "bearish"      # 价涨量缩（看多信号降权）
-    BULLISH_DIVERGENCE = "bullish"      # 价跌量缩（看空信号降权）
-    BULLISH_CONFIRMATION = "bull_confirm"  # 价涨量增（看多确认）
-    BEARISH_CONFIRMATION = "bear_confirm"  # 价跌量增（看空确认）
+    NONE = "正常"                         # 无背离
+    BEARISH_DIVERGENCE = "价涨量缩"       # 看多信号降权
+    BULLISH_DIVERGENCE = "价跌量缩"       # 看空信号降权
+    BULLISH_CONFIRMATION = "量价齐升"     # 看多确认
+    BEARISH_CONFIRMATION = "量价齐跌"     # 看空确认
 
 
 class VolumePriceDivergence(BaseModel):
