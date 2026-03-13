@@ -646,10 +646,8 @@ async def toggle_collector(group_id: str, source_id: str, body: ToggleRequest) -
 # ── 诊断端点 ─────────────────────────────────────────────────
 
 
-@admin_router.get("/diagnose")
-async def diagnose_datasources(
-    admin=Depends(require_admin),
-) -> dict:
+@router.get("/api/datasources/diagnose")
+async def diagnose_datasources() -> dict:
     """诊断数据源采集状态 — 探测 Redis 中的实际缓存键。"""
     from app.core.redis import get_json, get_redis_pool as _redis
     from app.services.config_service import get_config_value
