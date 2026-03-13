@@ -641,3 +641,154 @@ async def toggle_collector(group_id: str, source_id: str, body: ToggleRequest) -
         message=f"{src.name} 已{'开启' if body.enabled else '关闭'}",
         source_id=source_id,
     )
+
+
+# ── 诊断端点 ─────────────────────────────────────────────────
+
+
+@admin_router.get("/diagnose")
+async def diagnose_datasources(
+    admin=Depends(require_admin),
+) -> dict:
+    """诊断数据源采集状态 — 探测 Redis 中的实际缓存键。"""
+    from app.core.redis import get_json, get_redis_pool as _redis
+    from app.services.config_service import get_config_value
+
+    redis = _redis()
+    result: dict = {"glassnode": {}, "finnhub": {}, "scheduler": {}}
+
+    # ── GlassNode 诊断 ──
+    try:
+        gn_key = await get_config_value("glassnode_api_key", "")
+        result["glassnode"]["api_key_configured"] = bool(gn_key)
+        result["glassnode"]["api_key_length"] = len(gn_key) if gn_key else 0
+
+        # 检查各层缓存
+        for symbol in ["BTCUSDT", "ETHUSDT"]:
+            sym_data: dict = {}
+            for tier in ("high", "mid", "low", "daily"):
+                tier_cache = await get_json(f"gn_tier:{tier}:{symbol}")
+                if tier_cache:
+                    metrics = tier_cache.get("metrics", {})
+                    ok = sum(1 for v in metrics.values() if v is not None)
+                    sym_data[f"tier_{tier}"] = f"{ok}/{len(metrics)} 指标有值"
+                    sym_data[f"tier_{tier}_collected_at"] = tier_cache.get("collected_at", "N/A")
+                else:
+                    sym_data[f"tier_{tier}"] = "无缓存"
+
+            # 聚合快照
+            snapshot = await get_json(f"gn_onchain:{symbol}")
+            sym_data["gn_onchain_exists"] = snapshot is not None
+            compat = await get_json(f"onchain:{symbol}")
+            sym_data["onchain_compat_exists"] = compat is not None
+            if compat and isinstance(compat, dict):
+                sym_data["onchain_source"] = compat.get("_source", "unknown")
+                sym_data["onchain_metrics_count"] = compat.get("_metrics_count", 0)
+
+            result["glassnode"][symbol] = sym_data
+
+        # 直接测试 API
+        try:
+            import aiohttp
+            test_url = f"https://api.glassnode.com/v1/metrics/market/price_usd_close?a=BTC&i=24h&api_key={gn_key}"
+            async with aiohttp.ClientSession() as sess:
+                async with sess.get(test_url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+                    result["glassnode"]["api_test_status"] = resp.status
+                    if resp.status == 200:
+                        data = await resp.json()
+                        result["glassnode"]["api_test_data_points"] = len(data) if isinstance(data, list) else "non-list"
+                    else:
+                        body = await resp.text()
+                        result["glassnode"]["api_test_body"] = body[:200]
+        except Exception as e:
+            result["glassnode"]["api_test_error"] = str(e)
+
+    except Exception as e:
+        result["glassnode"]["error"] = str(e)
+
+    # ── Finnhub 诊断 ──
+    try:
+        fh_key = await get_config_value("finnhub_api_key", "")
+        result["finnhub"]["api_key_configured"] = bool(fh_key)
+
+        # 检查新闻缓存 — Collector 写入 finnhub_news:crypto
+        news_cache = await get_json("finnhub_news:crypto")
+        result["finnhub"]["crypto_news_cached"] = news_cache is not None
+        if news_cache and isinstance(news_cache, list):
+            result["finnhub"]["crypto_news_count"] = len(news_cache)
+
+        # 检查财报日历 — Collector 写入 finnhub_earnings
+        earnings_cache = await get_json("finnhub_earnings")
+        result["finnhub"]["earnings_cached"] = earnings_cache is not None
+        if earnings_cache and isinstance(earnings_cache, dict):
+            result["finnhub"]["earnings_count"] = earnings_cache.get("count", 0)
+
+        # 检查宏观报价 — Collector 写入 finnhub_quote:{sym}
+        for sym in ["SPY", "QQQ", "GLD", "IBIT"]:
+            quote = await get_json(f"finnhub_quote:{sym}")
+            result["finnhub"][f"quote_{sym}"] = quote is not None
+
+        # 检查加密概念股报价
+        for sym in ["MSTR", "COIN"]:
+            quote = await get_json(f"finnhub_quote:{sym}")
+            result["finnhub"][f"quote_{sym}"] = quote is not None
+
+        # 聚合快照
+        snapshot = await get_json("finnhub_snapshot")
+        result["finnhub"]["snapshot_exists"] = snapshot is not None
+        if snapshot and isinstance(snapshot, dict):
+            result["finnhub"]["snapshot_collected_at"] = snapshot.get("collected_at", "N/A")
+
+    except Exception as e:
+        result["finnhub"]["error"] = str(e)
+
+    # ── 币圈日历 (CoinMarketCal) 诊断 ──
+    try:
+        from app.core.config import settings
+        result["calendar"] = {
+            "coinmarketcal_api_key_configured": bool(settings.coinmarketcal_api_key),
+        }
+        # 检查 DB 中有没有日历数据
+        try:
+            from app.core.database import AsyncSessionLocal
+            from sqlalchemy import text
+            async with AsyncSessionLocal() as session:
+                row = await session.execute(text("SELECT COUNT(*) FROM calendar_events"))
+                count = row.scalar()
+                result["calendar"]["db_events_count"] = count
+        except Exception as e:
+            result["calendar"]["db_error"] = str(e)
+
+        # 检查 Redis calendar:{symbol} 缓存
+        for sym in ["BTCUSDT", "ETHUSDT"]:
+            cached = await get_json(f"calendar:{sym}")
+            result["calendar"][f"cache_{sym}"] = cached is not None
+    except Exception as e:
+        result["calendar"] = {"error": str(e)}
+
+    # ── GlassNode API T3 指标测试 ──
+    try:
+        gn_key = await get_config_value("glassnode_api_key", "")
+        if gn_key:
+            import aiohttp
+            # 测试 T3 指标 SOPR（高频层，需要 Professional 权限）
+            t3_url = f"https://api.glassnode.com/v1/metrics/indicators/sopr?a=BTC&i=24h&api_key={gn_key}"
+            async with aiohttp.ClientSession() as sess:
+                async with sess.get(t3_url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+                    result["glassnode"]["t3_sopr_status"] = resp.status
+                    if resp.status == 200:
+                        data = await resp.json()
+                        result["glassnode"]["t3_sopr_points"] = len(data) if isinstance(data, list) else "non-list"
+                    else:
+                        body = await resp.text()
+                        result["glassnode"]["t3_sopr_error"] = body[:200]
+    except Exception as e:
+        result["glassnode"]["t3_test_error"] = str(e)
+
+    # ── Scheduler 状态 ──
+    result["scheduler"] = {
+        "note": "请查看服务器日志: docker logs axiom-backend-1 --tail 100 | grep -E 'gn_|finnhub_|GlassnodeScheduler|FinnhubScheduler'"
+    }
+
+    return result
+

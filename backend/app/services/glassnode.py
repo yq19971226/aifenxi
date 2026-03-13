@@ -286,6 +286,16 @@ class GlassNodeClient:
             self._session = aiohttp.ClientSession()
         return self._session
 
+    def _get_proxy(self) -> str | None:
+        """从环境变量读取代理地址。"""
+        import os
+        return (
+            os.environ.get("HTTPS_PROXY")
+            or os.environ.get("https_proxy")
+            or os.environ.get("HTTP_PROXY")
+            or os.environ.get("http_proxy")
+        )
+
     async def close(self) -> None:
         if self._session and not self._session.closed:
             await self._session.close()
@@ -330,10 +340,12 @@ class GlassNodeClient:
             self._request_count += 1
             try:
                 session = await self._get_session()
+                proxy = self._get_proxy()
                 async with session.get(
                     url,
                     params=params,
                     timeout=aiohttp.ClientTimeout(total=30),
+                    proxy=proxy,
                 ) as resp:
                     if resp.status == 429:
                         logger.warning("glassnode_rate_limited", extra={"attempt": attempt, "path": path})
