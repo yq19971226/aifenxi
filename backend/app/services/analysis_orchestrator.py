@@ -1047,31 +1047,38 @@ class AnalysisOrchestrator:
         except Exception as exc:
             logger.warning("市场状态检测失败: %s", exc)
 
-        # --- 量价背离检测 ---
+        # --- 量价背离检测 V2（多因子）---
         final_signal = signal_result.direction
         final_confidence = signal_result.confidence
         try:
-            from app.services.volume_price_divergence import detect_volume_price_divergence
+            from app.services.volume_price_divergence_v2 import detect_volume_price_divergence_v2
             vpd_klines = market_data.klines_15m or market_data.klines_5m
             if vpd_klines and len(vpd_klines) >= 25:
-                vpd = detect_volume_price_divergence(vpd_klines, final_signal)
+                vpd = await detect_volume_price_divergence_v2(
+                    vpd_klines, final_signal,
+                    indicators=market_data.indicators,
+                    derivatives=market_data.derivatives,
+                    coinglass=market_data.coinglass,
+                )
                 if vpd.confidence_modifier != 1.0:
                     final_confidence *= vpd.confidence_modifier
-                    sections.append(ReportSection(
-                        title="量价验证",
-                        data={
-                            "背离类型": vpd.divergence_type.value,
-                            "量比": f"{vpd.volume_ratio:.0%}",
-                            "置信度修正": vpd.confidence_modifier,
-                        },
-                        summary=vpd.description,
-                    ))
-                    # 量价背离 + 信号冲突 → 降级为观望
-                    if vpd.confidence_modifier < 0.6 and final_signal != "neutral":
-                        final_signal = "neutral"
-                        final_confidence = min(final_confidence, 0.3)
+                vpd_data = {
+                    "评分": f"{vpd.score:+.3f}",
+                    "等级": vpd.grade,
+                    "置信度修正": f"×{vpd.confidence_modifier}",
+                    "位置": vpd.position,
+                    "数据完整度": f"{vpd.data_completeness:.0%}",
+                }
+                for f in vpd.factors:
+                    if abs(f.score) > 0.1 and f.available:
+                        vpd_data[f.factor_name] = f.detail
+                sections.append(ReportSection(
+                    title="量价验证",
+                    data=vpd_data,
+                    summary=vpd.description,
+                ))
         except Exception as exc:
-            logger.warning("量价背离检测失败: %s", exc)
+            logger.warning("量价背离V2检测失败: %s", exc)
 
         return AnalysisReport(
             symbol=symbol,
@@ -1359,29 +1366,36 @@ class AnalysisOrchestrator:
                 status="completed",
             ))
 
-        # --- 量价背离检测 ---
+        # --- 量价背离检测 V2（多因子）---
         try:
-            from app.services.volume_price_divergence import detect_volume_price_divergence
+            from app.services.volume_price_divergence_v2 import detect_volume_price_divergence_v2
             vpd_klines = market_data.klines_1h or market_data.klines_4h or market_data.klines_15m
             if vpd_klines and len(vpd_klines) >= 25:
-                vpd = detect_volume_price_divergence(vpd_klines, signal)
+                vpd = await detect_volume_price_divergence_v2(
+                    vpd_klines, signal,
+                    indicators=market_data.indicators,
+                    derivatives=market_data.derivatives,
+                    coinglass=market_data.coinglass,
+                )
                 if vpd.confidence_modifier != 1.0:
                     confidence *= vpd.confidence_modifier
-                    sections.append(ReportSection(
-                        title="量价验证",
-                        data={
-                            "背离类型": vpd.divergence_type.value,
-                            "量比": f"{vpd.volume_ratio:.0%}",
-                            "置信度修正": vpd.confidence_modifier,
-                        },
-                        summary=vpd.description,
-                    ))
-                    # 量价背离严重 + 信号冲突 → 降级为观望
-                    if vpd.confidence_modifier < 0.6 and signal != "neutral":
-                        signal = "neutral"
-                        confidence = min(confidence, 0.3)
+                vpd_data = {
+                    "评分": f"{vpd.score:+.3f}",
+                    "等级": vpd.grade,
+                    "置信度修正": f"×{vpd.confidence_modifier}",
+                    "位置": vpd.position,
+                    "数据完整度": f"{vpd.data_completeness:.0%}",
+                }
+                for f in vpd.factors:
+                    if abs(f.score) > 0.1 and f.available:
+                        vpd_data[f.factor_name] = f.detail
+                sections.append(ReportSection(
+                    title="量价验证",
+                    data=vpd_data,
+                    summary=vpd.description,
+                ))
         except Exception as exc:
-            logger.warning("量价背离检测失败: %s", exc)
+            logger.warning("量价背离V2检测失败: %s", exc)
 
         # --- 策略生成（使用聚合信号而非单一 agent）---
         try:
@@ -1989,31 +2003,36 @@ class AnalysisOrchestrator:
                 status="completed",
             ))
 
-        # --- 量价背离检测 ---
+        # --- 量价背离检测 V2（多因子）---
         try:
-            from app.services.volume_price_divergence import detect_volume_price_divergence
+            from app.services.volume_price_divergence_v2 import detect_volume_price_divergence_v2
             vpd_klines = market_data.klines_4h or market_data.klines_1d or market_data.klines_1h
             if vpd_klines and len(vpd_klines) >= 25:
-                vpd = detect_volume_price_divergence(vpd_klines, signal)
+                vpd = await detect_volume_price_divergence_v2(
+                    vpd_klines, signal,
+                    indicators=market_data.indicators,
+                    derivatives=market_data.derivatives,
+                    coinglass=market_data.coinglass,
+                )
                 if vpd.confidence_modifier != 1.0:
                     confidence *= vpd.confidence_modifier
-                    sections.append(ReportSection(
-                        title="量价验证",
-                        data={
-                            "背离类型": vpd.divergence_type.value,
-                            "量比": f"{vpd.volume_ratio:.0%}",
-                            "置信度修正": vpd.confidence_modifier,
-                        },
-                        summary=vpd.description,
-                    ))
-                    # 量价背离严重 + 信号冲突 → 降级为观望
-                    if vpd.confidence_modifier < 0.6 and signal != "neutral":
-                        signal = "neutral"
-                        confidence = min(confidence, 0.3)
-                        trend_status = "degraded"
-                        trend_blocked_reason = "volume_price_divergence"
+                vpd_data = {
+                    "评分": f"{vpd.score:+.3f}",
+                    "等级": vpd.grade,
+                    "置信度修正": f"×{vpd.confidence_modifier}",
+                    "位置": vpd.position,
+                    "数据完整度": f"{vpd.data_completeness:.0%}",
+                }
+                for f in vpd.factors:
+                    if abs(f.score) > 0.1 and f.available:
+                        vpd_data[f.factor_name] = f.detail
+                sections.append(ReportSection(
+                    title="量价验证",
+                    data=vpd_data,
+                    summary=vpd.description,
+                ))
         except Exception as exc:
-            logger.warning("量价背离检测失败: %s", exc)
+            logger.warning("量价背离V2检测失败: %s", exc)
 
         # =================================================================
         # 策略生成 — 仅在 gates 通过 + 信号聚合完成后执行

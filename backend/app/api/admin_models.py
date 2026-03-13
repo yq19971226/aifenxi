@@ -323,3 +323,99 @@ async def update_model_name(
 
     return {"ok": True, "message": f"模型 {model_key} 已更新: {old_name} → {body.model_name}"}
 
+
+# ══════════════════════════════════════════════════════════════
+# VPD 多因子权重管理
+# ══════════════════════════════════════════════════════════════
+
+
+_FACTOR_DESCRIPTIONS: dict[str, dict[str, str]] = {
+    "f1_peak_divergence": {"name": "极值点背离", "desc": "find_peaks 对比相邻波峰/谷成交量"},
+    "f2_volume_zscore": {"name": "量能Z-Score", "desc": "对数Z-Score统计标准化量能异常"},
+    "f3_cmf_divergence": {"name": "CMF资金流", "desc": "Chaikin Money Flow 主动买卖压力"},
+    "f4_macd_rsi_divergence": {"name": "MACD+RSI动量", "desc": "MACD柱背离 + RSI超买超卖增强"},
+    "f5_obv_divergence": {"name": "OBV趋势", "desc": "OBV累积量能趋势背离"},
+    "f6_derivatives_health": {"name": "衍生品健康度", "desc": "OI持仓量 + 资金费率拥挤度"},
+    "f7_vsa_efficiency": {"name": "VSA效率", "desc": "K线穿越效率 + 影线比率 + E/R比"},
+}
+
+
+class FactorWeightUpdate(BaseModel):
+    weights: dict[str, float]
+
+
+@router.get("/vpd-factors")
+async def get_vpd_factors(_=Depends(require_admin)):
+    """获取当前 VPD 多因子权重及描述。"""
+    from app.services.volume_price_divergence_v2 import DEFAULT_WEIGHTS
+    from app.services.config_service import get_config_value
+    import json
+
+    # 读取数据库中保存的权重
+    raw = await get_config_value("vpd_factor_weights", default=None)
+    current_weights = dict(DEFAULT_WEIGHTS)
+    source = "default"
+    if raw:
+        try:
+            saved = json.loads(raw) if isinstance(raw, str) else raw
+            if isinstance(saved, dict):
+                current_weights.update(saved)
+                source = "database"
+        except Exception:
+            pass
+
+    factors = []
+    for fid, weight in current_weights.items():
+        meta = _FACTOR_DESCRIPTIONS.get(fid, {"name": fid, "desc": ""})
+        factors.append({
+            "factor_id": fid,
+            "factor_name": meta["name"],
+            "description": meta["desc"],
+            "weight": weight,
+            "default_weight": DEFAULT_WEIGHTS.get(fid, 0.0),
+        })
+
+    return {
+        "factors": factors,
+        "total_weight": round(sum(current_weights.values()), 4),
+        "source": source,
+    }
+
+
+@router.put("/vpd-factors")
+async def update_vpd_factors(body: FactorWeightUpdate, _=Depends(require_admin)):
+    """管理员调整 VPD 因子权重。权重合计应接近 1.0。"""
+    from app.services.volume_price_divergence_v2 import DEFAULT_WEIGHTS
+    from app.services.config_service import set_config_value
+    import json
+
+    # 验证因子 ID
+    for fid in body.weights:
+        if fid not in DEFAULT_WEIGHTS:
+            raise HTTPException(400, f"未知因子: {fid}")
+
+    # 验证权重范围
+    for fid, w in body.weights.items():
+        if w < 0 or w > 1.0:
+            raise HTTPException(400, f"因子 {fid} 权重需在 0~1 之间")
+
+    total = sum(body.weights.values())
+    if total < 0.8 or total > 1.2:
+        raise HTTPException(400, f"权重合计 {total:.2f} 应接近 1.0 (允许 0.8~1.2)")
+
+    await set_config_value("vpd_factor_weights", json.dumps(body.weights))
+
+    logger.info("VPD factor weights updated", extra={"weights": body.weights, "total": total})
+    return {"ok": True, "message": f"因子权重已更新(合计{total:.2f})", "weights": body.weights}
+
+
+@router.post("/vpd-factors/reset")
+async def reset_vpd_factors(_=Depends(require_admin)):
+    """重置 VPD 因子权重为默认值。"""
+    from app.services.config_service import set_config_value
+    import json
+
+    from app.services.volume_price_divergence_v2 import DEFAULT_WEIGHTS
+    await set_config_value("vpd_factor_weights", json.dumps(DEFAULT_WEIGHTS))
+
+    return {"ok": True, "message": "因子权重已重置为默认值", "weights": DEFAULT_WEIGHTS}
