@@ -34,8 +34,27 @@ export const FIELD_LABELS: Record<string, string> = {
   phase: "阶段",
   evidence: "证据",
   warning: "警告",
+  warnings: "警告列表",
   description: "描述",
   title: "标题",
+  summary: "摘要",
+  name: "名称",
+  type: "类型",
+  status: "状态",
+  value: "数值",
+  count: "数量",
+  score: "评分",
+  level: "等级",
+  source: "数据源",
+  date: "日期",
+  time: "时间",
+  result: "结果",
+  detail: "详情",
+  details: "详细信息",
+  note: "备注",
+  notes: "备注列表",
+  message: "消息",
+  error: "错误",
   // ── 支撑/阻力 ──
   support_levels: "支撑位",
   resistance_levels: "阻力位",
@@ -123,6 +142,7 @@ export const FIELD_LABELS: Record<string, string> = {
   urgency: "紧急程度",
   events: "事件列表",
   total_impact: "总影响",
+  total_impact_score: "总影响评分",
   net_direction: "总体方向",
   confidence_modifier: "置信度修正",
   // ── 消息验证 ──
@@ -179,6 +199,102 @@ export const FIELD_LABELS: Record<string, string> = {
   pc_ratio: "看跌/看涨比",
   timestamp: "时间戳",
   adversarial_analysis: "对抗分析",
+
+  // ══════════════════════════════════════════════════════════
+  // ── 新闻分析（NewsAnalystAgent）──
+  // ══════════════════════════════════════════════════════════
+  news_analysis: "新闻分析",
+  total_news_count: "新闻总数",
+  news_count: "新闻数量",
+  sentiment_distribution: "情绪分布",
+  positive: "积极",
+  negative: "消极",
+  neutral: "中性",
+  top_events: "重要事件",
+  time_effect: "时间效应",
+  credibility: "可信度",
+  regulatory_risk: "监管风险",
+  market_narrative: "市场叙事",
+  // ── 新闻事件类别 ──
+  regulatory: "监管政策",
+  partnership: "合作公告",
+  technical_update: "技术升级",
+  exchange_listing: "交易所上线",
+  hack_exploit: "黑客攻击",
+  macro_economic: "宏观经济",
+  whale_movement: "巨鲸动向",
+  legal_action: "法律诉讼",
+  adoption: "主流采纳",
+  other: "其他",
+  // ── 时间效应值 ──
+  immediate: "即时",
+
+  // ══════════════════════════════════════════════════════════
+  // ── 日历事件（CalendarAgent）──
+  // ══════════════════════════════════════════════════════════
+  upcoming_events: "即将到来的事件",
+  events_count: "事件数量",
+  days_to_event: "距事件天数",
+  vote_count: "投票数",
+  high_impact_count: "高影响力事件数",
+  event_date: "事件日期",
+  proof_link: "证据链接",
+  can_occur_before: "可能提前发生",
+  positive_vote_count: "正面投票数",
+  percentage: "支持比例",
+  categories: "分类",
+
+  // ══════════════════════════════════════════════════════════
+  // ── 链上深度数据 ──
+  // ══════════════════════════════════════════════════════════
+  mvrv_z_score: "MVRV Z值",
+  mvrv: "MVRV比率",
+  nupl: "净未实现盈亏(NUPL)",
+  sopr: "花费产出利润率(SOPR)",
+  asopr: "调整后SOPR",
+  puell_multiple: "Puell倍数",
+  reserve_risk: "储备风险",
+  accumulation_score: "积累评分",
+  active_addresses: "活跃地址数",
+  new_addresses: "新增地址数",
+  addresses_in_profit_pct: "盈利地址占比",
+  exchange_reserve: "交易所储备",
+  exchange_balance: "交易所余额",
+  stablecoin_flow: "稳定币流入",
+  hash_rate: "算力",
+  realized_cap: "已实现市值",
+  net_unrealized_profit_loss: "净未实现盈亏",
+
+  // ══════════════════════════════════════════════════════════
+  // ── 舆情分析（SentimentAgent）──
+  // ══════════════════════════════════════════════════════════
+  social_dominance: "社交热度占比",
+  social_volume: "社交提及量",
+  kol_activity: "KOL活跃度",
+  fud_fomo_index: "FUD/FOMO指数",
+  weighted_sentiment: "加权情绪",
+  community_growth: "社区增长",
+
+  // ══════════════════════════════════════════════════════════
+  // ── 剧本推演（PlaybookAgent）──
+  // ══════════════════════════════════════════════════════════
+  dealer_credibility: "庄家可信度",
+  defense_feasibility: "防御可行性",
+  final_recommendation: "最终建议",
+  next_move: "下一步操作",
+  risk_alerts: "风险提醒",
+  plain_summary: "通俗总结",
+  confidence_level: "置信等级",
+
+  // ══════════════════════════════════════════════════════════
+  // ── 合谋检测子字段 ──
+  // ══════════════════════════════════════════════════════════
+  wash_trading_indicators: "对倒交易指标",
+  pump_dump_indicators: "拉盘砸盘指标",
+  coordination_signals: "协作信号",
+  risk_score: "风险评分",
+  detection_count: "检测数量",
+  severity: "严重程度",
 };
 
 export const HIDDEN_FIELDS = new Set([

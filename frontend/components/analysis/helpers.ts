@@ -129,6 +129,16 @@ const _TEXT_REPLACEMENTS: [RegExp, string][] = [
   [/\bmain_choch\b/gi, "主趋势转变"], [/\bmain_bos\b/gi, "主结构突破"],
   [/\bliquidity[_ ]grab\b/gi, "流动性猎取"], [/\bliquidity[_ ]sweep\b/gi, "流动性扫盘"],
   [/\bstop[_ ]hunt\b/gi, "猎杀止损"],
+  // ── 新闻事件类别（下划线枚举值） ──
+  [/\bwhale_movement\b/gi, "巨鲸动向"], [/\btechnical_update\b/gi, "技术升级"],
+  [/\bexchange_listing\b/gi, "交易所上线"], [/\bhack_exploit\b/gi, "黑客攻击"],
+  [/\bmacro_economic\b/gi, "宏观经济"], [/\blegal_action\b/gi, "法律诉讼"],
+  [/\bregulatory\b/gi, "监管政策"], [/\bpartnership\b/gi, "合作公告"],
+  [/\badoption\b/gi, "主流采纳"],
+  // ── 时间效应值 ──
+  [/\bimmediate\b/gi, "即时"], [/\bshort_term\b/gi, "短期"], [/\blong_term\b/gi, "长期"],
+  // ── 可信度/风险等级值 ──
+  [/\bcritical\b/gi, "关键"],
   // ── 方向/信号 ──
   [/\bbullish\b/gi, "看涨"], [/\bbearish\b/gi, "看跌"], [/\bneutral\b/gi, "中性"],
   [/\bsideways\b/gi, "横盘"],
@@ -178,6 +188,7 @@ const _TEXT_REPLACEMENTS: [RegExp, string][] = [
   [/\babove\b/gi, "高于"], [/\bbelow\b/gi, "低于"],
   [/\btrue\b/gi, "是"], [/\bfalse\b/gi, "否"],
   [/\bnone\b/gi, "无"], [/\bunknown\b/gi, "未知"],
+  [/\bother\b/gi, "其他"],
 ];
 
 export function localizeText(text: string | null | undefined): string {
