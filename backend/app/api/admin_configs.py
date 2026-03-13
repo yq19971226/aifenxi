@@ -267,6 +267,12 @@ async def test_connection(
             "headers": {"x-api-key": data.api_key},
             "timeout": 10,
         },
+        "deepseek_factor_api_key": {
+            "url": "https://api.deepseek.com/models",
+            "method": "GET",
+            "headers": {"Authorization": f"Bearer {data.api_key}"},
+            "timeout": 10,
+        },
     }
 
     if data.config_key not in test_endpoints:

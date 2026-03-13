@@ -171,6 +171,17 @@ const API_KEYS: ApiKeyDef[] = [
     required: false,
     category: "payment",
   },
+  {
+    key: "deepseek_factor_api_key",
+    name: "因子训练 AI 密钥",
+    provider: "DeepSeek",
+    description: "独立的 DeepSeek V3.2 官方 API Key，用于因子学习模块的 AI 训练。与主分析系统的 DMXAPI 完全独立。",
+    howToGet: "注册账号 → 充值 → API Keys 页面复制 Key",
+    registerUrl: "https://platform.deepseek.com/api_keys",
+    cost: "按量付费（极低价）",
+    required: false,
+    category: "ai_training",
+  },
 ];
 
 // ── 分组 ─────────────────────────────────────────────────────
@@ -178,6 +189,7 @@ const API_KEYS: ApiKeyDef[] = [
 const GROUPS = [
   { id: "core", label: "核心（必填）", filter: (k: ApiKeyDef) => k.required },
   { id: "data", label: "数据源（按需填写）", filter: (k: ApiKeyDef) => !k.required && k.category === "data_source" },
+  { id: "ai", label: "AI 训练（可选）", filter: (k: ApiKeyDef) => k.category === "ai_training" },
   { id: "notif", label: "推送通知（可选）", filter: (k: ApiKeyDef) => k.category === "notification" },
   { id: "pay", label: "支付（可选）", filter: (k: ApiKeyDef) => k.category === "payment" },
 ];
