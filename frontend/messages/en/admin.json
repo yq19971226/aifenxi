@@ -2,10 +2,9 @@
   "sidebar": {
     "groups": {
       "overview": "Overview",
-      "system": "System",
-      "users": "Users & Operations",
-      "review": "Content Review",
-      "finance": "Finance"
+      "config": "Configuration",
+      "operations": "Operations",
+      "intelligence": "Intelligence"
     },
     "items": {
       "dashboard": "Dashboard",

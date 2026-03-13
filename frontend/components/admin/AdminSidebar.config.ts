@@ -7,17 +7,13 @@ import {
   Brain,
   Coins,
   Users,
-  UserCog,
-  Receipt,
   Bell,
-  Megaphone,
   FileCheck,
   ClipboardCheck,
-  FileText,
   Wallet,
-  PieChart,
   GraduationCap,
   Server,
+  FileText,
   type LucideIcon,
 } from "lucide-react";
 
@@ -36,49 +32,43 @@ export interface AdminMenuGroup {
 }
 
 export const ADMIN_MENU_GROUPS: AdminMenuGroup[] = [
+  // ── 概览 ──────────────────────────────────
   {
     labelKey: "overview",
     items: [
       { labelKey: "dashboard", href: "/admin/dashboard", icon: LayoutDashboard, frequency: "high" },
+      { labelKey: "monitor", href: "/admin/monitor", icon: Activity, frequency: "high" },
     ],
   },
+  // ── 配置 ──────────────────────────────────
   {
-    labelKey: "system",
+    labelKey: "config",
     items: [
-      { labelKey: "monitor", href: "/admin/monitor", icon: Activity, frequency: "high" },
+      { labelKey: "apiKeys", href: "/admin/api-keys", icon: Key, frequency: "high" },
       { labelKey: "setup", href: "/admin/setup", icon: Settings, frequency: "high" },
       { labelKey: "models", href: "/admin/models", icon: Brain },
-      { labelKey: "logs", href: "/admin/system/logs", icon: FileText },
-      { labelKey: "datasources", href: "/admin/datasources", icon: Database },
-      { labelKey: "apiKeys", href: "/admin/api-keys", icon: Key },
       { labelKey: "symbols", href: "/admin/symbols", icon: Coins, frequency: "high" },
-      { labelKey: "learning", href: "/admin/learning", icon: GraduationCap, frequency: "high" },
-      { labelKey: "systemMgmt", href: "/admin/system", icon: Server },
     ],
   },
+  // ── 运营 ──────────────────────────────────
   {
-    labelKey: "users",
+    labelKey: "operations",
     items: [
-      { labelKey: "users", href: "/admin/users", icon: Users },
-      { labelKey: "operators", href: "/admin/operators", icon: UserCog },
-      { labelKey: "orders", href: "/admin/orders", icon: Receipt },
-      { labelKey: "notifications", href: "/admin/notifications", icon: Bell },
-      { labelKey: "announcements", href: "/admin/announcements", icon: Megaphone },
-    ],
-  },
-  {
-    labelKey: "review",
-    items: [
+      { labelKey: "users", href: "/admin/users", icon: Users, frequency: "high" },
       { labelKey: "playbookReview", href: "/admin/playbook-review", icon: FileCheck, badgeKey: "playbookReview", badgeColor: "amber", frequency: "high" },
       { labelKey: "taskReview", href: "/admin/task-review", icon: ClipboardCheck, badgeKey: "taskReview", badgeColor: "amber" },
-      { labelKey: "taskTemplates", href: "/admin/task-templates", icon: FileText },
+      { labelKey: "announcements", href: "/admin/announcements", icon: Bell },
+      { labelKey: "withdrawals", href: "/admin/withdrawals", icon: Wallet, badgeKey: "withdrawals", badgeColor: "blue" },
     ],
   },
+  // ── 智能 ──────────────────────────────────
   {
-    labelKey: "finance",
+    labelKey: "intelligence",
     items: [
-      { labelKey: "withdrawals", href: "/admin/withdrawals", icon: Wallet, badgeKey: "withdrawals", badgeColor: "blue" },
-      { labelKey: "partnerStats", href: "/admin/partner-stats", icon: PieChart },
+      { labelKey: "learning", href: "/admin/learning", icon: GraduationCap, frequency: "high" },
+      { labelKey: "datasources", href: "/admin/datasources", icon: Database },
+      { labelKey: "logs", href: "/admin/system/logs", icon: FileText },
+      { labelKey: "systemMgmt", href: "/admin/system", icon: Server },
     ],
   },
 ];

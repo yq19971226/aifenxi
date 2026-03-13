@@ -2,10 +2,9 @@
   "sidebar": {
     "groups": {
       "overview": "總覽",
-      "system": "系統",
-      "users": "用戶與運營",
-      "review": "內容審核",
-      "finance": "財務"
+      "config": "配置",
+      "operations": "運營",
+      "intelligence": "智能"
     },
     "items": {
       "dashboard": "後台總覽",
