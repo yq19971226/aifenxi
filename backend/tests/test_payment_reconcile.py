@@ -11,7 +11,7 @@ async def test_reconcile_payment_status_updates_from_provider(monkeypatch):
     session = object()
     pending_row = {
         "id": "local-1",
-        "payment_id": "np-123",
+        "payment_id": "151811887",
         "user_id": "user-1",
         "plan": 1,
         "amount_usd": 99.0,
@@ -23,7 +23,7 @@ async def test_reconcile_payment_status_updates_from_provider(monkeypatch):
     rows = [pending_row, completed_row]
 
     async def fake_get_payment_row(session_arg, payment_id, user_id=None):
-        assert payment_id == "np-123"
+        assert payment_id == "151811887"
         assert user_id == "user-1"
         return rows.pop(0)
 
@@ -32,13 +32,23 @@ async def test_reconcile_payment_status_updates_from_provider(monkeypatch):
     monkeypatch.setattr(payment, "_get_payment_row", fake_get_payment_row)
     monkeypatch.setattr(
         payment,
-        "_call_nowpayments_status",
+        "_call_oxapay_inquiry",
         AsyncMock(
             return_value={
-                "payment_id": "np-123",
-                "payment_status": "confirmed",
-                "price_amount": 99.0,
-                "pay_currency": "usdttrc20",
+                "track_id": "151811887",
+                "status": "Paid",
+                "type": "invoice",
+                "amount": 99.0,
+                "currency": "USD",
+                "order_id": "ORD-12345",
+                "txs": [
+                    {
+                        "address": "TXyz123abc",
+                        "currency": "USDT",
+                        "network": "Tron Network",
+                        "status": "confirmed",
+                    }
+                ],
             }
         ),
     )
@@ -46,12 +56,12 @@ async def test_reconcile_payment_status_updates_from_provider(monkeypatch):
     monkeypatch.setattr(
         config_service,
         "get_config_value",
-        AsyncMock(return_value="np-test-key"),
+        AsyncMock(return_value="ox-test-key"),
     )
 
-    result = await payment.reconcile_payment_status(session, "np-123", user_id="user-1")
+    result = await payment.reconcile_payment_status(session, "151811887", user_id="user-1")
 
-    assert result.payment_id == "np-123"
+    assert result.payment_id == "151811887"
     assert result.status == "completed"
     handle_webhook.assert_awaited_once()
 
@@ -65,11 +75,18 @@ async def test_reconcile_payment_status_raises_for_unknown_payment(monkeypatch):
 
 
 def test_build_provider_audit_values_marks_partial_payment_reason():
+    """Oxapay status 'Paying' = 部分支付 → status_reason='partial'"""
     payload = payment.WebhookPayload(
-        payment_id="np-456",
-        payment_status="partially_paid",
-        pay_currency="usdttrc20",
-        pay_amount=12.5,
+        track_id="151811887",
+        status="Paying",
+        currency="POL",
+        amount=10,
+        txs=[{
+            "address": "0xabc",
+            "currency": "POL",
+            "network": "Polygon Network",
+            "status": "confirming",
+        }],
     )
 
     audit = payment._build_provider_audit_values(
@@ -78,17 +95,18 @@ def test_build_provider_audit_values_marks_partial_payment_reason():
         source="sync",
     )
 
-    assert audit["provider_status"] == "partially_paid"
+    assert audit["provider_status"] == "paying"
     assert audit["status_reason"] == "partial"
     assert payment._map_local_payment_status(audit["provider_status"]) == "pending"
 
 
-def test_build_provider_audit_values_marks_wrong_asset_reason():
+def test_build_provider_audit_values_marks_confirming_reason():
+    """Status that is in pending but not 'paying' → status_reason = status itself"""
     payload = payment.WebhookPayload(
-        payment_id="np-789",
-        payment_status="confirming",
-        pay_currency="usdterc20",
-        pay_amount=99.0,
+        track_id="151811887",
+        status="Confirming",
+        currency="USDT",
+        amount=99.0,
     )
 
     audit = payment._build_provider_audit_values(
@@ -98,4 +116,36 @@ def test_build_provider_audit_values_marks_wrong_asset_reason():
     )
 
     assert audit["provider_status"] == "confirming"
-    assert audit["status_reason"] == "wrong_asset"
+    assert audit["status_reason"] == "confirming"
+
+
+def test_webhook_payload_extracts_address_from_txs():
+    """Address should be extracted from the txs array, not a top-level field."""
+    payload = payment.WebhookPayload(
+        track_id="151811887",
+        status="Paid",
+        type="invoice",
+        amount=10,
+        currency="POL",
+        txs=[{
+            "address": "TXyz123abc",
+            "currency": "POL",
+            "network": "Polygon Network",
+            "status": "confirmed",
+        }],
+    )
+
+    assert payload.get_payment_id() == "151811887"
+    assert payload.get_status() == "Paid"
+    assert payload.get_address() == "TXyz123abc"
+    assert payload.get_network() == "Polygon Network"
+    assert payload.get_amount() == 10.0
+    assert payload.get_currency() == "POL"
+
+
+def test_normalize_provider_status_lowercases():
+    """Oxapay returns statuses like 'Paying', 'Paid' — normalization lowercases them."""
+    assert payment._normalize_provider_status("Paying") == "paying"
+    assert payment._normalize_provider_status("Paid") == "paid"
+    assert payment._normalize_provider_status("Failed") == "failed"
+    assert payment._normalize_provider_status(None) == "waiting"

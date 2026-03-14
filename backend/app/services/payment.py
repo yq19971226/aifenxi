@@ -1,4 +1,4 @@
-"""NowPayments 支付服务 — 创建支付、Webhook 验签、幂等处理。
+"""Oxapay 支付服务 — 创建支付、Webhook 验签、幂等处理。
 
 所有外部 API 调用使用 httpx.AsyncClient + asyncio.wait_for 超时控制。
 数据库操作使用 sqlalchemy text()，多表更新在事务内完成。
@@ -26,23 +26,24 @@ logger = logging.getLogger(__name__)
 
 # ── 常量 ──────────────────────────────────────────────────────
 
-NOWPAYMENTS_API_BASE = "https://api.nowpayments.io/v1"
+OXAPAY_API_BASE = "https://api.oxapay.com"
 API_TIMEOUT_SECONDS = 30
 
-NETWORK_CURRENCY: dict[str, str] = {
-    "TRC-20": "usdttrc20",
-    "ERC-20": "usdterc20",
-    "BEP-20": "usdtbep20",
+# 前端展示网络 → Oxapay network 参数映射
+NETWORK_MAP: dict[str, str] = {
+    "TRC-20": "TRC20",
+    "ERC-20": "ERC20",
+    "BEP-20": "BEP20",
 }
 
-PROVIDER_SUCCESS_STATUSES = frozenset({"confirmed", "finished"})
-PROVIDER_FAILED_STATUSES = frozenset({"failed", "refunded"})
+# Oxapay 支付状态映射（Oxapay 返回首字母大写，统一转小写比较）
+PROVIDER_SUCCESS_STATUSES = frozenset({"paid"})
+PROVIDER_FAILED_STATUSES = frozenset({"failed"})
 PROVIDER_EXPIRED_STATUSES = frozenset({"expired"})
 PROVIDER_PENDING_STATUSES = frozenset({
     "waiting",
+    "paying",
     "confirming",
-    "sending",
-    "partially_paid",
 })
 
 PAYMENT_AUDIT_COLUMN_DEFS: dict[str, tuple[str, str]] = {
@@ -105,11 +106,11 @@ async def _get_duration_discount(months: int) -> float:
         return fallback
 
 
-async def _get_ipn_callback_url() -> str:
+async def _get_callback_url() -> str:
     try:
         from app.services.config_service import get_config_value
 
-        configured = (await get_config_value("nowpayments_ipn_callback_url", "")).strip()
+        configured = (await get_config_value("oxapay_callback_url", "")).strip()
         if configured.startswith("http://") or configured.startswith("https://"):
             return configured
     except Exception:
@@ -130,7 +131,7 @@ async def _get_ipn_callback_url() -> str:
     except Exception:
         logger.warning("推导支付回调地址失败")
 
-    logger.warning("NowPayments IPN callback URL not configured")
+    logger.warning("Oxapay callback URL not configured")
     return ""
 
 
@@ -168,20 +169,60 @@ class PaymentInfo(BaseModel):
     pay_currency: str | None = None
     provider_status: str | None = None
     status_reason: str | None = None
+    payment_url: str | None = None  # Oxapay 托管支付页面链接
 
 
 class WebhookPayload(BaseModel):
-    """NowPayments IPN Webhook 载荷。"""
+    """Oxapay Webhook 回调载荷。
 
-    payment_id: int | str
-    payment_status: str
-    pay_address: str | None = None
-    price_amount: float | None = None
-    price_currency: str | None = None
-    pay_amount: float | None = None
-    pay_currency: str | None = None
+    官方文档字段名均为 snake_case:
+    track_id, status, type, module_name, amount, value, currency,
+    order_id, email, note, fee_paid_by_payer, under_paid_coverage,
+    description, date, txs[]
+    """
+
+    track_id: int | str | None = None
+    status: str | None = None
+    type: str | None = None  # invoice / white_label / static_address
+    amount: float | str | None = None
+    value: float | str | None = None  # 币种等值金额
+    sent_value: float | str | None = None
+    currency: str | None = None
     order_id: str | None = None
-    order_description: str | None = None
+    email: str | None = None
+    description: str | None = None
+    date: int | None = None
+    txs: list[dict] | None = None  # 交易详情数组
+
+    def get_payment_id(self) -> str:
+        return str(self.track_id or "")
+
+    def get_status(self) -> str:
+        return self.status or "waiting"
+
+    def get_address(self) -> str | None:
+        """从 txs 数组中提取第一个交易地址。"""
+        if self.txs and len(self.txs) > 0:
+            return self.txs[0].get("address")
+        return None
+
+    def get_network(self) -> str | None:
+        """从 txs 数组中提取网络。"""
+        if self.txs and len(self.txs) > 0:
+            return self.txs[0].get("network")
+        return None
+
+    def get_amount(self) -> float | None:
+        val = self.amount
+        if val is not None:
+            try:
+                return float(val)
+            except (ValueError, TypeError):
+                return None
+        return None
+
+    def get_currency(self) -> str | None:
+        return self.currency
 
 
 # ── 服务函数 ──────────────────────────────────────────────────
@@ -214,16 +255,9 @@ def _derive_status_reason(
     expected_network: str | None = None,
     actual_pay_currency: str | None = None,
 ) -> str | None:
-    expected_pay_currency = _normalize_pay_currency(
-        NETWORK_CURRENCY.get(expected_network) if expected_network else None
-    )
-    actual_currency = _normalize_pay_currency(actual_pay_currency)
-
-    if expected_pay_currency and actual_currency and actual_currency != expected_pay_currency:
-        return "wrong_asset"
-    if provider_status == "partially_paid":
+    if provider_status == "paying":
         return "partial"
-    if provider_status in (PROVIDER_PENDING_STATUSES - {"partially_paid"}) | {"refunded"}:
+    if provider_status in PROVIDER_PENDING_STATUSES - {"paying"}:
         return provider_status
     return None
 
@@ -238,16 +272,16 @@ def _build_provider_audit_values(
     expected_network: str | None,
     source: Literal["create", "webhook", "sync", "legacy"],
 ) -> dict[str, Any]:
-    provider_status = _normalize_provider_status(payload.payment_status)
-    pay_currency = _normalize_pay_currency(payload.pay_currency)
+    provider_status = _normalize_provider_status(payload.get_status())
+    pay_currency = _normalize_pay_currency(payload.get_currency())
     payload_dict = payload.model_dump(exclude_none=True)
-    payload_dict["payment_status"] = provider_status
+    payload_dict["status"] = provider_status
     if pay_currency:
-        payload_dict["pay_currency"] = pay_currency
+        payload_dict["currency"] = pay_currency
 
     return {
-        "pay_address": payload.pay_address,
-        "pay_amount": payload.pay_amount,
+        "pay_address": payload.get_address(),
+        "pay_amount": payload.get_amount(),
         "pay_currency": pay_currency,
         "provider_status": provider_status,
         "status_reason": _derive_status_reason(
@@ -373,9 +407,9 @@ async def create_payment(
     user_id: str,
     request: CreatePaymentRequest,
 ) -> PaymentInfo:
-    """创建 NowPayments 支付订单并写入数据库。
+    """创建 Oxapay 支付订单并写入数据库。
 
-    1. 调用 NowPayments API 创建支付
+    1. 调用 Oxapay Merchant API 创建发票
     2. 将支付记录插入 payments 表
     3. 返回包含支付地址的 PaymentInfo
     """
@@ -385,49 +419,53 @@ async def create_payment(
 
     discount = await _get_duration_discount(request.duration_months)
     amount = round(monthly_price * request.duration_months * discount, 2)
-    pay_currency = NETWORK_CURRENCY.get(request.network)
-    if pay_currency is None:
+    oxapay_network = NETWORK_MAP.get(request.network)
+    if oxapay_network is None:
         raise ValueError(f"不支持的网络: {request.network}")
 
-    # 调用 NowPayments API
+    # 调用 Oxapay API
     try:
         from app.services.config_service import get_config_value
 
-        np_api_key = await get_config_value("nowpayments_api_key")
-        ipn_callback_url = await _get_ipn_callback_url()
+        merchant_key = await get_config_value("oxapay_merchant_key")
+        callback_url = await _get_callback_url()
         external_order_id = _build_external_order_id(user_id)
-        np_response = await asyncio.wait_for(
-            _call_nowpayments_create(
-                amount,
-                pay_currency,
-                external_order_id,
-                api_key=np_api_key,
-                ipn_callback_url=ipn_callback_url,
+        ox_response = await asyncio.wait_for(
+            _call_oxapay_create(
+                amount=amount,
+                currency="USDT",
+                network=oxapay_network,
+                order_id=external_order_id,
+                merchant_key=merchant_key,
+                callback_url=callback_url,
             ),
             timeout=API_TIMEOUT_SECONDS,
         )
     except asyncio.TimeoutError:
-        logger.error("NowPayments API timeout: user_id=%s", user_id)
+        logger.error("Oxapay API timeout: user_id=%s", user_id)
         raise RuntimeError("支付服务超时，请稍后重试")
     except Exception as exc:
-        logger.error("NowPayments API error: %s", exc)
+        logger.error("Oxapay API error: %s", exc)
         raise RuntimeError("支付服务异常，请稍后重试")
 
-    payment_id = str(np_response["payment_id"])
-    pay_address = np_response.get("pay_address", "")
-    pay_amount = np_response.get("pay_amount", 0)
-    create_payload = WebhookPayload.model_validate(
-        {
-            "payment_id": payment_id,
-            "payment_status": np_response.get("payment_status", "waiting"),
-            "pay_address": np_response.get("pay_address"),
-            "price_amount": amount,
-            "price_currency": "usd",
-            "pay_amount": np_response.get("pay_amount"),
-            "pay_currency": np_response.get("pay_currency"),
-            "order_id": np_response.get("order_id", external_order_id),
-            "order_description": np_response.get("order_description"),
-        }
+    # Oxapay V1 返回 { "data": { "track_id": "...", "payment_url": "..." }, "status": 200 }
+    resp_data = ox_response.get("data", {})
+    payment_id = str(resp_data.get("track_id", ""))
+    if not payment_id:
+        logger.error("Oxapay response missing track_id: %s", ox_response)
+        raise RuntimeError("支付服务返回异常")
+
+    payment_url = resp_data.get("payment_url", "")
+    # Invoice 创建时还没有具体 pay_address，需要用户在支付页面选择后才有
+    pay_address = ""
+    pay_amount = amount  # 创建时金额就是请求金额
+
+    create_payload = WebhookPayload(
+        track_id=payment_id,
+        status="waiting",
+        amount=pay_amount,
+        currency="USD",
+        order_id=external_order_id,
     )
     create_audit = _build_provider_audit_values(
         create_payload,
@@ -469,7 +507,7 @@ async def create_payment(
         logger.error("create_payment DB error: %s", exc)
         raise
 
-    return PaymentInfo(
+    info = PaymentInfo(
         id=str(row["id"]),
         payment_id=payment_id,
         user_id=user_id,
@@ -478,42 +516,40 @@ async def create_payment(
         network=request.network,
         status="pending",
         created_at=row["created_at"],
-        pay_address=pay_address,
-        pay_amount=float(pay_amount),
-        pay_currency=pay_currency,
+        pay_address=pay_address or None,
+        pay_amount=float(pay_amount) if pay_amount else None,
+        pay_currency="usd",
         provider_status=create_audit["provider_status"],
         status_reason=create_audit["status_reason"],
+        payment_url=payment_url or None,
     )
+    return info
 
 
-def verify_webhook_signature(body: bytes, signature: str, ipn_secret: str = "") -> bool:
-    """验证 NowPayments IPN Webhook 签名（HMAC-SHA512）。
+def verify_webhook_signature(body: bytes, signature: str, merchant_key: str = "") -> bool:
+    """验证 Oxapay Webhook 签名（HMAC-SHA512）。
 
-    NowPayments 使用 IPN Secret 对请求体进行 HMAC-SHA512 签名，
-    签名值通过 x-nowpayments-sig 请求头传递。
+    Oxapay 使用 Merchant API Key 对原始请求体进行 HMAC-SHA512 签名，
+    签名值通过 HMAC 请求头传递。
 
     Args:
         body: 原始请求体
-        signature: x-nowpayments-sig 请求头值
-        ipn_secret: NowPayments IPN Secret（由调用方从 ConfigService 获取）
+        signature: HMAC 请求头值
+        merchant_key: Oxapay Merchant API Key
     """
-    if not ipn_secret:
-        logger.warning("NowPayments IPN secret not configured")
+    if not merchant_key:
+        logger.warning("Oxapay merchant key not configured")
         return False
 
-    # NowPayments 要求对 JSON body 按 key 排序后计算签名
     try:
-        payload_dict = json.loads(body)
-        sorted_payload = json.dumps(payload_dict, sort_keys=True, separators=(",", ":"))
-    except (json.JSONDecodeError, TypeError):
-        logger.error("Webhook body is not valid JSON")
+        expected = hmac.new(
+            merchant_key.encode("utf-8"),
+            body,
+            hashlib.sha512,
+        ).hexdigest()
+    except Exception:
+        logger.error("Webhook HMAC calculation failed")
         return False
-
-    expected = hmac.new(
-        ipn_secret.encode("utf-8"),
-        sorted_payload.encode("utf-8"),
-        hashlib.sha512,
-    ).hexdigest()
 
     return hmac.compare_digest(expected, signature)
 
@@ -523,13 +559,13 @@ async def handle_webhook(
     payload: WebhookPayload,
     source: Literal["webhook", "sync"] = "webhook",
 ) -> None:
-    """处理 NowPayments IPN Webhook 回调。
+    """处理 Oxapay Webhook 回调。
 
     幂等性：已完成的支付不会重复处理。
     支付成功时在事务内完成：更新状态 → 升级会员 → 记录日志。
     """
-    payment_id = str(payload.payment_id)
-    provider_status = _normalize_provider_status(payload.payment_status)
+    payment_id = payload.get_payment_id()
+    provider_status = _normalize_provider_status(payload.get_status())
 
     # 查询现有支付记录
     try:
@@ -626,7 +662,7 @@ async def handle_webhook(
             # 合伙人佣金发放（DB 事务内写记录，事务提交后同步 Redis）
             commission_result = None
             try:
-                amount_usd = float(payload.price_amount) if payload.price_amount else 0
+                amount_usd = payload.get_amount() or 0
                 if amount_usd > 0:
                     commission_result = await grant_commission(
                         session, user_id, str(existing["id"]), amount_usd
@@ -769,32 +805,32 @@ async def reconcile_payment_status(
     try:
         from app.services.config_service import get_config_value
 
-        np_api_key = await get_config_value("nowpayments_api_key")
-        if not np_api_key:
+        merchant_key = await get_config_value("oxapay_merchant_key")
+        if not merchant_key:
             raise RuntimeError("未配置支付网关密钥")
 
         provider_response = await asyncio.wait_for(
-            _call_nowpayments_status(payment_id, api_key=np_api_key),
+            _call_oxapay_inquiry(payment_id, merchant_key=merchant_key),
             timeout=API_TIMEOUT_SECONDS,
         )
     except asyncio.TimeoutError:
-        logger.error("NowPayments status query timeout: payment_id=%s", payment_id)
+        logger.error("Oxapay status query timeout: payment_id=%s", payment_id)
         raise RuntimeError("支付状态查询超时，请稍后重试")
     except httpx.HTTPStatusError as exc:
         if exc.response.status_code == 404:
             raise ValueError("支付订单不存在")
-        logger.error("NowPayments status query failed: payment_id=%s, status=%s", payment_id, exc.response.status_code)
+        logger.error("Oxapay status query failed: payment_id=%s, status=%s", payment_id, exc.response.status_code)
         raise RuntimeError("支付状态查询失败，请稍后重试")
     except RuntimeError:
         raise
     except Exception as exc:
-        logger.error("NowPayments status query error: payment_id=%s, error=%s", payment_id, exc)
+        logger.error("Oxapay status query error: payment_id=%s, error=%s", payment_id, exc)
         raise RuntimeError("支付状态查询失败，请稍后重试")
 
     try:
         payload = WebhookPayload.model_validate(provider_response)
     except Exception as exc:
-        logger.error("NowPayments status payload parse error: payment_id=%s, error=%s", payment_id, exc)
+        logger.error("Oxapay status payload parse error: payment_id=%s, error=%s", payment_id, exc)
         raise RuntimeError("支付状态响应格式错误")
 
     await handle_webhook(session, payload, source="sync")
@@ -821,54 +857,82 @@ def _get_http_client() -> httpx.AsyncClient:
     return _http_client
 
 
-async def _call_nowpayments_create(
+async def _call_oxapay_create(
     amount: float,
-    pay_currency: str,
+    currency: str,
+    network: str,
     order_id: str,
-    api_key: str = "",
-    ipn_callback_url: str = "",
+    merchant_key: str = "",
+    callback_url: str = "",
 ) -> dict:
-    """调用 NowPayments 创建支付 API。
+    """调用 Oxapay Merchant API V1 创建发票。
 
-    Args:
-        amount: 支付金额（USD）
-        pay_currency: 支付币种
-        order_id: 订单 ID
-        api_key: NowPayments API Key（由调用方从 ConfigService 获取）
+    官方文档端点: POST https://api.oxapay.com/v1/payment/invoice
+    认证: merchant_api_key 放在 HTTP 请求头中
+    字段名: 全部 snake_case
+    成功响应: { "data": { "track_id": "...", "payment_url": "..." }, "status": 200 }
     """
     client = _get_http_client()
-    payload = {
-        "price_amount": amount,
-        "price_currency": "usd",
-        "pay_currency": pay_currency,
-        "order_id": order_id,
-        "order_description": "Axiom membership plan",
+    headers = {
+        "merchant_api_key": merchant_key,
+        "Content-Type": "application/json",
     }
-    if ipn_callback_url:
-        payload["ipn_callback_url"] = ipn_callback_url
+    payload: dict[str, Any] = {
+        "amount": amount,
+        "currency": currency,
+        "lifetime": 30,  # 30 分钟有效期
+        "fee_paid_by_payer": 0,  # 手续费由商户承担
+        "to_currency": "USDT",  # 自动转换为 USDT
+        "order_id": order_id,
+        "description": "Axiom membership plan",
+        "sandbox": False,
+    }
+    if callback_url:
+        payload["callback_url"] = callback_url
+
     response = await client.post(
-        f"{NOWPAYMENTS_API_BASE}/payment",
-        headers={
-            "x-api-key": api_key,
-            "Content-Type": "application/json",
-        },
+        f"{OXAPAY_API_BASE}/v1/payment/invoice",
         json=payload,
+        headers=headers,
     )
     response.raise_for_status()
-    return response.json()
+    data = response.json()
+
+    # Oxapay V1 返回 status=200 表示成功
+    if data.get("status") != 200:
+        error_msg = data.get("message", "Unknown error")
+        errors = data.get("error", {})
+        logger.error("Oxapay create invoice failed: %s, errors=%s", error_msg, errors)
+        raise RuntimeError(f"支付服务异常: {error_msg}")
+
+    return data
 
 
-async def _call_nowpayments_status(
+async def _call_oxapay_inquiry(
     payment_id: str,
-    api_key: str = "",
+    merchant_key: str = "",
 ) -> dict:
+    """调用 Oxapay Merchant API V1 查询支付详情。
+
+    官方文档端点: GET https://api.oxapay.com/v1/payment/{track_id}
+    认证: merchant_api_key 放在 HTTP 请求头中
+    """
     client = _get_http_client()
+    headers = {
+        "merchant_api_key": merchant_key,
+        "Content-Type": "application/json",
+    }
     response = await client.get(
-        f"{NOWPAYMENTS_API_BASE}/payment/{payment_id}",
-        headers={
-            "x-api-key": api_key,
-            "Content-Type": "application/json",
-        },
+        f"{OXAPAY_API_BASE}/v1/payment/{payment_id}",
+        headers=headers,
     )
     response.raise_for_status()
-    return response.json()
+    data = response.json()
+
+    if data.get("status") != 200:
+        error_msg = data.get("message", "Unknown error")
+        logger.error("Oxapay inquiry failed: %s", error_msg)
+        raise RuntimeError(f"支付状态查询异常: {error_msg}")
+
+    # 返回 data 子对象，字段结构与 Webhook 载荷一致
+    return data.get("data", data)

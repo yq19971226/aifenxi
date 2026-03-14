@@ -21,6 +21,7 @@ export interface PaymentInfo {
   pay_currency: string | null;
   provider_status: string | null;
   status_reason: string | null;
+  payment_url: string | null;  // Oxapay 托管支付页面
 }
 
 export type DurationMonths = 1 | 3 | 12;

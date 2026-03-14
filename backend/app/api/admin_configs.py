@@ -239,10 +239,11 @@ async def test_connection(
             "headers": {"Authorization": f"Bearer {data.api_key}"},
             "timeout": 10,
         },
-        "nowpayments_api_key": {
-            "url": "https://api.nowpayments.io/v1/status",
-            "method": "GET",
-            "headers": {"x-api-key": data.api_key},
+        "oxapay_merchant_key": {
+            "url": "https://api.oxapay.com/v1/payment/invoice",
+            "method": "POST",
+            "headers": {"merchant_api_key": data.api_key, "Content-Type": "application/json"},
+            "body": {"amount": 1, "currency": "USD", "sandbox": True},
             "timeout": 10,
         },
         "deepseek_factor_api_key": {
@@ -277,6 +278,7 @@ async def test_connection(
                 response = await client.post(
                     endpoint["url"],
                     headers=endpoint.get("headers", {}),
+                    json=endpoint.get("body"),
                 )
 
             # 判断响应状态

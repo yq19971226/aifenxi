@@ -51,22 +51,23 @@ async def create_payment_order(
 async def payment_webhook(
     request: Request,
     session: AsyncSession = Depends(get_db),
-    x_nowpayments_sig: str | None = Header(None),
-) -> dict[str, str]:
-    """NowPayments IPN Webhook 回调。
+    hmac_sig: str | None = Header(None, alias="HMAC"),
+) -> str:
+    """Oxapay Webhook 回调。
 
     公开端点，无需认证。通过 HMAC-SHA512 验签确保请求合法性。
+    Oxapay 要求返回 HTTP 200 + body "ok"。
     """
     body = await request.body()
 
-    if not x_nowpayments_sig:
-        logger.warning("Webhook missing signature header")
+    if not hmac_sig:
+        logger.warning("Webhook missing HMAC signature header")
         raise HTTPException(status_code=400, detail="缺少签名")
 
     from app.services.config_service import get_config_value
 
-    ipn_secret = await get_config_value("nowpayments_ipn_secret")
-    if not verify_webhook_signature(body, x_nowpayments_sig, ipn_secret=ipn_secret):
+    merchant_key = await get_config_value("oxapay_merchant_key")
+    if not verify_webhook_signature(body, hmac_sig, merchant_key=merchant_key):
         logger.warning("Webhook signature verification failed")
         raise HTTPException(status_code=403, detail="签名验证失败")
 
@@ -82,7 +83,8 @@ async def payment_webhook(
         logger.error("Webhook processing error: %s", exc)
         raise HTTPException(status_code=500, detail="Webhook 处理失败")
 
-    return {"status": "ok"}
+    # Oxapay 要求返回 "ok" 字符串
+    return "ok"
 
 
 @router.post("/{payment_id}/sync", response_model=PaymentInfo)
