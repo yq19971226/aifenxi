@@ -107,25 +107,25 @@ function ConfigHealthList({ configs }: { configs: SystemConfig[] }) {
         : t("dashboard.configHealth.pendingCount", { count: results.length - okCount });
 
   return (
-    <div className="glass-card">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
-        <div className="flex items-center gap-2">
-          <Stethoscope size={14} className="text-zinc-500" />
-          <span className="text-sm font-medium text-zinc-200">{t("dashboard.configHealth.title")}</span>
+    <div className="bg-bg-surface border border-border rounded-xl shadow-inner overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-bg-primary/30">
+        <div className="flex items-center gap-2.5">
+          <Stethoscope size={16} className="text-zinc-500" />
+          <span className="text-sm font-bold text-zinc-300">{t("dashboard.configHealth.title")}</span>
         </div>
         <span
-          className={`rounded-md px-2 py-0.5 text-xs font-medium ${
+          className={`rounded-md px-2.5 py-1 text-[10px] font-bold font-mono tracking-widest uppercase ${
             failCount > 0
-              ? "bg-red-500/10 text-red-400"
+              ? "bg-red-500/10 text-red-400 border border-red-500/20"
               : okCount === results.length
-              ? "bg-emerald-500/10 text-emerald-400"
-              : "bg-amber-500/10 text-amber-400"
+              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+              : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
           }`}
         >
           {statusBadge}
         </span>
       </div>
-      <div className="divide-y divide-white/[0.04]">
+      <div className="divide-y divide-border">
         {results.map((item) => {
           const statusText =
             item.status === "ok"
@@ -137,20 +137,20 @@ function ConfigHealthList({ configs }: { configs: SystemConfig[] }) {
             <Link
               key={item.id}
               href={item.href}
-              className="flex items-center justify-between px-5 py-3 transition-colors hover:bg-white/[0.02] group"
+              className="flex items-center justify-between px-5 py-3.5 transition-colors hover:bg-bg-elevated group"
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-3">
                 {item.status === "ok" ? (
-                  <CheckCircle2 size={14} className="text-emerald-400 shrink-0" />
+                  <CheckCircle2 size={16} className="text-emerald-400 shrink-0 shadow-sm" />
                 ) : item.status === "warn" ? (
-                  <AlertTriangle size={14} className="text-amber-400 shrink-0" />
+                  <AlertTriangle size={16} className="text-amber-400 shrink-0 shadow-sm" />
                 ) : (
-                  <XCircle size={14} className="text-red-400 shrink-0" />
+                  <XCircle size={16} className="text-red-400 shrink-0 shadow-sm" />
                 )}
                 <div>
-                  <span className="text-xs text-zinc-300">{t(`dashboard.configHealth.items.${item.itemKey}.label`)}</span>
+                  <span className="text-xs font-bold text-zinc-300">{t(`dashboard.configHealth.items.${item.itemKey}.label`)}</span>
                   <p
-                    className={`text-xs mt-0.5 ${
+                    className={`text-[10px] uppercase font-bold tracking-widest font-mono mt-1 ${
                       item.status === "ok"
                         ? "text-zinc-500"
                         : item.status === "warn"
@@ -164,8 +164,8 @@ function ConfigHealthList({ configs }: { configs: SystemConfig[] }) {
               </div>
               {item.status !== "ok" && (
                 <ArrowRight
-                  size={12}
-                  className="text-zinc-700 group-hover:text-zinc-400 transition-colors shrink-0"
+                  size={14}
+                  className="text-zinc-600 group-hover:text-zinc-400 group-hover:translate-x-0.5 transition-all shrink-0"
                 />
               )}
             </Link>
@@ -192,15 +192,15 @@ function KpiCard({
   color: string;
 }) {
   return (
-    <div className="glass-card glass-card-hover p-4">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm text-zinc-500">{label}</span>
-        <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${color}`}>
-          <Icon size={13} />
+    <div className="bg-bg-surface border border-border rounded-xl shadow-inner p-5 hover:border-indigo-500/30 transition-all group">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-[11px] font-bold text-zinc-400 group-hover:text-zinc-300 transition-colors uppercase tracking-widest">{label}</span>
+        <div className={`flex h-8 w-8 items-center justify-center rounded-xl shadow-inner border border-border/50 ${color}`}>
+          <Icon size={16} className="opacity-80" />
         </div>
       </div>
-      <p className="stat-value text-xl text-zinc-100">{value}</p>
-      {sub && <p className="text-xs text-zinc-500 mt-1">{sub}</p>}
+      <p className="text-2xl font-black text-white font-mono tracking-tight">{value}</p>
+      {sub && <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-2">{sub}</p>}
     </div>
   );
 }
@@ -212,28 +212,28 @@ function TierBar({ free, pro, flagship }: { free: number; pro: number; flagship:
   const pct = (n: number) => ((n / total) * 100).toFixed(1);
 
   return (
-    <div className="glass-card p-4">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-zinc-400">会员分布</span>
-        <span className="text-sm text-zinc-500">{total} 人</span>
+    <div className="bg-bg-surface border border-border rounded-xl shadow-inner p-5 space-y-4">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">会员分布</span>
+        <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{total} 人</span>
       </div>
-      <div className="mb-2.5 flex h-2 overflow-hidden rounded-full bg-white/[0.06]">
-        <div className="bg-zinc-500 transition-all" style={{ width: `${pct(free)}%` }} />
-        <div className="bg-[var(--color-accent)] transition-all" style={{ width: `${pct(pro)}%` }} />
-        <div className="bg-amber-500 transition-all" style={{ width: `${pct(flagship)}%` }} />
+      <div className="mb-2 flex h-2.5 overflow-hidden rounded-full bg-bg-elevated border border-border shadow-inner mt-2">
+        <div className="bg-zinc-500 transition-all opacity-80" style={{ width: `${pct(free)}%` }} />
+        <div className="bg-indigo-500 transition-all shadow-[0_0_8px_rgba(99,102,241,0.5)] z-10" style={{ width: `${pct(pro)}%` }} />
+        <div className="bg-amber-500 transition-all shadow-[0_0_8px_rgba(245,158,11,0.5)] z-20" style={{ width: `${pct(flagship)}%` }} />
       </div>
-      <div className="flex items-center gap-4 text-xs text-zinc-500">
+      <div className="flex items-center gap-4 text-[10px] font-bold font-mono uppercase tracking-widest text-zinc-500 flex-wrap">
         <span className="flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-zinc-500" />
-          免费 {free}
+          <span className="h-2 w-2 rounded-full bg-zinc-500 opacity-80" />
+          免费 <span className="text-zinc-300">{free}</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
-          专业 {pro}
+          <span className="h-2 w-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
+          专业 <span className="text-zinc-300">{pro}</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-          旗舰 {flagship}
+          <span className="h-2 w-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+          旗舰 <span className="text-zinc-300">{flagship}</span>
         </span>
       </div>
     </div>
@@ -262,17 +262,17 @@ function LLMCostCompact({ cost }: { cost: LLMCostSummary }) {
     o3: "o3",
   };
   const modelColors: Record<string, string> = {
-    "deepseek-r1": "bg-[var(--color-bull)]",
+    "deepseek-r1": "bg-emerald-500",
     "deepseek-v3.2-thinking": "bg-[#00D4AA]",
     "claude-sonnet": "bg-[#F59E0B]",
-    "grok-fast": "bg-[var(--color-accent)]",
+    "grok-fast": "bg-indigo-500",
     "grok-code-fast": "bg-[#3B82F6]",
     "qwen3-max": "bg-[#A855F7]",
     "qwen3-next-thinking": "bg-[#C084FC]",
     "claude-haiku": "bg-[#D97706]",
-    deepseek: "bg-[var(--color-bull)]",
-    "deepseek-reasoner": "bg-[var(--color-bull)]",
-    grok: "bg-[var(--color-accent)]",
+    deepseek: "bg-emerald-500",
+    "deepseek-reasoner": "bg-emerald-500",
+    grok: "bg-indigo-500",
     claude: "bg-[#F59E0B]",
     qwen: "bg-[#A855F7]",
     gpt4o: "bg-[#74AA9C]",
@@ -282,26 +282,26 @@ function LLMCostCompact({ cost }: { cost: LLMCostSummary }) {
   const total = cost.total_cost_usd || 1;
 
   return (
-    <div className="glass-card p-4">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-zinc-400">今日 AI 成本</span>
-        <span className="text-xs text-zinc-500">{cost.date}</span>
+    <div className="bg-bg-surface border border-border rounded-xl shadow-inner p-5 space-y-4">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">今日 AI 成本</span>
+        <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{cost.date}</span>
       </div>
-      <div className="grid grid-cols-3 gap-3 mb-3">
+      <div className="grid grid-cols-3 gap-3 pt-1">
         <div>
-          <p className="text-xs text-zinc-500">总成本</p>
-          <p className="stat-value text-base text-zinc-200">${cost.total_cost_usd.toFixed(4)}</p>
+          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">总成本</p>
+          <p className="text-base sm:text-lg font-black font-mono text-zinc-200 tracking-tight">${cost.total_cost_usd.toFixed(4)}</p>
         </div>
         <div>
-          <p className="text-xs text-zinc-500">Tokens</p>
-          <p className="stat-value text-base text-zinc-200">{cost.total_tokens.toLocaleString()}</p>
+          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Tokens</p>
+          <p className="text-base sm:text-lg font-black font-mono text-zinc-200 tracking-tight">{cost.total_tokens.toLocaleString()}</p>
         </div>
         <div>
-          <p className="text-xs text-zinc-500">调用</p>
-          <p className="stat-value text-base text-zinc-200">{cost.total_calls}</p>
+          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">调用</p>
+          <p className="text-base sm:text-lg font-black font-mono text-zinc-200 tracking-tight">{cost.total_calls}</p>
         </div>
       </div>
-      <div className="flex h-1.5 overflow-hidden rounded-full bg-white/[0.06] mb-2">
+      <div className="flex h-2.5 overflow-hidden rounded-full bg-bg-elevated border border-border mt-4 mb-3">
         {Object.entries(cost.by_model).map(([key, val]) => (
           <div
             key={key}
@@ -310,11 +310,11 @@ function LLMCostCompact({ cost }: { cost: LLMCostSummary }) {
           />
         ))}
       </div>
-      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-500">
+      <div className="flex flex-wrap gap-x-4 gap-y-2 text-[10px] font-bold font-mono uppercase tracking-widest text-zinc-500">
         {Object.entries(cost.by_model).map(([key, val]) => (
-          <span key={key} className="flex items-center gap-1">
-            <span className={`h-1.5 w-1.5 rounded-full ${modelColors[key] ?? "bg-zinc-500"}`} />
-            {modelLabels[key] ?? key} ${val.toFixed(4)}
+          <span key={key} className="flex items-center gap-1.5">
+            <span className={`h-2 w-2 rounded-full ${modelColors[key] ?? "bg-zinc-500"} shadow-sm`} />
+            {modelLabels[key] ?? key} <span className="text-zinc-300">${val.toFixed(4)}</span>
           </span>
         ))}
       </div>
@@ -328,43 +328,45 @@ function CrawlerStatsCard({ stats }: { stats: CrawlerStats }) {
   const bots = stats.bots.slice(0, 5); // 只看前5个
   
   return (
-    <div className="glass-card p-4">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-zinc-400">AI 引擎收录检测 (2026 GEO)</span>
-        <span className="text-xs text-zinc-500">累计 {stats.total_hits} 次</span>
+    <div className="bg-bg-surface border border-border rounded-xl shadow-inner p-5 space-y-4">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">AI 引擎收录检测</span>
+        <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest">累计 {stats.total_hits} 次</span>
       </div>
       
       {bots.length === 0 ? (
-        <div className="py-8 flex flex-col items-center justify-center gap-2 text-zinc-600">
-          <Wifi size={20} className="animate-pulse" />
-          <p className="text-xs">等待 AI 引擎首访同步...</p>
+        <div className="py-8 flex flex-col items-center justify-center gap-3 text-zinc-600 bg-bg-primary/50 rounded-xl border border-dashed border-border/50">
+          <Wifi size={24} className="animate-pulse opacity-50" />
+          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">等待 AI 引擎首访同步...</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4 pt-1">
           {bots.map((bot) => (
             <div key={bot.name}>
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-zinc-300 font-medium">{bot.name}</span>
-                <span className="text-zinc-500">{bot.count} hits</span>
+              <div className="flex items-center justify-between text-xs mb-1.5">
+                <span className="text-zinc-300 font-bold">{bot.name}</span>
+                <span className="text-zinc-500 font-mono font-bold tracking-widest uppercase text-[10px]">{bot.count} hits</span>
               </div>
-              <div className="flex h-1 overflow-hidden rounded-full bg-white/[0.04]">
+              <div className="flex h-1.5 overflow-hidden rounded-full bg-bg-elevated border border-border shadow-inner mb-2.5">
                 <div 
-                  className="bg-indigo-500 transition-all" 
+                  className="bg-indigo-500 transition-all shadow-[0_0_8px_rgba(99,102,241,0.5)]" 
                   style={{ width: `${Math.min(100, (bot.count / stats.total_hits) * 100)}%` }} 
                 />
               </div>
-              <div className="flex items-center gap-2 mt-1 px-0.5">
-                {Object.entries(bot.locales).map(([lang, count]) => (
-                  <span key={lang} className="text-[9px] text-zinc-500 bg-white/[0.04] px-1 rounded">
-                    {lang}: {count}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {Object.entries(bot.locales).map(([lang, count]) => (
+                    <span key={lang} className="text-[9px] font-bold font-mono text-zinc-500 bg-bg-elevated border border-border px-1.5 py-0.5 rounded-md uppercase tracking-widest">
+                      {lang}: {count}
+                    </span>
+                  ))}
+                </div>
+                {bot.last_seen && (
+                  <span className="text-[9px] font-bold font-mono text-zinc-600 uppercase tracking-widest">
+                    Last: {new Date(bot.last_seen).toLocaleTimeString()}
                   </span>
-                ))}
+                )}
               </div>
-              {bot.last_seen && (
-                <p className="text-[9px] text-zinc-600 mt-1 pl-0.5">
-                  Last: {new Date(bot.last_seen).toLocaleTimeString()}
-                </p>
-              )}
             </div>
           ))}
         </div>
@@ -386,27 +388,27 @@ const QUICK_ACTIONS: { label: string; href: string; icon: LucideIcon; desc: stri
 
 function QuickActions() {
   return (
-    <div className="glass-card">
-      <div className="px-5 py-4 border-b border-white/[0.06]">
-        <span className="text-sm font-medium text-zinc-200">快捷操作</span>
+    <div className="bg-bg-surface border border-border rounded-xl shadow-inner overflow-hidden">
+      <div className="px-5 py-4 border-b border-border bg-bg-primary/30">
+        <span className="text-sm font-bold text-zinc-300 tracking-wide">快捷操作</span>
       </div>
-      <div className="grid grid-cols-2 gap-0 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-px bg-border sm:grid-cols-3">
         {QUICK_ACTIONS.map((act) => {
           const Icon = act.icon;
           return (
             <Link
               key={act.href}
               href={act.href}
-              className="flex items-center gap-3 border-b border-r border-white/[0.04] px-4 py-3.5 hover:bg-white/[0.02] transition-colors group"
+              className="flex items-center gap-3 bg-bg-surface px-4 py-4 hover:bg-bg-elevated transition-colors group"
             >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-zinc-500 group-hover:text-zinc-300 transition-colors">
-                <Icon size={14} />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-bg-primary border border-border shadow-inner text-zinc-400 group-hover:text-indigo-400 group-hover:border-indigo-500/30 transition-colors">
+                <Icon size={16} />
               </div>
               <div>
-                <p className="text-xs text-zinc-300 group-hover:text-zinc-100 transition-colors">
+                <p className="text-sm font-bold text-zinc-300 group-hover:text-white transition-colors">
                   {act.label}
                 </p>
-                <p className="text-xs text-zinc-500">{act.desc}</p>
+                <p className="text-[10px] font-bold font-mono text-zinc-500 mt-0.5 uppercase tracking-widest">{act.desc}</p>
               </div>
             </Link>
           );
@@ -476,13 +478,13 @@ export default function AdminDashboardPage() {
     n.toLocaleString("en-US", { style: "currency", currency: "USD" });
 
   return (
-    <div className="min-h-screen bg-grid">
-      <div className="mx-auto max-w-[1400px] px-6 py-6 space-y-5">
+    <div className="min-h-screen">
+      <div className="mx-auto max-w-[1400px] px-6 py-6 space-y-6">
         {/* ── Header ── */}
         <div className="flex items-end justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-zinc-100">运营概览</h1>
-            <p className="text-[10px] mt-1 font-mono text-zinc-600 uppercase tracking-wider">
+            <h1 className="text-2xl font-black tracking-tight text-white font-mono">运营概览 / DASHBOARD</h1>
+            <p className="text-[10px] mt-2 font-bold font-mono text-zinc-500 uppercase tracking-widest">
               ADMIN CONTROL PANEL • {new Date().toLocaleDateString("zh-CN")}
             </p>
           </div>
@@ -493,7 +495,7 @@ export default function AdminDashboardPage() {
         <SystemHealthGrid services={healthData} />
 
         {/* ── KPI row (6 columns) ── */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 xl:grid-cols-7">
           <KpiCard
             label="总用户"
             value={stats.total_users}
@@ -518,7 +520,7 @@ export default function AdminDashboardPage() {
             label="待处理支付"
             value={stats.pending_payments}
             icon={Clock}
-            color={stats.pending_payments > 0 ? "bg-red-500/10 text-red-400" : "bg-white/[0.04] text-zinc-500"}
+            color={stats.pending_payments > 0 ? "bg-red-500/10 text-red-400 border-red-500/30" : "bg-bg-elevated border-border text-zinc-500"}
           />
           <KpiCard
             label="策略 24h"
@@ -549,29 +551,29 @@ export default function AdminDashboardPage() {
           {crawlerStats ? (
             <CrawlerStatsCard stats={crawlerStats} />
           ) : (
-            <div className="glass-card p-4">
-              <span className="text-xs text-zinc-500">爬虫数据加载中…</span>
+            <div className="bg-bg-surface border border-border rounded-xl shadow-inner p-5 flex items-center justify-center">
+              <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest animate-pulse">爬虫数据加载中…</span>
             </div>
           )}
           {llmCost ? (
             <LLMCostCompact cost={llmCost} />
           ) : (
-            <div className="glass-card p-4">
-              <span className="text-xs text-zinc-500">AI 成本数据加载中…</span>
+            <div className="bg-bg-surface border border-border rounded-xl shadow-inner p-5 flex items-center justify-center">
+              <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest animate-pulse">AI 成本数据加载中…</span>
             </div>
           )}
-          <div className="glass-card p-4">
-            <span className="text-xs text-zinc-400 mb-3 block">系统活跃度</span>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="bg-bg-surface border border-border rounded-xl shadow-inner p-5 space-y-4">
+            <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest block">系统活跃度</span>
+            <div className="grid grid-cols-2 gap-4 pt-1">
               <div>
-                <p className="text-xs text-zinc-500">智能体报告</p>
-                <p className="stat-value text-base text-zinc-200">{stats.total_agent_reports}</p>
-                <p className="text-xs text-zinc-500">24h +{stats.agent_reports_24h}</p>
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">智能体报告</p>
+                <p className="text-2xl font-black font-mono text-zinc-200 tracking-tight">{stats.total_agent_reports}</p>
+                <p className="text-[10px] font-bold font-mono text-indigo-400 uppercase tracking-widest mt-2 bg-indigo-500/10 inline-block px-1.5 py-0.5 rounded">24h +{stats.agent_reports_24h}</p>
               </div>
               <div>
-                <p className="text-xs text-zinc-500">预警规则</p>
-                <p className="stat-value text-base text-zinc-200">{stats.total_alert_rules}</p>
-                <p className="text-xs text-zinc-500">活跃 {stats.active_alert_rules}</p>
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">预警规则</p>
+                <p className="text-2xl font-black font-mono text-zinc-200 tracking-tight">{stats.total_alert_rules}</p>
+                <p className="text-[10px] font-bold font-mono text-emerald-400 uppercase tracking-widest mt-2 bg-emerald-500/10 inline-block px-1.5 py-0.5 rounded">活跃 {stats.active_alert_rules}</p>
               </div>
             </div>
           </div>
