@@ -92,70 +92,85 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <div className="space-y-2">
-            <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.15em] ml-1">{t("fields.email")}</label>
-            <input
-              name="email"
-              type="email"
-              required
-              className="w-full h-12 bg-white/[0.02] border border-white/[0.06] focus:border-indigo-500/50 focus:bg-indigo-500/[0.02] hover:border-white/[0.1] rounded-xl px-4 outline-none transition-all font-mono text-sm text-white placeholder:text-zinc-600 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)]"
-              placeholder={t("placeholders.email")}
-            />
+          <div className="space-y-1 group">
+            <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-indigo-400 transition-colors">{t("fields.email")}</label>
+            <div className="relative">
+              <input
+                name="email"
+                type="email"
+                required
+                className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-700/50"
+                placeholder="user@system.com"
+              />
+              <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-indigo-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.15em] ml-1">{t("fields.referralCodeOptional")}</label>
-            <input
-              name="referralCode"
-              type="text"
-              className="w-full h-12 bg-white/[0.02] border border-white/[0.06] focus:border-indigo-500/50 focus:bg-indigo-500/[0.02] hover:border-white/[0.1] rounded-xl px-4 outline-none transition-all font-mono text-sm text-white placeholder:text-zinc-600 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)] uppercase tracking-[0.2em]"
-              placeholder=""
-            />
+          <div className="space-y-1 group">
+            <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-indigo-400 transition-colors">{t("fields.referralCodeOptional")}</label>
+            <div className="relative">
+              <input
+                name="referralCode"
+                type="text"
+                className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-700/50 uppercase tracking-[0.2em]"
+                placeholder=""
+              />
+              <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-indigo-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.15em] ml-1">{t("fields.password")}</label>
-              <input
-                name="password"
-                type="password"
-                required
-                minLength={8}
-                className="w-full h-12 bg-white/[0.02] border border-white/[0.06] focus:border-indigo-500/50 focus:bg-indigo-500/[0.02] hover:border-white/[0.1] rounded-xl px-4 outline-none transition-all font-mono text-sm text-white placeholder:text-zinc-600 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)] tracking-[0.2em]"
-                placeholder="••••••••"
-              />
+            <div className="space-y-1 group">
+              <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-indigo-400 transition-colors">{t("fields.password")}</label>
+              <div className="relative">
+                <input
+                  name="password"
+                  type="password"
+                  required
+                  minLength={8}
+                  className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-700/50 tracking-[0.2em]"
+                  placeholder="••••••••"
+                />
+                <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-indigo-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.15em] ml-1">{t("page.confirm")}</label>
-              <input
-                name="confirmPassword"
-                type="password"
-                required
-                minLength={8}
-                className="w-full h-12 bg-white/[0.02] border border-white/[0.06] focus:border-indigo-500/50 focus:bg-indigo-500/[0.02] hover:border-white/[0.1] rounded-xl px-4 outline-none transition-all font-mono text-sm text-white placeholder:text-zinc-600 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)] tracking-[0.2em]"
-                placeholder="••••••••"
-              />
+            <div className="space-y-1 group">
+              <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-indigo-400 transition-colors">{t("page.confirm")}</label>
+              <div className="relative">
+                <input
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  minLength={8}
+                  className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-700/50 tracking-[0.2em]"
+                  placeholder="••••••••"
+                />
+                <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-indigo-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
+              </div>
             </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-12 bg-indigo-500 border border-indigo-400/50 text-white rounded-xl font-black text-sm uppercase tracking-widest hover:bg-indigo-400 hover:shadow-[0_0_25px_rgba(99,102,241,0.4)] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3 mt-8 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+            className="w-full relative group h-12 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-none font-mono text-[11px] uppercase tracking-[0.3em] overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-10"
           >
-            {loading ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : (
-              <>
-                {t("buttons.sendCode")} <ArrowRight size={18} />
-              </>
-            )}
+            <div className="absolute inset-0 bg-indigo-500/20 w-0 group-hover:w-full transition-all duration-500 ease-out z-0" />
+            <span className="relative z-10 flex items-center justify-center gap-3">
+              {loading ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <>
+                  GENERATE_ACCESS_KEY_ <span className="animate-pulse">_</span>
+                </>
+              )}
+            </span>
           </button>
 
-          <div className="text-center mt-6 pt-6 border-t border-white/[0.06]">
-            <span className="text-sm font-medium text-zinc-500">{t("page.haveAccount")}</span>
-            <Link href={`/${locale}/login`} className="ml-2 text-sm font-bold text-white hover:text-indigo-400 hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.5)] transition-all">
-              {t("tabs.login")}
+          <div className="text-center mt-6 pt-6 border-t border-white/[0.04]">
+            <span className="text-[10px] font-mono text-zinc-600 tracking-widest uppercase">{t("page.haveAccount")}</span>
+            <Link href={`/${locale}/login`} className="ml-3 text-[10px] font-mono font-bold tracking-[0.2em] text-white hover:text-indigo-400 transition-colors uppercase">
+              AUTHENTICATE
             </Link>
           </div>
         </form>
@@ -176,47 +191,53 @@ export default function RegisterPage() {
           <p className="text-sm text-zinc-400 leading-relaxed">
             {t("placeholders.verificationCode")}
           </p>
-          <div className="space-y-2">
-            <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.15em] ml-1">{t("fields.verificationCode")}</label>
-            <input
-              name="code"
-              type="text"
-              inputMode="numeric"
-              maxLength={6}
-              required
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              className="w-full h-14 bg-white/[0.02] border border-white/[0.06] focus:border-indigo-500/50 focus:bg-indigo-500/[0.02] hover:border-white/[0.1] rounded-xl px-4 outline-none transition-all font-mono text-xl text-white placeholder:text-zinc-700/50 text-center tracking-[0.5em] focus:shadow-[0_0_15px_rgba(99,102,241,0.1)]"
-              placeholder="000000"
-            />
+          <div className="space-y-1 group mt-8">
+            <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-emerald-400 transition-colors">{t("fields.verificationCode")}</label>
+            <div className="relative">
+              <input
+                name="code"
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                required
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                className="w-full h-14 bg-transparent border-b border-white/[0.1] focus:border-emerald-500 px-1 outline-none transition-all font-mono text-2xl text-emerald-400 placeholder:text-zinc-700/50 tracking-[0.5em] text-center"
+                placeholder="000000"
+              />
+              <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-emerald-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-12 bg-emerald-500 border border-emerald-400/50 text-white rounded-xl font-black text-sm uppercase tracking-widest hover:bg-emerald-400 hover:shadow-[0_0_25px_rgba(52,211,153,0.4)] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3 mt-8 shadow-[0_0_15px_rgba(52,211,153,0.2)]"
+            className="w-full relative group h-12 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-none font-mono text-[11px] uppercase tracking-[0.3em] overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-10"
           >
-            {loading ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : (
-              <>
-                {t("page.submitApplication")} <ArrowRight size={18} />
-              </>
-            )}
+            <div className="absolute inset-0 bg-emerald-500/20 w-0 group-hover:w-full transition-all duration-500 ease-out z-0" />
+            <span className="relative z-10 flex items-center justify-center gap-3">
+              {loading ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <>
+                  CONFIRM_ACCESS_ <span className="animate-pulse">_</span>
+                </>
+              )}
+            </span>
           </button>
 
           <button
             type="button"
             onClick={() => { setStep(1); setError(""); setCode(""); setCodeSentHint(false); }}
-            className="w-full text-sm font-bold text-zinc-500 hover:text-white transition-colors"
+            className="w-full text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition-colors"
           >
-            {t("layout.back")} · {t("placeholders.email")}
+            {t("layout.back")} · {email || t("placeholders.email")}
           </button>
 
-          <div className="text-center mt-6 pt-6 border-t border-white/[0.06]">
-            <span className="text-sm font-medium text-zinc-500">{t("page.haveAccount")}</span>
-            <Link href={`/${locale}/login`} className="ml-2 text-sm font-bold text-white hover:text-indigo-400 hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.5)] transition-all">
-              {t("tabs.login")}
+          <div className="text-center mt-6 pt-6 border-t border-white/[0.04]">
+            <span className="text-[10px] font-mono text-zinc-600 tracking-widest uppercase">{t("page.haveAccount")}</span>
+            <Link href={`/${locale}/login`} className="ml-3 text-[10px] font-mono font-bold tracking-[0.2em] text-white hover:text-indigo-400 transition-colors uppercase">
+              AUTHENTICATE
             </Link>
           </div>
         </form>

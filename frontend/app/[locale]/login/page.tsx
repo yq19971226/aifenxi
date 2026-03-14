@@ -60,51 +60,60 @@ export default function LoginPage() {
           </div>
         )}
 
-        <div className="space-y-2">
-          <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.15em] ml-1">{t("fields.email")}</label>
-          <input
-            name="email"
-            type="email"
-            required
-            className="w-full h-12 bg-white/[0.02] border border-white/[0.06] focus:border-indigo-500/50 focus:bg-indigo-500/[0.02] hover:border-white/[0.1] rounded-xl px-4 outline-none transition-all font-mono text-sm text-white placeholder:text-zinc-600 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)]"
-            placeholder={t("placeholders.email")}
-          />
+        <div className="space-y-1 group">
+          <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-indigo-400 transition-colors">{t("fields.email")}</label>
+          <div className="relative">
+            <input
+              name="email"
+              type="email"
+              required
+              className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-700/50"
+              placeholder="user@system.com"
+            />
+            <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-indigo-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
+          </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1 group">
           <div className="flex justify-between items-center ml-1">
-            <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.15em]">{t("fields.password")}</label>
-            <Link href={`/${locale}/forgot-password`} className="text-[11px] font-bold text-indigo-400/80 hover:text-indigo-400 transition-colors uppercase tracking-widest">
+            <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] group-focus-within:text-indigo-400 transition-colors">{t("fields.password")}</label>
+            <Link href={`/${locale}/forgot-password`} className="text-[9px] font-mono text-zinc-600 hover:text-indigo-400 transition-colors uppercase tracking-[0.2em]">
               {t("page.forgotLink")}
             </Link>
           </div>
-          <input
-            name="password"
-            type="password"
-            required
-            className="w-full h-12 bg-white/[0.02] border border-white/[0.06] focus:border-indigo-500/50 focus:bg-indigo-500/[0.02] hover:border-white/[0.1] rounded-xl px-4 outline-none transition-all font-mono text-sm text-white placeholder:text-zinc-600 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)] tracking-[0.2em]"
-            placeholder="••••••••"
-          />
+          <div className="relative">
+            <input
+              name="password"
+              type="password"
+              required
+              className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-700/50 tracking-[0.2em]"
+              placeholder="••••••••"
+            />
+            <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-indigo-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
+          </div>
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full h-12 bg-indigo-500 border border-indigo-400/50 text-white rounded-xl font-black text-sm uppercase tracking-widest hover:bg-indigo-400 hover:shadow-[0_0_25px_rgba(99,102,241,0.4)] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3 mt-8 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+          className="w-full relative group h-12 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-none font-mono text-[11px] uppercase tracking-[0.3em] overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-10"
         >
-          {loading ? (
-            <Loader2 size={18} className="animate-spin" />
-          ) : (
-            <>
-              {t("page.submitButton")} <ArrowRight size={18} />
-            </>
-          )}
+          <div className="absolute inset-0 bg-indigo-500/20 w-0 group-hover:w-full transition-all duration-500 ease-out z-0" />
+          <span className="relative z-10 flex items-center justify-center gap-3">
+            {loading ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <>
+                AUTHENTICATE_ <span className="animate-pulse">_</span>
+              </>
+            )}
+          </span>
         </button>
 
-        <div className="text-center mt-6 pt-6 border-t border-white/[0.06]">
-          <span className="text-sm font-medium text-zinc-500">{t("page.noAccount")}</span>
-          <Link href={`/${locale}/register`} className="ml-2 text-sm font-bold text-white hover:text-indigo-400 hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.5)] transition-all">
-            {t("page.applyForAccess")}
+        <div className="text-center mt-6 pt-6 border-t border-white/[0.04]">
+          <span className="text-[10px] font-mono text-zinc-600 tracking-widest uppercase">{t("page.noAccount")}</span>
+          <Link href={`/${locale}/register`} className="ml-3 text-[10px] font-mono font-bold tracking-[0.2em] text-white hover:text-indigo-400 transition-colors uppercase">
+            INITIATE_ACCESS
           </Link>
         </div>
       </form>
