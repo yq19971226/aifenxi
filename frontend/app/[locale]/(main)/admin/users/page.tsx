@@ -30,9 +30,9 @@ const LEVEL_LABEL: Record<number, string> = {
 };
 
 const LEVEL_STYLE: Record<number, string> = {
-  0: "bg-zinc-500/15 text-zinc-400",
-  1: "bg-[var(--color-accent)]/15 text-accent",
-  2: "bg-[#F5A623]/15 text-[#F5A623]",
+  0: "bg-bg-elevated text-zinc-400 border-border",
+  1: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+  2: "bg-amber-500/10 text-amber-500 border-amber-500/20",
 };
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -117,53 +117,53 @@ function CreateUserDialog({
       onClick={onClose}
     >
       <motion.div
-        className="card-surface rounded-xl p-6 w-full max-w-md mx-4"
+        className="card-surface p-6 w-full max-w-md mx-4 shadow-xl border border-border rounded-xl"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-semibold text-zinc-100">{t("users.createUserTitle")}</h2>
+        <div className="flex items-center justify-between mb-5 border-b border-border/50 pb-4">
+          <h2 className="text-[14px] font-bold font-mono tracking-widest uppercase text-zinc-100">{t("users.createUserTitle")}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06] transition-colors"
+            className="p-1 rounded-md text-zinc-500 hover:text-white hover:bg-bg-elevated transition-colors"
           >
             <X size={16} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-zinc-400">{t("users.email")}</label>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-bold font-mono tracking-widest uppercase text-zinc-500">{t("users.email")}</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="user@example.com"
-              className="h-9 rounded-lg bg-white/[0.06] border border-white/[0.1] px-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-accent transition-colors"
+              className="input font-mono bg-bg-surface/50"
               autoFocus
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-zinc-400">密码（至少 8 位）</label>
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-bold font-mono tracking-widest uppercase text-zinc-500">密码（至少 8 位）</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="h-9 rounded-lg bg-white/[0.06] border border-white/[0.1] px-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-accent transition-colors"
+              className="input font-mono tracking-widest bg-bg-surface/50"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-zinc-400">角色</label>
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold font-mono tracking-widest uppercase text-zinc-500">角色</label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="h-9 rounded-lg bg-white/[0.06] border border-white/[0.1] px-3 text-sm text-white outline-none focus:border-accent transition-colors"
+                className="input font-medium bg-bg-surface/50"
               >
                 <option value="user">用户</option>
                 <option value="operator">运营</option>
@@ -171,12 +171,12 @@ function CreateUserDialog({
               </select>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-zinc-400">会员等级</label>
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold font-mono tracking-widest uppercase text-zinc-500">会员等级</label>
               <select
                 value={level}
                 onChange={(e) => setLevel(Number(e.target.value))}
-                className="h-9 rounded-lg bg-white/[0.06] border border-white/[0.1] px-3 text-sm text-white outline-none focus:border-accent transition-colors"
+                className="input font-medium bg-bg-surface/50"
               >
                 <option value={0}>免费</option>
                 <option value={1}>专业</option>
@@ -186,33 +186,35 @@ function CreateUserDialog({
           </div>
 
           {level > 0 && (
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-zinc-400">到期时间</label>
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold font-mono tracking-widest uppercase text-zinc-500">到期时间</label>
               <input
                 type="datetime-local"
                 value={expiresAt}
                 onChange={(e) => setExpiresAt(e.target.value)}
-                className="h-9 rounded-lg bg-white/[0.06] border border-white/[0.1] px-3 text-sm text-white outline-none focus:border-accent transition-colors"
+                className="input font-mono text-xs bg-bg-surface/50"
               />
             </div>
           )}
 
           {formError && (
-            <p className="text-xs text-bear">{formError}</p>
+            <div className="rounded-lg bg-bear/10 border border-bear/20 p-3 text-[11px] font-mono font-bold text-bear">
+              {formError}
+            </div>
           )}
 
-          <div className="flex items-center justify-end gap-2 pt-2">
+          <div className="flex items-center justify-end gap-3 pt-5 border-t border-border/50 mt-6">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg px-4 py-2 text-xs font-medium bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] transition-colors"
+              className="btn-secondary !py-2 !px-5 font-bold font-mono tracking-widest uppercase text-[11px]"
             >
               取消
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-lg px-4 py-2 text-xs font-medium bg-white text-zinc-900 hover:bg-zinc-200 transition-colors disabled:opacity-50"
+              className="btn-primary !py-2 !px-5 font-bold font-mono tracking-widest uppercase text-[11px]"
             >
               {submitting ? "创建中..." : "创建用户"}
             </button>
@@ -331,23 +333,26 @@ export default function AdminUsersPage() {
   const totalPages = data ? Math.ceil(data.total / data.page_size) : 0;
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="card-surface m-6 rounded-xl border border-border flex flex-col min-h-[calc(100vh-80px)]">
       {/* Title */}
       <motion.div
-        className="flex items-center justify-between"
+        className="flex items-center justify-between p-6 border-b border-border/50"
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <h1 className="text-lg font-semibold text-zinc-200">用户管理</h1>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-xl font-bold text-zinc-100">用户管理</h1>
+          <p className="text-[11px] font-bold font-mono tracking-widest text-zinc-500 uppercase">管理系统内所有用户账号、权限以及订阅层级</p>
+        </div>
         {isAdmin && (
           <button
             type="button"
             onClick={() => setShowCreateDialog(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors"
+            className="btn-primary !py-2 !px-4 flex items-center justify-center gap-2 text-[11px]"
           >
-            <Plus size={16} />
-            创建用户
+            <Plus size={14} />
+            <span className="font-bold font-mono tracking-widest uppercase">创建用户</span>
           </button>
         )}
       </motion.div>
@@ -365,79 +370,80 @@ export default function AdminUsersPage() {
       )}
 
       {/* ── Filters ──────────────────────────────────────── */}
-      <motion.form
-        onSubmit={handleSearch}
-        className="card-surface rounded-lg p-5 flex flex-wrap items-end gap-4"
+      <motion.div
+        className="p-6 border-b border-border/50 bg-bg-surface/30"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.05 }}
       >
-        <div className="flex flex-col gap-1.5 min-w-[200px] flex-1">
-          <label htmlFor="user-search" className="text-xs text-zinc-400">
-            搜索邮箱
-          </label>
-          <input
-            id="user-search"
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="输入邮箱关键"
-            className="h-9 rounded-lg bg-white/[0.06] border border-white/[0.1] px-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-accent transition-colors"
-          />
-        </div>
+        <form onSubmit={handleSearch} className="flex flex-wrap items-end gap-5">
+           <div className="flex flex-col gap-2 min-w-[220px] flex-1">
+            <label htmlFor="user-search" className="text-[10px] font-bold font-mono uppercase tracking-widest text-zinc-500">
+              搜索邮箱
+            </label>
+            <input
+              id="user-search"
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="输入邮箱关键字"
+              className="input font-mono !py-2"
+            />
+          </div>
 
-        <div className="flex flex-col gap-1.5 min-w-[120px]">
-          <label htmlFor="role-filter" className="text-xs text-zinc-400">
-            角色
-          </label>
-          <select
-            id="role-filter"
-            value={roleFilter}
-            onChange={(e) => {
-              setRoleFilter(e.target.value);
-              setPage(1);
-            }}
-            className="h-9 rounded-lg bg-white/[0.06] border border-white/[0.1] px-3 text-sm text-white outline-none focus:border-accent transition-colors"
+          <div className="flex flex-col gap-2 min-w-[140px]">
+            <label htmlFor="role-filter" className="text-[10px] font-bold font-mono uppercase tracking-widest text-zinc-500">
+              过滤角色
+            </label>
+            <select
+              id="role-filter"
+              value={roleFilter}
+              onChange={(e) => {
+                setRoleFilter(e.target.value);
+                setPage(1);
+              }}
+              className="input font-medium cursor-pointer !py-2"
+            >
+              <option value="">全部数据</option>
+              <option value="admin">管理员组</option>
+              <option value="operator">运营团队</option>
+              <option value="user">常规用户</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-2 min-w-[140px]">
+            <label htmlFor="level-filter" className="text-[10px] font-bold font-mono uppercase tracking-widest text-zinc-500">
+              会员等级
+            </label>
+            <select
+              id="level-filter"
+              value={levelFilter}
+              onChange={(e) => {
+                setLevelFilter(e.target.value);
+                setPage(1);
+              }}
+              className="input font-medium cursor-pointer !py-2"
+            >
+              <option value="">全部类别</option>
+              <option value="0">免费账户</option>
+              <option value="1">专业方案</option>
+              <option value="2">旗舰方案</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            className="btn-primary shrink-0 font-bold font-mono tracking-widest uppercase text-[11px] !py-3 !px-6"
           >
-            <option value="">全部</option>
-            <option value="admin">管理员</option>
-            <option value="operator">运营</option>
-            <option value="user">用户</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col gap-1.5 min-w-[120px]">
-          <label htmlFor="level-filter" className="text-xs text-zinc-400">
-            会员等级
-          </label>
-          <select
-            id="level-filter"
-            value={levelFilter}
-            onChange={(e) => {
-              setLevelFilter(e.target.value);
-              setPage(1);
-            }}
-            className="h-9 rounded-lg bg-white/[0.06] border border-white/[0.1] px-3 text-sm text-white outline-none focus:border-accent transition-colors"
-          >
-            <option value="">全部</option>
-            <option value="0">免费</option>
-            <option value="1">专业</option>
-            <option value="2">旗舰</option>
-          </select>
-        </div>
-
-        <button
-          type="submit"
-          className="h-9 px-5 rounded-lg bg-white text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors shrink-0"
-        >
-          搜索
-        </button>
-      </motion.form>
+            筛选
+          </button>
+        </form>
+      </motion.div>
 
       {/* ── Loading ──────────────────────────────────────── */}
       {loading && (
-        <div className="flex justify-center py-12">
-          <span className="h-6 w-6 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+        <div className="flex justify-center p-12 flex-1 items-center">
+          <span className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
         </div>
       )}
 
@@ -445,12 +451,12 @@ export default function AdminUsersPage() {
       <AnimatePresence>
         {error && !loading && (
           <motion.div
-            className="backdrop-blur-md bg-white/[0.04] border border-[var(--color-bear)]/30 rounded-lg p-6 text-center"
+            className="m-6 rounded-xl bg-bear/10 border border-bear/20 p-4 text-xs font-bold font-mono text-bear flex-1 text-center flex items-center justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <p className="text-sm text-bear">{error}</p>
+            <p>{error}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -458,45 +464,47 @@ export default function AdminUsersPage() {
       {/* ── User Table ───────────────────────────────────── */}
       {!loading && data && (
         <motion.div
-          className="card-surface rounded-lg overflow-hidden"
+          className="flex-1 flex flex-col"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.1 }}
         >
           {data.items.length === 0 ? (
-            <EmptyUsers />
+            <div className="flex-1 flex items-center justify-center min-h-[300px]">
+               <EmptyUsers />
+            </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+             <div className="overflow-x-auto flex-1">
+              <table className="w-full text-sm whitespace-nowrap">
                 <thead>
-                  <tr className="border-b border-white/[0.08] text-left text-xs text-zinc-500">
-                    <th className="px-5 py-3 font-medium">邮箱</th>
-                    <th className="px-5 py-3 font-medium">角色</th>
-                    <th className="px-5 py-3 font-medium">会员等级</th>
-                    <th className="px-5 py-3 font-medium">到期时间</th>
-                    <th className="px-5 py-3 font-medium">状态</th>
-                    <th className="px-5 py-3 font-medium">注册时间</th>
-                    {isAdmin && <th className="px-5 py-3 font-medium text-right">操作</th>}
+                  <tr className="border-b border-border bg-bg-surface/50 text-left text-[10px] font-bold font-mono uppercase tracking-widest text-zinc-500">
+                    <th className="px-6 py-4">邮箱账号</th>
+                    <th className="px-6 py-4">体系角色</th>
+                    <th className="px-6 py-4">会员层级</th>
+                    <th className="px-6 py-4">到期时间</th>
+                    <th className="px-6 py-4">活跃状态</th>
+                    <th className="px-6 py-4">注册时间</th>
+                    {isAdmin && <th className="px-6 py-4 text-right">操作</th>}
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-border/50">
                   {data.items.map((u) => (
                     <tr
                       key={u.id}
-                      className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors"
+                      className="transition-colors hover:bg-bg-elevated/30 group"
                     >
-                      <td className="px-5 py-3 text-white">{u.email}</td>
-                      <td className="px-5 py-3 text-zinc-300">
+                      <td className="px-6 py-4 text-zinc-200 font-bold font-mono text-[13px]">{u.email}</td>
+                      <td className="px-6 py-4 text-zinc-500 font-mono text-xs font-bold uppercase tracking-widest">
                         {ROLE_LABEL[u.role] || u.role}
                       </td>
-                      <td className="px-5 py-3">
+                      <td className="px-6 py-4">
                         {editingId === u.id ? (
                           <select
                             value={editLevel}
                             onChange={(e) =>
                               setEditLevel(Number(e.target.value))
                             }
-                            className="h-7 rounded bg-white/[0.06] border border-white/[0.1] px-2 text-xs text-white outline-none"
+                            className="input !h-8 !py-1 !text-xs min-w-[100px]"
                           >
                             <option value={0}>免费</option>
                             <option value={1}>专业</option>
@@ -504,84 +512,84 @@ export default function AdminUsersPage() {
                           </select>
                         ) : (
                           <span
-                            className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${LEVEL_STYLE[u.membership_level] || LEVEL_STYLE[0]}`}
+                            className={`inline-flex items-center justify-center rounded border px-2 py-0.5 text-[10px] font-bold font-mono uppercase tracking-widest ${LEVEL_STYLE[u.membership_level] || LEVEL_STYLE[0]}`}
                           >
                             {LEVEL_LABEL[u.membership_level] || "免费"}
                           </span>
                         )}
                       </td>
-                      <td className="px-5 py-3 text-zinc-400">
+                      <td className="px-6 py-4 text-zinc-400 font-mono text-[11px] font-bold tracking-widest">
                         {editingId === u.id ? (
                           <input
                             type="datetime-local"
                             value={editExpires}
                             onChange={(e) => setEditExpires(e.target.value)}
-                            className="h-7 rounded bg-white/[0.06] border border-white/[0.1] px-2 text-xs text-white outline-none"
+                            className="input !h-8 !py-1 !text-[11px]"
                           />
                         ) : u.expires_at ? (
                           formatDate(u.expires_at)
                         ) : (
-                          <span className="text-zinc-500"></span>
+                          <span className="text-zinc-600 font-sans">—</span>
                         )}
                       </td>
-                      <td className="px-5 py-3">
+                      <td className="px-6 py-4">
                         {u.is_active ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-bull)]/15 px-2.5 py-0.5 text-xs font-medium text-bull">
-                            <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-bull)]" />
-                            启用
+                          <span className="inline-flex items-center gap-1.5 rounded bg-bull/10 border border-bull/20 px-2.5 py-1 text-[10px] font-bold font-mono uppercase tracking-widest text-bull">
+                            <span className="h-1.5 w-1.5 rounded-full bg-bull shadow-[0_0_5px_rgba(52,211,153,0.8)]" />
+                            启用中
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-bear)]/15 px-2.5 py-0.5 text-xs font-medium text-bear">
-                            <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-bear)]" />
-                            停用
+                          <span className="inline-flex items-center gap-1.5 rounded bg-bear/10 border border-bear/20 px-2.5 py-1 text-[10px] font-bold font-mono uppercase tracking-widest text-bear">
+                            <span className="h-1.5 w-1.5 rounded-full bg-bear shadow-[0_0_5px_rgba(244,63,94,0.8)]" />
+                            已停用
                           </span>
                         )}
                       </td>
-                      <td className="px-5 py-3 text-zinc-400">
+                      <td className="px-6 py-4 text-zinc-500 font-mono text-[11px] tracking-widest font-bold">
                         {formatDate(u.created_at)}
                       </td>
                       {isAdmin && (
-                        <td className="px-5 py-3 text-right">
-                          <div className="flex items-center justify-end gap-2">
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             {editingId === u.id ? (
                               <>
                                 <button
-                                  onClick={() => handleSaveMembership(u.id)}
-                                  disabled={saving}
-                                  className="rounded-lg px-3 py-1 text-xs font-medium bg-[var(--color-accent)]/15 text-accent hover:bg-[var(--color-accent)]/25 transition-colors disabled:opacity-50"
-                                >
-                                  {saving ? "保存中" : "保存"}
-                                </button>
-                                <button
                                   onClick={cancelEdit}
-                                  className="rounded-lg px-3 py-1 text-xs font-medium bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] transition-colors"
+                                  className="btn-secondary !py-1 !px-3 font-mono font-bold tracking-widest uppercase text-[10px]"
                                 >
                                   取消
+                                </button>
+                                <button
+                                  onClick={() => handleSaveMembership(u.id)}
+                                  disabled={saving}
+                                  className="btn-primary !py-1 !px-3 font-mono font-bold tracking-widest uppercase text-[10px]"
+                                >
+                                  {saving ? "..." : "保存"}
                                 </button>
                               </>
                             ) : (
                               <>
                                 <button
                                   onClick={() => startEdit(u)}
-                                  className="rounded-lg px-3 py-1 text-xs font-medium bg-[var(--color-accent)]/15 text-accent hover:bg-[var(--color-accent)]/25 transition-colors"
+                                  className="btn-secondary !py-1 !px-3 text-indigo-400 font-mono font-bold tracking-widest uppercase text-[10px]"
                                 >
-                                  调整等级
+                                  配置层级
                                 </button>
                                 {u.role !== "admin" && (
                                   <button
                                     onClick={() => handleToggle(u)}
                                     disabled={togglingId === u.id}
-                                    className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
+                                    className={`btn-secondary !py-1 !px-3 font-mono font-bold tracking-widest uppercase text-[10px] ${
                                       u.is_active
-                                        ? "bg-[var(--color-bear)]/15 text-bear hover:bg-[var(--color-bear)]/25"
-                                        : "bg-[var(--color-bull)]/15 text-bull hover:bg-[var(--color-bull)]/25"
+                                        ? "text-bear"
+                                        : "text-bull"
                                     }`}
                                   >
                                     {togglingId === u.id
-                                      ? "处理中"
+                                      ? "..."
                                       : u.is_active
-                                        ? "停用"
-                                        : "启用"}
+                                        ? "冻结"
+                                        : "解封"}
                                   </button>
                                 )}
                               </>
@@ -598,22 +606,22 @@ export default function AdminUsersPage() {
 
           {/* ── Pagination ─────────────────────────────────── */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-white/[0.08] px-5 py-3">
-              <span className="text-xs text-zinc-500">
-                共 {data.total} 条，第 {data.page}/{totalPages} 页
+            <div className="flex items-center justify-between border-t border-border/50 bg-bg-surface/50 px-6 py-4 mt-auto">
+              <span className="text-[11px] font-bold font-mono tracking-widest text-zinc-500 uppercase">
+                共 <span className="text-zinc-200">{data.total}</span> 条 <span className="text-zinc-700 mx-1">/</span> 第 <span className="text-zinc-200">{data.page}</span> 页 <span className="text-zinc-700 mx-1">/</span> 共 {totalPages} 页
               </span>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="rounded-lg px-3 py-1 text-xs font-medium bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] transition-colors disabled:opacity-30"
+                  className="btn-secondary !py-1.5 !px-4 text-[11px] font-bold font-mono tracking-widest uppercase"
                 >
                   上一页
                 </button>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
-                  className="rounded-lg px-3 py-1 text-xs font-medium bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] transition-colors disabled:opacity-30"
+                  className="btn-secondary !py-1.5 !px-4 text-[11px] font-bold font-mono tracking-widest uppercase"
                 >
                   下一页
                 </button>
