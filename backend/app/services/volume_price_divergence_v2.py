@@ -585,8 +585,8 @@ async def _load_dynamic_weights() -> dict[str, float]:
                 _weight_cache = weights
                 _weight_cache_ts = now
                 return weights
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("dynamic_weights_load_failed, using defaults: %s", exc)
     _weight_cache = dict(DEFAULT_WEIGHTS)
     _weight_cache_ts = now
     return dict(DEFAULT_WEIGHTS)

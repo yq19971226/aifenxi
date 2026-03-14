@@ -78,8 +78,11 @@ async def run_bot_once() -> dict:
                     continue
 
                 strategy_data = report.strategy
-                # 跳过 fallback 策略
-                if strategy_data.get("is_fallback") or strategy_data.get("direction") == "neutral":
+                # 跳过 fallback / neutral 策略（兼容 dict 和 model 两种类型）
+                _get = (lambda obj, key, default=None:
+                        obj.get(key, default) if isinstance(obj, dict)
+                        else getattr(obj, key, default))
+                if _get(strategy_data, "is_fallback") or _get(strategy_data, "direction") == "neutral":
                     stats["skipped"] += 1
                     await asyncio.sleep(_INTER_ANALYSIS_DELAY)
                     continue
