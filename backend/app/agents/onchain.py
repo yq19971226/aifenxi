@@ -245,6 +245,7 @@ class OnchainAgent(BaseAgent):
                 model_key=_model_key,
                 system_prompt=enriched_prompt,
                 user_prompt=user_prompt,
+                timeout_s=90.0,  # 推理模型需要更长时间处理链上数据
             )
 
             # 诊断日志：LLM 原始返回
