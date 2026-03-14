@@ -7,6 +7,7 @@ import {
   type DataSourceStatusSnapshot,
   type ExchangeStatusItem,
 } from "@/lib/api/datasources";
+import { cn } from "@/lib/utils";
 
 const POLL_INTERVAL = 30_000;
 
@@ -59,47 +60,49 @@ export function DataSourceBanner() {
 
   return (
     <div
-      className={`flex items-start gap-3 rounded-lg border px-4 py-3 text-sm ${
+      className={`flex items-start gap-3.5 rounded-xl border p-4 text-sm shadow-sm transition-colors ${
         isDanger
-          ? "border-red-500/20 bg-red-500/[0.06] text-red-300"
-          : "border-amber-500/20 bg-amber-500/[0.06] text-amber-300"
+          ? "border-red-500/30 bg-red-500/10 text-red-300"
+          : "border-amber-500/30 bg-amber-500/10 text-amber-300"
       }`}
     >
       <div className="mt-0.5 shrink-0">
         {isDanger ? (
-          <XCircle size={15} className="text-red-400" />
+          <XCircle size={18} className="text-red-400" />
         ) : (
-          <AlertTriangle size={15} className="text-amber-400" />
+          <AlertTriangle size={18} className="text-amber-400" />
         )}
       </div>
 
       <div className="flex-1 min-w-0">
-        <div className="font-medium">
+        <div className="font-bold tracking-wide">
           {isDanger ? "\u6570\u636E\u4E25\u91CD\u4E0D\u8DB3" : "\u90E8\u5206\u6570\u636E\u6E90\u79BB\u7EBF"}
         </div>
-        <div className="mt-1 text-xs opacity-80">
-          {"\u4FE1\u53F7\u5B8C\u6574\u5EA6\uFF1A"}
-          <span className={`stat-value ${isDanger ? "text-red-400" : "text-amber-400"}`}>
+        <div className="mt-1.5 text-xs text-zinc-300/90 leading-relaxed font-medium">
+          <span className="opacity-80">{"\u4FE1\u53F7\u5B8C\u6574\u5EA6\uFF1A"}</span>
+          <span className={`font-mono font-bold ml-1 ${isDanger ? "text-red-400" : "text-amber-400"}`}>
             {scorePercent}%
           </span>
           {missingDomains.length > 0 && (
             <>
-              {" \u00B7 \u7F3A\u5931\u4E3B\u57DF\uFF1A"}
-              <span className="font-medium">{missingDomains.map((d) => DOMAIN_LABEL[d] || d).join(" / ")}</span>
+              <span className="opacity-50 mx-1.5">{"\u00B7"}</span>
+              <span className="opacity-80">{"\u7F3A\u5931\u4E3B\u57DF\uFF1A"}</span>
+              <span className="font-bold text-white">{missingDomains.map((d) => DOMAIN_LABEL[d] || d).join(" / ")}</span>
             </>
           )}
           {offlineExchanges.length > 0 && (
             <>
-              {" \u00B7 \u79BB\u7EBF\u4EA4\u6613\u6240\uFF1A"}
+              <span className="opacity-50 mx-1.5">{"\u00B7"}</span>
+              <span className="opacity-80">{"\u79BB\u7EBF\u4EA4\u6613\u6240\uFF1A"}</span>
               {offlineExchanges.map((e, i) => (
                 <span key={e.source_id}>
                   {i > 0 && "\u3001"}
-                  <span className="font-medium">{e.name}</span>
+                  <span className="font-bold text-white">{e.name}</span>
                   {e.status === "error" && (
-                    <span className="ml-1 text-sm opacity-60">{"\uFF08\u8FDE\u63A5\u9519\u8BEF\uFF09"}</span>
+                    <span className="text-[10px] font-mono opacity-70 ml-1">{"\uFF08\u8FDE\u63A5\u9519\u8BEF\uFF09"}</span>
                   )}
                   {e.status === "stale" && (
-                    <span className="ml-1 text-sm opacity-60">{"\uFF08\u6570\u636E\u9648\u65E7\uFF09"}</span>
+                    <span className="text-[10px] font-mono opacity-70 ml-1">{"\uFF08\u6570\u636E\u9648\u65E7\uFF09"}</span>
                   )}
                 </span>
               ))}
@@ -107,7 +110,7 @@ export function DataSourceBanner() {
           )}
         </div>
         {isDanger && (
-          <div className="mt-1 text-sm opacity-70">
+          <div className="mt-2 text-xs font-medium text-red-300/80 bg-red-500/10 p-2 rounded-lg border border-red-500/20">
             {"\u6570\u636E\u4E25\u91CD\u4E0D\u8DB3\u65F6\uFF0C\u5206\u6790\u7ED3\u679C\u53EF\u9760\u6027\u663E\u8457\u964D\u4F4E\uFF0C\u8BF7\u8C28\u614E\u53C2\u8003\u3002"}
           </div>
         )}
@@ -116,10 +119,13 @@ export function DataSourceBanner() {
       <button
         onClick={fetchStatus}
         disabled={loading}
-        className="shrink-0 text-zinc-500 hover:text-zinc-300 transition-colors"
+        className={cn(
+          "shrink-0 p-2 rounded-lg transition-colors border",
+          isDanger ? "text-red-400 hover:bg-red-500/20 border-transparent hover:border-red-500/30" : "text-amber-400 hover:bg-amber-500/20 border-transparent hover:border-amber-500/30"
+        )}
         title={"\u5237\u65B0\u72B6\u6001"}
       >
-        <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+        <RefreshCw size={16} className={cn(loading && "animate-spin")} />
       </button>
     </div>
   );
