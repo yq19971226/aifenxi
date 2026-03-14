@@ -229,21 +229,11 @@ class OnchainAgent(BaseAgent):
                 oc.hodler_net_change, oc.reserve_risk,
             ] if f is not None)
             logger.info(
-                "OnchainAgent data check",
-                extra={
-                    "symbol": data.symbol,
-                    "onchain_available": True,
-                    "key_metrics": available,
-                    "mvrv": oc.mvrv,
-                    "exchange_netflow": oc.exchange_netflow,
-                    "sopr": oc.sopr,
-                },
+                f"OnchainAgent data check: symbol={data.symbol} onchain=YES "
+                f"metrics={available}/9 mvrv={oc.mvrv} netflow={oc.exchange_netflow} sopr={oc.sopr}"
             )
         else:
-            logger.warning(
-                "OnchainAgent data check — NO ONCHAIN DATA",
-                extra={"symbol": data.symbol, "onchain_available": False},
-            )
+            logger.warning(f"OnchainAgent data check: symbol={data.symbol} onchain=NO — 链上数据为空!")
 
         try:
             locale = getattr(data, "locale", "zh-CN")
@@ -259,16 +249,10 @@ class OnchainAgent(BaseAgent):
 
             # 诊断日志：LLM 原始返回
             logger.info(
-                "OnchainAgent LLM result",
-                extra={
-                    "symbol": data.symbol,
-                    "model_key": _model_key,
-                    "is_fallback": result.get("is_fallback", False),
-                    "raw_phase": result.get("phase"),
-                    "raw_confidence": result.get("confidence"),
-                    "raw_confidence_type": type(result.get("confidence")).__name__,
-                    "has_evidence": bool(result.get("evidence")),
-                },
+                f"OnchainAgent LLM result: symbol={data.symbol} model={_model_key} "
+                f"fallback={result.get('is_fallback', False)} phase={result.get('phase')} "
+                f"confidence={result.get('confidence')} conf_type={type(result.get('confidence')).__name__} "
+                f"evidence={bool(result.get('evidence'))}"
             )
 
             # 解析 phase
