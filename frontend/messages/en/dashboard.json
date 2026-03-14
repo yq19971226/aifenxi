@@ -2,6 +2,8 @@
   "title": "Signal Overview",
   "subtitle": "AI real-time monitoring of all enabled symbols",
   "autoRefresh": "Auto-refresh 30s",
+  "heroMarketDirection": "Market Direction",
+  "signalsGenerated": "Signals Generated",
   "heroLong": "Long",
   "heroShort": "Short",
   "heroNeutral": "Neutral",

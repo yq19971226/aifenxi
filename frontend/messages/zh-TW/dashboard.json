@@ -2,6 +2,8 @@
   "title": "訊號總覽",
   "subtitle": "AI 即時監控所有啟用幣種的分析訊號",
   "autoRefresh": "30s 自動更新",
+  "heroMarketDirection": "市場方向",
+  "signalsGenerated": "訊號趨向線",
   "heroLong": "看多",
   "heroShort": "看空",
   "heroNeutral": "觀望",

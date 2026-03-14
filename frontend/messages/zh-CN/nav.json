@@ -11,7 +11,8 @@
     "playbook": "剧本",
     "leaderboard": "排行榜",
     "autopilots": "自动驾驶仪",
-    "growth": "活动"
+    "growth": "活动",
+    "logout": "退出登录"
   },
   "settings": {
     "profile": "个人资料",

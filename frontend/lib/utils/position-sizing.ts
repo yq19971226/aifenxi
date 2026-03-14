@@ -107,10 +107,10 @@ export function fromStrategy(s: StrategyData): PositionInput {
 
 export function fromDefenseStrategy(d: DefenseStrategy): PositionInput {
   return {
-    entryPrice: d.entry.price,
-    stopLoss: d.stop_loss.price,
-    targets: d.take_profit.map((tp) => tp.price),
-    direction: d.entry.price < d.stop_loss.price ? "short" : "long",
+    entryPrice: d.entry?.price ?? 0,
+    stopLoss: d.stop_loss?.price ?? 0,
+    targets: (d.take_profit ?? []).map((tp) => tp?.price ?? 0).filter(p => p > 0),
+    direction: (d.entry?.price ?? 0) < (d.stop_loss?.price ?? 0) ? "short" : "long",
   };
 }
 

@@ -2,6 +2,8 @@
   "title": "信号总览",
   "subtitle": "AI 实时监控所有启用币种的分析信号",
   "autoRefresh": "30s 自动刷新",
+  "heroMarketDirection": "市场方向",
+  "signalsGenerated": "信号趋向线",
   "heroLong": "看多",
   "heroShort": "看空",
   "heroNeutral": "观望",

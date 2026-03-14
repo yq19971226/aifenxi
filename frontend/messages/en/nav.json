@@ -11,7 +11,8 @@
     "playbook": "Playbook",
     "leaderboard": "Leaderboard",
     "autopilots": "Autopilot",
-    "growth": "Activities"
+    "growth": "Activities",
+    "logout": "Log Out"
   },
   "settings": {
     "profile": "Profile",

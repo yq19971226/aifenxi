@@ -11,7 +11,8 @@
     "playbook": "劇本",
     "leaderboard": "排行榜",
     "autopilots": "自動駕駛儀",
-    "growth": "活動"
+    "growth": "活動",
+    "logout": "登出"
   },
   "settings": {
     "profile": "個人資料",

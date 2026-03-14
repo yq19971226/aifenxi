@@ -61,36 +61,6 @@
     "failed": "推演失败",
     "retry": "重新推演"
   },
-  "storyline": {
-    "title": "推演过程",
-    "phases": {
-      "setup": "布局阶段",
-      "accumulation": "吸筹阶段", 
-      "distribution": "派发阶段",
-      "manipulation": "操纵阶段",
-      "breakout": "突破阶段"
-    },
-    "statusActive": "跟踪中",
-    "statusRisk": "需关注",
-    "statusCompleted": "验证完成",
-    "statusFailed": "已失效",
-    "statusExpired": "已过期",
-    "statusUntracked": "未跟踪",
-    "estDuration": "预计时长",
-    "stageFeatures": "阶段特征",
-    "keyIndicators": "关键指标",
-    "nextStageProb": "下阶段概率",
-    "failurePrefix": "失效",
-    "marketStructure": "市场结构",
-    "keyDomains": "关键数据域",
-    "applicableRegimes": "适用环境",
-    "stageVerification": "阶段验证 {verified}/{total}",
-    "stageVerificationComplete": "阶段验证 {verified}/{total} 全部通过",
-    "riskDeviation": "走势偏离预期",
-    "predictionFailed": "预测失效",
-    "expiredMessage": "72小时内未观察到进一步阶段推进",
-    "verificationProgress": "验证进度 {verified}/{total}"
-  },
   "plaza": {
     "title": "市场广场",
     "subtitle": "实时市场情绪与资金流向",
@@ -165,21 +135,8 @@
     "targetLogic": "目标逻辑",
     "riskWarning": "风险警告"
   },
-  "matchCard": {
-    "featureMatch": "特征匹配",
-    "dataDomain": "数据域",
-    "environment": "环境",
-    "marketStructure": "市场结构",
-    "structureMatched": "当前快照已命中",
-    "structureNotMatched": "当前快照未直接命中",
-    "keyDomains": "关键数据域",
-    "applicableRegimes": "适用环境",
-    "stageRoadmap": "阶段路线图",
-    "aftermath": "后续走势",
-    "confidenceBoosters": "增强置信度信号",
-    "invalidationSignals": "失效条件"
-  },
   "storyline": {
+    "title": "推演过程",
     "active": "跟踪中",
     "risk": "需关注",
     "completed": "验证完成",
