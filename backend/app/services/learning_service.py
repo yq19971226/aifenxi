@@ -284,7 +284,7 @@ class LearningService:
                 result = await self._session.execute(
                     _ACCURACY_SQL,
                     {
-                        "lookback_days": f"{lookback_days} days",
+                        "lookback_days": lookback_days,
                         "agent_id": model_key,
                         "threshold": PRICE_THRESHOLD,
                     },

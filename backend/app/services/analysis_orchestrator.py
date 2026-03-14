@@ -68,14 +68,14 @@ logger = logging.getLogger(__name__)
 # 常量
 # ---------------------------------------------------------------------------
 
-_AGENT_TIMEOUT = 60.0  # 单智能体超时（秒）
+_AGENT_TIMEOUT = 90.0  # 单智能体超时（秒）— 推理模型普遍需要更长时间
 _DATA_COLLECT_TIMEOUT = 30.0  # 数据采集超时（秒）
 
 # agent_id → (AgentClass, section_title, safe_call_kwargs)
 # 被 exec_plan.resolved_agents 消费，不允许在 _run_trend 内部手工硬编码 agent 列表
 _TREND_AGENT_REGISTRY: dict[str, tuple[type, str, dict]] = {
     "technical":          (TechnicalAgent,   "技术分析",       {}),
-    "onchain":            (OnchainAgent,     "链上深度解读",   {}),
+    "onchain":            (OnchainAgent,     "链上深度解读",   {"timeout": 100.0}),
     "risk":               (RiskAgent,        "风险评估",       {}),
     "orderbook":          (OrderBookAgent,   "订单簿微观结构", {}),
     "sentiment":          (SentimentAgent,   "舆情分析",       {}),
@@ -87,7 +87,7 @@ _TREND_AGENT_REGISTRY: dict[str, tuple[type, str, dict]] = {
 
 _INTRADAY_AGENT_REGISTRY: dict[str, tuple[type, str, dict]] = {
     "technical":    (TechnicalAgent,   "技术分析", {}),
-    "onchain":      (OnchainAgent,     "链上数据", {}),
+    "onchain":      (OnchainAgent,     "链上数据", {"timeout": 100.0}),
     "risk":         (RiskAgent,        "风险评估", {}),
     "orderbook":    (OrderBookAgent,   "订单流",   {}),
     "news_analyst": (NewsAnalystAgent, "新闻分析", {}),
