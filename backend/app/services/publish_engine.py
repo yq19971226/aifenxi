@@ -23,8 +23,9 @@ logger = logging.getLogger(__name__)
 
 # dedup window: (value, unit) for now_minus_interval_literal
 DEDUP_WINDOWS: dict[str, tuple[int, str]] = {
-    "intraday": (24, "hours"),
-    "trend": (7, "days"),
+    "scalping": (4, "hours"),
+    "intraday": (12, "hours"),
+    "trend": (3, "days"),
 }
 
 
@@ -66,7 +67,7 @@ class PublishRuleEngine:
     def _passes_basic_rules(
         analysis_mode: str, direction: str, is_fallback: bool
     ) -> bool:
-        if analysis_mode not in ("intraday", "trend"):
+        if analysis_mode not in ("scalping", "intraday", "trend"):
             return False
         if is_fallback:
             return False

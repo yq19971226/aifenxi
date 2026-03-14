@@ -13,6 +13,7 @@
   },
   "modes": {
     "all": "All",
+    "scalping": "Scalping",
     "intraday": "Intraday",
     "trend": "Trend"
   },
@@ -108,7 +109,12 @@
     "winLoss": "W/L",
     "avgPnl": "Avg PnL",
     "profitFactor": "Profit Factor",
-    "minSettledHint": "At least 3 settled strategies required to rank (current: {count})"
+    "minSettledHint": "At least {min} settled strategies required to rank (current: {count})"
+  },
+  "accuracy": {
+    "title": "System Performance",
+    "winRate": "Win Rate",
+    "overall": "Overall"
   },
   "strategyHistory": {
     "noRecords": "No published strategy records",
@@ -139,10 +145,10 @@
   "rules": {
     "title": "Leaderboard Rules",
     "rule1": "Ranking metric is Profit Factor (total profit ÷ total loss), higher is better",
-    "rule2": "Only Intraday and Trend mode strategies are ranked; Scalping mode is excluded",
+    "rule2": "Scalping, Intraday, and Trend mode strategies all participate in rankings",
     "rule3": "Fallback strategies (auto-generated when data is insufficient) and neutral direction strategies are excluded",
-    "rule4": "De-duplication per user per symbol: only the first entry within 24h (Intraday) / 7d (Trend) is kept",
-    "rule5": "At least 3 settled strategies are required to be ranked",
+    "rule4": "De-duplication: Scalping 4h / Intraday 12h / Trend 3d window per user per symbol",
+    "rule5": "Min to rank: Scalping 5 / Intraday 2 / Trend 1 settled strategies",
     "rule6": "Anonymous IDs are hashed from user IDs and cannot be reverse-engineered"
   }
 }

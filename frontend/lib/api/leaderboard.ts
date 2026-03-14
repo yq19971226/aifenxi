@@ -27,6 +27,19 @@ export interface SystemReport {
   profit_factor: number;
 }
 
+export interface ModeAccuracy {
+  mode: string;
+  settled: number;
+  wins: number;
+  losses: number;
+  win_rate: number;
+  avg_pnl: number;
+}
+
+export interface SystemAccuracyResponse {
+  modes: ModeAccuracy[];
+}
+
 export interface MyStats {
   anonymous_id: string;
   total_published: number;
@@ -57,6 +70,16 @@ export async function fetchSystemReport(
     `${API_BASE}/api/leaderboard/report?${params}`,
   );
   return handleApiResponse(res, "系统报告加载失败");
+}
+
+export async function fetchSystemAccuracy(
+  period: string = "7d",
+): Promise<SystemAccuracyResponse> {
+  const params = new URLSearchParams({ period });
+  const res = await authFetch(
+    `${API_BASE}/api/leaderboard/system-accuracy?${params}`,
+  );
+  return handleApiResponse(res, "系统命中率加载失败");
 }
 
 export async function fetchMyStats(

@@ -110,9 +110,10 @@ class PerformanceTracker:
                 snapshot_id, snapshot, current_price, SettlementStatus.HIT_TARGET
             )
 
-        # 按 analysis_mode 动态超时：intraday=24h, trend=72h, 默认72h
+        # 按 analysis_mode 动态超时
+        _SETTLE_TIMEOUT = {"scalping": 6, "intraday": 24, "trend": 72}
         mode = snapshot.get("analysis_mode") or ""
-        timeout_hours = 24 if mode == "intraday" else 72
+        timeout_hours = _SETTLE_TIMEOUT.get(mode, 72)
         if elapsed_hours >= timeout_hours:
             return await self._settle(
                 snapshot_id, snapshot, current_price, SettlementStatus.TIMEOUT

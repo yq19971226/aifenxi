@@ -4,12 +4,14 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
-import { Trophy, BarChart2, History, AlertCircle } from "lucide-react";
+import { Trophy, BarChart2, History, AlertCircle, TrendingUp, Zap, Clock, Target } from "lucide-react";
 import {
   fetchRankings,
   fetchSystemReport,
   fetchMyStats,
   fetchMyHistory,
+  fetchSystemAccuracy,
+  type ModeAccuracy,
 } from "@/lib/api/leaderboard";
 import {
   TabButton,
@@ -25,9 +27,83 @@ import { MaintenancePlaceholder } from "@/components/layout/MaintenancePlacehold
 const PAGE_SIZE = 20;
 
 const PERIOD_KEYS = ["7d", "30d", "90d"] as const;
-const MODE_KEYS = ["all", "intraday", "trend"] as const;
+const MODE_KEYS = ["all", "scalping", "intraday", "trend"] as const;
 type LeaderboardPeriod = (typeof PERIOD_KEYS)[number];
 type LeaderboardMode = (typeof MODE_KEYS)[number];
+
+const MODE_ICON: Record<string, React.ReactNode> = {
+  scalping: <Zap size={18} className="text-amber-400" />,
+  intraday: <Clock size={18} className="text-blue-400" />,
+  trend: <TrendingUp size={18} className="text-emerald-400" />,
+};
+const MODE_COLOR: Record<string, string> = {
+  scalping: "text-amber-400",
+  intraday: "text-blue-400",
+  trend: "text-emerald-400",
+};
+
+/* ── System Accuracy Hero Panel ── */
+function SystemAccuracyHero({
+  modes,
+  period,
+}: {
+  modes: ModeAccuracy[];
+  period: string;
+}) {
+  const t = useTranslations("leaderboard");
+  if (!modes || modes.length === 0) return null;
+
+  const totalSettled = modes.reduce((s, m) => s + m.settled, 0);
+  const totalWins = modes.reduce((s, m) => s + m.wins, 0);
+  const overallWr = totalSettled > 0 ? totalWins / totalSettled : 0;
+
+  return (
+    <div className="card overflow-hidden">
+      <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Target size={14} className="text-indigo-400" />
+          <span className="text-sm font-semibold text-white">{t("accuracy.title")}</span>
+        </div>
+        <span className="text-[10px] text-zinc-500 uppercase tracking-widest">
+          {t(`periods.${period}`)}
+        </span>
+      </div>
+      <div className="p-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+          {modes.map((m) => (
+            <div
+              key={m.mode}
+              className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 flex flex-col items-center text-center"
+            >
+              <div className="mb-2">{MODE_ICON[m.mode] || <Target size={18} className="text-zinc-400" />}</div>
+              <span className="text-xs text-zinc-500 mb-1">{t(`modes.${m.mode}`)}</span>
+              <span className={`text-2xl font-bold font-mono ${MODE_COLOR[m.mode] || "text-white"}`}>
+                {(m.win_rate * 100).toFixed(1)}%
+              </span>
+              <span className="text-[10px] text-zinc-500 mt-1">{t("accuracy.winRate")}</span>
+              <div className="mt-2 flex items-center gap-2 text-[10px] text-zinc-400">
+                <span>{m.wins}/{m.losses}</span>
+                <span className="text-zinc-600">·</span>
+                <span className={m.avg_pnl >= 0 ? "text-emerald-400" : "text-red-400"}>
+                  {m.avg_pnl >= 0 ? "+" : ""}{m.avg_pnl.toFixed(2)}%
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center justify-center gap-4 text-xs text-zinc-500 pt-3 border-t border-white/[0.04]">
+          <span>
+            {t("accuracy.overall")}: <span className="font-mono text-white">{(overallWr * 100).toFixed(1)}%</span>
+          </span>
+          <span className="text-zinc-600">·</span>
+          <span>
+            {t("comp.settled")}: <span className="font-mono text-white">{totalSettled}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function LeaderboardPage() {
   const t = useTranslations('leaderboard');
@@ -51,6 +127,13 @@ export default function LeaderboardPage() {
     queryKey: ["leaderboard-report", period, mode],
     queryFn: () => fetchSystemReport(period, mode),
     retry: 2,
+  });
+
+  const { data: accuracy } = useQuery({
+    queryKey: ["leaderboard-accuracy", period],
+    queryFn: () => fetchSystemAccuracy(period),
+    retry: 2,
+    staleTime: 60_000,
   });
 
   const { data: myStats, isLoading: myStatsLoading, error: myStatsError } = useQuery({
@@ -138,6 +221,11 @@ export default function LeaderboardPage() {
             {apiError instanceof Error ? apiError.message : t('error.loadFailed')}
           </p>
         </div>
+      )}
+
+      {/* ── System Accuracy Hero ── */}
+      {accuracy && accuracy.modes.length > 0 && (
+        <SystemAccuracyHero modes={accuracy.modes} period={period} />
       )}
 
       {reportLoading ? (

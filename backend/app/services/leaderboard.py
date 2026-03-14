@@ -19,7 +19,13 @@ from app.core.sql_compat import count_filter, sum_filter, avg_filter, now_minus_
 logger = logging.getLogger(__name__)
 
 _CACHE_TTL = 300  # 5 分钟
-_MIN_STRATEGIES = 3  # 上榜最低策略数
+_MIN_STRATEGIES = 3  # 默认上榜最低策略数
+_MIN_BY_MODE: dict[str, int] = {
+    "all": 3,
+    "scalping": 5,
+    "intraday": 2,
+    "trend": 1,
+}
 
 
 def anonymous_id(user_id: UUID) -> str:
@@ -76,7 +82,7 @@ class LeaderboardService:
         mode_filter = "AND analysis_mode = :mode" if mode != "all" else ""
         ranked_cte = self._ranked_cte(period_cutoff, mode_filter)
 
-        params: dict = {"min_strategies": _MIN_STRATEGIES}
+        params: dict = {"min_strategies": _MIN_BY_MODE.get(mode, _MIN_STRATEGIES)}
         if mode != "all":
             params["mode"] = mode
 
@@ -119,7 +125,7 @@ class LeaderboardService:
         mode_filter = "AND analysis_mode = :mode" if mode != "all" else ""
         ranked_cte = self._ranked_cte(period_cutoff, mode_filter)
 
-        params: dict = {"min_strategies": _MIN_STRATEGIES, "uid": str(user_id)}
+        params: dict = {"min_strategies": _MIN_BY_MODE.get(mode, _MIN_STRATEGIES), "uid": str(user_id)}
         if mode != "all":
             params["mode"] = mode
 
@@ -237,6 +243,65 @@ class LeaderboardService:
             pass
 
         return report
+
+    # ── 系统命中率（按模式分组）────────────────────────────
+
+    async def get_system_accuracy(self, period: str = "7d") -> dict:
+        """按 analysis_mode 分组的系统命中率（不限 published，展示系统整体能力）。"""
+        cache_key = f"leaderboard:accuracy:{period}"
+        cached = await get_json(cache_key)
+        if cached:
+            return cached
+
+        period_cutoff = self._period_to_cutoff(period)
+        _settled = count_filter("status != 'pending'")
+        _wins = count_filter("pnl_pct > 0")
+        _losses = count_filter("pnl_pct <= 0 AND status != 'pending'")
+        _avg = avg_filter("pnl_pct", "status != 'pending'")
+        sql = f"""
+            SELECT
+                analysis_mode,
+                {_settled} AS settled,
+                {_wins} AS wins,
+                {_losses} AS losses,
+                ROUND(
+                    COALESCE(
+                        CAST({_wins} AS FLOAT)
+                        / NULLIF({_settled}, 0),
+                        0
+                    ), 4
+                ) AS win_rate,
+                ROUND({_avg}, 4) AS avg_pnl
+            FROM strategy_snapshots
+            WHERE created_at > {period_cutoff}
+              AND analysis_mode IS NOT NULL
+            GROUP BY analysis_mode
+            ORDER BY analysis_mode
+        """
+        try:
+            result = await self._session.execute(text(sql))
+            rows = result.mappings().all()
+        except Exception as exc:
+            logger.error("系统命中率查询失败: %s", exc)
+            return {"modes": []}
+
+        modes = []
+        for row in rows:
+            modes.append({
+                "mode": row["analysis_mode"],
+                "settled": int(row["settled"]),
+                "wins": int(row["wins"]),
+                "losses": int(row["losses"]),
+                "win_rate": round(float(row["win_rate"] or 0), 4),
+                "avg_pnl": round(float(row["avg_pnl"] or 0), 4),
+            })
+
+        data = {"modes": modes}
+        try:
+            await set_with_ttl(cache_key, data, _CACHE_TTL)
+        except Exception:
+            pass
+        return data
 
     # ── 个人战绩 ──────────────────────────────────────────
 
