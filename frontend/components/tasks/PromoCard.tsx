@@ -256,7 +256,7 @@ export default function PromoCard({ data }: PromoCardProps) {
                 textTransform: "uppercase"
               }}
             >
-              <span style={{ display: "inline-block", width: 6, h: 6, borderRadius: "50%", background: "#818cf8", boxShadow: "0 0 8px #818cf8" }} />
+              <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "#818cf8", boxShadow: "0 0 8px #818cf8" }} />
               ON-CHAIN VERIFIED
             </span>
           )}
