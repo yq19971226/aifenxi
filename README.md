@@ -16,7 +16,7 @@
 | AI 网关 | DMXAPI（DeepSeek / Claude / Grok / Qwen） |
 | 图表 | TradingView Lightweight Charts |
 | 样式 | Tailwind CSS + shadcn/ui |
-| 支付 | NowPayments（USDT） |
+| 支付 | Oxapay（USDT / BTC / ETH） |
 | 推送 | Telegram Bot + SendGrid + WebSocket |
 | 数据源 | Binance · CoinGlass · CryptoQuant · CoinMarketCal · CryptoPanic · BlockBeats · Alternative.me |
 
@@ -141,8 +141,7 @@ docker compose logs -f worker
 | `BINANCE_API_KEY` | Binance API Key | ❌ | - |
 | `BINANCE_API_SECRET` | Binance API Secret | ❌ | - |
 | `GLASSNODE_API_KEY` | GlassNode API Key | ❌ | - |
-| `NOWPAYMENTS_API_KEY` | NowPayments API Key | ❌ | - |
-| `NOWPAYMENTS_IPN_SECRET` | NowPayments Webhook 签名密钥 | ❌ | - |
+| `OXAPAY_MERCHANT_KEY` | Oxapay Merchant API Key | ❌ | - |
 | `TELEGRAM_BOT_TOKEN` | Telegram Bot Token | ❌ | - |
 | `SENDGRID_API_KEY` | SendGrid 邮件 API Key | ❌ | - |
 | `JWT_SECRET_KEY` | JWT 签名密钥 | ✅ | - |
