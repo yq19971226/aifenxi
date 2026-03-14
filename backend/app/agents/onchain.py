@@ -94,10 +94,30 @@ _SYSTEM_PROMPT = """你是一位专业的加密货币链上数据分析师，擅
 
 def _build_user_prompt(data: MarketData) -> str:
     """从 MarketData 提取链上数据构建用户 prompt。"""
+    is_btc = data.symbol.upper().startswith("BTC")
+    is_eth = data.symbol.upper().startswith("ETH")
+
     parts: list[str] = [
         f"交易对: {data.symbol}",
         f"当前价格: {data.current_price}",
     ]
+
+    # 提示 LLM 不同币种的数据覆盖范围不同
+    if is_btc:
+        parts.append("【数据覆盖】BTC — 全量链上指标可用，包含所有 T3 高级指标")
+    elif is_eth:
+        parts.append(
+            "【数据覆盖】ETH — 可用指标: SOPR, MVRV, NUPL, 交易所净流量/余额, "
+            "活跃地址, 新增地址, NVT Signal, 盈利地址占比, 净已实现盈亏。"
+            "LTH/STH-SOPR, NUPL, 积累评分, HODLer, Reserve Risk, SSR 等仅BTC可用，标注缺失的请忽略。"
+            "请基于可用的ETH指标进行分析并给出合理置信度（不要因指标少就给0%）。"
+        )
+    else:
+        parts.append(
+            f"【数据覆盖】{data.symbol} — 链上数据有限，仅有基础指标（活跃地址、新增地址等）。"
+            "大部分高级T3指标不可用。请基于有限数据进行分析，"
+            "如果数据确实太少无法判断，给出观望但置信度不应为0%（可给0.3-0.5表示数据不足但有初步判断）。"
+        )
 
     oc = data.onchain
     if oc:
@@ -223,14 +243,29 @@ class OnchainAgent(BaseAgent):
         # 诊断日志：检查链上数据是否可用
         if data.onchain:
             oc = data.onchain
-            available = sum(1 for f in [
-                oc.exchange_netflow, oc.mvrv, oc.active_addresses,
-                oc.nupl, oc.sopr, oc.lth_sopr, oc.sth_nupl,
-                oc.hodler_net_change, oc.reserve_risk,
-            ] if f is not None)
+            # BTC 有全量指标; 非 BTC 指标集较小, 分开计数避免误报
+            is_btc = data.symbol.upper().startswith("BTC")
+            if is_btc:
+                check_fields = [
+                    oc.exchange_netflow, oc.mvrv, oc.active_addresses,
+                    oc.nupl, oc.sopr, oc.lth_sopr, oc.sth_nupl,
+                    oc.hodler_net_change, oc.reserve_risk,
+                ]
+                available = sum(1 for f in check_fields if f is not None)
+                total_expected = 9
+            else:
+                # ETH: sopr, exchange_netflow, exchange_balance, mvrv, nupl, active_addresses, new_addresses
+                # SOL/BNB/其他: active_addresses, new_addresses
+                check_fields = [
+                    oc.exchange_netflow, oc.mvrv, oc.active_addresses,
+                    oc.nupl, oc.sopr, oc.exchange_balance,
+                    oc.new_addresses, oc.nvt_signal,
+                ]
+                available = sum(1 for f in check_fields if f is not None)
+                total_expected = len([f for f in check_fields])
             logger.info(
                 f"OnchainAgent data check: symbol={data.symbol} onchain=YES "
-                f"metrics={available}/9 mvrv={oc.mvrv} netflow={oc.exchange_netflow} sopr={oc.sopr}"
+                f"metrics={available}/{total_expected} mvrv={oc.mvrv} netflow={oc.exchange_netflow} sopr={oc.sopr}"
             )
         else:
             logger.warning(f"OnchainAgent data check: symbol={data.symbol} onchain=NO — 链上数据为空!")
