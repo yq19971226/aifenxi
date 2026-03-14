@@ -1,0 +1,48 @@
+{
+  "title": "合約網格策略推薦",
+  "subtitle": "基於 AI 分析自動生成的最優網格參數",
+  "flagshipOnly": "解鎖旗艦版查看完整網格策略",
+  "upgradeBtn": "升級旗艦版",
+  "scenario": {
+    "ranging": "震盪網格",
+    "trending": "趨勢網格"
+  },
+  "direction": {
+    "neutral": "中性（雙向）",
+    "long": "做多",
+    "short": "做空"
+  },
+  "params": {
+    "direction": "方向",
+    "priceRange": "價格範圍",
+    "gridCount": "網格數量",
+    "gridMode": "網格模式",
+    "arithmetic": "等差網格",
+    "geometric": "等比網格",
+    "leverage": "推薦槓桿",
+    "investment": "投資額（保證金）",
+    "leveragedAmount": "槓桿後投資金額",
+    "perGridAmount": "每筆數量",
+    "perGridProfit": "每格利潤",
+    "takeProfit": "止盈價格",
+    "stopLoss": "止損價格",
+    "liquidationLong": "預估強平價（做多）",
+    "liquidationShort": "預估強平價（做空）",
+    "shiftUp": "上移",
+    "shiftDown": "下移",
+    "annualYield": "預估年化",
+    "gridSpacing": "格間距"
+  },
+  "labels": {
+    "enabled": "啟用",
+    "disabled": "關閉",
+    "buy": "買入",
+    "sell": "賣出",
+    "current": "當前價",
+    "tp": "止盈",
+    "sl": "止損",
+    "advanced": "進階參數",
+    "gridLevels": "網格點位"
+  },
+  "disclaimer": "* 以上為 AI 基於分析結果自動生成的網格參數建議，不構成投資建議。實際交易請在幣安等交易所中手動設置，並根據自身風險承受能力調整參數。"
+}

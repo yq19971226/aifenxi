@@ -1,0 +1,48 @@
+{
+  "title": "合约网格策略推荐",
+  "subtitle": "基于 AI 分析自动生成的最优网格参数",
+  "flagshipOnly": "解锁旗舰版查看完整网格策略",
+  "upgradeBtn": "升级旗舰版",
+  "scenario": {
+    "ranging": "震荡网格",
+    "trending": "趋势网格"
+  },
+  "direction": {
+    "neutral": "中性（双向）",
+    "long": "做多",
+    "short": "做空"
+  },
+  "params": {
+    "direction": "方向",
+    "priceRange": "价格范围",
+    "gridCount": "网格数量",
+    "gridMode": "网格模式",
+    "arithmetic": "等差网格",
+    "geometric": "等比网格",
+    "leverage": "推荐杠杆",
+    "investment": "投资额（保证金）",
+    "leveragedAmount": "杠杆后投资金额",
+    "perGridAmount": "每笔数量",
+    "perGridProfit": "每格利润",
+    "takeProfit": "止盈价格",
+    "stopLoss": "止损价格",
+    "liquidationLong": "预估强平价（做多）",
+    "liquidationShort": "预估强平价（做空）",
+    "shiftUp": "上移",
+    "shiftDown": "下移",
+    "annualYield": "预估年化",
+    "gridSpacing": "格间距"
+  },
+  "labels": {
+    "enabled": "启用",
+    "disabled": "关闭",
+    "buy": "买入",
+    "sell": "卖出",
+    "current": "当前价",
+    "tp": "止盈",
+    "sl": "止损",
+    "advanced": "进阶参数",
+    "gridLevels": "网格点位"
+  },
+  "disclaimer": "* 以上为 AI 基于分析结果自动生成的网格参数建议，不构成投资建议。实际交易请在币安等交易所中手动设置，并根据自身风险承受能力调整参数。"
+}

@@ -1,0 +1,48 @@
+{
+  "title": "Contract Grid Strategy",
+  "subtitle": "AI-optimized grid parameters based on analysis",
+  "flagshipOnly": "Unlock Flagship to view full grid strategy",
+  "upgradeBtn": "Upgrade to Flagship",
+  "scenario": {
+    "ranging": "Ranging Grid",
+    "trending": "Trending Grid"
+  },
+  "direction": {
+    "neutral": "Neutral (Bi-directional)",
+    "long": "Long",
+    "short": "Short"
+  },
+  "params": {
+    "direction": "Direction",
+    "priceRange": "Price Range",
+    "gridCount": "Grid Count",
+    "gridMode": "Grid Mode",
+    "arithmetic": "Arithmetic",
+    "geometric": "Geometric",
+    "leverage": "Leverage",
+    "investment": "Investment (Margin)",
+    "leveragedAmount": "Leveraged Amount",
+    "perGridAmount": "Per Grid Amount",
+    "perGridProfit": "Per Grid Profit",
+    "takeProfit": "Take Profit",
+    "stopLoss": "Stop Loss",
+    "liquidationLong": "Est. Liq. (Long)",
+    "liquidationShort": "Est. Liq. (Short)",
+    "shiftUp": "Shift Up",
+    "shiftDown": "Shift Down",
+    "annualYield": "Est. Annual Yield",
+    "gridSpacing": "Grid Spacing"
+  },
+  "labels": {
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "buy": "Buy",
+    "sell": "Sell",
+    "current": "Current",
+    "tp": "TP",
+    "sl": "SL",
+    "advanced": "Advanced",
+    "gridLevels": "Grid Levels"
+  },
+  "disclaimer": "* The above grid parameters are AI-generated recommendations based on analysis results and do not constitute investment advice. Please set up grids manually on exchanges and adjust parameters based on your risk tolerance."
+}

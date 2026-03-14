@@ -20,6 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useConsensusData } from "./UnifiedSections";
 import { PositionCalculator } from "@/components/trade/PositionCalculator";
+import { GridStrategyCard } from "@/components/trade/GridStrategyCard";
 import { fromStrategy } from "@/lib/utils/position-sizing";
 import type { StrategyData } from "@/lib/types/strategy";
 
@@ -252,6 +253,13 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
             confidence={report.confidence ?? 0.5}
             isFallback={strategy.is_fallback ?? false}
           />
+        </div>
+      )}
+
+      {/* ── Grid Strategy Recommendation ── */}
+      {report.mode !== "scalping" && strategy && strategy.direction !== "neutral" && !strategy.is_fallback && (
+        <div className="px-5 pb-5">
+          <GridStrategyCard report={report} />
         </div>
       )}
 
