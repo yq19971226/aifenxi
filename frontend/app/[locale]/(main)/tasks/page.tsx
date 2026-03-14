@@ -48,37 +48,42 @@ export default function TasksPage() {
     return <MaintenancePlaceholder featureName={t('title')} />;
   }
 
-  if (isLoading) return <PageTransition><div className="mx-auto max-w-3xl px-4 py-8 space-y-4">{[1,2,3].map(i => <div key={i} className="h-24 skeleton rounded-lg" />)}</div></PageTransition>;
+  if (isLoading) return <PageTransition><div className="mx-auto max-w-3xl px-4 py-8 space-y-4">{[1,2,3].map(i => <div key={i} className="h-28 bg-bg-surface border border-border rounded-xl animate-pulse" />)}</div></PageTransition>;
 
-  if (isError) return <PageTransition><div className="mx-auto max-w-3xl px-4 py-8"><div className="card p-8 text-center"><Gift size={28} className="mx-auto text-zinc-700 mb-3" /><p className="text-sm text-zinc-400">{t('error.loadFailed')}</p><p className="text-xs text-zinc-500 mt-1">{t('error.networkError')}</p></div></div></PageTransition>;
+  if (isError) return <PageTransition><div className="mx-auto max-w-3xl px-4 py-8"><div className="bg-bg-surface border border-border rounded-xl p-8 text-center shadow-inner"><Gift size={32} className="mx-auto text-zinc-600 mb-4 opacity-50" /><p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">{t('error.loadFailed')}</p><p className="text-[10px] font-mono font-bold text-zinc-500 mt-2 uppercase tracking-widest">{t('error.networkError')}</p></div></div></PageTransition>;
 
   const canSubmit = home?.can_submit ?? false;
   const todaySub = home?.today_submission;
   const templates = home?.templates ?? [];
   const bonus = home?.bonus_credits ?? {};
-  const inputCls = "w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:border-white/[0.16] focus:ring-1 focus:ring-white/[0.06] outline-none transition-all";
+  const inputCls = "w-full rounded-xl border border-border bg-bg-primary/50 px-4 py-3.5 text-sm font-mono text-zinc-200 placeholder:text-zinc-600 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 outline-none transition-all";
 
   return (
     <PageTransition>
       <div className="mx-auto max-w-3xl space-y-6 px-4 md:px-8 py-8">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="flex items-center gap-2.5 text-lg md:text-xl font-semibold text-white"><Gift size={20} className="text-purple-400" />{t('title')}</h1>
-            <p className="mt-1 text-xs md:text-sm text-zinc-500">{t('subtitle')}</p>
+            <h1 className="flex items-center gap-2.5 text-xl font-black text-white font-mono tracking-tight uppercase">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 shadow-inner">
+                <Gift size={16} className="text-indigo-400" />
+              </div>
+              {t('title')}
+            </h1>
+            <p className="mt-2 text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{t('subtitle')}</p>
           </div>
           <div className="flex gap-2">
             {Object.entries(bonus).map(([mode, count]) => (
-              <div key={mode} className="card px-3.5 py-2 text-center min-w-[72px]">
-                <p className="text-lg font-bold font-mono text-white leading-none">{count as number}</p>
-                <p className="text-xs text-zinc-500 uppercase tracking-wider mt-1">{mode}</p>
+              <div key={mode} className="bg-bg-surface border border-amber-500/20 rounded-xl px-4 py-2.5 text-center min-w-[80px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:border-amber-500/40 transition-colors">
+                <p className="text-xl font-black font-mono text-amber-400 tracking-tight leading-none">{count as number}</p>
+                <p className="text-[9px] font-bold font-mono text-amber-500/70 uppercase tracking-widest mt-1.5">{mode}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="flex gap-1 rounded-lg bg-white/[0.03] border border-white/[0.06] p-1 w-fit">
+        <div className="flex gap-1 rounded-xl bg-bg-surface border border-border p-1.5 w-fit shadow-inner">
           {(["today", "history"] as Tab[]).map(tabKey => (
-            <button key={tabKey} onClick={() => setTab(tabKey)} className={`rounded-lg px-6 py-2.5 text-sm font-medium transition-all ${tab === tabKey ? "bg-white/[0.08] text-zinc-100 shadow-sm" : "text-zinc-500 hover:text-zinc-400"}`}>
+            <button key={tabKey} onClick={() => setTab(tabKey)} className={`rounded-lg px-6 py-2.5 text-xs font-bold font-mono uppercase tracking-widest transition-all ${tab === tabKey ? "bg-bg-elevated border border-border text-white shadow-sm" : "text-zinc-500 hover:text-zinc-400 hover:bg-bg-primary/50"}`}>
               {t(`tabs.${tabKey}`)}
             </button>
           ))}
@@ -86,31 +91,35 @@ export default function TasksPage() {
 
         <AnimatePresence mode="wait">
           {tab === "today" && (
-            <motion.div key="today" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-5">
+            <motion.div key="today" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
               {todaySub && (() => { const s = statusMeta[todaySub.status] ?? statusMeta.pending; const I = s.icon; return (
-                <div className="card p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2"><div className={`flex h-7 w-7 items-center justify-center rounded-lg ${s.bg}`}><I size={14} className={s.color} /></div><span className={`text-sm font-medium ${s.color}`}>{s.label}</span></div>
-                    <span className="text-xs text-zinc-500">{new Date(todaySub.submitted_at).toLocaleString()}</span>
+                <div className="bg-bg-surface border border-border rounded-xl p-5 sm:p-6 shadow-inner relative overflow-hidden">
+                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${s.bg}`} />
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3"><div className={`flex h-8 w-8 items-center justify-center rounded-lg shadow-inner border border-white/5 ${s.bg}`}><I size={16} className={s.color} /></div><span className={`text-[11px] font-bold uppercase tracking-widest font-mono ${s.color}`}>{s.label}</span></div>
+                    <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{new Date(todaySub.submitted_at).toLocaleString()}</span>
                   </div>
-                  <p className="text-sm text-zinc-300">{t('today.submitted', { task: todaySub.template_title })}</p>
-                  {todaySub.status === "approved" && <p className="mt-2 text-sm font-medium text-emerald-400">{t('today.rewardGranted', { amount: todaySub.reward_amount, mode: todaySub.reward_mode })}</p>}
-                  {todaySub.status === "rejected" && todaySub.reject_reason && <p className="mt-2 text-sm text-red-400">{t('today.rejected', { reason: todaySub.reject_reason })}</p>}
+                  <p className="text-sm font-medium text-zinc-300">{t('today.submitted', { task: todaySub.template_title })}</p>
+                  {todaySub.status === "approved" && <p className="mt-3 text-[11px] font-bold uppercase tracking-widest font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-md inline-block">{t('today.rewardGranted', { amount: todaySub.reward_amount, mode: todaySub.reward_mode })}</p>}
+                  {todaySub.status === "rejected" && todaySub.reject_reason && <p className="mt-3 text-[11px] font-bold uppercase tracking-widest font-mono text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-md inline-block">{t('today.rejected', { reason: todaySub.reject_reason })}</p>}
                 </div>
               ); })()}
 
               {canSubmit && (<>
-                <div className="card p-5">
-                  <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2"><span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500/[0.15] text-blue-400 text-xs font-bold">1</span>{t('today.step1')}</h3>
+                <div className="bg-bg-surface border border-border rounded-xl p-5 sm:p-6 shadow-inner">
+                  <h3 className="text-xs font-bold text-white mb-5 flex items-center gap-3 uppercase tracking-widest">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] shadow-inner font-mono">1</span>
+                    {t('today.step1')}
+                  </h3>
                   <div className="grid gap-3 sm:grid-cols-2">
                     {templates.map((t: TaskTemplate) => (
-                      <button key={t.id} onClick={() => setSelTpl(t.id)} className={`rounded-lg border p-4 text-left transition-all ${selTpl === t.id ? "border-blue-500/30 bg-blue-500/[0.04]" : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]"}`}>
-                        {selTpl === t.id && <div className="float-right"><CheckCircle2 size={15} className="text-blue-400" /></div>}
-                        <div className="flex items-center gap-2.5 mb-2"><span className="text-base">{t.icon || "📱"}</span><span className={`font-medium text-sm ${selTpl === t.id ? "text-white" : "text-zinc-300"}`}>{t.title}</span></div>
-                        <p className="text-xs text-zinc-500 leading-relaxed mb-3 min-h-[32px]">{t.description}</p>
-                        <div className="flex items-center gap-3 text-sm">
-                          <span className="text-emerald-400 font-medium bg-emerald-500/[0.08] px-2 py-0.5 rounded">+{t.reward_amount} {t.reward_mode}</span>
-                          <span className="text-zinc-500">≥{t.min_views} views</span>
+                      <button key={t.id} onClick={() => setSelTpl(t.id)} className={`group relative rounded-xl border p-5 text-left transition-all ${selTpl === t.id ? "border-indigo-500/50 bg-indigo-500/5 shadow-[0_0_15px_rgba(99,102,241,0.05)]" : "border-border bg-bg-primary/30 hover:bg-bg-elevated hover:border-zinc-700"}`}>
+                        {selTpl === t.id && <div className="absolute top-4 right-4"><CheckCircle2 size={18} className="text-indigo-400 shadow-sm" /></div>}
+                        <div className="flex items-center gap-3 mb-3"><span className="flex items-center justify-center w-8 h-8 rounded-lg bg-bg-surface border border-border text-lg shadow-inner grayscale group-hover:grayscale-0 transition-all">{t.icon || "📱"}</span><span className={`font-bold text-sm tracking-wide ${selTpl === t.id ? "text-white" : "text-zinc-300 group-hover:text-white"}`}>{t.title}</span></div>
+                        <p className="text-[11px] text-zinc-500 leading-relaxed mb-4 min-h-[36px]">{t.description}</p>
+                        <div className="flex items-center gap-3 pt-3 border-t border-border/50">
+                          <span className="text-[10px] font-bold font-mono text-emerald-400 uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded shadow-sm">+{t.reward_amount} {t.reward_mode}</span>
+                          <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest">≥{t.min_views} VIEWS</span>
                         </div>
                       </button>
                     ))}
@@ -118,29 +127,32 @@ export default function TasksPage() {
                 </div>
 
                 {selTpl && (
-                  <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="card p-5">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-semibold text-white flex items-center gap-2"><span className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500/[0.15] text-purple-400 text-xs font-bold">2</span>{t('today.step2')}</h3>
-                      <button onClick={() => genPromo()} disabled={promoLoading} className="flex items-center gap-1.5 rounded-lg bg-white/[0.05] border border-white/[0.08] px-3.5 py-2 text-xs font-medium text-zinc-300 hover:bg-white/[0.08] disabled:opacity-40 transition-all">
-                        <Sparkles size={13} className="text-purple-400" />{promoLoading ? t('today.generating') : t('today.generate')}
+                  <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="bg-bg-surface border border-border rounded-xl p-5 sm:p-6 shadow-inner">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                      <h3 className="text-xs font-bold text-white flex items-center gap-3 uppercase tracking-widest">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] shadow-inner font-mono">2</span>
+                        {t('today.step2')}
+                      </h3>
+                      <button onClick={() => genPromo()} disabled={promoLoading} className="flex items-center gap-2 rounded-lg bg-bg-elevated border border-border px-4 py-2.5 text-[10px] font-bold font-mono text-zinc-300 uppercase tracking-widest hover:bg-bg-primary hover:text-white disabled:opacity-40 transition-all shadow-inner group">
+                        <Sparkles size={14} className="text-indigo-400 group-hover:scale-110 transition-transform" />{promoLoading ? t('today.generating') : t('today.generate')}
                       </button>
                     </div>
-                    {promo && <div className="space-y-4">
+                    {promo && <div className="space-y-6">
                       {/* Promo Image Card */}
-                      <div>
-                        <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">{t('today.promoImage')}</p>
+                      <div className="bg-bg-primary/30 border border-border rounded-xl p-4 sm:p-5 shadow-inner">
+                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest font-mono mb-4">{t('today.promoImage')}</p>
                         <PromoCard data={promo.image_data as any} />
                       </div>
                       {/* Text Copies */}
-                      <div>
-                        <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">{t('today.promoCopy')}</p>
-                        <div className="space-y-3">{promo.copies.map((c, i) => (
-                          <div key={i} className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-xs font-medium text-purple-400 uppercase tracking-wider bg-purple-500/[0.08] px-2 py-0.5 rounded">{c.style}</span>
-                              <button onClick={() => copyText(c.text, i)} className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"><Copy size={11} />{copied === i ? t('today.copied') : t('today.copy')}</button>
+                      <div className="bg-bg-primary/30 border border-border rounded-xl p-4 sm:p-5 shadow-inner">
+                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest font-mono mb-4">{t('today.promoCopy')}</p>
+                        <div className="space-y-4">{promo.copies.map((c, i) => (
+                          <div key={i} className="rounded-xl border border-border bg-bg-surface p-5 shadow-inner group transition-colors hover:border-zinc-700">
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="text-[10px] font-bold font-mono text-indigo-400 uppercase tracking-widest bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded shadow-sm">{c.style}</span>
+                              <button onClick={() => copyText(c.text, i)} className="flex items-center gap-1.5 text-[10px] font-bold font-mono uppercase tracking-widest text-zinc-500 hover:text-indigo-400 transition-colors bg-bg-elevated border border-border px-2.5 py-1 rounded shadow-sm"><Copy size={12} />{copied === i ? t('today.copied') : t('today.copy')}</button>
                             </div>
-                            <p className="text-sm leading-relaxed text-zinc-300 whitespace-pre-wrap">{c.text}</p>
+                            <p className="text-xs leading-relaxed text-zinc-300 whitespace-pre-wrap font-mono">{c.text}</p>
                           </div>
                         ))}</div>
                       </div>
@@ -149,17 +161,26 @@ export default function TasksPage() {
                 )}
 
                 {selTpl && (
-                  <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="card p-5">
-                    <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2"><span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/[0.15] text-emerald-400 text-xs font-bold">3</span>{t('today.step3')}</h3>
-                    <div className="space-y-4">
-                      <div><label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-zinc-500 uppercase tracking-wider"><ExternalLink size={11} />{t('today.postUrl')}</label><input type="url" value={postUrl} onChange={e => setPostUrl(e.target.value)} placeholder="https://x.com/your_post_url" className={inputCls} /></div>
-                      <div><label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-zinc-500 uppercase tracking-wider"><ImageIcon size={11} />{t('today.screenshotUrl')}</label><input type="url" value={ssUrl} onChange={e => setSsUrl(e.target.value)} placeholder={t('today.screenshotPlaceholder')} className={inputCls} /></div>
+                  <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="bg-bg-surface border border-border rounded-xl p-5 sm:p-6 shadow-inner">
+                    <h3 className="text-xs font-bold text-white mb-5 flex items-center gap-3 uppercase tracking-widest">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] shadow-inner font-mono">3</span>
+                      {t('today.step3')}
+                    </h3>
+                    <div className="space-y-5">
+                      <div>
+                        <label className="mb-2 flex items-center gap-2 text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest"><ExternalLink size={12} className="text-zinc-600" />{t('today.postUrl')}</label>
+                        <input type="url" value={postUrl} onChange={e => setPostUrl(e.target.value)} placeholder="https://x.com/your_post_url" className={inputCls} />
+                      </div>
+                      <div>
+                        <label className="mb-2 flex items-center gap-2 text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest"><ImageIcon size={12} className="text-zinc-600" />{t('today.screenshotUrl')}</label>
+                        <input type="url" value={ssUrl} onChange={e => setSsUrl(e.target.value)} placeholder={t('today.screenshotPlaceholder')} className={inputCls} />
+                      </div>
                       <button onClick={() => submitMut.mutate({ template_id: selTpl, post_url: postUrl, screenshot_url: ssUrl })} disabled={!postUrl || !ssUrl || submitMut.isPending}
-                        className="flex w-full items-center justify-center gap-2 mt-2 rounded-lg bg-gradient-to-r from-zinc-100 to-zinc-300 py-3 text-sm font-medium text-zinc-900 hover:from-white hover:to-zinc-200 disabled:opacity-40 transition-all active:scale-[0.98]">
-                        <Upload size={15} />{submitMut.isPending ? t('today.submitting') : t('today.submit')}<ArrowRight size={14} />
+                        className="flex w-full items-center justify-center gap-2 mt-4 rounded-xl bg-indigo-600 py-3.5 text-xs font-bold font-mono uppercase tracking-widest text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 transition-all active:scale-[0.98]">
+                        <Upload size={14} className={submitMut.isPending ? "animate-bounce" : ""} />{submitMut.isPending ? t('today.submitting') : t('today.submit')}<ArrowRight size={14} />
                       </button>
-                      {submitMut.isError && <div className="flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/[0.06] px-4 py-3"><AlertCircle size={14} className="text-red-400 mt-0.5 shrink-0" /><p className="text-xs text-red-300">{(submitMut.error as Error).message}</p></div>}
-                      {submitMut.isSuccess && <div className="flex items-start gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/[0.06] px-4 py-3"><CheckCircle2 size={14} className="text-emerald-400 mt-0.5 shrink-0" /><p className="text-xs text-emerald-300">{t('today.submitSuccess')}</p></div>}
+                      {submitMut.isError && <div className="flex items-start gap-2.5 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 shadow-inner"><AlertCircle size={16} className="text-red-400 mt-0.5 shrink-0" /><p className="text-xs font-mono text-red-300 tracking-wide">{(submitMut.error as Error).message}</p></div>}
+                      {submitMut.isSuccess && <div className="flex items-start gap-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 shadow-inner"><CheckCircle2 size={16} className="text-emerald-400 mt-0.5 shrink-0" /><p className="text-xs font-mono text-emerald-300 tracking-wide">{t('today.submitSuccess')}</p></div>}
                     </div>
                   </motion.div>
                 )}
@@ -168,18 +189,22 @@ export default function TasksPage() {
           )}
 
           {tab === "history" && (
-            <motion.div key="hist" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-2">
+            <motion.div key="hist" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-3">
               {hist.length === 0 ? (
-                <div className="card py-16 text-center"><History size={28} className="mx-auto text-zinc-700 mb-3" /><p className="text-sm text-zinc-500">{t('history.empty')}</p><p className="text-xs text-zinc-500 mt-1">{t('history.emptyHint')}</p></div>
+                <div className="bg-bg-surface border border-border rounded-xl py-16 text-center shadow-inner mt-4"><History size={32} className="mx-auto text-zinc-600 mb-4 opacity-50" /><p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">{t('history.empty')}</p><p className="text-[10px] font-mono font-bold text-zinc-500 mt-2 uppercase tracking-widest">{t('history.emptyHint')}</p></div>
               ) : hist.map((s: TaskSubmission, idx: number) => { const st = statusMeta[s.status] ?? statusMeta.pending; const I = st.icon; return (
-                <motion.div key={s.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: idx * 0.03 }} className="flex items-center justify-between card px-4 py-3.5">
-                  <div className="flex items-center gap-3">
-                    <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${st.bg}`}><I size={16} className={st.color} /></div>
-                    <div><p className="text-sm text-white">{s.template_title}</p><p className="text-xs text-zinc-500 mt-0.5">{new Date(s.submitted_at).toLocaleString(undefined, { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}</p></div>
+                <motion.div key={s.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: idx * 0.03 }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-bg-surface border border-border hover:border-zinc-700 transition-colors rounded-xl px-5 py-4 shadow-inner relative overflow-hidden group">
+                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${st.bg} opacity-50 group-hover:opacity-100 transition-opacity`} />
+                  <div className="flex items-center gap-4">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl border border-white/5 shadow-inner ${st.bg}`}><I size={18} className={st.color} /></div>
+                    <div>
+                      <p className="text-sm font-bold text-zinc-200 tracking-wide">{s.template_title}</p>
+                      <p className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mt-1.5">{new Date(s.submitted_at).toLocaleString(undefined, { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <span className={`text-xs font-medium ${st.color}`}>{st.label}</span>
-                    {s.reward_granted && <p className="text-sm font-mono text-emerald-400 mt-0.5">+{s.reward_amount} {s.reward_mode}</p>}
+                  <div className="sm:text-right flex sm:flex-col items-center sm:items-end justify-between sm:justify-center w-full sm:w-auto border-t sm:border-t-0 border-border/50 pt-3 sm:pt-0">
+                    <span className={`text-[10px] font-bold font-mono uppercase tracking-widest ${st.color} bg-white/5 px-2 py-0.5 rounded border border-white/5 shadow-sm`}>{st.label}</span>
+                    {s.reward_granted && <p className="text-sm font-black font-mono tracking-tight text-emerald-400 mt-1 sm:mt-1.5">+{s.reward_amount} {s.reward_mode}</p>}
                   </div>
                 </motion.div>
               ); })}
