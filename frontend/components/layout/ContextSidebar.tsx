@@ -94,16 +94,16 @@ export function ContextSidebar() {
 
 function StatusItem({ icon: Icon, label, status, value }: { icon: any, label: string, status: "active" | "warning" | "error", value: string }) {
   return (
-    <div className="flex items-center justify-between p-3 rounded bg-bg-surface border border-border">
+    <div className="flex items-center justify-between p-3.5 rounded-xl bg-bg-surface border border-border">
       <div className="flex items-center gap-3">
-        <Icon size={14} className="text-muted-foreground" />
-        <span className="text-sm font-medium text-secondary-foreground">{label}</span>
+        <Icon size={16} className="text-zinc-400" />
+        <span className="text-sm font-bold text-zinc-300 tracking-wide">{label}</span>
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-xs font-mono text-foreground">{value}</span>
-        <div className={`w-1.5 h-1.5 rounded-full ${
-          status === "active" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" :
-          status === "warning" ? "bg-amber-500" : "bg-red-500"
+        <span className="text-xs font-mono font-bold text-white">{value}</span>
+        <div className={`w-2 h-2 rounded-full ${
+          status === "active" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" :
+          status === "warning" ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"
         }`} />
       </div>
     </div>
@@ -117,28 +117,28 @@ function WatchlistItem({ item }: { item: SymbolOverview }) {
     : "—";
   const isLong = direction === "long" || direction === "bullish";
   const isShort = direction === "short" || direction === "bearish";
-  const changeClass = isLong ? "text-bull" : isShort ? "text-bear" : "text-muted-foreground";
+  const changeClass = isLong ? "text-bull" : isShort ? "text-bear" : "text-zinc-500";
 
   return (
-    <div className="group flex items-center justify-between p-3 rounded hover:bg-bg-surface border border-transparent hover:border-border transition-all cursor-pointer">
+    <div className="group flex items-center justify-between p-3.5 rounded-xl hover:bg-bg-surface border border-transparent hover:border-border transition-all cursor-pointer">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-zinc-900 border border-white/[0.08] flex items-center justify-center text-xs font-bold font-mono text-zinc-300">
+        <div className="w-9 h-9 rounded-xl bg-bg-elevated border border-border flex items-center justify-center text-sm font-black font-mono text-zinc-300 shadow-inner group-hover:text-white transition-colors">
            {symbol.substring(0, 1)}
         </div>
         <div>
-          <div className="text-sm font-bold tracking-tight">{symbol.replace("USDT", "")}</div>
-          <div className="text-[9px] text-muted-foreground uppercase tracking-widest">PERP</div>
+          <div className="text-sm font-black tracking-tight text-zinc-200 group-hover:text-white transition-colors">{symbol.replace("USDT", "")}</div>
+          <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-0.5">PERP</div>
         </div>
       </div>
       <div className="text-right">
-        <div className="text-sm font-mono font-medium">{priceStr}</div>
-        <div className={`flex items-center justify-end gap-1 mt-0.5 text-[9px] font-mono font-bold tracking-widest ${changeClass}`}>
+        <div className="text-sm font-mono font-bold text-white tracking-tight">{priceStr}</div>
+        <div className={`flex items-center justify-end gap-1 mt-1 text-[10px] font-mono font-bold tracking-widest ${changeClass}`}>
           {isLong ? (
-            <><TrendingUp size={10} strokeWidth={3} /> BULL</>
+            <><TrendingUp size={12} strokeWidth={3} /> BULL</>
           ) : isShort ? (
-            <><TrendingDown size={10} strokeWidth={3} /> BEAR</>
+            <><TrendingDown size={12} strokeWidth={3} /> BEAR</>
           ) : (
-             <><Minus size={10} strokeWidth={3} /> NEUTRAL</>
+             <><Minus size={12} strokeWidth={3} /> NEUTRAL</>
           )}
         </div>
       </div>

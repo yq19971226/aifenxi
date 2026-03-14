@@ -157,7 +157,7 @@ export function Sidebar() {
       </div>
 
       {/* Nav Items */}
-      <div className="flex-1 overflow-y-auto py-4 px-2 space-y-1 scrollbar-thin scrollbar-thumb-bg-elevated">
+      <div className="flex-1 overflow-y-auto py-5 px-3 space-y-1.5 scrollbar-thin scrollbar-thumb-bg-elevated">
         {allItems.map((item) => {
           if (item.featureFlag && !flags?.[item.featureFlag]) return null;
           if (!isNavItemVisible(item.href, role)) return null;
@@ -177,11 +177,11 @@ export function Sidebar() {
                   }
                 }}
                 className={cn(
-                  "group flex items-center h-10 px-3 rounded-md transition-colors relative",
-                  isActive ? "bg-bg-elevated text-foreground" : "text-muted-foreground hover:bg-bg-surface hover:text-foreground"
+                  "group flex items-center h-11 px-3.5 rounded-xl transition-all relative font-semibold",
+                  isActive ? "bg-bg-elevated text-white shadow-inner" : "text-zinc-500 hover:bg-bg-surface hover:text-zinc-200"
                 )}
               >
-                <item.icon size={18} className={cn("shrink-0", isActive && "text-primary")} />
+                <item.icon size={20} className={cn("shrink-0 transition-colors", isActive && "text-indigo-400")} />
                 
                 <AnimatePresence>
                   {expanded && (
@@ -189,12 +189,12 @@ export function Sidebar() {
                       initial={{ opacity: 0, width: 0 }}
                       animate={{ opacity: 1, width: "auto" }}
                       exit={{ opacity: 0, width: 0 }}
-                      className="ml-3 flex-1 overflow-hidden flex items-center justify-between"
+                      className="ml-3.5 flex-1 overflow-hidden flex items-center justify-between"
                     >
-                      <span className="text-sm font-medium whitespace-nowrap">{t(`main.${item.key}`)}</span>
+                      <span className="text-sm font-bold tracking-wide whitespace-nowrap">{t(`main.${item.key}`)}</span>
                       {hasChildren && (
                         <ChevronDown
-                          size={14}
+                          size={16}
                           className={cn("transition-transform", isOpen && "rotate-180")}
                         />
                       )}
@@ -204,7 +204,7 @@ export function Sidebar() {
                 
                 {/* Active Indicator Line */}
                 {isActive && !expanded && (
-                  <div className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-primary" />
+                  <div className="absolute left-0 top-2.5 bottom-2.5 w-1.5 rounded-r-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
                 )}
               </Link>
 
@@ -215,7 +215,7 @@ export function Sidebar() {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden ml-4 pl-4 border-l border-border mt-1 space-y-1"
+                    className="overflow-hidden ml-5 pl-5 border-l-2 border-border mt-1.5 space-y-1"
                   >
                     {item.children!.map((sub) => {
                       if (sub.featureFlag && !flags?.[sub.featureFlag]) return null;
@@ -227,8 +227,8 @@ export function Sidebar() {
                           key={sub.key}
                           href={`/${locale}${sub.href}`}
                           className={cn(
-                            "block py-2 px-2 text-xs rounded-md transition-colors",
-                            isSubActive ? "text-primary bg-primary/5" : "text-muted-foreground hover:text-foreground"
+                            "block py-2.5 px-3 text-xs font-bold tracking-wide rounded-lg transition-colors",
+                            isSubActive ? "text-indigo-400 bg-indigo-500/10 shadow-inner" : "text-zinc-500 hover:text-zinc-200 hover:bg-bg-surface"
                           )}
                         >
                           {t(getSubLabelKey(item.key, sub.key))}
@@ -244,10 +244,10 @@ export function Sidebar() {
       </div>
 
       {/* User Footer */}
-      <div className="p-2 border-t border-border">
+      <div className="p-3 border-t border-border bg-bg-primary/50">
         {user ? (
-          <div className={cn("flex items-center gap-3 px-2 py-2 rounded-md", expanded ? "bg-bg-surface" : "")}>
-            <div className="h-8 w-8 rounded-full bg-bg-elevated flex items-center justify-center text-xs font-mono shrink-0 border border-border">
+          <div className={cn("flex items-center gap-3 px-2 py-2.5 rounded-xl transition-colors", expanded ? "hover:bg-bg-surface" : "")}>
+            <div className="h-9 w-9 rounded-full bg-bg-surface flex items-center justify-center text-sm font-black font-mono shadow-inner shrink-0 border border-border text-zinc-300">
               {(user.email?.split("@")[0] ?? "U").substring(0, 2).toUpperCase()}
             </div>
             <AnimatePresence>
@@ -256,24 +256,33 @@ export function Sidebar() {
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: "auto" }}
                   exit={{ opacity: 0, width: 0 }}
-                  className="flex-1 overflow-hidden"
+                  className="flex-1 overflow-hidden flex flex-col justify-center"
                 >
-                  <div className="text-xs font-medium truncate">{user.email?.split("@")[0] ?? "User"}</div>
-                  <div className="text-[10px] text-muted-foreground truncate">
+                  <div className="text-sm font-bold truncate text-zinc-200 leading-tight mb-0.5">{user.email?.split("@")[0] ?? "User"}</div>
+                  <div className="text-xs font-bold font-mono tracking-widest text-zinc-500 truncate uppercase">
                     {user.membership_level >= 2 ? "PRO PLAN" : "BASIC"}
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
-            {expanded && (
-              <button onClick={logout} className="text-muted-foreground hover:text-destructive transition-colors">
-                <LogOut size={16} />
-              </button>
-            )}
+            <AnimatePresence>
+              {expanded && (
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={logout}
+                  className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors group cursor-pointer"
+                  title={t('main.logout')}
+                >
+                  <LogOut size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+                </motion.button>
+              )}
+            </AnimatePresence>
           </div>
         ) : (
           expanded && (
-            <Link href={`/${locale}/login`} className="flex items-center justify-center h-9 rounded-md bg-primary text-primary-foreground text-sm font-medium">
+            <Link href={`/${locale}/login`} className="flex w-full items-center justify-center h-10 rounded-lg bg-indigo-500 text-white font-bold hover:bg-indigo-600 transition-colors shadow-lg">
               {t('common.login')}
             </Link>
           )
