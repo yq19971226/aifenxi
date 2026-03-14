@@ -1,46 +1,58 @@
 {
-  "title": "多幣種概覽",
-  "subtitle": "AI 即時監控 {count} 個幣種，點擊展開查看詳情",
+  "title": "訊號總覽",
+  "subtitle": "AI 即時監控所有啟用幣種的分析訊號",
   "autoRefresh": "30s 自動更新",
-  "guideBanner": "第一次用？花兩分鐘看看使用指南，快速上手。",
-  "guideBannerLink": "查看指南",
-  "onlineLabel": "人在線",
-  "commandCenter": "指揮中心",
-  "welcomeBack": "歡迎回來",
-  "credits": "積分",
-  "rank": "排名",
-  "topPercent": "前 5%",
-  "liveAnalysisFeed": "全幣種規則研判",
-  "autoRefreshHint": "後台每 30 秒自動更新，依規則引擎展示",
-  "noActiveSessions": "暫無概覽資料，請確保已啟用幣種並稍後重新整理。",
-  "ruleVerdict": {
-    "opportunity": "可操作",
-    "risk": "風險",
+  "heroLong": "看多",
+  "heroShort": "看空",
+  "heroNeutral": "觀望",
+  "heroAccuracy": "{days}日命中率",
+  "heroNewSignals": "{count} 條新訊號",
+  "heroLastUpdate": "上次更新",
+  "heroJustNow": "剛剛",
+  "heroMinAgo": "{min}分鐘前",
+  "heroHourAgo": "{hour}小時前",
+  "signalCards": "訊號卡片",
+  "strategy": "策略",
+  "entryRange": "入場",
+  "stopLoss": "止損",
+  "target": "目標",
+  "riskReward": "盈虧比",
+  "dealerIntent": "莊家意圖",
+  "worthTaking": "值得操作",
+  "notWorth": "觀望為主",
+  "updatedAt": "更新於",
+  "direction": {
+    "long": "看多",
+    "short": "看空",
     "neutral": "觀望"
   },
-  "goConsensus": "深度分析",
-  "noSymbolsHint": "請在後台「幣種管理」中啟用交易對，概覽將基於規則引擎展示研判結果（不呼叫分析 API）。",
-  "initializingEngine": "Axiom 共識協議初始化中…",
+  "timeline": {
+    "title": "訊號時間線",
+    "empty": "暫無近期訊號變化",
+    "showMore": "展開更多",
+    "showLess": "收起"
+  },
+  "insights": {
+    "title": "最新洞察",
+    "empty": "暫無洞察資料",
+    "types": {
+      "onchain": "鏈上",
+      "macro": "宏觀",
+      "risk": "風險",
+      "dealer": "莊家"
+    }
+  },
+  "membership": {
+    "upgradeHint": "升級查看完整策略",
+    "blurred": "***"
+  },
+  "initializingEngine": "訊號引擎初始化中…",
   "connectionFailed": "系統連線失敗",
   "connectionFailedDesc": "無法與分析節點建立安全連線。",
   "retryConnection": "重試連線",
+  "goConsensus": "深度分析",
   "error": {
     "loadFailed": "載入失敗",
-    "fetchFailed": "取得概覽資料失敗，30s 後自動重試"
-  },
-  "table": {
-    "symbol": "幣種",
-    "price": "最新價",
-    "aiJudgment": "AI 判斷",
-    "confidence": "置信度",
-    "defenseStatus": "防禦狀態",
-    "onchainData": "鏈上資料",
-    "noData": "暫無幣種資料，請在後台「幣種管理」中新增"
-  },
-  "legend": {
-    "safe": "安全 = 無異常偵測",
-    "caution": "警惕 = 莊家活動跡象",
-    "danger": "危險 = 莊家操盤確認",
-    "critical": "極危 = 高度操控風險"
+    "fetchFailed": "取得資料失敗，30s 後自動重試"
   }
 }

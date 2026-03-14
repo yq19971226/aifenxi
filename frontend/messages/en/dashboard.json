@@ -1,46 +1,58 @@
 {
-  "title": "Multi-Symbol Overview",
-  "subtitle": "AI monitoring {count} symbols in real-time, click to expand for details",
-  "autoRefresh": "Auto-refresh every 30s",
-  "guideBanner": "First time here? Check out the guide to get started in 2 minutes.",
-  "guideBannerLink": "View Guide",
-  "onlineLabel": "online",
-  "commandCenter": "Command Center",
-  "welcomeBack": "Welcome back",
-  "credits": "Credits",
-  "rank": "Rank",
-  "topPercent": "Top 5%",
-  "liveAnalysisFeed": "Rule-based overview",
-  "autoRefreshHint": "Auto-refresh every 30s in background, rule engine display",
-  "noActiveSessions": "No overview data yet. Enable symbols and refresh.",
-  "ruleVerdict": {
-    "opportunity": "Opportunity",
-    "risk": "Risk",
+  "title": "Signal Overview",
+  "subtitle": "AI real-time monitoring of all enabled symbols",
+  "autoRefresh": "Auto-refresh 30s",
+  "heroLong": "Long",
+  "heroShort": "Short",
+  "heroNeutral": "Neutral",
+  "heroAccuracy": "{days}-day hit rate",
+  "heroNewSignals": "{count} new signals",
+  "heroLastUpdate": "Last update",
+  "heroJustNow": "Just now",
+  "heroMinAgo": "{min}m ago",
+  "heroHourAgo": "{hour}h ago",
+  "signalCards": "Signal Cards",
+  "strategy": "Strategy",
+  "entryRange": "Entry",
+  "stopLoss": "SL",
+  "target": "Target",
+  "riskReward": "RR",
+  "dealerIntent": "Dealer intent",
+  "worthTaking": "Worth taking",
+  "notWorth": "Wait",
+  "updatedAt": "Updated",
+  "direction": {
+    "long": "Long",
+    "short": "Short",
     "neutral": "Neutral"
   },
-  "goConsensus": "Deep analysis",
-  "noSymbolsHint": "Enable symbols in admin to see rule-based verdicts (no analysis API).",
-  "initializingEngine": "Initiating Axiom Consensus Protocol…",
-  "connectionFailed": "System Connection Failed",
-  "connectionFailedDesc": "Unable to establish secure link with analysis nodes.",
-  "retryConnection": "Retry Connection",
+  "timeline": {
+    "title": "Signal Timeline",
+    "empty": "No recent signals",
+    "showMore": "Show more",
+    "showLess": "Show less"
+  },
+  "insights": {
+    "title": "Latest Insights",
+    "empty": "No insights yet",
+    "types": {
+      "onchain": "On-chain",
+      "macro": "Macro",
+      "risk": "Risk",
+      "dealer": "Dealer"
+    }
+  },
+  "membership": {
+    "upgradeHint": "Upgrade to see full strategy",
+    "blurred": "***"
+  },
+  "initializingEngine": "Initializing signal engine…",
+  "connectionFailed": "Connection Failed",
+  "connectionFailedDesc": "Unable to connect to analysis nodes.",
+  "retryConnection": "Retry",
+  "goConsensus": "Deep Analysis",
   "error": {
-    "loadFailed": "Load Failed",
-    "fetchFailed": "Failed to fetch overview data, will retry in 30s"
-  },
-  "table": {
-    "symbol": "Symbol",
-    "price": "Latest Price",
-    "aiJudgment": "AI Signal",
-    "confidence": "Confidence",
-    "defenseStatus": "Defense Status",
-    "onchainData": "On-chain Data",
-    "noData": "No symbol data available, please add symbols in admin panel"
-  },
-  "legend": {
-    "safe": "Safe = No anomalies detected",
-    "caution": "Caution = Market maker activity signs",
-    "danger": "Danger = Market maker manipulation confirmed",
-    "critical": "Critical = High manipulation risk"
+    "loadFailed": "Load failed",
+    "fetchFailed": "Failed to fetch data, will retry in 30s"
   }
 }
