@@ -60,7 +60,7 @@ export default function AnalysisColumn({ sim, activeMatch, latest, phaseHistory 
   }
 
   return (
-    <div className="xl:col-span-7 space-y-5">
+    <div className="space-y-5">
       {activeMatch && (
         <div className="card p-5">
           <div className="flex items-center gap-2 mb-4">
