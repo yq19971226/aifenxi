@@ -253,18 +253,29 @@ def detect_macro_events(
             impact = impact * 1.1
 
         title_map = {
-            "fomc": "FOMC/Fed Rate Decision",
-            "cpi": "CPI/Inflation Data",
-            "nfp": "Employment/NFP Report",
-            "sec_action": "SEC/Regulatory Action",
-            "etf": "Crypto ETF Development",
-            "stablecoin_risk": "Stablecoin/Banking Risk",
-            "geopolitical": "Geopolitical Risk Event",
-            "gov_policy": "Government Crypto Policy",
+            "fomc": "美联储利率决议",
+            "cpi": "CPI/通胀数据",
+            "nfp": "非农就业报告",
+            "sec_action": "SEC监管行动",
+            "etf": "加密ETF进展",
+            "stablecoin_risk": "稳定币/银行风险",
+            "geopolitical": "地缘政治风险",
+            "gov_policy": "政府加密政策",
+        }
+
+        category_map = {
+            "fomc": "美联储",
+            "cpi": "通胀数据",
+            "nfp": "非农就业",
+            "sec_action": "监管行动",
+            "etf": "ETF进展",
+            "stablecoin_risk": "稳定币风险",
+            "geopolitical": "地缘政治",
+            "gov_policy": "政府政策",
         }
 
         detected.append(MacroEvent(
-            category=category,
+            category=category_map.get(category, category),
             title=title_map.get(category, category),
             impact_score=round(impact, 1),
             direction=direction,
@@ -297,14 +308,20 @@ def detect_macro_events(
         confidence_modifier = 1.0
 
     # Warning message
+    _dir_zh = {"bullish": "看涨", "bearish": "看跌", "neutral": "中性"}
+    _urg_zh = {"low": "低", "medium": "中", "high": "高"}
     parts: list[str] = []
     for e in sorted(detected, key=lambda x: abs(x.impact_score), reverse=True):
-        urgency_tag = f"[{e.urgency.upper()}]" if e.urgency != "low" else ""
+        e.direction = _dir_zh.get(e.direction, e.direction)
+        e.urgency = _urg_zh.get(e.urgency, e.urgency)
+        urgency_tag = f"[{e.urgency}]" if e.urgency != "低" else ""
         parts.append(f"{urgency_tag}{e.title}({e.direction},{e.impact_score:+.0f})")
 
     warning = ""
     if detected:
-        warning = f"Macro: {'; '.join(parts)}"
+        warning = f"宏观事件: {'; '.join(parts)}"
+
+    net_direction = _dir_zh.get(net_direction, net_direction)
 
     return MacroEventResult(
         events=detected,

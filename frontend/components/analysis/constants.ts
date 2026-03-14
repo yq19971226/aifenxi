@@ -105,7 +105,10 @@ export const FIELD_LABELS: Record<string, string> = {
   key_risks: "关键风险",
   alerts_count: "预警数",
   alerts: "预警列表",
-  published_stream_id: "Stream ID",
+  published_stream_id: "推送ID",
+  published_stream_ids: "推送ID",
+  // ── 预警字段 ──
+  alert_type: "预警类型",
   // ── 合约数据 ──
   funding_rate: "资金费率",
   predicted_funding_rate: "预测资金费率",
@@ -303,6 +306,7 @@ export const HIDDEN_FIELDS = new Set([
   "snapped_fields",
   "discarded_levels",
   "published_stream_id",
+  "published_stream_ids",
   "filter_mode",
   "atr_fallback",
 ]);

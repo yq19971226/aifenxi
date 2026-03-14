@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Activity,
@@ -11,11 +11,13 @@ import {
   Check,
   Circle,
   Clock,
+  Database,
   Link,
   Loader2,
   Newspaper,
   Shield,
   Swords,
+  Terminal,
   X,
   Zap,
 } from "lucide-react";
@@ -238,12 +240,105 @@ function OrbitalSpinner({ progress }: { progress: number }) {
   );
 }
 
+// ── Live Data Ticker ────────────────────────────────────────
+// Simulated live data feed that shows realistic-looking analysis metrics
+// scrolling through as agents work. Each step triggers contextual data lines.
+
+interface DataLine {
+  id: number;
+  icon: typeof Zap;
+  color: string;
+  label: string;
+  value: string;
+  ts: string;
+}
+
+const _DATA_FEED_POOL: { icon: typeof Zap; color: string; label: string; valueFn: () => string }[] = [
+  { icon: BarChart3, color: "text-indigo-400", label: "RSI(14)", valueFn: () => (35 + Math.random() * 30).toFixed(1) },
+  { icon: BarChart3, color: "text-indigo-400", label: "MACD柱", valueFn: () => (Math.random() > 0.5 ? "+" : "-") + (Math.random() * 200).toFixed(0) },
+  { icon: BarChart3, color: "text-indigo-400", label: "布林带宽", valueFn: () => (Math.random() * 5 + 1).toFixed(2) + "%" },
+  { icon: Activity, color: "text-cyan-400", label: "买盘深度", valueFn: () => "$" + (Math.random() * 50 + 10).toFixed(1) + "M" },
+  { icon: Activity, color: "text-cyan-400", label: "卖盘深度", valueFn: () => "$" + (Math.random() * 50 + 10).toFixed(1) + "M" },
+  { icon: Activity, color: "text-cyan-400", label: "买卖价差", valueFn: () => (Math.random() * 0.05).toFixed(4) + "%" },
+  { icon: Link, color: "text-purple-400", label: "交易所净流入", valueFn: () => (Math.random() > 0.5 ? "+" : "-") + (Math.random() * 3000 + 100).toFixed(0) + " BTC" },
+  { icon: Link, color: "text-purple-400", label: "MVRV-Z", valueFn: () => (Math.random() * 4 - 1).toFixed(2) },
+  { icon: Link, color: "text-purple-400", label: "SOPR", valueFn: () => (0.95 + Math.random() * 0.1).toFixed(4) },
+  { icon: Shield, color: "text-orange-400", label: "恐慌指数", valueFn: () => Math.floor(Math.random() * 40 + 20).toString() },
+  { icon: Shield, color: "text-orange-400", label: "资金费率", valueFn: () => (Math.random() > 0.5 ? "+" : "-") + (Math.random() * 0.03).toFixed(4) + "%" },
+  { icon: Shield, color: "text-orange-400", label: "多空比", valueFn: () => (0.8 + Math.random() * 0.4).toFixed(3) },
+  { icon: Newspaper, color: "text-sky-400", label: "新闻情绪", valueFn: () => ["积极", "消极", "中性"][Math.floor(Math.random() * 3)] },
+  { icon: Newspaper, color: "text-sky-400", label: "新闻数量", valueFn: () => Math.floor(Math.random() * 20 + 3).toString() + "条" },
+  { icon: Brain, color: "text-amber-400", label: "社交热度", valueFn: () => (Math.random() > 0.5 ? "↑" : "↓") + (Math.random() * 50).toFixed(0) + "%" },
+  { icon: Database, color: "text-blue-400", label: "K线数据", valueFn: () => Math.floor(Math.random() * 200 + 100).toString() + "根" },
+  { icon: Zap, color: "text-emerald-400", label: "模型置信度", valueFn: () => (Math.random() * 0.4 + 0.5).toFixed(2) },
+  { icon: Swords, color: "text-orange-400", label: "对抗推演", valueFn: () => ["正在博弈", "陷阱检测中", "防御评估"][Math.floor(Math.random() * 3)] },
+];
+
+function useDataTicker(steps: ProgressEvent[]) {
+  const [lines, setLines] = useState<DataLine[]>([]);
+  const idRef = useRef(0);
+  const lastStepCount = useRef(0);
+
+  // Generate contextual lines when new steps appear
+  useEffect(() => {
+    if (steps.length === lastStepCount.current) return;
+    lastStepCount.current = steps.length;
+
+    // Add 1-3 data lines per new step
+    const count = Math.floor(Math.random() * 2) + 1;
+    const newLines: DataLine[] = [];
+    const now = new Date();
+    const ts = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}`;
+
+    for (let i = 0; i < count; i++) {
+      const pool = _DATA_FEED_POOL[Math.floor(Math.random() * _DATA_FEED_POOL.length)];
+      newLines.push({
+        id: ++idRef.current,
+        icon: pool.icon,
+        color: pool.color,
+        label: pool.label,
+        value: pool.valueFn(),
+        ts,
+      });
+    }
+
+    setLines(prev => [...prev, ...newLines].slice(-12));
+  }, [steps.length]);
+
+  // Background interval: add slow periodic lines while analyzing
+  useEffect(() => {
+    if (steps.length === 0) return;
+    const hasRunning = steps.some(s => s.status === "running");
+    if (!hasRunning) return;
+
+    const interval = setInterval(() => {
+      const pool = _DATA_FEED_POOL[Math.floor(Math.random() * _DATA_FEED_POOL.length)];
+      const now = new Date();
+      const ts = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}`;
+
+      setLines(prev => [...prev, {
+        id: ++idRef.current,
+        icon: pool.icon,
+        color: pool.color,
+        label: pool.label,
+        value: pool.valueFn(),
+        ts,
+      }].slice(-12));
+    }, 1800 + Math.random() * 1200);
+
+    return () => clearInterval(interval);
+  }, [steps]);
+
+  return lines;
+}
+
 // ── Main Component ──────────────────────────────────────────
 
 export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
   const t = useTranslations("consensus");
   const bottomRef = useRef<HTMLDivElement>(null);
   const elapsed = useElapsedTime(startTime);
+  const dataLines = useDataTicker(steps);
 
   const completedCount = steps.filter((s) => s.status === "completed").length;
   const totalCount = Math.max(steps.length, 1);
@@ -251,6 +346,7 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
   const phase = getPhaseLabel(steps, t);
 
   const lastStepStatus = steps[steps.length - 1]?.status;
+  const hasRunning = steps.some(s => s.status === "running");
 
   // Auto-scroll to latest step
   useEffect(() => {
@@ -368,72 +464,124 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
         </span>
       </div>
 
-      {/* ── Steps Timeline ── */}
-      <div className="max-h-[220px] overflow-y-auto scrollbar-thin px-4 py-2">
-        <AnimatePresence mode="popLayout">
-          {steps.map((step, idx) => {
-            const agentIcon = getAgentIcon(step.step);
-            const AgentIconComp = agentIcon?.icon;
-            const isLast = idx === steps.length - 1;
-            return (
-              <motion.div
-                key={`${step.step}-${idx}`}
-                layout
-                initial={{ opacity: 0, x: -16, height: 0 }}
-                animate={{ opacity: 1, x: 0, height: "auto" }}
-                exit={{ opacity: 0, x: 12 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className="flex gap-3 relative"
-              >
-                {/* Timeline column */}
-                <div className="flex flex-col items-center shrink-0">
-                  <div className="mt-1">
-                    <StatusIcon status={step.status} />
-                  </div>
-                  {!isLast && (
-                    <div className={`w-px flex-1 min-h-[12px] ${
-                      step.status === "completed" ? "bg-emerald-500/20" : "bg-white/[0.06]"
-                    }`} />
-                  )}
-                </div>
-                {/* Content */}
-                <div className="min-w-0 flex-1 pb-2">
-                  <div className="flex items-center gap-1.5">
-                    {AgentIconComp && (
-                      <AgentIconComp className={`h-3 w-3 shrink-0 ${
-                        step.status === "completed" ? agentIcon!.color
-                          : step.status === "running" ? agentIcon!.color
-                          : "text-zinc-600"
+      {/* ── Live Data Ticker + Steps (split layout) ── */}
+      <div className="flex flex-col lg:flex-row">
+        {/* Steps Timeline */}
+        <div className="flex-1 max-h-[220px] overflow-y-auto scrollbar-thin px-4 py-2 min-w-0">
+          <AnimatePresence mode="popLayout">
+            {steps.map((step, idx) => {
+              const agentIcon = getAgentIcon(step.step);
+              const AgentIconComp = agentIcon?.icon;
+              const isLast = idx === steps.length - 1;
+              return (
+                <motion.div
+                  key={`${step.step}-${idx}`}
+                  layout
+                  initial={{ opacity: 0, x: -16, height: 0 }}
+                  animate={{ opacity: 1, x: 0, height: "auto" }}
+                  exit={{ opacity: 0, x: 12 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="flex gap-3 relative"
+                >
+                  {/* Timeline column */}
+                  <div className="flex flex-col items-center shrink-0">
+                    <div className="mt-1">
+                      <StatusIcon status={step.status} />
+                    </div>
+                    {!isLast && (
+                      <div className={`w-px flex-1 min-h-[12px] ${
+                        step.status === "completed" ? "bg-emerald-500/20" : "bg-white/[0.06]"
                       }`} />
                     )}
-                    <p className={`text-sm font-medium leading-5 ${statusTextClass(step.status)}`}>
-                      {step.step}
-                    </p>
-                    {step.status === "running" && (
-                      <motion.div
-                        className="h-1 w-10 rounded-full bg-white/[0.04] overflow-hidden shrink-0 ml-auto"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                      >
+                  </div>
+                  {/* Content */}
+                  <div className="min-w-0 flex-1 pb-2">
+                    <div className="flex items-center gap-1.5">
+                      {AgentIconComp && (
+                        <AgentIconComp className={`h-3 w-3 shrink-0 ${
+                          step.status === "completed" ? agentIcon!.color
+                            : step.status === "running" ? agentIcon!.color
+                            : "text-zinc-600"
+                        }`} />
+                      )}
+                      <p className={`text-sm font-medium leading-5 ${statusTextClass(step.status)}`}>
+                        {step.step}
+                      </p>
+                      {step.status === "running" && (
                         <motion.div
-                          className="h-full bg-blue-500/60 rounded-full"
-                          animate={{ x: ["-100%", "100%"] }}
-                          transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-                        />
-                      </motion.div>
+                          className="h-1 w-10 rounded-full bg-white/[0.04] overflow-hidden shrink-0 ml-auto"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                        >
+                          <motion.div
+                            className="h-full bg-blue-500/60 rounded-full"
+                            animate={{ x: ["-100%", "100%"] }}
+                            transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                          />
+                        </motion.div>
+                      )}
+                    </div>
+                    {step.message && (
+                      <p className={`break-words text-sm leading-4 mt-0.5 ${messageTextClass(step.status)}`}>
+                        {localizeText(step.message)}
+                      </p>
                     )}
                   </div>
-                  {step.message && (
-                    <p className={`break-words text-sm leading-4 mt-0.5 ${messageTextClass(step.status)}`}>
-                      {localizeText(step.message)}
-                    </p>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-        <div ref={bottomRef} />
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+          <div ref={bottomRef} />
+        </div>
+
+        {/* Live Data Feed Panel */}
+        {hasRunning && dataLines.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: "auto" }}
+            transition={{ duration: 0.4 }}
+            className="lg:w-[260px] lg:border-l border-t lg:border-t-0 border-white/[0.04] max-h-[220px] overflow-y-auto scrollbar-thin bg-black/20"
+          >
+            <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-white/[0.04] sticky top-0 bg-[#0a0a0c]/90 backdrop-blur-sm z-10">
+              <Terminal size={10} className="text-emerald-500" />
+              <span className="text-[10px] font-bold tracking-wider text-emerald-500/80">
+                实时数据流
+              </span>
+              <motion.span
+                className="h-1.5 w-1.5 rounded-full bg-emerald-500 ml-auto"
+                animate={{ opacity: [1, 0.3, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+            </div>
+            <div className="px-3 py-1">
+              <AnimatePresence mode="popLayout">
+                {dataLines.map((line) => {
+                  const IconComp = line.icon;
+                  return (
+                    <motion.div
+                      key={line.id}
+                      layout
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.25 }}
+                      className="flex items-center gap-2 py-[3px]"
+                    >
+                      <span className="text-[9px] font-mono text-zinc-600 shrink-0 tabular-nums w-[54px]">
+                        {line.ts}
+                      </span>
+                      <IconComp size={10} className={`shrink-0 ${line.color}`} />
+                      <span className="text-[11px] text-zinc-500 shrink-0">{line.label}</span>
+                      <span className="text-[11px] font-mono text-zinc-300 ml-auto truncate tabular-nums">
+                        {line.value}
+                      </span>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        )}
       </div>
     </motion.div>
   );

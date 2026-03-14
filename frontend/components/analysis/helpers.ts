@@ -189,6 +189,30 @@ const _TEXT_REPLACEMENTS: [RegExp, string][] = [
   [/\btrue\b/gi, "是"], [/\bfalse\b/gi, "否"],
   [/\bnone\b/gi, "无"], [/\bunknown\b/gi, "未知"],
   [/\bother\b/gi, "其他"],
+  // ── 预警类型值（alert_type enum） ──
+  [/\bfear_greed_extreme\b/gi, "恐慌贪婪极端"],
+  [/\bkill_zone_warning\b/gi, "猎杀区预警"],
+  [/\bai_acceleration_warning\b/gi, "AI加速预警"],
+  [/\bai_manipulation_warning\b/gi, "AI操纵预警"],
+  [/\bdefense_warning\b/gi, "防御预警"],
+  [/\bexchange_large_inflow\b/gi, "交易所大额流入"],
+  [/\bwhale_large_transfer\b/gi, "巨鲸大额转账"],
+  [/\bmvrv_extreme\b/gi, "MVRV极端值"],
+  [/\bfunding_rate_extreme\b/gi, "资金费率极端"],
+  [/\blarge_liquidation\b/gi, "大额爆仓"],
+  [/\blong_short_imbalance\b/gi, "多空失衡"],
+  [/\bfunding_rate_manipulation\b/gi, "资金费率操纵"],
+  // ── 宏观事件 ──
+  [/\bMacro:\s*/gi, "宏观事件: "],
+  [/\bFOMC\/Fed Rate Decision\b/gi, "美联储利率决议"],
+  [/\bCPI\/Inflation Data\b/gi, "CPI/通胀数据"],
+  [/\bEmployment\/NFP Report\b/gi, "非农就业报告"],
+  [/\bSEC\/Regulatory Action\b/gi, "SEC监管行动"],
+  [/\bCrypto ETF Development\b/gi, "加密ETF进展"],
+  [/\bStablecoin\/Banking Risk\b/gi, "稳定币/银行风险"],
+  [/\bGeopolitical Risk Event\b/gi, "地缘政治风险"],
+  [/\bGovernment Crypto Policy\b/gi, "政府加密政策"],
+  [/\bGeopolitical Risk\b/gi, "地缘政治风险"],
 ];
 
 export function localizeText(text: string | null | undefined): string {
