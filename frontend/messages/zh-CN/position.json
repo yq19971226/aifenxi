@@ -1,0 +1,38 @@
+{
+  "calculator": {
+    "title": "仓位计算器",
+    "setupHint": "设置资金偏好后查看仓位建议 →",
+    "editPrefs": "修改偏好",
+    "margin": "保证金",
+    "positionSize": "名义仓位",
+    "maxLoss": "最大亏损",
+    "targetProfit": "目标收益",
+    "leverage": "杠杆",
+    "risk": "风险",
+    "lowQualityWarning": "策略盈亏比不足或置信度偏低，请谨慎参考",
+    "disclaimer": "以上为基于您输入参数的数学计算结果，不构成投资建议",
+    "summaryMargin": "若入场：保证金",
+    "summaryMaxLoss": "最大亏损",
+    "summarySetupHint": "设置偏好查看仓位 →"
+  },
+  "modal": {
+    "title": "仓位计算偏好设置",
+    "step1Title": "第一步：可用资金",
+    "step1Desc": "输入您计划投入交易的总金额",
+    "capitalLabel": "可用资金",
+    "capitalUnit": "USDT",
+    "step2Title": "第二步：风险控制",
+    "step2Desc": "设置杠杆倍数和单笔最大风险比例",
+    "leverageLabel": "杠杆倍数",
+    "leverageHint": "1x = 现货，越高风险越大",
+    "riskLabel": "单笔风险比例",
+    "riskHint": "每笔交易最多亏损资金的百分比",
+    "step3Title": "第三步：确认",
+    "step3Desc": "请阅读并同意免责声明",
+    "disclaimerText": "我已了解仓位计算结果仅为基于输入参数的数学计算，不构成任何投资建议。交易有风险，请自行判断。",
+    "prev": "上一步",
+    "next": "下一步",
+    "save": "保存偏好",
+    "stepIndicator": "第 {current} 步 / 共 {total} 步"
+  }
+}

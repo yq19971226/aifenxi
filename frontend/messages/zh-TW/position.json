@@ -1,0 +1,38 @@
+{
+  "calculator": {
+    "title": "倉位計算器",
+    "setupHint": "設定資金偏好後查看倉位建議 →",
+    "editPrefs": "修改偏好",
+    "margin": "保證金",
+    "positionSize": "名義倉位",
+    "maxLoss": "最大虧損",
+    "targetProfit": "目標收益",
+    "leverage": "槓桿",
+    "risk": "風險",
+    "lowQualityWarning": "策略盈虧比不足或置信度偏低，請謹慎參考",
+    "disclaimer": "以上為基於您輸入參數的數學計算結果，不構成投資建議",
+    "summaryMargin": "若入場：保證金",
+    "summaryMaxLoss": "最大虧損",
+    "summarySetupHint": "設定偏好查看倉位 →"
+  },
+  "modal": {
+    "title": "倉位計算偏好設定",
+    "step1Title": "第一步：可用資金",
+    "step1Desc": "輸入您計劃投入交易的總金額",
+    "capitalLabel": "可用資金",
+    "capitalUnit": "USDT",
+    "step2Title": "第二步：風險控制",
+    "step2Desc": "設定槓桿倍數和單筆最大風險比例",
+    "leverageLabel": "槓桿倍數",
+    "leverageHint": "1x = 現貨，越高風險越大",
+    "riskLabel": "單筆風險比例",
+    "riskHint": "每筆交易最多虧損資金的百分比",
+    "step3Title": "第三步：確認",
+    "step3Desc": "請閱讀並同意免責聲明",
+    "disclaimerText": "我已了解倉位計算結果僅為基於輸入參數的數學計算，不構成任何投資建議。交易有風險，請自行判斷。",
+    "prev": "上一步",
+    "next": "下一步",
+    "save": "儲存偏好",
+    "stepIndicator": "第 {current} 步 / 共 {total} 步"
+  }
+}

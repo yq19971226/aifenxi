@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Settings, AlertTriangle, TrendingUp, TrendingDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useTradePreferences } from "@/lib/hooks/useTradePreferences";
 import {
   calculatePosition,
@@ -25,6 +26,7 @@ export function PositionCalculator({
   confidence = 0.5,
   isFallback = false,
 }: Props) {
+  const t = useTranslations("position.calculator");
   const { preferences, loaded, defaults, savePreferences, needsSetup } =
     useTradePreferences();
   const [showModal, setShowModal] = useState(false);
@@ -50,10 +52,10 @@ export function PositionCalculator({
         >
           <div className="flex items-center gap-2 mb-1">
             <Settings size={14} className="text-indigo-400" />
-            <span className="text-xs font-medium text-white">仓位计算器</span>
+            <span className="text-xs font-medium text-white">{t("title")}</span>
           </div>
           <p className="text-xs text-zinc-500">
-            设置资金偏好后查看仓位建议 →
+            {t("setupHint")}
           </p>
         </button>
         <PreferenceSetupModal
@@ -81,13 +83,13 @@ export function PositionCalculator({
             ) : (
               <TrendingDown size={14} className="text-red-400" />
             )}
-            <span className="text-xs font-medium text-white">仓位计算器</span>
+            <span className="text-xs font-medium text-white">{t("title")}</span>
           </div>
           <button
             type="button"
             onClick={() => setShowModal(true)}
             className="text-zinc-500 hover:text-indigo-400 transition-colors"
-            title="修改偏好"
+            title={t("editPrefs")}
           >
             <Settings size={14} />
           </button>
@@ -98,17 +100,17 @@ export function PositionCalculator({
           <div className="flex items-start gap-2 rounded-md border border-red-500/20 bg-red-500/5 px-3 py-2">
             <AlertTriangle size={14} className="text-red-400 mt-0.5 shrink-0" />
             <p className="text-xs text-red-400/80">
-              策略盈亏比不足或置信度偏低，请谨慎参考
+              {t("lowQualityWarning")}
             </p>
           </div>
         )}
 
         {/* Key metrics */}
         <div className="grid grid-cols-3 gap-2">
-          <MetricCell label="保证金" value={fmtUSD(result.margin)} />
-          <MetricCell label="名义仓位" value={fmtUSD(result.positionSize)} />
+          <MetricCell label={t("margin")} value={fmtUSD(result.margin)} />
+          <MetricCell label={t("positionSize")} value={fmtUSD(result.positionSize)} />
           <MetricCell
-            label="最大亏损"
+            label={t("maxLoss")}
             value={fmtUSD(result.maxLoss)}
             valueClass="text-red-400"
           />
@@ -117,7 +119,7 @@ export function PositionCalculator({
         {/* Target results */}
         {result.targetResults.length > 0 && (
           <div>
-            <p className="section-label mb-2">目标收益</p>
+            <p className="section-label mb-2">{t("targetProfit")}</p>
             <div className="space-y-1.5">
               {result.targetResults.map((tr, i) => (
                 <div
@@ -148,13 +150,13 @@ export function PositionCalculator({
             confidence={confidence}
           />
           <span className="text-xs text-zinc-500">
-            {preferences?.leverage}x · {((preferences?.riskPct ?? 0) * 100).toFixed(0)}% 风险
+            {preferences?.leverage}x · {((preferences?.riskPct ?? 0) * 100).toFixed(0)}% {t("risk")}
           </span>
         </div>
 
         {/* Disclaimer */}
         <p className="text-xs text-zinc-500 border-t border-white/[0.04] pt-2">
-          以上为基于您输入参数的数学计算结果，不构成投资建议
+          {t("disclaimer")}
         </p>
       </div>
 
@@ -193,4 +195,3 @@ function fmtUSD(n: number): string {
   if (n >= 10_000) return `$${(n / 1_000).toFixed(1)}K`;
   return `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
-

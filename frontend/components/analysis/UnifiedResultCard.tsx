@@ -19,6 +19,9 @@ import {
 } from "./helpers";
 import { cn } from "@/lib/utils";
 import { useConsensusData } from "./UnifiedSections";
+import { PositionCalculator } from "@/components/trade/PositionCalculator";
+import { fromStrategy } from "@/lib/utils/position-sizing";
+import type { StrategyData } from "@/lib/types/strategy";
 
 // ── Technical Blueprint Style Card ─────────────────────────
 
@@ -231,6 +234,18 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
            </div>
         </div>
       </div>
+
+      {/* ── Position Calculator ── */}
+      {strategy && strategy.direction !== "neutral" && !strategy.is_fallback && (
+        <div className="px-5 pb-4">
+          <PositionCalculator
+            input={fromStrategy(strategy as StrategyData)}
+            isWorthTaking={strategy.is_worth_taking ?? true}
+            confidence={report.confidence ?? 0.5}
+            isFallback={strategy.is_fallback ?? false}
+          />
+        </div>
+      )}
 
       {/* ── Footer Metadata ── */}
       <div className="px-4 py-2.5 bg-bg-surface border-t border-border flex items-center justify-between text-xs text-muted-foreground font-mono">

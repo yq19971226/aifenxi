@@ -1,0 +1,38 @@
+{
+  "calculator": {
+    "title": "Position Calculator",
+    "setupHint": "Set up preferences to see position suggestions →",
+    "editPrefs": "Edit Preferences",
+    "margin": "Margin",
+    "positionSize": "Position Size",
+    "maxLoss": "Max Loss",
+    "targetProfit": "Target Profit",
+    "leverage": "Leverage",
+    "risk": "Risk",
+    "lowQualityWarning": "Low R:R ratio or confidence — use with caution",
+    "disclaimer": "Results are mathematical calculations based on your inputs, not investment advice",
+    "summaryMargin": "If entered: Margin",
+    "summaryMaxLoss": "Max Loss",
+    "summarySetupHint": "Set preferences to see position →"
+  },
+  "modal": {
+    "title": "Position Preferences",
+    "step1Title": "Step 1: Capital",
+    "step1Desc": "Enter your total trading capital",
+    "capitalLabel": "Available Capital",
+    "capitalUnit": "USDT",
+    "step2Title": "Step 2: Risk Control",
+    "step2Desc": "Set leverage and max risk per trade",
+    "leverageLabel": "Leverage",
+    "leverageHint": "1x = Spot, higher = more risk",
+    "riskLabel": "Risk per Trade",
+    "riskHint": "Max % of capital to lose per trade",
+    "step3Title": "Step 3: Confirm",
+    "step3Desc": "Read and agree to the disclaimer",
+    "disclaimerText": "I understand that position calculations are mathematical results based on inputs and do not constitute investment advice. Trading involves risk.",
+    "prev": "Previous",
+    "next": "Next",
+    "save": "Save Preferences",
+    "stepIndicator": "Step {current} of {total}"
+  }
+}
