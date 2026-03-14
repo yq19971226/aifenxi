@@ -50,9 +50,9 @@ export function MyStatsCard({
           valueClass="text-emerald-400"
         />
       </div>
-      {stats.settled < 3 && (
+      {!rank && stats.settled < 5 && (
         <p className="text-xs text-zinc-500 mt-3">
-          {t("stats.minSettledHint", { count: stats.settled })}
+          {t("stats.minSettledHint", { min: 3, count: stats.settled })}
         </p>
       )}
     </div>
