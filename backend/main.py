@@ -256,8 +256,17 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     except Exception as exc:
         import logging
         logging.getLogger(__name__).warning("因子学习初始化失败: %s", exc)
+    # 系统机器人 — 排行榜冷启动填充
+    try:
+        from app.services.system_bot import system_bot_loop
+        app.state._system_bot_task = asyncio.create_task(system_bot_loop())
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning("系统机器人启动失败: %s", exc)
     yield
     # shutdown
+    if hasattr(app.state, "_system_bot_task"):
+        app.state._system_bot_task.cancel()
     if hasattr(app.state, "_factor_tracking_task"):
         app.state._factor_tracking_task.cancel()
     if hasattr(app.state, "glassnode_scheduler"):
