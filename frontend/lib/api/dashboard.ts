@@ -53,3 +53,35 @@ export async function fetchDashboardSignals(limit = 20): Promise<DashboardSignal
   const res = await authFetch(`${API_BASE}/api/dashboard/signals?limit=${limit}`);
   return handleApiResponse(res, "请求失败");
 }
+
+// ── Insights ────────────────────────────────────────────────
+
+export interface InsightItem {
+  type: string; // onchain / macro / risk / dealer
+  symbol: string;
+  text: string;
+  icon: string;
+}
+
+export interface DashboardInsightsResponse {
+  insights: InsightItem[];
+}
+
+export async function fetchDashboardInsights(): Promise<DashboardInsightsResponse> {
+  const res = await authFetch(`${API_BASE}/api/dashboard/insights`);
+  return handleApiResponse(res, "请求失败");
+}
+
+// ── Accuracy ────────────────────────────────────────────────
+
+export interface AccuracyResponse {
+  hit_count: number;
+  total: number;
+  accuracy: number;
+  period_days: number;
+}
+
+export async function fetchDashboardAccuracy(days = 7): Promise<AccuracyResponse> {
+  const res = await authFetch(`${API_BASE}/api/dashboard/accuracy?days=${days}`);
+  return handleApiResponse(res, "请求失败");
+}

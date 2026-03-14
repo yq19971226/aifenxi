@@ -1,6 +1,6 @@
 {
   "main": {
-    "dashboard": "仪表盘",
+    "dashboard": "信号总览",
     "onchain": "链上数据",
     "consensus": "共识分析",
     "cases": "历史案例",
@@ -59,7 +59,7 @@
   },
   "breadcrumb": {
     "home": "首页",
-    "dashboard": "仪表盘",
+    "dashboard": "信号总览",
     "onchain": "链上数据",
     "consensus": "共识分析",
     "cases": "历史案例",

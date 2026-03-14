@@ -1,46 +1,58 @@
 {
-  "title": "多币种概览",
-  "subtitle": "AI 实时监控 {count} 个币种，点击展开查看详情",
+  "title": "信号总览",
+  "subtitle": "AI 实时监控所有启用币种的分析信号",
   "autoRefresh": "30s 自动刷新",
-  "guideBanner": "第一次用？花两分钟看看使用指南，快速上手。",
-  "guideBannerLink": "查看指南",
-  "onlineLabel": "人在线",
-  "commandCenter": "指挥中心",
-  "welcomeBack": "欢迎回来",
-  "credits": "积分",
-  "rank": "排名",
-  "topPercent": "前 5%",
-  "liveAnalysisFeed": "全币种规则研判",
-  "autoRefreshHint": "后台每 30 秒自动刷新，按规则引擎展示",
-  "noActiveSessions": "暂无概览数据，请确保已启用币种并稍后刷新。",
-  "ruleVerdict": {
-    "opportunity": "可操作",
-    "risk": "风险",
+  "heroLong": "看多",
+  "heroShort": "看空",
+  "heroNeutral": "观望",
+  "heroAccuracy": "{days}日命中率",
+  "heroNewSignals": "{count} 条新信号",
+  "heroLastUpdate": "上次更新",
+  "heroJustNow": "刚刚",
+  "heroMinAgo": "{min}分钟前",
+  "heroHourAgo": "{hour}小时前",
+  "signalCards": "信号卡片",
+  "strategy": "策略",
+  "entryRange": "入场",
+  "stopLoss": "止损",
+  "target": "目标",
+  "riskReward": "盈亏比",
+  "dealerIntent": "庄家意图",
+  "worthTaking": "值得操作",
+  "notWorth": "观望为主",
+  "updatedAt": "更新于",
+  "direction": {
+    "long": "看多",
+    "short": "看空",
     "neutral": "观望"
   },
-  "goConsensus": "深度分析",
-  "noSymbolsHint": "请在后台「币种管理」中启用交易对，概览将基于规则引擎展示研判结果（不调用分析 API）。",
-  "initializingEngine": "Axiom 共识协议初始化中…",
+  "timeline": {
+    "title": "信号时间线",
+    "empty": "暂无近期信号变化",
+    "showMore": "展开更多",
+    "showLess": "收起"
+  },
+  "insights": {
+    "title": "最新洞察",
+    "empty": "暂无洞察数据",
+    "types": {
+      "onchain": "链上",
+      "macro": "宏观",
+      "risk": "风险",
+      "dealer": "庄家"
+    }
+  },
+  "membership": {
+    "upgradeHint": "升级查看完整策略",
+    "blurred": "***"
+  },
+  "initializingEngine": "信号引擎初始化中…",
   "connectionFailed": "系统连接失败",
   "connectionFailedDesc": "无法与分析节点建立安全连接。",
   "retryConnection": "重试连接",
+  "goConsensus": "深度分析",
   "error": {
     "loadFailed": "加载失败",
-    "fetchFailed": "获取概览数据失败，30s 后自动重试"
-  },
-  "table": {
-    "symbol": "币种",
-    "price": "最新价",
-    "aiJudgment": "AI 判断",
-    "confidence": "置信度",
-    "defenseStatus": "防御状态",
-    "onchainData": "链上数据",
-    "noData": "暂无币种数据，请在后台「币种管理」中添加"
-  },
-  "legend": {
-    "safe": "安全 = 无异常检测",
-    "caution": "警惕 = 庄家活动迹象",
-    "danger": "危险 = 庄家操盘确认",
-    "critical": "极危 = 高度操控风险"
+    "fetchFailed": "获取数据失败，30s 后自动重试"
   }
 }

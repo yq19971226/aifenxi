@@ -265,3 +265,204 @@ async def get_dashboard_signals(
         logger.warning("Failed to generate signals", extra={"error": str(exc)})
 
     return DashboardSignalsResponse(signals=signals, total=len(signals))
+
+
+# ── 最新洞察 API ──────────────────────────────────────────────
+
+class InsightItem(BaseModel):
+    """单条洞察。"""
+    type: str  # onchain / macro / risk / dealer
+    symbol: str
+    text: str
+    icon: str = ""
+
+
+class DashboardInsightsResponse(BaseModel):
+    insights: list[InsightItem] = Field(default_factory=list)
+
+
+@router.get("/insights", response_model=DashboardInsightsResponse)
+async def get_dashboard_insights(
+    _user: UserInfo = Depends(get_current_user),
+) -> DashboardInsightsResponse:
+    """从最近分析报告中提取高价值洞察摘要 — 供信号总览使用。"""
+    await init_redis()
+
+    from app.core.database import AsyncSessionLocal
+    from app.services.symbol_registry import DEFAULT_SYMBOLS, SymbolRegistry
+
+    symbols: list[str] = []
+    try:
+        async with AsyncSessionLocal() as session:
+            registry = SymbolRegistry(session)
+            configs = await registry.list_symbols(enabled_only=True)
+            symbols = [c.symbol for c in configs]
+    except Exception:
+        symbols = list(DEFAULT_SYMBOLS)
+
+    if not symbols:
+        symbols = list(DEFAULT_SYMBOLS)
+
+    insights: list[InsightItem] = []
+
+    for symbol in symbols:
+        try:
+            report = await get_json(f"analysis:latest:{symbol}")
+            if not isinstance(report, dict):
+                continue
+
+            for section in report.get("sections", []):
+                title = section.get("title", "")
+                data = section.get("data") or {}
+                if not isinstance(data, dict):
+                    continue
+
+                findings = data.get("key_findings", [])
+                if not isinstance(findings, list):
+                    findings = []
+
+                # 链上洞察
+                if "链上" in title and findings:
+                    insights.append(InsightItem(
+                        type="onchain", symbol=symbol, icon="🔗",
+                        text=f"{symbol.replace('USDT', '')} {findings[0][:80]}",
+                    ))
+
+                # 宏观/新闻洞察
+                elif ("宏观" in title or "新闻" in title or "macro" in title.lower()):
+                    warning = data.get("warning") or data.get("reasoning", "")
+                    if warning:
+                        insights.append(InsightItem(
+                            type="macro", symbol=symbol, icon="📰",
+                            text=f"{warning[:80]}",
+                        ))
+
+                # 风险洞察
+                elif "风险" in title or "risk" in title.lower():
+                    risk_text = ""
+                    if findings:
+                        risk_text = findings[0]
+                    elif data.get("reasoning"):
+                        risk_text = data["reasoning"]
+                    if risk_text:
+                        insights.append(InsightItem(
+                            type="risk", symbol=symbol, icon="⚠️",
+                            text=f"{symbol.replace('USDT', '')} {risk_text[:80]}",
+                        ))
+
+            # 庄家意图
+            defense = await get_json(f"defense:summary:{symbol}")
+            if isinstance(defense, dict):
+                adv = defense.get("adversarial") or {}
+                intent = adv.get("dealer_intent", "")
+                if intent and intent != "unknown":
+                    insights.append(InsightItem(
+                        type="dealer", symbol=symbol, icon="🎯",
+                        text=f"{symbol.replace('USDT', '')} 庄家意图: {intent[:40]}",
+                    ))
+
+        except Exception as exc:
+            logger.debug("insight extraction failed for %s: %s", symbol, exc)
+            continue
+
+    # 去重并限制数量
+    seen: set[str] = set()
+    unique: list[InsightItem] = []
+    for item in insights:
+        key = f"{item.type}:{item.symbol}"
+        if key not in seen:
+            seen.add(key)
+            unique.append(item)
+    return DashboardInsightsResponse(insights=unique[:12])
+
+
+# ── 命中率 API ────────────────────────────────────────────────
+
+class AccuracyResponse(BaseModel):
+    hit_count: int = 0
+    total: int = 0
+    accuracy: float = 0.0
+    period_days: int = 7
+
+
+@router.get("/accuracy", response_model=AccuracyResponse)
+async def get_strategy_accuracy(
+    days: int = 7,
+    _user: UserInfo = Depends(get_current_user),
+) -> AccuracyResponse:
+    """计算近 N 日策略方向准确率。
+
+    逻辑：取 strategies 表中 direction != neutral 的记录，
+    对比创建时价格与 24 小时后的实际价格变化是否与预测方向一致。
+    """
+    from app.core.database import AsyncSessionLocal
+    from sqlalchemy import text as sa_text
+
+    try:
+        async with AsyncSessionLocal() as session:
+            result = await session.execute(
+                sa_text("""
+                    WITH ranked AS (
+                        SELECT
+                            s.symbol,
+                            s.direction,
+                            s.confidence,
+                            s.entry_low,
+                            s.entry_high,
+                            s.created_at,
+                            ROW_NUMBER() OVER (
+                                PARTITION BY s.symbol, DATE(s.created_at)
+                                ORDER BY s.confidence DESC
+                            ) AS rn
+                        FROM strategies s
+                        WHERE s.direction IN ('long', 'short')
+                          AND s.created_at > NOW() - MAKE_INTERVAL(days => :days)
+                          AND s.confidence >= 0.5
+                    )
+                    SELECT symbol, direction, entry_low, entry_high, created_at
+                    FROM ranked
+                    WHERE rn = 1
+                    ORDER BY created_at DESC
+                    LIMIT 100
+                """),
+                {"days": days},
+            )
+            rows = result.mappings().all()
+
+        if not rows:
+            return AccuracyResponse(period_days=days)
+
+        # 从 Redis 读取当前价格用于比较（简化版本）
+        hit = 0
+        total = 0
+        for row in rows:
+            symbol = row["symbol"]
+            direction = row["direction"]
+            entry_mid = 0.0
+            if row["entry_low"] and row["entry_high"]:
+                entry_mid = (float(row["entry_low"]) + float(row["entry_high"])) / 2
+            if entry_mid <= 0:
+                continue
+
+            current_price_raw = await get_json(f"latest_price:{symbol}")
+            if not isinstance(current_price_raw, (int, float)):
+                continue
+
+            current_price = float(current_price_raw)
+            price_change_pct = (current_price - entry_mid) / entry_mid
+
+            total += 1
+            # 方向一致即命中
+            if direction == "long" and price_change_pct > 0.001:
+                hit += 1
+            elif direction == "short" and price_change_pct < -0.001:
+                hit += 1
+
+        accuracy = round(hit / total, 4) if total > 0 else 0.0
+        return AccuracyResponse(
+            hit_count=hit, total=total, accuracy=accuracy, period_days=days,
+        )
+
+    except Exception as exc:
+        logger.warning("accuracy calculation failed: %s", exc)
+        return AccuracyResponse(period_days=days)
