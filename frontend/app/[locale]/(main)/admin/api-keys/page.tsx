@@ -161,13 +161,13 @@ const API_KEYS: ApiKeyDef[] = [
     category: "notification",
   },
   {
-    key: "nowpayments_api_key",
+    key: "oxapay_merchant_key",
     name: "支付网关密钥",
-    provider: "NOWPayments",
-    description: "接受 USDT 加密货币支付（会员订阅用）。",
-    howToGet: "注册商户账号 → Store Settings → API Keys",
-    registerUrl: "https://nowpayments.io/",
-    cost: "按交易收费",
+    provider: "Oxapay",
+    description: "接受 USDT 加密货币支付（会员订阅用），支持 TRC-20/ERC-20/BEP-20。",
+    howToGet: "注册商户账号 → 创建 Merchant API → 复制 Merchant Key",
+    registerUrl: "https://oxapay.com/",
+    cost: "0.4% 起",
     required: false,
     category: "payment",
   },
@@ -229,51 +229,51 @@ function ApiKeyCard({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-lg border p-5 transition-colors ${
+      className={`rounded-xl border p-5 transition-colors ${
         isConfigured
-          ? "border-emerald-500/20 bg-emerald-500/5"
+          ? "border-bull/30 bg-bull/5 shadow-[inset_0_0_10px_rgba(52,211,153,0.05)]"
           : def.required
-          ? "border-yellow-500/20 bg-yellow-500/5"
-          : "border-zinc-800 bg-zinc-900"
+          ? "border-amber-500/30 bg-amber-500/5 shadow-[inset_0_0_10px_rgba(245,158,11,0.05)]"
+          : "border-border bg-bg-surface/30"
       }`}
     >
       {/* 顶部：名称 + 状态 */}
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold text-white text-sm">{def.name}</span>
-            <span className="text-xs px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <span className="font-bold text-zinc-100 text-sm tracking-wide">{def.name}</span>
+            <span className="text-[10px] font-bold font-mono tracking-widest uppercase px-2 py-0.5 rounded bg-bg-elevated text-zinc-400 border border-border">
               {def.provider}
             </span>
             {def.required && (
-              <span className="text-xs px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30">
+              <span className="text-[10px] font-bold font-mono tracking-widest uppercase px-2 py-0.5 rounded bg-bear/20 text-bear border border-bear/30">
                 必填
               </span>
             )}
-            <span className={`text-xs px-1.5 py-0.5 rounded border ${
+            <span className={`text-[10px] font-bold font-mono tracking-widest uppercase px-2 py-0.5 rounded border ${
               def.cost === "免费"
-                ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
-                : "bg-amber-500/20 text-amber-400 border-amber-500/30"
+                ? "bg-bull/20 text-bull border-bull/30"
+                : "bg-amber-500/20 text-amber-500 border-amber-500/30"
             }`}>
               {def.cost}
             </span>
           </div>
-          <p className="text-xs text-zinc-400 mt-1">{def.description}</p>
+          <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">{def.description}</p>
         </div>
-        <div className="ml-3 shrink-0">
+        <div className="ml-3 shrink-0 flex items-center justify-end">
           {isConfigured ? (
-            <span className="inline-flex items-center gap-1 text-xs text-emerald-400">
-              <CheckCircle2 className="h-4 w-4" />
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold font-mono tracking-widest uppercase text-bull px-2.5 py-1 rounded bg-bull/10 border border-bull/20">
+              <CheckCircle2 className="h-3.5 w-3.5" />
               已配置
             </span>
           ) : isVerifiedUnsaved ? (
-            <span className="inline-flex items-center gap-1 text-xs text-amber-400">
-              <Wifi className="h-4 w-4" />
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold font-mono tracking-widest uppercase text-amber-500 px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/20">
+              <Wifi className="h-3.5 w-3.5" />
               已验证未保存
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-xs text-zinc-500">
-              <XCircle className="h-4 w-4" />
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold font-mono tracking-widest uppercase text-zinc-500 px-2.5 py-1 rounded bg-bg-elevated border border-border">
+              <XCircle className="h-3.5 w-3.5" />
               未配置
             </span>
           )}
@@ -281,40 +281,43 @@ function ApiKeyCard({
       </div>
 
       {/* 获取步骤 */}
-      <div className="mb-3 rounded-lg bg-zinc-800/50 px-3 py-2.5">
-        <div className="flex items-start gap-2">
-          <Key className="h-3.5 w-3.5 text-blue-400 mt-0.5 shrink-0" />
+      <div className="mb-4 rounded-xl bg-bg-elevated/50 p-4 border border-border/50 col-span-2">
+        <div className="flex items-start gap-3">
+          <Key className="h-4 w-4 text-indigo-400 mt-0.5 shrink-0" />
           <div className="flex-1 min-w-0">
-            <div className="text-xs text-zinc-300 font-medium mb-1">如何获取：</div>
-            <div className="text-xs text-zinc-400">{def.howToGet}</div>
-            <a
-              href={def.registerUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 mt-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
-            >
-              <ExternalLink className="h-3 w-3" />
-              前往 {def.provider} 注册
-            </a>
+            <div className="text-[11px] font-bold font-mono tracking-widest uppercase text-zinc-400 mb-2">如何获取</div>
+            <div className="text-xs text-zinc-300 leading-relaxed font-mono bg-bg-surface px-2 py-1 rounded inline-block border border-border/50">{def.howToGet}</div>
+            <div className="mt-3">
+              <a
+                href={def.registerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-[11px] font-bold font-mono tracking-[0.1em] uppercase text-indigo-400 hover:text-indigo-300 transition-colors"
+                style={{ textDecoration: 'none' }}
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                前往 {def.provider} 注册
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
       {/* 输入框 + 测试 + 保存 */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <input
               type={showKey ? "text" : "password"}
               value={editValue}
               onChange={(e) => onChange(e.target.value)}
               placeholder={isConfigured ? "已配置（输入新值可覆盖）" : "粘贴你的 API Key…"}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-3 py-2.5 text-sm text-zinc-200 placeholder-zinc-600 outline-none transition-colors focus:border-blue-500/40 focus:bg-zinc-800 pr-10"
+              className="input pr-10"
             />
             <button
               type="button"
               onClick={() => setShowKey(!showKey)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-zinc-500 hover:text-zinc-300 transition-colors"
               title={showKey ? "隐藏" : "显示"}
             >
               {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -324,43 +327,39 @@ function ApiKeyCard({
             type="button"
             onClick={onTest}
             disabled={testing || !canTest}
-            className="shrink-0 flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-xs font-semibold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-purple-500/20 text-purple-400 hover:bg-purple-500/30"
+            className="btn-secondary !py-2.5 !px-4 flex items-center justify-center gap-2 text-[11px]"
           >
             {testing ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
             ) : (
-              <Wifi className="h-3.5 w-3.5" />
+              <Wifi className="h-4 w-4 text-indigo-400" />
             )}
-            {testing ? "测试中" : "测试连接"}
+            <span className="font-bold font-mono tracking-widest uppercase text-zinc-300">{testing ? "测试中" : "测试连接"}</span>
           </button>
           <button
             type="button"
             onClick={onSave}
             disabled={saving || !hasChanged}
-            className={`shrink-0 flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-xs font-semibold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed ${
-              saved
-                ? "bg-emerald-500/20 text-emerald-400"
-                : "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
-            }`}
+            className={`btn-primary !py-2.5 !px-6 flex items-center justify-center gap-2 text-[11px] ${saved ? '!bg-bull !text-black !border-bull' : ''}`}
           >
             {saving ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin opacity-70" />
             ) : saved ? (
-              <CheckCircle2 className="h-3.5 w-3.5" />
+              <CheckCircle2 className="h-4 w-4" />
             ) : (
-              <Save className="h-3.5 w-3.5" />
+              <Save className="h-4 w-4" />
             )}
-            {saving ? "保存中" : saved ? "已保存" : "保存"}
+            <span className="font-bold font-mono tracking-widest uppercase">{saving ? "保存中" : saved ? "已保存" : "保存"}</span>
           </button>
         </div>
 
         {/* 测试结果 */}
         {testResult && (
           <div
-            className={`rounded-lg px-3 py-2 text-xs ${
+            className={`rounded-lg px-3 py-2 text-xs font-mono font-bold col-span-2 mt-2 ${
               testResult.success
-                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
-                : "bg-red-500/10 text-red-400 border border-red-500/30"
+                ? "bg-bull/10 text-bull border border-bull/30"
+                : "bg-bear/10 text-bear border border-bear/30"
             }`}
           >
             {testResult.success ? "✓ " : "✗ "}
@@ -368,7 +367,7 @@ function ApiKeyCard({
           </div>
         )}
         {isVerifiedUnsaved && (
-          <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
+          <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-xs font-mono font-bold text-amber-500 col-span-2 mt-2">
             当前只完成了连接验证，还没有写入系统配置。请继续点击“保存”。
           </div>
         )}
@@ -504,57 +503,57 @@ export default function ApiKeysPage() {
 
   if (configsLoading) {
     return (
-      <div className="min-h-screen bg-[var(--bg-primary)] text-white p-6 flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
+      <div className="flex min-h-screen items-center justify-center bg-bg-primary">
+        <Loader2 className="h-6 w-6 animate-spin text-zinc-400" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] text-white p-6">
+    <div className="min-h-screen bg-bg-primary text-zinc-200 p-6 space-y-6">
       {/* 顶部 */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Key className="h-6 w-6 text-blue-400" />
+      <div className="card-surface p-6 rounded-xl border border-border">
+        <h1 className="text-xl font-bold text-zinc-100 flex items-center gap-3">
+          <Key className="h-5 w-5 text-indigo-400" />
           API 密钥管理
         </h1>
-        <p className="mt-1 text-sm text-zinc-400">
-          在这里填入各个服务的 API Key，填好后系统会自动开始采集数据。
+        <p className="mt-2 text-[13px] text-zinc-400">
+          配置各项服务的 API 密钥以启用完整的数据采集分析能力。
         </p>
       </div>
 
       {/* 进度条 */}
-      <div className="mb-6 rounded-lg border border-zinc-800 bg-zinc-900 p-5">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-zinc-300 font-medium">配置进度</span>
-          <span className="text-sm text-white font-bold">{configuredCount}/{API_KEYS.length}</span>
+      <div className="card-surface p-6 rounded-xl border border-border">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-[11px] font-bold font-mono tracking-widest text-zinc-400 uppercase">配置进度</span>
+          <span className="text-sm font-bold font-mono text-zinc-100">{configuredCount} <span className="text-zinc-600 font-normal">/</span> {API_KEYS.length}</span>
         </div>
-        <div className="h-2.5 rounded-full bg-zinc-800 overflow-hidden">
+        <div className="h-2 rounded-full bg-bg-elevated overflow-hidden border border-border/50">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${
-              requiredConfigured >= requiredTotal ? "bg-emerald-500" : "bg-yellow-500"
+            className={`h-full rounded-full transition-all duration-500 shadow-inner ${
+              requiredConfigured >= requiredTotal ? "bg-bull/80 shadow-[inset_0_0_10px_rgba(52,211,153,0.5)]" : "bg-amber-500/80 shadow-[inset_0_0_10px_rgba(245,158,11,0.5)]"
             }`}
             style={{ width: `${(configuredCount / API_KEYS.length) * 100}%` }}
           />
         </div>
-        <div className="mt-2 flex items-center gap-4 text-xs text-zinc-500">
-          <span className={requiredConfigured >= requiredTotal ? "text-emerald-400" : "text-yellow-400"}>
+        <div className="mt-4 flex items-center gap-4 text-[11px] text-zinc-500 font-bold tracking-wide">
+          <span className={requiredConfigured >= requiredTotal ? "text-bull" : "text-amber-500"}>
             {requiredConfigured >= requiredTotal
               ? "✓ 核心密钥已配置"
               : `核心密钥 ${requiredConfigured}/${requiredTotal}，请先配置必填项`}
           </span>
-          <span>·</span>
-          <span>其余数据源可随时添加</span>
+          <span className="text-zinc-700">/</span>
+          <span className="text-zinc-400">其余数据源可按需补充</span>
         </div>
       </div>
 
       {/* Toast */}
       {toast && (
         <div
-          className={`mb-4 rounded-lg px-4 py-3 text-sm font-medium ${
+          className={`rounded-lg px-4 py-3 text-sm font-bold shadow-md ${
             toast.type === "ok"
-              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-              : "bg-red-500/20 text-red-300 border border-red-500/30"
+              ? "bg-bull/20 text-bull border border-bull/30"
+              : "bg-bear/20 text-bear border border-bear/30"
           }`}
         >
           {toast.msg}
@@ -568,9 +567,12 @@ export default function ApiKeysPage() {
           if (items.length === 0) return null;
 
           return (
-            <div key={group.id}>
-              <h2 className="text-base font-semibold text-zinc-200 mb-3">{group.label}</h2>
-              <div className="grid grid-cols-1 gap-3">
+            <div key={group.id} className="space-y-4">
+              <h2 className="text-[11px] font-bold font-mono tracking-widest text-zinc-500 uppercase flex items-center gap-4">
+                {group.label}
+                <div className="h-px flex-1 bg-border/50" />
+              </h2>
+              <div className="grid grid-cols-1 gap-4">
                 {items.map((def) => (
                   <ApiKeyCard
                     key={def.key}
@@ -593,27 +595,46 @@ export default function ApiKeysPage() {
       </div>
 
       {/* 底部说明 */}
-      <div className="mt-8 rounded-lg border border-zinc-800 bg-zinc-900 p-5">
-        <h3 className="text-sm font-semibold text-zinc-300 mb-3">常见问题</h3>
-        <div className="space-y-3 text-xs text-zinc-400">
-          <div>
-            <span className="text-zinc-300 font-medium">Q: 必须全部填完才能用吗？</span>
-            <p className="mt-0.5">不需要。只有「AI 分析密钥」是必填的，其他数据源可以按需开通。没有填的数据源系统会自动跳过。</p>
+      <div className="card-surface p-6 rounded-xl border border-border">
+        <h3 className="mb-6 text-[11px] font-bold font-mono tracking-[0.2em] uppercase text-zinc-500">
+          常见问题
+        </h3>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 text-xs text-zinc-400 leading-relaxed">
+          <div className="flex items-start gap-4">
+             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-bg-elevated text-zinc-500 font-mono font-bold text-[10px] border border-border">
+               01
+             </div>
+             <div>
+               <span className="text-zinc-200 font-bold block mb-1.5 text-[13px]">必须全部填完才能用吗？</span>
+               不需要。只有标了 <span className="text-bear font-bold">必填</span> 的项是保证系统基础运作的（例如 AI 的调用）。其他数据源都是按需开启的模块。没有填的数据源系统会自动跳过分析流程。
+             </div>
           </div>
-          <div>
-            <span className="text-zinc-300 font-medium">Q: 填了 Key 后需要重启吗？</span>
-            <p className="mt-0.5">不需要。保存后系统会自动生效，下一次采集周期就会使用新的 Key。</p>
+          <div className="flex items-start gap-4">
+             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-bg-elevated text-zinc-500 font-mono font-bold text-[10px] border border-border">
+               02
+             </div>
+             <div>
+               <span className="text-zinc-200 font-bold block mb-1.5 text-[13px]">填了 Key 后需要重启吗？</span>
+               不需要。配置保存后立即写入系统全局内存并且生效，下一个周期的计划任务或实时分析引擎将会读取并应用新的 API 认证。
+             </div>
           </div>
-          <div>
-            <span className="text-zinc-300 font-medium">Q: Key 安全吗？</span>
-            <p className="mt-0.5">所有 API Key 在数据库中加密存储，前端只能看到脱敏后的值（如 sk-****abc），不会明文显示。</p>
+          <div className="flex items-start gap-4">
+             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-bg-elevated text-zinc-500 font-mono font-bold text-[10px] border border-border">
+               03
+             </div>
+             <div>
+               <span className="text-zinc-200 font-bold block mb-1.5 text-[13px]">如何防止 Key 泄露？</span>
+               系统后端会对接收到的秘钥进行一次性注入，并且前端的读取接口是经过掩码脱敏处理过的 `****` 格式，在此页面不会明文显示已保存的 Key。
+             </div>
           </div>
-          <div>
-            <span className="text-zinc-300 font-medium">Q: 免费的数据源够用吗？</span>
-            <p className="mt-0.5">
-              免费数据源（Binance + Alternative.me + BlockBeats + Finnhub + CoinGecko Demo）已经覆盖了 K 线、合约、恐慌指数、新闻、财报日历、美股关联报价、基本面数据，
-              对于基础分析足够。付费数据源（CoinGlass、GlassNode、CoinGecko 高级套餐）主要增强衡生品、链上深度和社区情绪维度。
-            </p>
+          <div className="flex items-start gap-4">
+             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-bg-elevated text-zinc-500 font-mono font-bold text-[10px] border border-border">
+               04
+             </div>
+             <div>
+               <span className="text-zinc-200 font-bold block mb-1.5 text-[13px]">免费套餐可以支撑分析吗？</span>
+               系统内置免费的数据链路涵盖了很大一部分的信息收集（如 Binance OCO/Orderbooks 等核心基础属性），即使全是免费的第三方 API，也足够系统完成轻量化的行情简读。
+             </div>
           </div>
         </div>
       </div>
