@@ -118,7 +118,6 @@ function HeroSection() {
 }
 
 function TerminalBlock() {
-  const [lines, setLines] = useState<string[]>([]);
   const fullLog = [
     "> INITIATING NSED ENGINE...",
     "> CONNECTING TO BINANCE STREAM [WSS]... OK",
@@ -132,18 +131,17 @@ function TerminalBlock() {
     "> GENERATING REPORT #8X29A..."
   ];
 
+  const [visibleCount, setVisibleCount] = useState(0);
+
   useEffect(() => {
-    let currentIndex = 0;
-    const interval = setInterval(() => {
-      if (currentIndex < fullLog.length) {
-        setLines(prev => [...prev, fullLog[currentIndex]]);
-        currentIndex++;
-      } else {
-        clearInterval(interval);
-      }
+    if (visibleCount >= fullLog.length) return;
+    const timer = setTimeout(() => {
+      setVisibleCount((c) => c + 1);
     }, 800);
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearTimeout(timer);
+  }, [visibleCount, fullLog.length]);
+
+  const lines = fullLog.slice(0, visibleCount);
 
   return (
     <div className="relative rounded-2xl border border-white/[0.1] bg-[#000]/80 backdrop-blur-2xl p-1 font-mono text-sm shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
@@ -157,7 +155,7 @@ function TerminalBlock() {
       </div>
       <div className="p-6 h-[400px] overflow-hidden flex flex-col justify-end text-xs md:text-sm">
         {lines.map((line, i) => {
-          const isHighlight = line.includes("CONSENSUS");
+          const isHighlight = typeof line === "string" && line.includes("CONSENSUS");
           return (
             <div key={i} className={`mb-2.5 ${isHighlight ? 'text-indigo-400 font-bold drop-shadow-[0_0_5px_rgba(99,102,241,0.5)]' : 'text-emerald-400/80'}`}>
               <span className="text-zinc-600 mr-3">{new Date().toLocaleTimeString()}</span>
