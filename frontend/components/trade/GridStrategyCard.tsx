@@ -126,27 +126,50 @@ export function GridStrategyCard({ report }: Props) {
       <div className="relative">
         {/* Blur overlay for non-flagship users */}
         {!isFlagship && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center backdrop-blur-md bg-bg-primary/60 rounded-b-xl">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/20 shadow-inner mb-4">
-              <Lock size={24} className="text-amber-400" />
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden rounded-b-xl">
+            {/* Base blur and noise */}
+            <div className="absolute inset-0 backdrop-blur-md bg-black/60 opacity-90" />
+            
+            {/* Animated data flow lines in background */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none">
+              <div className="absolute top-1/4 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-amber-500/50 to-transparent translate-x-[-100%] animate-[flow_3s_infinite]" />
+              <div className="absolute top-2/4 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent translate-x-[-100%] animate-[flow_4s_infinite_1s]" />
+              <div className="absolute top-3/4 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent translate-x-[-100%] animate-[flow_2.5s_infinite_2s]" />
             </div>
-            <p className="text-sm font-bold text-zinc-300 mb-1">{t("flagshipOnly")}</p>
+
+            {/* Premium Lock Icon */}
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-black/80 border border-zinc-800 shadow-[0_0_30px_rgba(245,158,11,0.15)] mb-6 z-10">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-amber-500/20 to-transparent opacity-50" />
+              <div className="absolute inset-[1px] rounded-2xl bg-gradient-to-b from-white/5 to-transparent" />
+              <Lock size={26} className="text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" strokeWidth={1.5} />
+            </div>
+            
+            <p className="text-sm font-medium text-white tracking-wide mb-2 z-10">{t("flagshipOnly")}</p>
+            <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.2em] mb-6 z-10">Exclusive Quant Institutional Tools</p>
+            
             <a
               href="/settings/membership"
-              className="mt-3 flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-xs font-bold font-mono uppercase tracking-widest text-black hover:bg-amber-400 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] active:scale-[0.98]"
+              className="relative group z-10 flex items-center gap-2 rounded-lg bg-black px-6 py-3 text-[11px] font-bold font-mono uppercase tracking-[0.15em] text-amber-500 transition-all hover:text-amber-400 active:scale-[0.98]"
             >
-              <Zap size={14} />
+              <div className="absolute inset-0 rounded-lg border border-amber-500/30 group-hover:border-amber-500/60 transition-colors" />
+              <div className="absolute inset-0 rounded-lg bg-amber-500/5 group-hover:bg-amber-500/10 transition-colors" />
+              <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Zap size={14} className="group-hover:drop-shadow-[0_0_5px_rgba(245,158,11,0.8)]" />
               {t("upgradeBtn")}
-              <ArrowUpRight size={12} />
+              <ArrowUpRight size={12} className="opacity-70 group-hover:opacity-100" />
             </a>
           </div>
         )}
 
         {/* Grid visualization */}
         <div className={cn("p-5 space-y-5", !isFlagship && "min-h-[400px]")}>
-          {/* Visual grid ladder */}
-          <div className="bg-bg-primary/50 border border-border/50 rounded-xl p-4 shadow-inner">
-            <div className="relative flex flex-col gap-0">
+          {/* Visual grid ladder - Terminal Style */}
+          <div className="bg-black/40 rounded-xl p-5 border border-white/[0.04]">
+            <div className="flex justify-between items-center mb-4">
+               <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-[0.2em]">{t("labels.buy")} / {t("labels.sell")}</span>
+               <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-[0.2em]">{t("labels.current")}</span>
+            </div>
+            <div className="relative flex flex-col gap-[2px]">
               {grid.gridLevels.slice().reverse().slice(0, 12).map((price, idx, arr) => {
                 const total = arr.length;
                 const isFirst = idx === 0;
@@ -158,57 +181,69 @@ export function GridStrategyCard({ report }: Props) {
                 return (
                   <div
                     key={price}
-                    className={cn(
-                      "flex items-center justify-between py-1.5 px-3 border-l-2 transition-colors",
-                      isFirst ? "border-l-emerald-500" :
-                      isLast ? "border-l-red-500" :
-                      isMid ? "border-l-indigo-500" :
-                      isAboveMid ? "border-l-emerald-500/40" : "border-l-red-500/40",
-                    )}
+                    className="group relative flex items-center justify-between py-1.5 transition-colors hover:bg-white/[0.02]"
                   >
-                    <div className="flex items-center gap-2">
+                    {/* Background line extension */}
+                    <div className="absolute left-0 right-0 top-1/2 h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent pointer-events-none" />
+                    
+                    {/* Left: Action Indicator */}
+                    <div className="flex items-center gap-3 z-10 w-24">
+                      <div className={cn(
+                        "h-4 w-1 rounded-full",
+                        isFirst ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" :
+                        isLast ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" :
+                        isMid ? "bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)] animate-pulse" :
+                        isAboveMid ? "bg-emerald-500/30" : "bg-red-500/30"
+                      )} />
                       <span className={cn(
-                        "text-[9px] font-bold font-mono uppercase tracking-widest w-8",
+                        "text-[9px] font-bold font-mono uppercase tracking-widest",
                         isFirst ? "text-emerald-400" :
                         isLast ? "text-red-400" :
                         isMid ? "text-indigo-400" : "text-zinc-600"
                       )}>
-                        {isFirst ? t("labels.tp") : isLast ? t("labels.sl") : isMid ? "MID" : `G${total - idx}`}
-                      </span>
-                      <span className={cn(
-                        "text-xs font-mono font-bold tracking-tight",
-                        isFirst ? "text-emerald-400" :
-                        isLast ? "text-red-400" :
-                        isMid ? "text-white" : "text-zinc-400"
-                      )}>
-                        ${price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                        {isFirst ? t("labels.tp") : isLast ? t("labels.sl") : isMid ? "ENTRY" : `G${total - idx}`}
                       </span>
                     </div>
-                    <span className={cn(
-                      "text-[9px] font-bold font-mono uppercase tracking-widest",
-                      isAboveMid ? "text-red-400/60" : "text-emerald-400/60"
-                    )}>
-                      {isFirst ? "" : isLast ? "" : isAboveMid ? t("labels.sell") : t("labels.buy")}
-                    </span>
+
+                    {/* Right: Price */}
+                    <div className="flex items-center justify-end flex-1 z-10 gap-3">
+                      <span className={cn(
+                        "text-[9px] font-bold font-mono uppercase tracking-widest text-right",
+                        isAboveMid ? "text-red-400/40" : "text-emerald-400/40"
+                      )}>
+                        {isFirst ? "" : isLast ? "" : isAboveMid ? t("labels.sell") : t("labels.buy")}
+                      </span>
+                      <span className={cn(
+                        "text-[13px] font-sans font-black tracking-tight tabular-nums relative",
+                        isFirst ? "text-emerald-400 glow-text-green" :
+                        isLast ? "text-red-400 glow-text-red" :
+                        isMid ? "text-white glow-text" : "text-zinc-400"
+                      )}>
+                        ${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {isMid && (
+                          <span className="absolute -right-3 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-indigo-400 shadow-[0_0_6px_rgba(99,102,241,0.8)] animate-pulse" />
+                        )}
+                      </span>
+                    </div>
                   </div>
                 );
               })}
               {grid.gridLevels.length > 12 && (
-                <div className="text-center text-[10px] font-mono font-bold text-zinc-500 py-2 uppercase tracking-widest">
+                <div className="text-center text-[10px] font-mono font-bold text-zinc-600 py-3 uppercase tracking-[0.2em]">
                   ... +{grid.gridLevels.length - 12} {t("labels.gridLevels")}
                 </div>
               )}
             </div>
           </div>
 
-          {/* Key parameters grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <ParamCell label={t("params.priceRange")} value={`$${grid.priceLower.toLocaleString()} — $${grid.priceUpper.toLocaleString()}`} />
-            <ParamCell label={t("params.gridCount")} value={`${grid.gridCount}`} />
-            <ParamCell label={t("params.gridMode")} value={t(`params.${grid.gridMode}`)} />
-            <ParamCell label={t("params.leverage")} value={`${grid.leverage}x`} highlight />
-            <ParamCell label={t("params.investment")} value={`$${grid.investmentAmount.toLocaleString()}`} />
-            <ParamCell label={t("params.perGridProfit")} value={`${grid.perGridProfitPct.toFixed(2)}%`} highlight />
+          {/* Key parameters grid - HUD Style */}
+          <div className="grid grid-cols-2 md:grid-cols-3 bg-black/40 rounded-xl overflow-hidden border border-white/[0.04] p-1">
+            <ParamCell HUD label={t("params.priceRange")} value={`$${grid.priceLower.toLocaleString()} — $${grid.priceUpper.toLocaleString()}`} />
+            <ParamCell HUD label={t("params.gridCount")} value={`${grid.gridCount}`} />
+            <ParamCell HUD label={t("params.gridMode")} value={t(`params.${grid.gridMode}`)} />
+            <ParamCell HUD label={t("params.leverage")} value={`${grid.leverage}x`} highlight />
+            <ParamCell HUD label={t("params.investment")} value={`$${grid.investmentAmount.toLocaleString()}`} />
+            <ParamCell HUD label={t("params.perGridProfit")} value={`${grid.perGridProfitPct.toFixed(2)}%`} highlight />
           </div>
 
           {/* Advanced toggle */}
@@ -228,21 +263,21 @@ export function GridStrategyCard({ report }: Props) {
               exit={{ opacity: 0, height: 0 }}
               className="space-y-3"
             >
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <ParamCell label={t("params.leveragedAmount")} value={`$${grid.leveragedAmount.toLocaleString()}`} />
-                <ParamCell label={t("params.perGridAmount")} value={`$${grid.perGridAmount.toLocaleString()}`} />
-                <ParamCell label={t("params.gridSpacing")} value={grid.gridMode === "arithmetic" ? `$${grid.gridSpacing.toFixed(2)}` : `${grid.gridSpacing.toFixed(2)}%`} />
-                <ParamCell label={t("params.takeProfit")} value={`$${grid.takeProfit.toLocaleString()}`} valueColor="text-emerald-400" />
-                <ParamCell label={t("params.stopLoss")} value={`$${grid.stopLoss.toLocaleString()}`} valueColor="text-red-400" />
-                <ParamCell label={t("params.annualYield")} value={`${grid.estAnnualYield.toFixed(1)}%`} highlight />
+              <div className="grid grid-cols-2 md:grid-cols-3 bg-black/40 rounded-xl overflow-hidden border border-white/[0.04] p-1">
+                <ParamCell HUD label={t("params.leveragedAmount")} value={`$${grid.leveragedAmount.toLocaleString()}`} />
+                <ParamCell HUD label={t("params.perGridAmount")} value={`$${grid.perGridAmount.toLocaleString()}`} />
+                <ParamCell HUD label={t("params.gridSpacing")} value={grid.gridMode === "arithmetic" ? `$${grid.gridSpacing.toFixed(2)}` : `${grid.gridSpacing.toFixed(2)}%`} />
+                <ParamCell HUD label={t("params.takeProfit")} value={`$${grid.takeProfit.toLocaleString()}`} valueColor="text-emerald-400" />
+                <ParamCell HUD label={t("params.stopLoss")} value={`$${grid.stopLoss.toLocaleString()}`} valueColor="text-red-400" />
+                <ParamCell HUD label={t("params.annualYield")} value={`${grid.estAnnualYield.toFixed(1)}%`} highlight />
                 {grid.estLiquidationLong && (
-                  <ParamCell label={t("params.liquidationLong")} value={`$${grid.estLiquidationLong.toLocaleString()}`} valueColor="text-red-400" />
+                  <ParamCell HUD label={t("params.liquidationLong")} value={`$${grid.estLiquidationLong.toLocaleString()}`} valueColor="text-red-400" />
                 )}
                 {grid.estLiquidationShort && (
-                  <ParamCell label={t("params.liquidationShort")} value={`$${grid.estLiquidationShort.toLocaleString()}`} valueColor="text-red-400" />
+                  <ParamCell HUD label={t("params.liquidationShort")} value={`$${grid.estLiquidationShort.toLocaleString()}`} valueColor="text-red-400" />
                 )}
-                <ParamCell label={t("params.shiftUp")} value={grid.shiftUp ? t("labels.enabled") : t("labels.disabled")} valueColor={grid.shiftUp ? "text-emerald-400" : "text-zinc-500"} />
-                <ParamCell label={t("params.shiftDown")} value={grid.shiftDown ? t("labels.enabled") : t("labels.disabled")} valueColor={grid.shiftDown ? "text-emerald-400" : "text-zinc-500"} />
+                <ParamCell HUD label={t("params.shiftUp")} value={grid.shiftUp ? t("labels.enabled") : t("labels.disabled")} valueColor={grid.shiftUp ? "text-emerald-400" : "text-zinc-500"} />
+                <ParamCell HUD label={t("params.shiftDown")} value={grid.shiftDown ? t("labels.enabled") : t("labels.disabled")} valueColor={grid.shiftDown ? "text-emerald-400" : "text-zinc-500"} />
               </div>
             </motion.div>
           )}
@@ -267,19 +302,37 @@ function ParamCell({
   value,
   valueColor = "text-white",
   highlight = false,
+  HUD = false,
 }: {
   label: string;
   value: string;
   valueColor?: string;
   highlight?: boolean;
+  HUD?: boolean;
 }) {
+  if (HUD) {
+    return (
+      <div className={cn(
+        "relative p-3 border-b border-white/[0.04]",
+        "[&:nth-child(odd)]:border-r md:[&:nth-child(odd)]:border-r-0 md:[&:not(:nth-child(3n))]:border-r",
+      )}>
+        {highlight && (
+          <div className="absolute left-0 top-1/4 bottom-1/4 w-[2px] bg-amber-500 rounded-r-full shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+        )}
+        <p className="text-[9px] font-mono text-zinc-600 uppercase tracking-[0.2em] mb-1 line-clamp-1 pl-1">{label}</p>
+        <p className={cn("text-[13px] font-sans font-black tracking-tight tabular-nums pl-1", valueColor === "text-white" ? "text-zinc-200" : valueColor)}>{value}</p>
+      </div>
+    );
+  }
+
+  // Fallback for non-HUD style (if needed elsewhere)
   return (
     <div className={cn(
       "rounded-xl bg-bg-primary/50 border border-border/50 p-3 shadow-inner",
       highlight && "border-amber-500/20 bg-amber-500/[0.03]"
     )}>
-      <p className="text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest mb-1.5 line-clamp-1">{label}</p>
-      <p className={cn("text-sm font-bold font-mono tracking-tight", valueColor)}>{value}</p>
+      <p className="text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-[0.15em] mb-1.5 line-clamp-1">{label}</p>
+      <p className={cn("text-[13px] font-sans font-black tracking-tight tabular-nums", valueColor)}>{value}</p>
     </div>
   );
 }
