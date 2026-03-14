@@ -324,17 +324,13 @@
           "professional": "Professional — 1200/min · 30s interval · All Endpoints"
         }
       },
-      "nowpayments_api_key": {
-        "label": "Payment Gateway API Key",
-        "help": "NowPayments USDT payment"
+      "oxapay_merchant_key": {
+        "label": "Payment Gateway Key",
+        "help": "Oxapay crypto payment Merchant Key"
       },
-      "nowpayments_ipn_secret": {
-        "label": "Payment Callback Secret",
-        "help": "Payment notification signature verification"
-      },
-      "nowpayments_ipn_callback_url": {
+      "oxapay_callback_url": {
         "label": "Payment Callback URL",
-        "help": "NowPayments callback full URL (must be publicly accessible)"
+        "help": "Oxapay callback full URL (must be publicly accessible)"
       },
       "telegram_bot_token": {
         "label": "Telegram Bot Token",

@@ -363,11 +363,11 @@
         "howToGet": "注册账号 → Settings → API Keys → Create API Key",
         "cost": "免费层可用"
       },
-      "nowpayments_api_key": {
+      "oxapay_merchant_key": {
         "name": "支付网关密钥",
-        "description": "接受 USDT 加密货币支付（会员订阅用）。",
-        "howToGet": "注册商户账号 → Store Settings → API Keys",
-        "cost": "按交易收费"
+        "description": "接受 USDT 加密货币支付（会员订阅用），支持 TRC-20/ERC-20/BEP-20。",
+        "howToGet": "注册商户账号 → 创建 Merchant API → 复制 Merchant Key",
+        "cost": "0.4% 起"
       }
     }
   },

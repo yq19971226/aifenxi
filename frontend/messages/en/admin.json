@@ -423,11 +423,11 @@
         "howToGet": "Register → Settings → API Keys → Create API Key",
         "cost": "Free tier available"
       },
-      "nowpayments_api_key": {
+      "oxapay_merchant_key": {
         "name": "Payment Gateway Key",
-        "description": "Accept USDT crypto payments for membership subscriptions.",
-        "howToGet": "Register merchant → Store Settings → API Keys",
-        "cost": "Per-transaction fee"
+        "description": "Accept USDT crypto payments for membership (TRC-20/ERC-20/BEP-20).",
+        "howToGet": "Register merchant → Create Merchant API → Copy Merchant Key",
+        "cost": "From 0.4%"
       }
     }
   },

@@ -324,17 +324,13 @@
           "professional": "Professional — 1200次/分 · 30秒間隔 · 全部端點"
         }
       },
-      "nowpayments_api_key": {
+      "oxapay_merchant_key": {
         "label": "支付網關密鑰",
-        "help": "NowPayments USDT 支付"
+        "help": "Oxapay 加密貨幣支付 Merchant Key"
       },
-      "nowpayments_ipn_secret": {
-        "label": "支付回調密鑰",
-        "help": "支付通知驗證簽名"
-      },
-      "nowpayments_ipn_callback_url": {
+      "oxapay_callback_url": {
         "label": "支付回調地址",
-        "help": "NowPayments 回調完整地址（需公網可訪問）"
+        "help": "Oxapay 回調完整地址（需公網可訪問）"
       },
       "telegram_bot_token": {
         "label": "Telegram 機器人",
