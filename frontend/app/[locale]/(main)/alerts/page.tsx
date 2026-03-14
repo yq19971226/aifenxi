@@ -123,13 +123,13 @@ export default function AlertsPage() {
   return (
     <PageTransition>
       <div className="flex flex-col gap-6 p-6">
-        <div className="flex items-center justify-between pb-4 border-b border-white/[0.05]">
+        <div className="flex items-center justify-between pb-4 border-b border-border">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-              <span className="flex h-3 w-3 rounded-full bg-indigo-500 animate-pulse"></span>
+            <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+              <span className="flex h-3 w-3 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_10px_rgba(99,102,241,0.5)]"></span>
               {t('title')}
             </h1>
-            <p className="mt-1.5 text-sm text-zinc-400">
+            <p className="mt-1.5 text-sm font-medium text-zinc-400">
               {t('subtitle')}
             </p>
           </div>
@@ -138,23 +138,23 @@ export default function AlertsPage() {
               type="button"
               onClick={() => setFormMode({ type: "create" })}
               disabled={isAtLimit}
-              className="btn-primary text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              className="btn-primary text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {t('createButton')}
             </button>
           )}
         </div>
 
-        <div className="card rounded-lg p-6">
+        <div className="bg-bg-surface border border-border shadow-inner rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+            <span className="text-xs font-bold font-mono uppercase tracking-widest text-zinc-400">
               {t('quota.label', { level: levelLabel })}
             </span>
-            <span className="text-sm font-mono font-medium text-white">
+            <span className="text-sm font-mono font-bold text-white tracking-tight">
               {t('quota.used', { used: usedCount, limit: ruleLimit })}
             </span>
           </div>
-          <div className="h-2 rounded-full bg-white/[0.04] overflow-hidden">
+          <div className="h-2 rounded-full bg-bg-elevated border border-border overflow-hidden shadow-inner">
             <motion.div
               className={`h-full rounded-full ${barColor}`}
               initial={{ width: 0 }}
@@ -163,8 +163,8 @@ export default function AlertsPage() {
             />
           </div>
           {isAtLimit && (
-            <p className="mt-3 text-sm font-medium text-red-400 flex items-center gap-1.5">
-              <span className="flex h-1.5 w-1.5 rounded-full bg-red-400"></span>
+            <p className="mt-4 text-[10px] font-bold font-mono uppercase tracking-widest text-red-400 flex items-center gap-2">
+              <span className="flex h-1.5 w-1.5 rounded-full bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]"></span>
               {t('quota.limitReached')}
             </p>
           )}
@@ -182,7 +182,7 @@ export default function AlertsPage() {
           )}
         </AnimatePresence>
 
-        <div className="flex items-center gap-1 p-1.5 rounded-lg bg-white/[0.02] border border-white/[0.05] w-fit">
+        <div className="flex items-center gap-1 p-1.5 rounded-xl bg-bg-surface shadow-inner border border-border w-fit">
           {([
             { key: "rules" as Tab, tabKey: "rules" },
             { key: "history" as Tab, tabKey: "history" },
@@ -191,10 +191,10 @@ export default function AlertsPage() {
               key={key}
               type="button"
               onClick={() => setTab(key)}
-              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${
+              className={`px-6 py-2 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 ${
                 tab === key
-                  ? "bg-white/[0.06] text-indigo-400"
-                  : "text-zinc-400 hover:text-white hover:bg-white/[0.02]"
+                  ? "bg-bg-elevated text-indigo-400 shadow-sm"
+                  : "text-zinc-500 hover:text-zinc-300 hover:bg-bg-elevated/50"
               }`}
             >
               {t(`tabs.${tabKey}`)}
