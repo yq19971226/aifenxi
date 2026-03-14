@@ -74,7 +74,7 @@ function regimeLabel(r: string | null): string {
 }
 
 const S = {
-  card: { width: 420, maxWidth: "100%", background: "#09090b", borderRadius: 20, overflow: "hidden" as const, fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: "#e4e4e7", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255,255,255,0.08)", position: "relative" as const },
+  card: { width: 420, background: "#09090b", borderRadius: 20, overflow: "hidden" as const, fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: "#e4e4e7", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255,255,255,0.08)", position: "relative" as const },
   gridBg: { position: "absolute" as const, inset: 0, backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)", backgroundSize: "20px 20px", pointerEvents: "none" as const },
   sectionBox: (borderColor: string, bg: string) => ({ position: "relative" as const, zIndex: 10, margin: "0 24px", border: "1px solid rgba(255,255,255,0.06)", borderLeft: `3px solid ${borderColor}`, borderRadius: 12, padding: "16px 20px", marginBottom: 16, background: bg, backdropFilter: "blur(10px)" }),
   row: { display: "flex" as const, justifyContent: "space-between" as const, alignItems: "center" as const, padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" },

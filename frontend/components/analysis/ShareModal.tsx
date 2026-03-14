@@ -65,9 +65,11 @@ export function ShareModal({ report, config, onClose }: ShareModalProps) {
           </button>
         </div>
 
-        {/* Card preview：窄屏时卡片随容器收缩 */}
-        <div className="w-full overflow-auto rounded-lg flex justify-center">
-          <ShareCard ref={cardRef} report={report} config={config} />
+        {/* Card preview：使用 transform scale 来完美自适应显示 */}
+        <div className="w-full relative flex justify-center py-2 overflow-y-auto overflow-x-hidden rounded-lg mx-auto custom-scrollbar" style={{ maxHeight: '65vh' }}>
+          <div className="origin-top" style={{ transform: 'scale(var(--scale-factor, 1))', transformOrigin: 'top center', marginBottom: 'calc(400px * (var(--scale-factor, 1) - 1))', ['--scale-factor' as string]: 'min(1, calc((100vw - 48px) / 420))' }}>
+            <ShareCard ref={cardRef} report={report} config={config} />
+          </div>
         </div>
 
         {/* Save button */}
