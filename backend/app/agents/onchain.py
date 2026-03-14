@@ -220,6 +220,31 @@ class OnchainAgent(BaseAgent):
         """分析链上数据，调用 LLM 生成庄家行为解读报告。"""
         user_prompt = _build_user_prompt(data)
 
+        # 诊断日志：检查链上数据是否可用
+        if data.onchain:
+            oc = data.onchain
+            available = sum(1 for f in [
+                oc.exchange_netflow, oc.mvrv, oc.active_addresses,
+                oc.nupl, oc.sopr, oc.lth_sopr, oc.sth_nupl,
+                oc.hodler_net_change, oc.reserve_risk,
+            ] if f is not None)
+            logger.info(
+                "OnchainAgent data check",
+                extra={
+                    "symbol": data.symbol,
+                    "onchain_available": True,
+                    "key_metrics": available,
+                    "mvrv": oc.mvrv,
+                    "exchange_netflow": oc.exchange_netflow,
+                    "sopr": oc.sopr,
+                },
+            )
+        else:
+            logger.warning(
+                "OnchainAgent data check — NO ONCHAIN DATA",
+                extra={"symbol": data.symbol, "onchain_available": False},
+            )
+
         try:
             locale = getattr(data, "locale", "zh-CN")
             system_prompt = get_system_prompt("onchain", locale)
@@ -232,6 +257,20 @@ class OnchainAgent(BaseAgent):
                 user_prompt=user_prompt,
             )
 
+            # 诊断日志：LLM 原始返回
+            logger.info(
+                "OnchainAgent LLM result",
+                extra={
+                    "symbol": data.symbol,
+                    "model_key": _model_key,
+                    "is_fallback": result.get("is_fallback", False),
+                    "raw_phase": result.get("phase"),
+                    "raw_confidence": result.get("confidence"),
+                    "raw_confidence_type": type(result.get("confidence")).__name__,
+                    "has_evidence": bool(result.get("evidence")),
+                },
+            )
+
             # 解析 phase
             phase: str = result.get("phase", "观望")
             if phase not in VALID_PHASES:
@@ -240,9 +279,17 @@ class OnchainAgent(BaseAgent):
             # 映射 signal
             signal = _PHASE_SIGNAL_MAP.get(phase, "neutral")
 
-            # 解析 confidence
-            confidence = result.get("confidence", 0.0)
-            if not isinstance(confidence, (int, float)) or not (0.0 <= confidence <= 1.0):
+            # 解析 confidence — 兼容字符串类型
+            raw_conf = result.get("confidence", 0.0)
+            try:
+                confidence = float(raw_conf)
+                if not (0.0 <= confidence <= 1.0):
+                    confidence = 0.0
+            except (ValueError, TypeError):
+                logger.warning(
+                    "OnchainAgent confidence parse failed",
+                    extra={"raw_value": raw_conf, "type": type(raw_conf).__name__},
+                )
                 confidence = 0.0
 
             # 解析 evidence
