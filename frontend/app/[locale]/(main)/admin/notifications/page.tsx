@@ -37,7 +37,6 @@ export default function AdminNotificationsPage() {
   const { user } = useAuth();
   const t = useTranslations("admin.notifications");
   
-  if (!user || user.role !== "admin") return null;
   const [data, setData] = useState<NotificationLogListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,6 +64,7 @@ export default function AdminNotificationsPage() {
     } finally {
       setLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, channelFilter, statusFilter, page]);
 
   useEffect(() => {
@@ -81,6 +81,8 @@ export default function AdminNotificationsPage() {
   );
 
   const totalPages = data ? Math.ceil(data.total / data.page_size) : 0;
+
+  if (!user || user.role !== "admin") return null;
 
   return (
     <div className="flex flex-col gap-6 p-6">

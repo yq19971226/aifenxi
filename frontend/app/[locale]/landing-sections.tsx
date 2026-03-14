@@ -51,38 +51,45 @@ function HeroSection() {
   const locale = useLocale();
 
   return (
-    <section className="relative min-h-[90vh] flex items-center pt-24 pb-32 overflow-hidden bg-[#09090b]">
-      {/* Grid Background */}
-      <div className="absolute inset-0 bg-[#09090b]">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-        <div className="absolute top-0 right-0 w-[50vw] h-[50vw] rounded-full bg-indigo-500/10 blur-[120px] -mr-[10vw] -mt-[10vw] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] rounded-full bg-emerald-500/5 blur-[120px] -ml-[10vw] -mb-[10vw] pointer-events-none" />
-      </div>
+    <section className="relative min-h-screen flex items-center pt-24 pb-32 overflow-hidden bg-black selection:bg-indigo-500/30">
+      {/* 极客深渊背景网络 */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_0%,#000_20%,transparent_100%)] pointer-events-none" />
       
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-16 items-center">
+      {/* 巨大的缓慢旋转的模糊光晕 Spotlight */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 150, repeat: Infinity, ease: "linear" }}
+        className="absolute w-[150vw] h-[150vw] -left-[25vw] -top-[50vw] opacity-30 pointer-events-none"
+      >
+        <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 bg-indigo-500/20 rounded-full blur-[150px] mix-blend-screen" />
+        <div className="absolute bottom-1/4 right-1/4 w-1/2 h-1/2 bg-emerald-500/10 rounded-full blur-[150px] mix-blend-screen" />
+      </motion.div>
+      
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
         {/* Left: Copy */}
         <div className="max-w-2xl">
           <FadeIn delay={0.1}>
-            <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-xs font-bold text-indigo-400 mb-8 shadow-[0_0_20px_rgba(99,102,241,0.1)] uppercase tracking-[0.15em] backdrop-blur-md">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+            <div className="inline-flex items-center gap-3 px-3 py-1.5 border-l-2 border-indigo-500 bg-indigo-500/10 text-[10px] font-mono text-indigo-400 mb-8 shadow-[0_0_20px_rgba(99,102,241,0.1)] uppercase tracking-[0.2em] backdrop-blur-md">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full bg-indigo-400 opacity-75"></span>
+                <span className="relative inline-flex h-1.5 w-1.5 bg-indigo-500"></span>
               </span>
-              {t("hero.badge")}
+              SYS.STATUS // {t("hero.badge")}
             </div>
           </FadeIn>
           
           <FadeIn delay={0.2}>
-            <h1 className="text-5xl sm:text-7xl font-black tracking-tighter text-white mb-6 leading-[1.1]">
+            <h1 className="text-5xl sm:text-7xl font-black tracking-tighter text-white mb-6 leading-[1.05] uppercase">
               {t("hero.titleLine1")} <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.3)]">
+              <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-white to-emerald-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]">
                 {t("hero.titleLine2")}
               </span>
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.3}>
-            <p className="text-lg md:text-xl text-zinc-400 mb-10 max-w-lg leading-relaxed font-mono">
+            <p className="text-sm md:text-base text-zinc-500 mb-10 max-w-lg leading-relaxed font-mono tracking-wide uppercase border-l border-white/10 pl-4 py-1">
               {t("hero.subtitleLine1")}
               <br />
               {t("hero.subtitleLine2")}
@@ -93,15 +100,20 @@ function HeroSection() {
             <div className="flex flex-wrap gap-4">
               <Link
                 href={`/${locale}/login`}
-                className="h-14 px-8 rounded-xl bg-indigo-500 text-white font-black text-sm uppercase tracking-widest flex items-center gap-3 hover:bg-indigo-400 transition-all shadow-[0_0_20px_rgba(99,102,241,0.3)] border border-indigo-400/50 hover:shadow-[0_0_30px_rgba(99,102,241,0.5)]"
+                className="relative group h-14 px-8 bg-indigo-500/10 border border-indigo-500/40 text-indigo-400 font-mono text-[11px] uppercase tracking-[0.2em] flex items-center gap-3 transition-all hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] overflow-hidden"
               >
-                {t("hero.ctaPrimary")} <ArrowRight size={18} />
+                <div className="absolute inset-0 bg-indigo-500/20 w-0 group-hover:w-full transition-all duration-500 ease-out z-0" />
+                <span className="relative z-10 flex items-center gap-2">
+                  INITIATE_CORE <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                </span>
+                <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-indigo-400 pointer-events-none" />
               </Link>
               <Link
                 href={`/${locale}/guide`}
-                className="h-14 px-8 rounded-xl border border-white/[0.1] bg-white/[0.02] backdrop-blur-md text-white font-bold text-sm tracking-widest flex items-center hover:bg-white/[0.06] hover:border-white/[0.2] transition-colors"
+                className="h-14 px-8 border border-white/[0.1] bg-white/[0.02] backdrop-blur-md text-zinc-400 font-mono text-[11px] tracking-[0.2em] uppercase flex items-center hover:bg-white/[0.06] hover:text-white hover:border-white/[0.3] transition-colors relative"
               >
-                {t("cta.guide")}
+                READ_DOCS
+                <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-zinc-500 pointer-events-none" />
               </Link>
             </div>
           </FadeIn>
@@ -109,7 +121,6 @@ function HeroSection() {
 
         {/* Right: Terminal */}
         <FadeIn delay={0.5} className="hidden lg:block relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-emerald-500/10 rounded-2xl blur-3xl" />
           <TerminalBlock />
         </FadeIn>
       </div>
@@ -119,16 +130,16 @@ function HeroSection() {
 
 function TerminalBlock() {
   const fullLog = [
-    "> INITIATING NSED ENGINE...",
-    "> CONNECTING TO BINANCE STREAM [WSS]... OK",
-    "> CONNECTING TO ONCHAIN NODES... OK",
-    "> AGENT[TECHNICAL] ANALYZING BTC/USDT...",
-    "> AGENT[ONCHAIN] DETECTED WHALE MOVE (2000 BTC)...",
-    "> AGENT[RISK] CALCULATING VOLATILITY...",
-    "> ROUND 1 DEBATE: BULLISH (CONFIDENCE 65%)",
-    "> ROUND 2 DEBATE: CROSS-EXAMINATION...",
-    "> CONSENSUS REACHED: BULLISH (CONFIDENCE 82%)",
-    "> GENERATING REPORT #8X29A..."
+    "> AUTHORIZING_ACCESS_TOKEN...",
+    "> SYNCING_GLOBAL_ORACLE_NODES... [OK]",
+    "> DEPLOYING_AI_AGENTS (QTY: 4)... [ACTIVE]",
+    "> AGENT[TECH]: DETECTED_VOLATILITY_SPIKE $BTC",
+    "> AGENT[RISK]: HEDGE_RATIO_ADJUSTED -> 0.45",
+    "> INITIATING_SWARM_DEBATE_PROTOCOL...",
+    "> ROUND_1: BULLISH_BIAS (65% CONFIDENCE)",
+    "> ROUND_2: CROSS_EXAMINING_ONCHAIN_DATA...",
+    "> CONSENSUS_ACHIEVED: STRONG_BUY (82%)",
+    "> EXECUTING_GRID_STRATEGY_GENERATION..."
   ];
 
   const [visibleCount, setVisibleCount] = useState(0);
@@ -137,33 +148,47 @@ function TerminalBlock() {
     if (visibleCount >= fullLog.length) return;
     const timer = setTimeout(() => {
       setVisibleCount((c) => c + 1);
-    }, 800);
+    }, Math.random() * 400 + 400); // Randomized typing speed
     return () => clearTimeout(timer);
   }, [visibleCount, fullLog.length]);
 
   const lines = fullLog.slice(0, visibleCount);
 
   return (
-    <div className="relative rounded-2xl border border-white/[0.1] bg-[#000]/80 backdrop-blur-2xl p-1 font-mono text-sm shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
-      <div className="flex items-center gap-3 px-5 py-3.5 border-b border-white/[0.06] bg-white/[0.02]">
-        <div className="flex gap-2">
-          <div className="w-3 h-3 rounded-full bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
-          <div className="w-3 h-3 rounded-full bg-amber-500/80 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
-          <div className="w-3 h-3 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+    <div className="relative border border-white/[0.05] bg-black/60 backdrop-blur-2xl p-1 font-mono text-[10px] shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden">
+      {/* HUD Corners */}
+      <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20" />
+      <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/20" />
+      <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/20" />
+      <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20" />
+
+      <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.05] bg-white/[0.01]">
+        <div className="text-[9px] font-bold text-indigo-400 uppercase tracking-[0.3em] flex items-center gap-2">
+          <div className="w-1.5 h-1.5 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)] animate-pulse" />
+          AXIOM_TERMINAL_V5
         </div>
-        <div className="ml-2 text-xs font-bold text-zinc-500 uppercase tracking-widest">axiom_core.exe</div>
+        <div className="flex gap-4 text-[8px] text-zinc-600 tracking-widest">
+          <span>PORT: 5092</span>
+          <span>NET: MAIN</span>
+        </div>
       </div>
-      <div className="p-6 h-[400px] overflow-hidden flex flex-col justify-end text-xs md:text-sm">
-        {lines.map((line, i) => {
-          const isHighlight = typeof line === "string" && line.includes("CONSENSUS");
-          return (
-            <div key={i} className={`mb-2.5 ${isHighlight ? 'text-indigo-400 font-bold drop-shadow-[0_0_5px_rgba(99,102,241,0.5)]' : 'text-emerald-400/80'}`}>
-              <span className="text-zinc-600 mr-3">{new Date().toLocaleTimeString()}</span>
-              {line}
-            </div>
-          );
-        })}
-        <div className="animate-pulse text-emerald-400 font-black text-lg ml-16 mt-1">_</div>
+
+      <div className="p-5 h-[360px] flex flex-col justify-end text-xs relative">
+        {/* Subtle grid in terminal */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
+        
+        <div className="relative z-10 w-full flex flex-col gap-1.5">
+          {lines.map((line, i) => {
+            const isHighlight = typeof line === "string" && line.includes("CONSENSUS");
+            return (
+              <div key={i} className={`${isHighlight ? 'text-indigo-400 font-bold drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]' : 'text-emerald-400/70'} tracking-wider`}>
+                <span className="text-zinc-600 mr-3 hidden sm:inline-block">[{new Date().toISOString().split('T')[1].slice(0, 11)}]</span>
+                {line}
+              </div>
+            );
+          })}
+          <div className="animate-pulse text-emerald-400 font-black text-sm ml-1 mt-1 block w-2 h-4 bg-emerald-400/80 shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
+        </div>
       </div>
     </div>
   );
@@ -175,18 +200,23 @@ function PainPointsSection() {
   const t = useTranslations("landing.painPoints");
   const items = t.raw("items") as { problem: string; solution: string }[];
   return (
-    <section className="py-24 border-t border-white/[0.05] bg-[#09090b]">
+    <section className="py-24 border-t border-white/[0.05] bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <FadeIn>
-          <h2 className="text-4xl md:text-5xl font-black mb-16 tracking-tight text-white">{t("title")}</h2>
+          <h2 className="text-4xl md:text-5xl font-black mb-16 tracking-tighter text-white uppercase">{t("title")}</h2>
         </FadeIn>
         <div className="grid md:grid-cols-3 gap-6">
           {(items || []).map((item, i) => (
             <FadeIn key={i} delay={i * 0.1}>
-              <div className="p-8 rounded-2xl border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-colors h-full group">
-                <p className="text-zinc-500 font-medium mb-4 text-sm tracking-wide">{item.problem}</p>
-                <div className="w-12 h-px bg-white/[0.1] mb-4 group-hover:bg-indigo-500/50 transition-colors" />
-                <p className="text-white font-bold text-lg">{item.solution}</p>
+              <div className="relative p-8 border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-colors h-full group overflow-hidden">
+                <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20 opacity-50 group-hover:opacity-100 group-hover:border-indigo-500 transition-colors" />
+                <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20 opacity-50 group-hover:opacity-100 group-hover:border-indigo-500 transition-colors" />
+                
+                <p className="text-zinc-500 font-mono mb-4 text-[11px] tracking-widest uppercase">{item.problem}</p>
+                <div className="w-12 h-px bg-white/[0.1] mb-6 group-hover:bg-indigo-500/50 group-hover:w-full transition-all duration-500" />
+                <p className="text-white font-bold text-lg tracking-wide">{item.solution}</p>
+                
+                <div className="absolute -inset-px bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity blur-md" />
               </div>
             </FadeIn>
           ))}
@@ -201,29 +231,32 @@ function PainPointsSection() {
 function CapabilitiesSection() {
   const t = useTranslations("landing.capabilities");
   return (
-    <section className="py-24 border-t border-white/[0.05] bg-[#09090b]">
+    <section className="py-24 border-t border-white/[0.05] bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <FadeIn>
-          <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-white">{t("title")}</h2>
-          <p className="text-lg text-zinc-400 max-w-2xl mb-16 leading-relaxed font-mono">{t("subtitle")}</p>
+          <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter text-white uppercase">{t("title")}</h2>
+          <p className="text-sm text-zinc-500 max-w-2xl mb-16 leading-relaxed font-mono uppercase tracking-[0.1em]">{t("subtitle")}</p>
         </FadeIn>
         <div className="grid md:grid-cols-3 gap-6">
           <FadeIn delay={0.1}>
-            <div className="p-8 rounded-2xl border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-colors h-full">
-              <h3 className="text-xl font-bold mb-4 text-white">{t("analysis.title")}</h3>
-              <p className="text-sm text-zinc-500 leading-relaxed font-mono">{t("analysis.desc")}</p>
+            <div className="relative p-8 border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-300 h-full group hover:-translate-y-1">
+              <div className="absolute top-0 right-0 p-2 opacity-20 font-mono text-[8px] group-hover:opacity-100 group-hover:text-indigo-400">#001</div>
+              <h3 className="text-xl font-bold mb-4 text-white uppercase tracking-wider">{t("analysis.title")}</h3>
+              <p className="text-[11px] text-zinc-500 leading-relaxed font-mono tracking-wide">{t("analysis.desc")}</p>
             </div>
           </FadeIn>
           <FadeIn delay={0.2}>
-            <div className="p-8 rounded-2xl border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-colors h-full">
-              <h3 className="text-xl font-bold mb-4 text-white">{t("consensus.title")}</h3>
-              <p className="text-sm text-zinc-500 leading-relaxed font-mono">{t("consensus.desc")}</p>
+            <div className="relative p-8 border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-300 h-full group hover:-translate-y-1">
+              <div className="absolute top-0 right-0 p-2 opacity-20 font-mono text-[8px] group-hover:opacity-100 group-hover:text-indigo-400">#002</div>
+              <h3 className="text-xl font-bold mb-4 text-white uppercase tracking-wider">{t("consensus.title")}</h3>
+              <p className="text-[11px] text-zinc-500 leading-relaxed font-mono tracking-wide">{t("consensus.desc")}</p>
             </div>
           </FadeIn>
           <FadeIn delay={0.3}>
-            <div className="p-8 rounded-2xl border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-colors h-full">
-              <h3 className="text-xl font-bold mb-4 text-white">{t("practice.title")}</h3>
-              <p className="text-sm text-zinc-500 leading-relaxed font-mono">{t("practice.desc")}</p>
+            <div className="relative p-8 border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-300 h-full group hover:-translate-y-1">
+              <div className="absolute top-0 right-0 p-2 opacity-20 font-mono text-[8px] group-hover:opacity-100 group-hover:text-indigo-400">#003</div>
+              <h3 className="text-xl font-bold mb-4 text-white uppercase tracking-wider">{t("practice.title")}</h3>
+              <p className="text-[11px] text-zinc-500 leading-relaxed font-mono tracking-wide">{t("practice.desc")}</p>
             </div>
           </FadeIn>
         </div>
@@ -237,33 +270,52 @@ function CapabilitiesSection() {
 function ModesSection() {
   const t = useTranslations("landing.modes");
   return (
-    <section className="py-24 border-t border-white/[0.05] bg-[#09090b] relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
+    <section className="py-32 border-t border-white/[0.05] bg-black relative overflow-hidden">
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_10%,transparent_100%)] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] md:w-[600px] md:h-[600px] rounded-full bg-indigo-500/10 blur-[150px] pointer-events-none" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <FadeIn>
-          <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-white">{t("title")}</h2>
-          <p className="text-lg text-zinc-400 max-w-2xl mb-16 leading-relaxed font-mono">{t("subtitle")}</p>
+          <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">{t("title")}</h2>
+          <p className="text-sm text-zinc-500 max-w-2xl mb-20 leading-relaxed font-mono uppercase tracking-[0.1em]">{t("subtitle")}</p>
         </FadeIn>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-8">
           <FadeIn delay={0.1}>
-            <div className="p-8 rounded-2xl border border-white/[0.05] bg-black/40 backdrop-blur-sm hover:border-indigo-500/30 transition-colors">
-              <span className="inline-block text-[10px] font-black font-mono text-indigo-400/80 border border-indigo-500/30 bg-indigo-500/10 px-2 py-1 rounded uppercase tracking-[0.2em] shadow-[0_0_10px_rgba(99,102,241,0.1)]">{t("scalping.tag")}</span>
-              <h3 className="text-xl font-bold mt-5 mb-3 text-white">{t("scalping.name")}</h3>
-              <p className="text-sm text-zinc-500 leading-relaxed font-mono">{t("scalping.desc")}</p>
+            <div className="relative p-10 border border-white/[0.05] bg-black/80 backdrop-blur-xl hover:border-indigo-500/30 transition-all duration-500 group overflow-hidden">
+              <div className="absolute -inset-px bg-gradient-to-b from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 -translate-x-full group-hover:translate-x-0" />
+              <div className="relative z-10">
+                <span className="inline-block text-[10px] font-black font-mono text-indigo-400 border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 uppercase tracking-[0.3em] shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                  {t("scalping.tag")}
+                </span>
+                <h3 className="text-2xl font-black mt-8 mb-4 text-white uppercase tracking-widest">{t("scalping.name")}</h3>
+                <p className="text-[11px] text-zinc-400 leading-relaxed font-mono tracking-widest uppercase">{t("scalping.desc")}</p>
+              </div>
             </div>
           </FadeIn>
           <FadeIn delay={0.2}>
-            <div className="p-8 rounded-2xl border border-white/[0.05] bg-black/40 backdrop-blur-sm hover:border-emerald-500/30 transition-colors">
-              <span className="inline-block text-[10px] font-black font-mono text-emerald-400/80 border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 rounded uppercase tracking-[0.2em] shadow-[0_0_10px_rgba(16,185,129,0.1)]">{t("intraday.tag")}</span>
-              <h3 className="text-xl font-bold mt-5 mb-3 text-white">{t("intraday.name")}</h3>
-              <p className="text-sm text-zinc-500 leading-relaxed font-mono">{t("intraday.desc")}</p>
+            <div className="relative p-10 border border-white/[0.05] bg-black/80 backdrop-blur-xl hover:border-emerald-500/30 transition-all duration-500 group overflow-hidden">
+              <div className="absolute -inset-px bg-gradient-to-b from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 -translate-x-full group-hover:translate-x-0" />
+              <div className="relative z-10">
+                <span className="inline-block text-[10px] font-black font-mono text-emerald-400 border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 uppercase tracking-[0.3em] shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                  {t("intraday.tag")}
+                </span>
+                <h3 className="text-2xl font-black mt-8 mb-4 text-white uppercase tracking-widest">{t("intraday.name")}</h3>
+                <p className="text-[11px] text-zinc-400 leading-relaxed font-mono tracking-widest uppercase">{t("intraday.desc")}</p>
+              </div>
             </div>
           </FadeIn>
           <FadeIn delay={0.3}>
-            <div className="p-8 rounded-2xl border border-white/[0.05] bg-black/40 backdrop-blur-sm hover:border-amber-500/30 transition-colors">
-              <span className="inline-block text-[10px] font-black font-mono text-amber-400/80 border border-amber-500/30 bg-amber-500/10 px-2 py-1 rounded uppercase tracking-[0.2em] shadow-[0_0_10px_rgba(245,158,11,0.1)]">{t("trend.tag")}</span>
-              <h3 className="text-xl font-bold mt-5 mb-3 text-white">{t("trend.name")}</h3>
-              <p className="text-sm text-zinc-500 leading-relaxed font-mono">{t("trend.desc")}</p>
+            <div className="relative p-10 border border-white/[0.05] bg-black/80 backdrop-blur-xl hover:border-amber-500/30 transition-all duration-500 group overflow-hidden">
+              <div className="absolute -inset-px bg-gradient-to-b from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-amber-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 -translate-x-full group-hover:translate-x-0" />
+              <div className="relative z-10">
+                <span className="inline-block text-[10px] font-black font-mono text-amber-400 border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 uppercase tracking-[0.3em] shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                  {t("trend.tag")}
+                </span>
+                <h3 className="text-2xl font-black mt-8 mb-4 text-white uppercase tracking-widest">{t("trend.name")}</h3>
+                <p className="text-[11px] text-zinc-400 leading-relaxed font-mono tracking-widest uppercase">{t("trend.desc")}</p>
+              </div>
             </div>
           </FadeIn>
         </div>
@@ -280,37 +332,43 @@ function ProductSection() {
   const consensusHighlights = t.raw("consensus.highlights") as string[];
   const playbookHighlights = t.raw("playbook.highlights") as string[];
   return (
-    <section className="py-24 border-t border-white/[0.05] bg-[#09090b]">
+    <section className="py-24 border-t border-white/[0.05] bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <FadeIn>
-          <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-white">{t("title")}</h2>
-          <p className="text-lg text-zinc-400 max-w-2xl mb-16 leading-relaxed font-mono">{t("subtitle")}</p>
+          <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter text-white uppercase">{t("title")}</h2>
+          <p className="text-sm text-zinc-500 max-w-2xl mb-16 leading-relaxed font-mono tracking-[0.1em] uppercase">{t("subtitle")}</p>
         </FadeIn>
         <div className="grid md:grid-cols-3 gap-8">
           <FadeIn delay={0.1}>
-            <div className="p-8 rounded-2xl border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-colors h-full flex flex-col group">
-              <h3 className="text-xl font-bold mb-4 text-white">{t("dashboard.title")}</h3>
-              <p className="text-sm text-zinc-500 leading-relaxed mb-6 flex-1 font-mono">{t("dashboard.desc")}</p>
-              <ul className="text-xs text-zinc-400 space-y-2 font-mono">
-                {(dashboardHighlights || []).map((h, i) => <li key={i}>· {h}</li>)}
+            <div className="relative p-8 border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-all h-full flex flex-col group overflow-hidden">
+              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20 group-hover:border-indigo-500 transition-colors" />
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20 group-hover:border-indigo-500 transition-colors" />
+              <h3 className="text-xl font-bold mb-4 text-white uppercase tracking-widest">{t("dashboard.title")}</h3>
+              <p className="text-[11px] text-zinc-500 leading-relaxed mb-6 flex-1 font-mono tracking-widest uppercase">{t("dashboard.desc")}</p>
+              <ul className="text-[10px] text-zinc-400 space-y-3 font-mono tracking-[0.1em] uppercase">
+                {(dashboardHighlights || []).map((h, i) => <li key={i} className="flex gap-2 items-start"><span className="text-indigo-500 font-black pt-0.5">/</span> {h}</li>)}
               </ul>
             </div>
           </FadeIn>
           <FadeIn delay={0.2}>
-            <div className="p-8 rounded-2xl border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-colors h-full flex flex-col group">
-              <h3 className="text-xl font-bold mb-4 text-white">{t("consensus.title")}</h3>
-              <p className="text-sm text-zinc-500 leading-relaxed mb-6 flex-1 font-mono">{t("consensus.desc")}</p>
-              <ul className="text-xs text-zinc-400 space-y-2 font-mono">
-                {(consensusHighlights || []).map((h, i) => <li key={i}>· {h}</li>)}
+            <div className="relative p-8 border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-all h-full flex flex-col group overflow-hidden">
+              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20 group-hover:border-emerald-500 transition-colors" />
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20 group-hover:border-emerald-500 transition-colors" />
+              <h3 className="text-xl font-bold mb-4 text-white uppercase tracking-widest">{t("consensus.title")}</h3>
+              <p className="text-[11px] text-zinc-500 leading-relaxed mb-6 flex-1 font-mono tracking-widest uppercase">{t("consensus.desc")}</p>
+              <ul className="text-[10px] text-zinc-400 space-y-3 font-mono tracking-[0.1em] uppercase">
+                {(consensusHighlights || []).map((h, i) => <li key={i} className="flex gap-2 items-start"><span className="text-emerald-500 font-black pt-0.5">/</span> {h}</li>)}
               </ul>
             </div>
           </FadeIn>
           <FadeIn delay={0.3}>
-            <div className="p-8 rounded-2xl border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-colors h-full flex flex-col group">
-              <h3 className="text-xl font-bold mb-4 text-white">{t("playbook.title")}</h3>
-              <p className="text-sm text-zinc-500 leading-relaxed mb-6 flex-1 font-mono">{t("playbook.desc")}</p>
-              <ul className="text-xs text-zinc-400 space-y-2 font-mono">
-                {(playbookHighlights || []).map((h, i) => <li key={i}>· {h}</li>)}
+            <div className="relative p-8 border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-all h-full flex flex-col group overflow-hidden">
+              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20 group-hover:border-amber-500 transition-colors" />
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20 group-hover:border-amber-500 transition-colors" />
+              <h3 className="text-xl font-bold mb-4 text-white uppercase tracking-widest">{t("playbook.title")}</h3>
+              <p className="text-[11px] text-zinc-500 leading-relaxed mb-6 flex-1 font-mono tracking-widest uppercase">{t("playbook.desc")}</p>
+              <ul className="text-[10px] text-zinc-400 space-y-3 font-mono tracking-[0.1em] uppercase">
+                {(playbookHighlights || []).map((h, i) => <li key={i} className="flex gap-2 items-start"><span className="text-amber-500 font-black pt-0.5">/</span> {h}</li>)}
               </ul>
             </div>
           </FadeIn>
@@ -326,16 +384,16 @@ function DataSection() {
   const t = useTranslations("landing.data");
   const tags = ["exchange", "onchain", "derivatives", "macro", "sentiment", "news"] as const;
   return (
-    <section className="py-24 border-t border-white/[0.05] bg-[#09090b] relative">
+    <section className="py-24 border-t border-white/[0.05] bg-black relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <FadeIn>
-          <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-white">{t("title")}</h2>
-          <p className="text-lg text-zinc-400 max-w-2xl mb-12 leading-relaxed font-mono">{t("desc")}</p>
+          <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter text-white uppercase">{t("title")}</h2>
+          <p className="text-sm text-zinc-500 max-w-2xl mb-12 leading-relaxed font-mono uppercase tracking-[0.1em]">{t("desc")}</p>
         </FadeIn>
         <FadeIn delay={0.1}>
           <div className="flex flex-wrap gap-3">
             {tags.map((key) => (
-              <span key={key} className="px-5 py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.02] text-xs font-bold font-mono text-zinc-400 uppercase tracking-widest hover:border-indigo-500/50 hover:text-white transition-colors">
+              <span key={key} className="px-5 py-2.5 border border-white/[0.08] bg-white/[0.02] text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-[0.2em] hover:border-indigo-500/50 hover:text-indigo-400 hover:bg-indigo-500/10 transition-colors shadow-[0_0_15px_rgba(0,0,0,0.5)]">
                 {t(key)}
               </span>
             ))}
@@ -352,21 +410,30 @@ function CTASection() {
   const t = useTranslations("landing.cta");
   const locale = useLocale();
   return (
-    <section className="py-32 border-t border-white/[0.05] bg-[#09090b] relative overflow-hidden">
+    <section className="py-32 border-t border-white/[0.05] bg-black relative overflow-hidden">
       {/* Background ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-indigo-500/10 blur-[150px] pointer-events-none" />
       
       <div className="max-w-3xl mx-auto px-4 text-center relative z-10">
         <FadeIn>
-          <h2 className="text-5xl md:text-6xl font-black mb-6 tracking-tighter text-white drop-shadow-lg">{t("title")}</h2>
-          <p className="text-lg text-zinc-400 mb-12 font-mono leading-relaxed">{t("subtitle")}</p>
+          <h2 className="text-5xl md:text-6xl font-black mb-6 tracking-tighter text-white drop-shadow-lg uppercase">{t("title")}</h2>
+          <p className="text-sm text-zinc-500 mb-12 font-mono uppercase tracking-[0.1em]">{t("subtitle")}</p>
         </FadeIn>
         <FadeIn delay={0.1} className="flex flex-wrap items-center justify-center gap-4">
-          <Link href={`/${locale}/register`} className="h-14 px-8 rounded-xl bg-indigo-500 text-white font-black text-sm uppercase tracking-widest hover:bg-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.3)] border border-indigo-400/50 hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] transition-all flex items-center justify-center">
-            {t("button")}
+          <Link
+            href={`/${locale}/register`}
+            className="relative group h-14 px-8 bg-indigo-500/10 border border-indigo-500/40 text-indigo-400 font-mono text-[11px] uppercase tracking-[0.2em] flex items-center justify-center transition-all hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] min-w-[200px]"
+          >
+            <div className="absolute inset-0 bg-indigo-500/20 w-0 group-hover:w-full transition-all duration-500 ease-out z-0" />
+            <span className="relative z-10">{t("button")}</span>
+            <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-indigo-400 pointer-events-none" />
           </Link>
-          <Link href={`/${locale}/login`} className="h-14 px-8 rounded-xl border border-white/[0.1] bg-white/[0.02] backdrop-blur-md text-white font-bold text-sm tracking-widest hover:bg-white/[0.06] hover:border-white/[0.2] transition-colors flex items-center justify-center">
-            {t("login")}
+          <Link
+            href={`/${locale}/login`}
+            className="relative group h-14 px-8 border border-white/[0.1] bg-white/[0.02] text-zinc-400 font-mono text-[11px] uppercase tracking-[0.2em] flex items-center justify-center transition-all hover:border-white/[0.3] hover:text-white min-w-[200px]"
+          >
+            <span className="relative z-10">{t("login")}</span>
+            <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-zinc-500 pointer-events-none" />
           </Link>
         </FadeIn>
       </div>
@@ -384,11 +451,11 @@ function FeaturesSection() {
   const items = t.raw("items") as { title: string; desc: string }[];
 
   return (
-    <section id="features" className="py-32 border-t border-white/[0.05] bg-[#09090b]">
+    <section id="features" className="py-32 border-t border-white/[0.05] bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-20">
-          <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-white">{t("sectionTitle")}</h2>
-          <p className="text-lg text-zinc-400 max-w-2xl font-mono leading-relaxed">
+          <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter text-white uppercase">{t("sectionTitle")}</h2>
+          <p className="text-sm text-zinc-500 max-w-2xl font-mono tracking-[0.1em] uppercase">
             {t("sectionDesc")}
           </p>
         </div>
@@ -398,14 +465,16 @@ function FeaturesSection() {
             const Icon = FEATURE_ICONS[i] ?? Cpu;
             return (
               <FadeIn key={i} delay={i * 0.1}>
-                <div className="p-8 rounded-2xl border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/[0.1] transition-all h-full group">
-                  <div className="w-12 h-12 rounded-xl bg-white/[0.05] flex items-center justify-center mb-6 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
-                    <Icon className="w-6 h-6 text-zinc-400 group-hover:text-indigo-400" strokeWidth={2} />
+                <div className="relative p-8 border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] transition-all h-full group overflow-hidden">
+                  <div className="absolute top-0 right-0 font-mono text-[8px] p-2 opacity-20 group-hover:opacity-100 group-hover:text-indigo-400 transition-colors">M_0{i+1}</div>
+                  <div className="w-10 h-10 border border-white/[0.1] bg-white/[0.02] flex items-center justify-center mb-6 group-hover:bg-indigo-500/20 group-hover:border-indigo-500/50 group-hover:text-indigo-400 transition-colors">
+                    <Icon className="w-5 h-5 text-zinc-500 group-hover:text-indigo-400" strokeWidth={1.5} />
                   </div>
-                  <h3 className="text-xl font-bold mb-3 text-white tracking-tight">{f.title}</h3>
-                  <p className="text-sm text-zinc-500 leading-relaxed font-mono">
+                  <h3 className="text-xl font-bold mb-3 text-white tracking-widest uppercase">{f.title}</h3>
+                  <p className="text-[11px] text-zinc-500 leading-relaxed font-mono tracking-widest uppercase">
                     {f.desc}
                   </p>
+                  <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-indigo-500/50 group-hover:w-full transition-all duration-500 ease-out" />
                 </div>
               </FadeIn>
             );
@@ -421,13 +490,13 @@ function FeaturesSection() {
 function TrustSection() {
   const t = useTranslations("landing.trust");
   return (
-    <div className="border-y border-white/[0.06] bg-[#09090b] overflow-hidden py-4">
-      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between font-mono text-[11px] font-bold text-zinc-500 uppercase tracking-widest overflow-x-auto whitespace-nowrap gap-12 scrollbar-none">
-        <span className="flex items-center gap-2">{t("status")}<span className="text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]">{t("statusValue")}</span></span>
-        <span className="flex items-center gap-2">{t("analyzed")}<span className="text-white">{t("analyzedValue")}</span></span>
-        <span className="flex items-center gap-2">{t("signals")}<span className="text-white">{t("signalsValue")}</span></span>
-        <span className="flex items-center gap-2">{t("accuracy")}<span className="text-indigo-400 drop-shadow-[0_0_5px_rgba(99,102,241,0.5)]">{t("accuracyValue")}</span></span>
-        <span className="flex items-center gap-2">{t("nodes")}<span className="text-white">{t("nodesValue")}</span></span>
+    <div className="border-y border-white/[0.06] bg-black overflow-hidden py-4">
+      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between font-mono text-[10px] font-bold text-zinc-600 uppercase tracking-[0.3em] overflow-x-auto whitespace-nowrap gap-12 scrollbar-none">
+        <span className="flex items-center gap-3">{t("status")}<span className="text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse">{t("statusValue")}</span></span>
+        <span className="flex items-center gap-3">{t("analyzed")}<span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">{t("analyzedValue")}</span></span>
+        <span className="flex items-center gap-3">{t("signals")}<span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">{t("signalsValue")}</span></span>
+        <span className="flex items-center gap-3">{t("accuracy")}<span className="text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]">{t("accuracyValue")}</span></span>
+        <span className="flex items-center gap-3">{t("nodes")}<span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">{t("nodesValue")}</span></span>
       </div>
     </div>
   );
@@ -440,21 +509,21 @@ export function LandingPage() {
   const t = useTranslations("landing");
   const { user } = useAuth();
   return (
-    <div className="min-h-screen bg-bg-primary text-foreground font-sans selection:bg-foreground selection:text-bg-primary">
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#09090b]/80 backdrop-blur-xl">
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-indigo-500/30">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-black/60 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <LogoMark className="h-6 w-6 text-white" />
-            <span className="font-black tracking-widest text-white uppercase text-lg">AXIOM</span>
+            <LogoMark className="h-6 w-6 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+            <span className="font-black tracking-widest text-white uppercase text-xl">AXIOM</span>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 text-[10px] font-mono tracking-[0.2em] uppercase">
             <LanguageSwitcher />
             {user ? (
-              <Link href={`/${locale}/dashboard`} className="text-[11px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition-colors">
+              <Link href={`/${locale}/dashboard`} className="text-zinc-500 font-bold hover:text-indigo-400 transition-colors">
                 {t("nav.enterApp")}
               </Link>
             ) : (
-              <Link href={`/${locale}/login`} className="text-[11px] font-bold uppercase tracking-widest text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded border border-white/10 transition-colors">
+              <Link href={`/${locale}/login`} className="text-zinc-400 hover:text-white border px-4 py-1.5 border-white/10 hover:border-white/30 hover:bg-white/5 transition-colors">
                 {t("nav.login")}
               </Link>
             )}
@@ -474,13 +543,13 @@ export function LandingPage() {
         <CTASection />
       </main>
 
-      <footer className="py-12 border-t border-white/[0.06] bg-[#09090b] text-center text-xs text-zinc-600 font-mono">
-        <div className="flex flex-wrap items-center justify-center gap-8 mb-6 uppercase tracking-widest font-bold text-[10px]">
-          <Link href={`/${locale}/guide`} className="hover:text-white transition-colors">{t("footer.guide")}</Link>
-          <Link href={`/${locale}/guide`} className="hover:text-white transition-colors">{t("footer.docs")}</Link>
-          <Link href={`/${locale}/guide#faq`} className="hover:text-white transition-colors">{t("footer.faq")}</Link>
+      <footer className="py-12 border-t border-white/[0.04] bg-black text-center text-[10px] text-zinc-600 font-mono tracking-widest uppercase">
+        <div className="flex flex-wrap items-center justify-center gap-8 mb-6 font-bold">
+          <Link href={`/${locale}/guide`} className="hover:text-indigo-400 transition-colors">{t("footer.guide")}</Link>
+          <Link href={`/${locale}/guide`} className="hover:text-indigo-400 transition-colors">{t("footer.docs")}</Link>
+          <Link href={`/${locale}/guide#faq`} className="hover:text-indigo-400 transition-colors">{t("footer.faq")}</Link>
         </div>
-        <p className="tracking-widest uppercase">{t("footerOperational", { year: new Date().getFullYear() })}</p>
+        <p className="opacity-50">{t("footerOperational", { year: new Date().getFullYear() })}</p>
       </footer>
     </div>
   );

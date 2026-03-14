@@ -181,7 +181,7 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
         }, 300);
       }
     },
-    [running, symbol, mode, locale, isModeLocked, isQuotaExhausted, queryClient],
+    [running, symbol, mode, locale, isModeLocked, isQuotaExhausted, queryClient, tCommon],
   );
 
   const handleRetry = useCallback(() => {

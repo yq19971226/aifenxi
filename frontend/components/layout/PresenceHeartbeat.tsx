@@ -31,7 +31,7 @@ export function PresenceHeartbeat() {
       if (intervalRef.current) clearInterval(intervalRef.current);
       intervalRef.current = null;
     };
-  }, [user?.id]);
+  }, [user]);
 
   return null;
 }

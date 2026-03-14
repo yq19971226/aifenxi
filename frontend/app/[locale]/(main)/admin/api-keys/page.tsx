@@ -380,7 +380,6 @@ function ApiKeyCard({
 
 export default function ApiKeysPage() {
   const { user } = useAuth();
-  if (!user || user.role !== "admin") return null;
   const queryClient = useQueryClient();
   const [editValues, setEditValues] = useState<Record<string, string>>({});
   const [initialized, setInitialized] = useState(false);
@@ -495,6 +494,8 @@ export default function ApiKeysPage() {
     },
     [editValues, configMap, queryClient]
   );
+
+  if (!user || user.role !== "admin") return null;
 
   // 统计
   const configuredCount = API_KEYS.filter((k) => configMap.has(k.key)).length;

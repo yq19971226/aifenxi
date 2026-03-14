@@ -229,8 +229,7 @@ function CreateUserDialog({
 
 export default function AdminUsersPage() {
   const { user } = useAuth();
-  if (!user || (user.role !== "admin" && user.role !== "operator")) return null;
-  const isAdmin = user.role === "admin";
+  const isAdmin = user?.role === "admin";
   const [data, setData] = useState<AdminUserListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -331,6 +330,8 @@ export default function AdminUsersPage() {
   );
 
   const totalPages = data ? Math.ceil(data.total / data.page_size) : 0;
+
+  if (!user || (user.role !== "admin" && user.role !== "operator")) return null;
 
   return (
     <div className="card-surface m-6 rounded-xl border border-border flex flex-col min-h-[calc(100vh-80px)]">

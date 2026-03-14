@@ -258,7 +258,6 @@ function DataSourceHealthCard() {
 
 export default function AdminMonitorPage() {
   const { user } = useAuth();
-  if (!user || user.role !== "admin") return null;
   const [monitorSymbol, setMonitorSymbol] = useState("BTCUSDT");
 
   const { data: health } = useSystemHealth();
@@ -296,6 +295,8 @@ export default function AdminMonitorPage() {
   });
 
   const isHealthy = health?.status === "ok";
+
+  if (!user || user.role !== "admin") return null;
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6">

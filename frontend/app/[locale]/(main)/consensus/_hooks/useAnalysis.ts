@@ -89,7 +89,7 @@ export function useAnalysis(
         queryClient.invalidateQueries({ queryKey: ["consensus", symbol] });
       }
     },
-    [running, symbol, mode, canStart, queryClient],
+    [running, symbol, mode, canStart, queryClient, locale],
   );
 
   return { running, startTime, progressSteps, analysisReport, error, handleStart, handleAbort };

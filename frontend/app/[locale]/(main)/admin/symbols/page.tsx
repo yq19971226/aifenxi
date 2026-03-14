@@ -226,7 +226,7 @@ function SymbolRow({ config, onToggle, onDelete, toggling }: SymbolRowProps) {
 
 export default function AdminSymbolsPage() {
   const { user } = useAuth();
-  if (!user || user.role !== "admin") return null;
+  
   const queryClient = useQueryClient();
   const [showAdd, setShowAdd] = useState(false);
   const [toggling, setToggling] = useState<string | null>(null);
@@ -251,7 +251,7 @@ export default function AdminSymbolsPage() {
   } = useQuery<KlineProgressResponse>({
     queryKey: ["kline-progress", enabledSymbols],
     queryFn: () => fetchKlineProgress(enabledSymbols),
-    enabled: true && enabledSymbols.length > 0,
+    enabled: !!user && user.role === "admin" && enabledSymbols.length > 0,
     refetchInterval: 15000,
   });
 
@@ -309,6 +309,8 @@ export default function AdminSymbolsPage() {
       0,
     );
   }, [klineProgress]);
+
+  if (!user || user.role !== "admin") return null;
 
   return (
     <div className="flex flex-col gap-4 p-6">

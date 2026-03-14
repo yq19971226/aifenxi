@@ -22,8 +22,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
 export default function AdminOrdersPage() {
   const t = useTranslations("admin");
   const { user } = useAuth();
-  if (!user || (user.role !== "admin" && user.role !== "operator")) return null;
-  const isAdmin = user.role === "admin";
+  const isAdmin = user?.role === "admin";
   // filter state
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -59,6 +58,7 @@ export default function AdminOrdersPage() {
     } finally {
       setLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, statusFilter, planFilter, page, pageSize]);
 
   useEffect(() => {
@@ -85,6 +85,8 @@ export default function AdminOrdersPage() {
     setPageSize(v);
     setPage(1);
   }, []);
+
+  if (!user || (user.role !== "admin" && user.role !== "operator")) return null;
 
   return (
     <div className="flex flex-col gap-6 p-6">

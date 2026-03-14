@@ -1267,8 +1267,9 @@ function ErrorMsg({ msg }: { msg: string }) {
 
 export default function LearningPage() {
   const { user } = useAuth();
-  if (!user || user.role !== "admin") return null;
   const [activeTab, setActiveTab] = useState<TabId>("perf");
+
+  if (!user || user.role !== "admin") return null;
 
   return (
     <div className="flex flex-col gap-4 p-6">

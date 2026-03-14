@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations, useLocale } from "next-intl";
+import { motion, AnimatePresence } from "framer-motion";
 import { fetchCurrentUser } from "@/lib/api/auth";
 import { usePaymentStatusSync } from "@/lib/hooks/usePaymentStatusSync";
 import {
@@ -66,7 +67,7 @@ function CurrentStatusCard({ user, t }: CurrentStatusCardProps & { t: Membership
   const locale = useLocale();
   const level = user.membership_level;
   const name = t(`currentStatus.levels.${level}`);
-  const color = LEVEL_COLORS[level] ?? "text-zinc-400";
+  const color = LEVEL_COLORS[level] ?? "text-zinc-500";
 
   const expiresAt = user.membership_expires_at;
   let expiryInfo: { dateStr: string; daysLeft: number } | null = null;
@@ -83,19 +84,32 @@ function CurrentStatusCard({ user, t }: CurrentStatusCardProps & { t: Membership
   }
 
   return (
-    <div className="card-surface rounded-lg p-6">
-      <p className="text-xs uppercase tracking-widest text-zinc-500">{t('currentStatus.title')}</p>
-      <div className="mt-3 flex items-baseline gap-3">
-        <span className={`text-2xl font-bold ${color}`}>{name}</span>
-        <span className="text-xs text-zinc-500">{user.email}</span>
+    <div className="relative bg-black border border-white/[0.05] p-6 overflow-hidden">
+      <div className={`absolute left-0 top-0 bottom-0 w-1 ${level === 2 ? 'bg-[#F5A623]' : level === 1 ? 'bg-indigo-500' : 'bg-zinc-600'}`} />
+      <div className="flex items-center justify-between border-b border-white/[0.05] pb-4 mb-4">
+        <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500">{t('currentStatus.title')}</p>
+        <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest">{user.email}</span>
+      </div>
+      <div className="flex items-end gap-4 mt-2">
+        <span className={`text-4xl font-black font-mono tracking-tighter uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] ${color}`}>{name}</span>
+        {level > 0 ? (
+           <span className={`text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 border ${level === 2 ? 'border-[#F5A623]/30 text-[#F5A623] bg-[#F5A623]/10' : 'border-indigo-500/30 text-indigo-400 bg-indigo-500/10'}`}>ACTIVE</span>
+        ) : (
+           <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 border border-zinc-500/30 text-zinc-400 bg-zinc-500/10">INACTIVE</span>
+        )}
       </div>
       {expiryInfo && (
-        <div className={`mt-3 flex items-center gap-2 text-sm ${expiryInfo.daysLeft <= 7 ? "text-red-400" : expiryInfo.daysLeft <= 30 ? "text-amber-400" : "text-zinc-400"}`}>
-          {expiryInfo.daysLeft <= 7 && (
-            <span className="inline-block h-2 w-2 rounded-full bg-red-400 animate-pulse" />
-          )}
-          <span>{t('currentStatus.expiresAt', { date: expiryInfo.dateStr })}</span>
-          <span className="text-xs">{t('currentStatus.daysLeft', { count: expiryInfo.daysLeft })}</span>
+        <div className={`mt-6 flex items-center justify-between p-4 border border-white/[0.05] bg-white/[0.02] text-[10px] font-mono font-bold uppercase tracking-widest ${expiryInfo.daysLeft <= 7 ? "text-red-400 border-red-500/20 bg-red-500/5" : expiryInfo.daysLeft <= 30 ? "text-amber-400" : "text-zinc-400"}`}>
+          <div className="flex items-center gap-3">
+            {expiryInfo.daysLeft <= 7 && (
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full bg-red-400 opacity-75"/>
+                <span className="relative inline-flex h-2 w-2 bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)]"/>
+              </span>
+            )}
+            <span>{t('currentStatus.expiresAt', { date: expiryInfo.dateStr })}</span>
+          </div>
+          <span className="text-zinc-500">{t('currentStatus.daysLeft', { count: expiryInfo.daysLeft })}</span>
         </div>
       )}
     </div>
@@ -112,25 +126,26 @@ function PlanComparisonTable({ plansData, t }: PlanComparisonTableProps & { t: M
   const flagshipPrice = plansData?.plans?.find((p) => p.plan === 2)?.price_monthly ?? 299;
 
   return (
-    <div className="card-surface rounded-lg p-6">
-      <p className="text-xs uppercase tracking-widest text-zinc-500">{t('planComparison.title')}</p>
-      <div className="mt-4 overflow-x-auto">
-        <table className="w-full text-sm">
+    <div className="relative bg-black border border-white/[0.05] p-6 lg:p-8 mt-4 overflow-hidden">
+      <div className="absolute top-0 right-0 w-8 h-[1px] bg-white/[0.2]" />
+      <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500 mb-6">{t('planComparison.title')}</p>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm font-mono">
           <thead>
-            <tr className="border-b border-white/[0.08]">
-              <th className="pb-3 text-left text-xs font-medium text-zinc-500">{t('planComparison.feature')}</th>
-              <th className="pb-3 text-center text-xs font-medium text-zinc-400">{t('planComparison.free')} <span className="font-mono">$0</span></th>
-              <th className="pb-3 text-center text-xs font-medium text-accent">{t('planComparison.pro')} <span className="font-mono">${proPrice}/{t('planSelection.perMonth')}</span></th>
-              <th className="pb-3 text-center text-xs font-medium text-[#F5A623]">{t('planComparison.flagship')} <span className="font-mono">${flagshipPrice}/{t('planSelection.perMonth')}</span></th>
+            <tr className="border-b border-white/[0.1]">
+              <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">{t('planComparison.feature')}</th>
+              <th className="pb-4 text-center text-[10px] font-bold text-zinc-500 tracking-widest uppercase">{t('planComparison.free')} <br/><span className="text-[9px] text-zinc-600">$0</span></th>
+              <th className="pb-4 text-center text-[10px] font-bold text-indigo-400 tracking-widest uppercase">{t('planComparison.pro')} <br/><span className="text-[9px] text-indigo-500/70">${proPrice}/{t('planSelection.perMonth')}</span></th>
+              <th className="pb-4 text-center text-[10px] font-bold text-[#F5A623] tracking-widest uppercase">{t('planComparison.flagship')} <br/><span className="text-[9px] text-[#F5A623]/70">${flagshipPrice}/{t('planSelection.perMonth')}</span></th>
             </tr>
           </thead>
           <tbody>
-            {features.map((f) => (
-              <tr key={f.name} className="border-b border-white/[0.04]">
-                <td className="py-3 text-xs text-zinc-300">{f.name}</td>
-                <td className="py-3 text-center text-xs text-zinc-500">{f.free}</td>
-                <td className="py-3 text-center text-xs text-zinc-300">{f.pro}</td>
-                <td className="py-3 text-center text-xs text-zinc-200">{f.flagship}</td>
+            {features.map((f, i) => (
+              <tr key={f.name} className={`border-b border-white/[0.02] hover:bg-white/[0.02] transition-colors ${i%2===0?'bg-white/[0.01]':''}`}>
+                <td className="py-4 text-[11px] text-zinc-400 pl-2 uppercase tracking-wider">{f.name}</td>
+                <td className="py-4 text-center text-[10px] text-zinc-600 uppercase">{f.free}</td>
+                <td className="py-4 text-center text-[10px] text-zinc-300 uppercase">{f.pro}</td>
+                <td className="py-4 text-center text-[10px] text-white font-bold uppercase">{f.flagship}</td>
               </tr>
             ))}
           </tbody>
@@ -159,7 +174,7 @@ const DURATION_LABEL_KEYS: Record<DurationMonths, string> = {
   12: "perYear",
 };
 
-function PlanCard({ name, monthlyPrice, totalPrice, durationMonths, color, borderColor, glow, selected, onSelect }: PlanCardProps) {
+function PlanCard({ plan, name, monthlyPrice, totalPrice, durationMonths, color, borderColor, glow, selected, onSelect }: PlanCardProps) {
   const avgMonthly = durationMonths > 1 ? Math.round(totalPrice / durationMonths * 100) / 100 : monthlyPrice;
   const hasSaving = durationMonths > 1 && avgMonthly < monthlyPrice;
 
@@ -168,29 +183,29 @@ function PlanCard({ name, monthlyPrice, totalPrice, durationMonths, color, borde
       type="button"
       onClick={onSelect}
       className={`
-        w-full rounded-lg border p-5 text-left transition-all duration-200
-        backdrop-blur-md bg-white/[0.04]
-        ${selected ? `${borderColor} ${glow}` : "border-white/[0.08]"}
-        hover:border-white/[0.16]
+        relative w-full border p-6 text-left transition-all duration-300 overflow-hidden group
+        ${selected ? `${borderColor} ${glow} bg-${plan === 2 ? '[#F5A623]' : 'indigo-500'}/10` : "border-white/[0.05] bg-black/40 hover:border-white/[0.2] hover:bg-white/[0.02]"}
       `}
     >
-      <div className="flex items-baseline justify-between">
-        <span className={`text-lg font-semibold ${color}`}>{name}</span>
+      <div className={`absolute top-0 right-0 p-2 font-mono text-[8px] uppercase transition-opacity ${selected ? `opacity-100 ${color}` : 'opacity-20 group-hover:opacity-100 group-hover:text-zinc-500'}`}>SYS.PLAN_{plan}</div>
+      <div className="flex items-center justify-between mb-4">
+        <span className={`text-xl font-black font-mono tracking-widest uppercase ${color} drop-shadow-[0_0_10px_currentColor]`}>{name}</span>
         {selected && (
-          <span className={`rounded px-2 py-0.5 text-xs font-medium ${color} bg-white/[0.08]`}>
-            ✓
+          <span className="flex h-2 w-2 relative">
+            <span className={`animate-ping absolute inline-flex h-full w-full opacity-75 bg-current ${color}`}/>
+            <span className={`relative inline-flex h-2 w-2 bg-current ${color}`}/>
           </span>
         )}
       </div>
-      <div className="mt-2 flex items-baseline gap-1">
-        <span className="font-mono text-2xl font-bold text-zinc-200">${totalPrice}</span>
-        <span className="text-xs text-zinc-500">{DURATION_LABEL_KEYS[durationMonths]}</span>
+      <div className="flex items-end gap-2 mb-2">
+        <span className="font-mono text-3xl font-black text-white tracking-tighter">${totalPrice}</span>
+        <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest border-l border-white/[0.1] pl-2 pb-1.5">{DURATION_LABEL_KEYS[durationMonths]}</span>
       </div>
       {hasSaving && (
-        <div className="mt-1 flex items-center gap-2">
-          <span className="text-xs text-zinc-500 line-through">${monthlyPrice}/mo</span>
-          <span className="text-xs text-bull bg-[var(--color-bull)]/10 rounded px-1.5 py-0.5">
-            -{Math.round((1 - avgMonthly / monthlyPrice) * 100)}%
+        <div className="mt-4 flex items-center justify-between pt-4 border-t border-white/[0.05]">
+          <span className="text-[10px] font-mono text-zinc-600 line-through tracking-wider">REG: ${monthlyPrice}/mo</span>
+          <span className="text-[10px] font-black font-mono uppercase tracking-[0.2em] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+            SAVE {Math.round((1 - avgMonthly / monthlyPrice) * 100)}%
           </span>
         </div>
       )}
@@ -260,51 +275,57 @@ function PaymentDisplay({ payment, expiresAt }: PaymentDisplayProps) {
   }, [payment.pay_address]);
 
   return (
-    <div className="card-surface rounded-lg p-6">
-      <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-widest text-zinc-500">{t('payment.info.title')}</p>
-        <div className="flex items-center gap-2">
+    <div className="relative bg-black border border-white/[0.05] p-6 lg:p-8 mt-6">
+      <div className={`absolute top-0 right-0 w-1/3 h-[1px] ${payment.status === 'pending' ? 'bg-[#F5A623]/50' : 'bg-white/[0.1]'}`} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/[0.05]">
+        <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500">{t('payment.info.title')}</p>
+        <div className="flex items-center gap-4">
           {payment.status === "pending" && !isExpired ? (
-            <>
-              <span className="text-xs text-zinc-500">{t('payment.info.timeRemaining')}</span>
-              <span className="font-mono text-sm font-bold text-[#F5A623]">{countdown}</span>
-            </>
+            <div className="flex items-center gap-3 border border-[#F5A623]/30 px-3 py-1 bg-[#F5A623]/5">
+              <span className="flex h-1.5 w-1.5 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full bg-[#F5A623] opacity-75"/>
+                <span className="relative inline-flex h-1.5 w-1.5 bg-[#F5A623]"/>
+              </span>
+              <span className="text-[9px] font-bold font-mono text-zinc-400 uppercase tracking-widest">{t('payment.info.timeRemaining')}</span>
+              <span className="font-mono text-sm font-black text-[#F5A623] drop-shadow-[0_0_8px_rgba(245,166,35,0.4)]">{countdown}</span>
+            </div>
           ) : (
-            <span className={`rounded px-2 py-0.5 text-xs font-medium ${payment.status === "pending" ? "bg-zinc-400/20 text-zinc-400" : `${statusStyle.bg} ${statusStyle.text}`}`}>
+            <span className={`px-3 py-1 font-mono text-[10px] font-black uppercase tracking-[0.2em] border ${payment.status === "pending" ? "border-zinc-500/30 text-zinc-500 bg-zinc-500/10" : `${statusStyle.bg} ${statusStyle.text} border-current/30`}`}>
               {payment.status === "pending" ? t('payment.info.expired') : statusStyle.label}
             </span>
           )}
         </div>
       </div>
 
-      <div className="mt-4 space-y-4">
+      <div className="grid gap-8 sm:grid-cols-2">
         <div>
-          <p className="text-xs uppercase tracking-widest text-zinc-500">{t('payment.info.amount')}</p>
-          <p className="mt-1 font-mono text-lg font-bold text-zinc-200">
-            {payment.pay_amount} <span className="text-sm text-zinc-400">{payment.pay_currency?.toUpperCase()}</span>
+          <p className="text-[9px] font-bold font-mono uppercase tracking-[0.3em] text-zinc-600 mb-2">{t('payment.info.amount')}</p>
+          <p className="font-mono text-3xl font-black text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+            {payment.pay_amount} <span className="text-sm text-zinc-500 font-bold ml-1">{payment.pay_currency?.toUpperCase()}</span>
           </p>
         </div>
 
         <div>
-          <p className="text-xs uppercase tracking-widest text-zinc-500">{t('payment.info.address')}</p>
-          <div className="mt-1 flex items-center gap-2">
-            <code className="flex-1 break-all rounded bg-white/[0.06] px-3 py-2 font-mono text-xs text-zinc-300">
+          <p className="text-[9px] font-bold font-mono uppercase tracking-[0.3em] text-zinc-600 mb-2">{t('payment.info.address')}</p>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <code className="block flex-1 border border-white/[0.1] bg-white/[0.02] px-4 py-3 font-mono text-[10px] text-indigo-300 break-all text-center sm:text-left">
               {payment.pay_address}
             </code>
             <button
               type="button"
               onClick={handleCopy}
-              className="shrink-0 rounded bg-white/[0.08] px-3 py-2 text-xs text-zinc-400 transition-colors hover:bg-white/[0.12] hover:text-zinc-200"
+              className={`w-full sm:w-auto shrink-0 border px-6 py-3 font-mono text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:bg-white/5 ${copied ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10' : 'border-white/[0.1] text-zinc-400'}`}
             >
               {copied ? t('payment.info.copied') : t('payment.info.copy')}
             </button>
           </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          <span className={`h-2 w-2 rounded-full ${payment.status === "completed" ? "bg-[var(--color-bull)]" : payment.status === "failed" ? "bg-[var(--color-bear)]" : payment.status === "expired" || isExpired ? "bg-zinc-400" : "animate-pulse bg-[#F5A623]"}`} />
-          <span className={`text-xs ${payment.status === "pending" && isExpired ? "text-zinc-400" : statusStyle.text}`}>{statusMessage}</span>
-        </div>
+      </div>
+      
+      <div className="mt-8 flex items-center justify-center sm:justify-start gap-3 pt-6 border-t border-white/[0.05]">
+         <span className={`text-[10px] font-mono font-bold uppercase tracking-widest flex items-center gap-2 ${payment.status === "pending" && isExpired ? "text-zinc-500" : statusStyle.text}`}>
+             <span className="text-zinc-600">STATUS_</span> {statusMessage}
+         </span>
       </div>
     </div>
   );
@@ -318,45 +339,46 @@ function PaymentHistory({ payments }: PaymentHistoryProps) {
   const t = useTranslations('settings.membership');
   if (payments.length === 0) {
     return (
-      <div className="card-surface rounded-lg overflow-hidden">
+      <div className="relative bg-black border border-white/[0.05] p-20 text-center overflow-hidden">
         <EmptyPayments />
       </div>
     );
   }
 
   return (
-    <div className="card-surface rounded-lg p-6">
-      <p className="text-xs uppercase tracking-widest text-zinc-500">{t('history.title')}</p>
-      <div className="mt-4 overflow-x-auto">
-        <table className="w-full text-sm">
+    <div className="relative bg-black border border-white/[0.05] p-6 lg:p-8 overflow-hidden">
+      <div className="absolute top-0 right-0 w-8 h-[1px] bg-white/[0.2]" />
+      <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500 mb-6">{t('history.title')}</p>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm font-mono">
           <thead>
-            <tr className="border-b border-white/[0.08]">
-              <th className="pb-3 text-left text-xs font-medium text-zinc-500">{t('history.columns.date')}</th>
-              <th className="pb-3 text-left text-xs font-medium text-zinc-500">{t('history.columns.plan')}</th>
-              <th className="pb-3 text-right text-xs font-medium text-zinc-500">{t('history.columns.amount')}</th>
-              <th className="pb-3 text-left text-xs font-medium text-zinc-500">{t('history.columns.network')}</th>
-              <th className="pb-3 text-left text-xs font-medium text-zinc-500">{t('history.columns.status')}</th>
+            <tr className="border-b border-white/[0.1]">
+              <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.date')}</th>
+              <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.plan')}</th>
+              <th className="pb-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.amount')}</th>
+              <th className="pb-4 text-left pl-4 text-[10px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.network')}</th>
+              <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.status')}</th>
             </tr>
           </thead>
           <tbody>
-            {payments.map((p) => {
+            {payments.map((p, i) => {
               const st = STATUS_STYLES[p.status] ?? STATUS_STYLES.pending;
               return (
-                <tr key={p.id} className="border-b border-white/[0.04]">
-                  <td className="py-3 font-mono text-xs text-zinc-400">
+                <tr key={p.id} className={`border-b border-white/[0.02] hover:bg-white/[0.02] transition-colors ${i%2===0?'bg-white/[0.01]':''}`}>
+                  <td className="py-4 font-mono text-[10px] text-zinc-500 uppercase tracking-widest">
                     {p.created_at ? formatDate(p.created_at) : "—"}
                   </td>
-                  <td className="py-3 text-xs text-zinc-300">
+                  <td className="py-4 text-[11px] text-zinc-300 uppercase tracking-wider font-bold">
                     {t(`currentStatus.levels.${LEVEL_NAME_KEYS[p.plan] ?? p.plan}`)}
                   </td>
-                  <td className="py-3 text-right font-mono text-xs text-zinc-200">
+                  <td className="py-4 text-right font-mono text-[11px] font-black text-white">
                     ${p.amount_usd}
                   </td>
-                  <td className="py-3 text-xs text-zinc-400">
+                  <td className="py-4 text-[10px] text-zinc-500 pl-4 uppercase tracking-widest">
                     {p.network ?? "—"}
                   </td>
-                  <td className="py-3">
-                    <span className={`inline-flex rounded px-2 py-0.5 text-xs font-medium ${st.text} ${st.bg}`}>
+                  <td className="py-4">
+                    <span className={`inline-flex px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.2em] border ${st.text} ${st.bg} border-current/30`}>
                       {st.label}
                     </span>
                   </td>
@@ -400,11 +422,13 @@ function FreeTrialCard() {
   if (!trial?.enabled) return null;
 
   return (
-    <div className="card-surface rounded-lg p-6 border border-indigo-500/20">
-      <div className="flex items-center justify-between">
+    <div className="relative bg-black border border-indigo-500/20 p-6 overflow-hidden">
+      <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-indigo-500/50" />
+      <div className="absolute top-0 right-0 w-8 h-[1px] bg-indigo-500/50" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-white">{t('freeTrial.title')}</p>
-          <p className="text-xs text-zinc-500 mt-1">
+          <p className="text-[11px] font-black font-mono uppercase tracking-[0.3em] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] mb-2">{t('freeTrial.title')}</p>
+          <p className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase">
             {trial.claimed
               ? trial.remaining > 0
                 ? t('freeTrial.remaining', { count: trial.remaining })
@@ -412,28 +436,30 @@ function FreeTrialCard() {
               : t('freeTrial.description', { count: trial.total })}
           </p>
         </div>
-        {!trial.claimed && (
-          <button
-            type="button"
-            onClick={handleClaim}
-            disabled={claiming}
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors disabled:opacity-50"
-          >
-            {claiming ? t('freeTrial.claiming') : t('freeTrial.claim')}
-          </button>
-        )}
-        {trial.claimed && trial.remaining > 0 && (
-          <span className="rounded bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400">
-            {trial.remaining} {t('freeTrial.claimed')}
-          </span>
-        )}
-        {trial.claimed && trial.remaining === 0 && (
-          <span className="rounded bg-zinc-500/10 px-3 py-1.5 text-xs font-medium text-zinc-500">
-            {t('freeTrial.used')}
-          </span>
-        )}
+        <div className="mt-4 sm:mt-0">
+          {!trial.claimed && (
+            <button
+              type="button"
+              onClick={handleClaim}
+              disabled={claiming}
+              className="border border-indigo-500/40 bg-indigo-600/90 px-6 py-2.5 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-white hover:bg-indigo-500 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] disabled:opacity-50 transition-all duration-300"
+            >
+              {claiming ? t('freeTrial.claiming') : t('freeTrial.claim')}
+            </button>
+          )}
+          {trial.claimed && trial.remaining > 0 && (
+            <span className="inline-block border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-[10px] font-black font-mono tracking-[0.2em] text-emerald-400 uppercase">
+              {trial.remaining} {t('freeTrial.claimed')}
+            </span>
+          )}
+          {trial.claimed && trial.remaining === 0 && (
+            <span className="inline-block border border-zinc-500/30 bg-zinc-500/10 px-4 py-2 text-[10px] font-black font-mono tracking-[0.2em] text-zinc-500 uppercase">
+              {t('freeTrial.used')}
+            </span>
+          )}
+        </div>
       </div>
-      {error && <p className="mt-3 text-xs text-bear">{error}</p>}
+      {error && <p className="mt-4 text-[10px] font-mono text-red-400 tracking-widest uppercase">{error}</p>}
     </div>
   );
 }
@@ -537,8 +563,13 @@ export default function MembershipPage() {
   }, [queryClient, selectedPlan, selectedNetwork, selectedDuration]);
 
   return (
-    <div className="flex flex-col gap-4 p-6">
-      <h1 className="text-xl font-semibold text-zinc-200">{t('title')}</h1>
+    <div className="flex flex-col gap-10 p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto min-h-screen">
+      <div className="pb-6 border-b border-white/[0.05]">
+        <h1 className="text-3xl font-black text-white font-mono tracking-widest uppercase mb-2">
+           SYS.{t('title')}_
+        </h1>
+        <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-[0.3em]">MEMBER_STATUS &_ UPGRADES</p>
+      </div>
 
       {user && <CurrentStatusCard user={user} t={t} />}
 
@@ -546,11 +577,13 @@ export default function MembershipPage() {
 
       <PlanComparisonTable plansData={plansData} t={t} />
 
-      <div className="card-surface rounded-lg p-6">
-        <p className="text-xs uppercase tracking-widest text-zinc-500">{t('planSelection.title')}</p>
+      <div className="relative bg-black border border-white/[0.05] p-6 lg:p-8 overflow-hidden">
+        <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20" />
+        <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8 pb-6 border-b border-white/[0.05]">
+          <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500">{t('planSelection.title')}</p>
 
-        <div className="mt-4 flex justify-center">
-          <div className="inline-flex rounded-lg bg-white/[0.04] border border-white/[0.08] p-1">
+          <div className="inline-flex bg-black border border-white/[0.1] p-1 shadow-inner">
             {([1, 3, 12] as DurationMonths[]).map((dur) => {
               const labelKeys: Record<DurationMonths, string> = { 1: "monthly", 3: "quarterly", 12: "yearly" };
               const badgeKeys: Record<DurationMonths, string | null> = { 1: null, 3: "quarterly", 12: "yearly" };
@@ -559,15 +592,15 @@ export default function MembershipPage() {
                   key={dur}
                   type="button"
                   onClick={() => setSelectedDuration(dur)}
-                  className={`relative rounded-lg px-5 py-2 text-xs font-medium transition-all duration-200 ${
+                  className={`relative px-6 py-2.5 text-[10px] font-black font-mono uppercase tracking-widest transition-all duration-300 ${
                     selectedDuration === dur
-                      ? "bg-[var(--color-accent)]/20 text-accent"
-                      : "text-zinc-400 hover:text-zinc-300"
+                      ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.4)]"
+                      : "text-zinc-500 hover:text-white"
                   }`}
                 >
                   {t(`planSelection.duration.${labelKeys[dur]}`)}
                   {badgeKeys[dur] && (
-                    <span className="absolute -top-1.5 -right-1 text-xs font-bold text-bull bg-[var(--color-bull)]/15 rounded px-1">
+                    <span className="absolute -top-2 -right-2 text-[8px] font-bold text-bull bg-[var(--color-bull)]/20 border border-[var(--color-bull)]/40 px-1.5 py-0.5 shadow-sm">
                       {t(`planSelection.duration.discount.${badgeKeys[dur]}`)}
                     </span>
                   )}
@@ -577,15 +610,15 @@ export default function MembershipPage() {
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <PlanCard
             plan={1}
             name={t('planSelection.plans.pro')}
             monthlyPrice={proPrice}
             totalPrice={proTotal}
             durationMonths={selectedDuration}
-            color="text-accent"
-            borderColor={LEVEL_BORDER[1]}
+            color="text-indigo-400"
+            borderColor="border-indigo-500/50"
             glow={LEVEL_GLOW[1]}
             selected={selectedPlan === 1}
             onSelect={() => setSelectedPlan(1)}
@@ -604,20 +637,20 @@ export default function MembershipPage() {
           />
         </div>
 
-        <div className="mt-6">
-          <p className="text-xs uppercase tracking-widest text-zinc-500">{t('payment.network')}</p>
-          <div className="mt-2 flex gap-2">
+        <div className="mt-10 pt-8 border-t border-white/[0.05]">
+          <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500 mb-4">{t('payment.network')}</p>
+          <div className="flex flex-wrap gap-4">
             {NETWORKS.map((net) => (
               <button
                 key={net}
                 type="button"
                 onClick={() => setSelectedNetwork(net)}
                 className={`
-                  rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200
+                  border px-6 py-3 text-[11px] font-black font-mono uppercase tracking-widest transition-all duration-300
                   ${
                     selectedNetwork === net
-                      ? "bg-[var(--color-accent)]/20 text-accent border border-accent/40"
-                      : "bg-white/[0.04] text-zinc-400 border border-white/[0.08] hover:border-white/[0.16]"
+                      ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.15)]"
+                      : "bg-black text-zinc-600 border-white/[0.1] hover:border-white/[0.3] hover:text-zinc-400"
                   }
                 `}
               >
@@ -631,21 +664,29 @@ export default function MembershipPage() {
           type="button"
           onClick={handleCreatePayment}
           disabled={creating}
-          className="mt-6 w-full rounded-lg bg-white px-6 py-3 text-sm font-semibold text-zinc-900 transition-all duration-200 hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-10 w-full border border-indigo-500/40 bg-indigo-600/90 px-8 py-5 text-sm font-black font-mono tracking-[0.2em] uppercase text-white transition-all duration-300 hover:bg-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] disabled:opacity-40 disabled:hover:bg-indigo-600"
         >
           {creating ? t('payment.creating') : `${t('payment.createButton', { amount: selectedTotal })}`}
         </button>
 
         {error && (
-          <p className="mt-3 text-xs text-bear">{error}</p>
+          <div className="mt-4 border border-red-500/30 bg-red-500/10 px-4 py-3 text-center">
+             <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-red-400">{error}</p>
+          </div>
         )}
       </div>
 
-      {syncedCurrentPayment && paymentExpiresAt && (
-        <PaymentDisplay payment={syncedCurrentPayment} expiresAt={paymentExpiresAt} />
-      )}
+      <AnimatePresence>
+        {syncedCurrentPayment && paymentExpiresAt && (
+          <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} exit={{opacity:0}}>
+             <PaymentDisplay payment={syncedCurrentPayment} expiresAt={paymentExpiresAt} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <PaymentHistory payments={history} />
+      <div className="mt-4">
+        <PaymentHistory payments={history} />
+      </div>
     </div>
   );
 }

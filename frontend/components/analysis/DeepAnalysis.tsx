@@ -59,6 +59,7 @@ export function DeepAnalysis({
     });
 
     return { tabGroups: nextTabGroups, visibleTabs: nextVisibleTabs };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sections]);
 
   const effectiveTab = visibleTabs.some((t) => t.key === activeTab)
@@ -95,6 +96,7 @@ export function DeepAnalysis({
         handleJump as EventListener,
       );
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabGroups]);
 
   useEffect(() => {

@@ -174,7 +174,6 @@ function ModelSelect({
 
 export default function AdminModelsPage() {
   const { user } = useAuth();
-  if (!user || user.role !== "admin") return null;
   const [models, setModels] = useState<AvailableModel[]>([]);
   const [assignments, setAssignments] = useState<ModelAssignment[]>([]);
   const [pendingChanges, setPendingChanges] = useState<Record<string, string>>({});
@@ -278,6 +277,8 @@ export default function AdminModelsPage() {
     if (!grouped[a.phase]) grouped[a.phase] = [];
     grouped[a.phase].push(a);
   }
+
+  if (!user || user.role !== "admin") return null;
 
   if (loading) {
     return (

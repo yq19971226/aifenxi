@@ -64,7 +64,7 @@ export function AICitationSnippet({ report }: AICitationSnippetProps) {
         </button>
       </div>
       <p className="text-[11px] leading-relaxed text-zinc-500 font-mono italic">
-        "{generateSnippet()}"
+        &quot;{generateSnippet()}&quot;
       </p>
       <div className="mt-2 text-[9px] text-zinc-600">
         {t("snippet.tip")}

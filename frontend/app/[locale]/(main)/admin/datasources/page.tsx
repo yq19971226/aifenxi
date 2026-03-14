@@ -287,7 +287,6 @@ const PRIMARY_SOURCE_META: Record<
 
 export default function AdminDataSourcesPage() {
   const { user } = useAuth();
-  if (!user || user.role !== "admin") return null;
   const [snapshot, setSnapshot] = useState<DataSourceStatusSnapshot | null>(null);
   const [health, setHealth] = useState<HealthSummary | null>(null);
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
@@ -469,6 +468,8 @@ export default function AdminDataSourcesPage() {
 
   const getSourceHealth = (sourceId: string) =>
     health?.sources?.[sourceId] ?? null;
+
+  if (!user || user.role !== "admin") return null;
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-white p-6">

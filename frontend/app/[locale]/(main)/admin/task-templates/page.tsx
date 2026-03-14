@@ -23,7 +23,7 @@ const EMPTY_FORM = {
 
 export default function TaskTemplatesPage() {
   const { user } = useAuth();
-  if (!user || user.role !== "admin") return null;
+  
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<Partial<TaskTemplate> | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -31,6 +31,7 @@ export default function TaskTemplatesPage() {
   const { data: templates = [], isLoading } = useQuery({
     queryKey: ["admin-task-templates"],
     queryFn: adminTasksApi.listTemplates,
+    enabled: !!user && user.role === "admin",
   });
 
   const createMutation = useMutation({
@@ -77,125 +78,142 @@ export default function TaskTemplatesPage() {
     }
   };
 
+  if (!user || user.role !== "admin") return null;
+
   return (
     <PageTransition>
-      <div className="mx-auto max-w-5xl space-y-6 px-4 py-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-white">任务模板管理</h1>
+      <div className="mx-auto max-w-5xl space-y-8 px-4 py-8">
+        <div className="flex items-end justify-between border-b border-white/[0.05] pb-6">
+          <div>
+            <h1 className="text-2xl font-black text-white font-mono tracking-widest uppercase mb-2">SYS.TASK_TEMPLATES_</h1>
+            <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-[0.3em]">
+              Admin Task Blueprint Management
+            </p>
+          </div>
           <button
             onClick={openCreate}
-            className="flex items-center gap-1.5 rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-200"
+            className="flex items-center gap-2 border border-indigo-500/40 bg-indigo-500/10 px-4 py-2 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-indigo-400 hover:bg-indigo-500 hover:text-white transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.1)]"
           >
-            <Plus size={16} /> 新建模板
+            <Plus size={14} /> NEW_BLUEPRINT
           </button>
         </div>
 
         {/* Edit Form */}
         {editing && (
-          <div className="rounded-lg border border-accent/30 bg-white/[0.03] p-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-white">
-                {editingId ? "编辑模板" : "新建模板"}
+          <div className="relative bg-black border border-indigo-500/30 p-6 shadow-[0_0_20px_rgba(99,102,241,0.05)] space-y-5">
+            <div className="absolute top-0 right-0 w-16 h-[1px] bg-indigo-500/50" />
+            <div className="absolute bottom-0 left-0 w-16 h-[1px] bg-indigo-500/50" />
+            
+            <div className="flex items-center justify-between border-b border-white/[0.05] pb-4 mb-4">
+              <h3 className="text-[11px] font-black font-mono text-indigo-400 uppercase tracking-[0.3em] flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-indigo-400 animate-pulse"></span>
+                {editingId ? "EDIT_BLUEPRINT" : "CREATE_BLUEPRINT"}
               </h3>
-              <button onClick={() => setEditing(null)} className="text-zinc-400 hover:text-white">
+              <button onClick={() => setEditing(null)} className="text-zinc-500 hover:text-white transition-colors">
                 <X size={16} />
               </button>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">标题</label>
+                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">TEMPLATE_TITLE</label>
                 <input
                   value={editing.title ?? ""}
                   onChange={(e) => setEditing({ ...editing, title: e.target.value })}
-                  className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                  className="w-full border border-white/[0.1] bg-white/[0.02] px-4 py-2.5 text-[11px] text-white font-mono tracking-widest focus:border-indigo-500/50 focus:bg-indigo-500/5 outline-none transition-all"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">平台</label>
+                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">PLATFORM</label>
                 <select
                   value={editing.platform ?? "twitter"}
                   onChange={(e) => setEditing({ ...editing, platform: e.target.value })}
-                  className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                  className="w-full border border-white/[0.1] bg-[#0a0a0a] px-4 py-2.5 text-[11px] text-white font-mono tracking-widest focus:border-indigo-500/50 outline-none transition-all cursor-pointer"
                 >
-                  <option value="twitter">Twitter / X</option>
-                  <option value="binance_square">币安广场</option>
-                  <option value="telegram">Telegram</option>
-                  <option value="reddit">Reddit</option>
-                  <option value="xiaohongshu">小红书 / 抖音</option>
+                  <option value="twitter">TWITTER_X</option>
+                  <option value="binance_square">BINANCE_SQUARE</option>
+                  <option value="telegram">TELEGRAM</option>
+                  <option value="reddit">REDDIT</option>
+                  <option value="xiaohongshu">XHS_DOUYIN</option>
                 </select>
               </div>
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">图标</label>
+                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">ICON_EMOJI</label>
                 <input
                   value={editing.icon ?? ""}
                   onChange={(e) => setEditing({ ...editing, icon: e.target.value })}
-                  className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                  className="w-full border border-white/[0.1] bg-white/[0.02] px-4 py-2.5 text-[11px] text-white font-mono tracking-widest focus:border-indigo-500/50 focus:bg-indigo-500/5 outline-none transition-all"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">奖励模式</label>
+                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">REWARD_MODE</label>
                 <select
                   value={editing.reward_mode ?? "scalping"}
                   onChange={(e) => setEditing({ ...editing, reward_mode: e.target.value })}
-                  className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                  className="w-full border border-white/[0.1] bg-[#0a0a0a] px-4 py-2.5 text-[11px] text-white font-mono tracking-widest focus:border-indigo-500/50 outline-none transition-all cursor-pointer"
                 >
-                  <option value="scalping">超短线 (Scalping)</option>
-                  <option value="intraday">日内 (Intraday)</option>
-                  <option value="trend">趋势 (Trend)</option>
+                  <option value="scalping">SCALPING (Daily)</option>
+                  <option value="intraday">INTRADAY (Weekly)</option>
+                  <option value="trend">TREND (Monthly)</option>
                 </select>
               </div>
+              <div className="grid grid-cols-2 gap-5">
+                <div>
+                  <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">REWARD_AMT</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={editing.reward_amount ?? 5}
+                    onChange={(e) => setEditing({ ...editing, reward_amount: Number(e.target.value) })}
+                    className="w-full border border-white/[0.1] bg-white/[0.02] px-4 py-2.5 text-[11px] text-white font-mono tracking-widest focus:border-indigo-500/50 focus:bg-indigo-500/5 outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">MIN_VIEWS</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={editing.min_views ?? 200}
+                    onChange={(e) => setEditing({ ...editing, min_views: Number(e.target.value) })}
+                    className="w-full border border-white/[0.1] bg-white/[0.02] px-4 py-2.5 text-[11px] text-white font-mono tracking-widest focus:border-indigo-500/50 focus:bg-indigo-500/5 outline-none transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-5 border-t border-white/[0.05] pt-5">
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">奖励次数</label>
-                <input
-                  type="number"
-                  min={1}
-                  value={editing.reward_amount ?? 5}
-                  onChange={(e) => setEditing({ ...editing, reward_amount: Number(e.target.value) })}
-                  className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">DESCRIPTION</label>
+                <textarea
+                  value={editing.description ?? ""}
+                  onChange={(e) => setEditing({ ...editing, description: e.target.value })}
+                  rows={2}
+                  className="w-full border border-white/[0.1] bg-white/[0.02] px-4 py-2.5 text-[11px] text-white font-mono tracking-wide focus:border-indigo-500/50 focus:bg-indigo-500/5 outline-none transition-all leading-relaxed"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">最低浏览量</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={editing.min_views ?? 200}
-                  onChange={(e) => setEditing({ ...editing, min_views: Number(e.target.value) })}
-                  className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">RULES_DETAILS</label>
+                <textarea
+                  value={editing.rules ?? ""}
+                  onChange={(e) => setEditing({ ...editing, rules: e.target.value })}
+                  rows={2}
+                  className="w-full border border-white/[0.1] bg-white/[0.02] px-4 py-2.5 text-[11px] text-white font-mono tracking-wide focus:border-indigo-500/50 focus:bg-indigo-500/5 outline-none transition-all leading-relaxed"
                 />
               </div>
             </div>
-            <div>
-              <label className="mb-1 block text-xs text-zinc-400">描述</label>
-              <textarea
-                value={editing.description ?? ""}
-                onChange={(e) => setEditing({ ...editing, description: e.target.value })}
-                rows={2}
-                className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs text-zinc-400">规则说明</label>
-              <textarea
-                value={editing.rules ?? ""}
-                onChange={(e) => setEditing({ ...editing, rules: e.target.value })}
-                rows={2}
-                className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
-              />
-            </div>
-            <div className="flex justify-end gap-2">
+            
+            <div className="flex justify-end gap-4 pt-4">
               <button
                 onClick={() => setEditing(null)}
-                className="rounded-lg px-4 py-2 text-sm text-zinc-400 hover:text-white"
+                className="border border-white/[0.1] bg-white/[0.02] px-6 py-2.5 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-zinc-400 hover:bg-white/[0.05] hover:text-white transition-all"
               >
-                取消
+                CANCEL
               </button>
               <button
                 onClick={handleSave}
                 disabled={!editing.title || createMutation.isPending || updateMutation.isPending}
-                className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-200 disabled:opacity-50"
+                className="border border-indigo-500/40 bg-indigo-600/80 px-8 py-2.5 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-white disabled:opacity-40 transition-all hover:bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
               >
-                保存
+                SAVE_BLUEPRINT
               </button>
             </div>
           </div>
@@ -203,48 +221,66 @@ export default function TaskTemplatesPage() {
 
         {/* Template List */}
         {isLoading ? (
-          <div className="py-12 text-center text-zinc-400">加载中...</div>
+          <div className="relative bg-black border border-white/[0.05] py-20 text-center overflow-hidden">
+             <span className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em] animate-pulse">LOADING_BLUEPRINTS...</span>
+          </div>
+        ) : templates.length === 0 ? (
+          <div className="relative bg-black border border-white/[0.05] py-20 text-center overflow-hidden">
+             <span className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em]">NO_BLUEPRINTS_FOUND</span>
+          </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {templates.map((t: TaskTemplate) => (
               <div
                 key={t.id}
-                className={`flex items-center justify-between rounded-lg border p-4 ${
+                className={`relative flex items-center justify-between p-5 lg:p-6 transition-all duration-300 border ${
                   t.is_active
-                    ? "border-white/10 bg-white/[0.03]"
-                    : "border-white/5 bg-white/[0.01] opacity-50"
+                    ? "bg-black border-white/[0.05] hover:border-white/[0.15] hover:bg-white/[0.01]"
+                    : "bg-black/50 border-white/[0.02] opacity-60 grayscale"
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{t.icon || "📱"}</span>
+                {t.is_active && (
+                   <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-indigo-500/50" />
+                )}
+                
+                <div className="flex items-center gap-5">
+                  <span className="text-3xl drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{t.icon || "📱"}</span>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-white">{t.title}</span>
-                      <span className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-zinc-400">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-sm font-black font-mono tracking-widest text-white uppercase">{t.title}</span>
+                      <span className="border border-white/[0.1] bg-white/[0.05] px-2 py-0.5 text-[9px] font-bold font-mono tracking-widest text-zinc-400 uppercase">
                         {t.platform}
                       </span>
                       {!t.is_active && (
-                        <span className="rounded bg-red-500/20 px-1.5 py-0.5 text-xs text-red-400">
-                          已停用
+                        <span className="border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[9px] font-bold font-mono tracking-widest text-red-400 uppercase">
+                          INACTIVE
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-zinc-500">
-                      +{t.reward_amount} {t.reward_mode} · ≥{t.min_views} 浏览量
-                    </p>
+                    <div className="flex items-center gap-4 text-[10px] font-mono font-bold tracking-widest text-zinc-500 uppercase">
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-1 h-3 bg-emerald-500/50 block"></span>
+                        REWARD: <span className="text-emerald-400">+{t.reward_amount} {t.reward_mode}</span>
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-1 h-3 bg-zinc-600 block"></span>
+                        MIN_VIEWS: <span className="text-zinc-300">≥{t.min_views}</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                
+                <div className="flex gap-3">
                   <button
                     onClick={() => openEdit(t)}
-                    className="rounded-lg p-2 text-zinc-400 hover:bg-white/10 hover:text-white"
+                    className="border border-white/[0.08] p-2.5 text-zinc-400 hover:bg-white/[0.05] hover:text-white transition-all bg-black"
                   >
                     <Pencil size={14} />
                   </button>
                   {t.is_active && (
                     <button
                       onClick={() => deleteMutation.mutate(t.id)}
-                      className="rounded-lg p-2 text-zinc-400 hover:bg-red-500/10 hover:text-red-400"
+                      className="border border-red-500/20 p-2.5 text-zinc-500 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/40 transition-all bg-black"
                     >
                       <Trash2 size={14} />
                     </button>

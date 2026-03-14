@@ -92,25 +92,28 @@ export default function PartnerPage() {
     <PageTransition>
       <div className="mx-auto max-w-4xl space-y-6 px-4 md:px-8 py-8">
         {/* Header */}
-        <div>
-          <h1 className="flex items-center gap-2.5 text-xl font-black text-white font-mono tracking-tight uppercase">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 shadow-inner">
+        <div className="pb-6 border-b border-white/[0.05]">
+          <h1 className="flex items-center gap-3 text-2xl font-black text-white font-mono tracking-widest uppercase mb-2">
+            <span className="flex items-center justify-center w-8 h-8 bg-blue-500/10 border border-blue-500/30">
               <Users size={16} className="text-blue-400" />
-            </div>
-            {t('title')}
+            </span>
+            SYS.{t('title')}_
           </h1>
-          <p className="mt-2 text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{t('subtitle')}</p>
+          <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-[0.2em]">{t('subtitle')}</p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 mt-6">
           {stats.map((s, i) => (
-            <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.05 }} className="bg-bg-surface border border-border hover:border-zinc-700 transition-colors rounded-xl px-5 py-4 shadow-inner">
-              <div className="flex items-center gap-3">
-                <div className={`flex h-10 w-10 items-center justify-center rounded-xl shadow-inner border border-white/5 ${s.bg}`}><s.icon size={18} className={s.color} /></div>
-                <div>
-                  <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest line-clamp-1">{s.label}</p>
-                  <p className={`text-xl font-black font-mono tracking-tight mt-1 leading-none ${s.color}`}>{s.value}</p>
+            <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.05 }} className="relative bg-black border border-white/[0.05] p-5 overflow-hidden group">
+              <div className={`absolute top-0 right-0 w-8 h-[1px] ${s.bg.includes('blue') ? 'bg-blue-500/50' : s.bg.includes('emerald') ? 'bg-emerald-500/50' : s.bg.includes('yellow') ? 'bg-yellow-500/50' : 'bg-purple-500/50'}`} />
+              <div className="flex items-start gap-4">
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center border border-white/10 ${s.bg.replace('/[0.08]', '/10')} shadow-[0_0_10px_currentColor] opacity-30 drop-shadow-md`} style={{ color: s.color.replace('text-', 'var(--tw-') }}>
+                  <s.icon size={18} className={s.color} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[9px] font-black font-mono text-zinc-500 uppercase tracking-[0.2em] line-clamp-1 mb-1">{s.label}</p>
+                  <p className={`text-xl font-black font-mono tracking-tighter leading-none truncate ${s.color} drop-shadow-[0_0_8px_currentColor]`}>{s.value}</p>
                 </div>
               </div>
             </motion.div>
@@ -118,145 +121,246 @@ export default function PartnerPage() {
         </div>
 
         {/* Referral Link */}
-        <div className="bg-[#09090b] border border-border rounded-xl p-6 sm:p-8 shadow-2xl relative overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#09090b] to-[#09090b]">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl" />
+        <div className="relative bg-black border border-indigo-500/20 p-6 sm:p-8 mt-6 overflow-hidden">
+          <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-indigo-500/50" />
+          <div className="absolute top-0 right-0 w-8 h-[1px] bg-indigo-500/50" />
+          
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
             <div className="min-w-0">
-              <p className="text-[11px] font-bold text-indigo-400/80 uppercase tracking-widest font-mono mb-2">{t('overview.referralCode')}</p>
-              <p className="text-4xl font-black font-mono text-white tracking-widest drop-shadow-md">{d.referral_code}</p>
+              <p className="text-[10px] font-black font-mono text-indigo-400 uppercase tracking-[0.3em] mb-2">{t('overview.referralCode')}</p>
+              <p className="text-4xl font-black font-mono text-white tracking-widest drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">{d.referral_code}</p>
             </div>
-            <button onClick={copyLink} className="shrink-0 flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3.5 text-xs font-bold font-mono uppercase tracking-widest text-white hover:bg-indigo-500 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2),_0_5px_15px_rgba(99,102,241,0.2)] active:scale-[0.98]">
+            <button onClick={copyLink} className="shrink-0 flex items-center justify-center gap-2 border border-indigo-500/40 bg-indigo-600/90 px-6 py-4 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-white hover:bg-indigo-500 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all active:scale-[0.98]">
               <Copy size={16} />{linkCopied ? t('overview.linkCopied') : effectiveLink ? t('overview.copyLink') : t('overview.copyCode')}
             </button>
           </div>
+          
           {effectiveLink && (
-            <div className="mt-6 flex items-center gap-3 rounded-lg bg-black/40 border border-white/5 px-4 py-3 backdrop-blur-sm">
-              <LinkIcon size={14} className="text-indigo-400 shrink-0" />
-              <p className="truncate text-[11px] text-zinc-400 font-mono tracking-wider">{effectiveLink}</p>
+            <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-4 border-t border-white/[0.05] pt-6">
+               <div className="flex items-center gap-3 bg-white/[0.02] border border-white/[0.05] px-4 py-3 flex-1">
+                 <LinkIcon size={14} className="text-indigo-400 shrink-0" />
+                 <code className="truncate text-[10px] text-zinc-400 font-mono tracking-widest">{effectiveLink}</code>
+               </div>
+               <div className="flex items-center gap-2 text-[10px] font-bold font-mono uppercase tracking-widest text-zinc-500 shrink-0">
+                  <Percent size={12} className="text-zinc-600" />
+                  {t('overview.commissionRate')}: 
+                  <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 ml-1 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+                    {(d.commission_rate * 100).toFixed(0)}%
+                  </span>
+               </div>
             </div>
           )}
-          <div className="mt-4 flex items-center gap-2 text-[10px] font-bold font-mono uppercase tracking-widest text-zinc-500">
-            <Percent size={12} className="text-zinc-600" />{t('overview.commissionRate')}: <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded ml-1">{(d.commission_rate * 100).toFixed(0)}%</span>
-          </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 rounded-xl bg-bg-surface border border-border p-1.5 shadow-inner overflow-x-auto min-w-full sm:min-w-fit">
+        <div className="flex items-center gap-6 border-b border-white/[0.05] relative mt-10">
           {tabs.map((item) => (
-            <button key={item.key} onClick={() => setTab(item.key)} className={`flex-1 min-w-[100px] py-2.5 text-xs font-bold font-mono uppercase tracking-widest rounded-lg transition-all duration-200 ${tab === item.key ? "bg-bg-elevated border border-border text-white shadow-sm" : "text-zinc-500 hover:text-zinc-400 hover:bg-bg-primary/50"}`}>{item.label}</button>
+            <button
+              key={item.key}
+              onClick={() => setTab(item.key)}
+              className={`pb-4 text-[11px] font-black font-mono uppercase tracking-widest transition-colors relative ${
+                tab === item.key ? "text-white" : "text-zinc-500 hover:text-zinc-400"
+              }`}
+            >
+              {item.label}
+              {tab === item.key && (
+                <motion.div
+                  layoutId="partnerTabIndicator"
+                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                />
+              )}
+            </button>
           ))}
         </div>
 
         {/* Content */}
         <AnimatePresence mode="wait">
           {tab === "overview" && (
-            <motion.div key="ov" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="bg-bg-surface border border-border rounded-xl p-10 text-center shadow-inner relative overflow-hidden">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(234,179,8,0.05)_0%,_transparent_70%)] pointer-events-none" />
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-yellow-500/10 border border-yellow-500/20 shadow-inner mx-auto mb-6 relative z-10"><DollarSign size={28} className="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]" /></div>
-              <p className="text-4xl font-black font-mono text-white tracking-tight mb-2 relative z-10">${d.total_commission.toFixed(2)}</p>
-              <p className="text-xs font-bold font-mono text-zinc-400 uppercase tracking-widest relative z-10">{t('overview.summaryInvited', { total: d.total_invitations, paid: d.total_paid_referees })}</p>
-              {d.frozen > 0 && <div className="mt-6 flex items-center justify-center gap-2 text-[10px] font-bold font-mono uppercase tracking-widest text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 py-1.5 px-3 rounded-md w-fit mx-auto relative z-10"><Snowflake size={12} />{t('overview.frozen', { amount: d.frozen.toFixed(2) })}</div>}
+            <motion.div key="ov" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="relative bg-black border border-yellow-500/20 p-12 text-center overflow-hidden">
+               <div className="absolute top-0 right-0 w-8 h-[1px] bg-yellow-500/50" />
+               <div className="absolute bottom-0 left-0 w-8 h-[1px] bg-yellow-500/50" />
+               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(234,179,8,0.05)_0%,_transparent_50%)] pointer-events-none" />
+              
+              <div className="flex h-16 w-16 items-center justify-center border border-yellow-500/30 bg-yellow-500/10 mx-auto mb-8 relative z-10 shadow-[0_0_20px_rgba(234,179,8,0.1)]"><DollarSign size={28} className="text-yellow-400" /></div>
+              <p className="text-5xl font-black font-mono text-white tracking-widest mb-4 relative z-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">${d.total_commission.toFixed(2)}</p>
+              <p className="text-[10px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em] relative z-10">{t('overview.summaryInvited', { total: d.total_invitations, paid: d.total_paid_referees })}</p>
+              
+              {d.frozen > 0 && (
+                <div className="mt-8 pt-6 border-t border-white/[0.05] relative z-10">
+                   <div className="flex items-center justify-center gap-2 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 py-2 px-4 w-fit mx-auto shadow-[0_0_10px_rgba(234,179,8,0.1)]">
+                     <Snowflake size={12} />{t('overview.frozen', { amount: d.frozen.toFixed(2) })}
+                   </div>
+                </div>
+              )}
             </motion.div>
           )}
 
           {tab === "invitations" && (
-            <motion.div key="inv" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-3">
+            <motion.div key="inv" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
               {invitations.length === 0 ? (
-                <div className="bg-bg-surface border border-border rounded-xl py-16 text-center shadow-inner"><Users size={32} className="mx-auto text-zinc-600 mb-4 opacity-50" /><p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">{t('invitations.empty')}</p></div>
-              ) : invitations.map((inv: Invitation, idx: number) => (
-                <motion.div key={inv.user_id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: idx * 0.03 }} className="flex items-center justify-between bg-bg-surface border border-border hover:border-zinc-700 transition-colors rounded-xl px-5 py-4 shadow-inner">
-                  <div>
-                    <p className="text-sm font-bold text-zinc-200 font-mono tracking-wide">{inv.email_masked}</p>
-                    <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest mt-1.5">{inv.registered_at ? new Date(inv.registered_at).toLocaleDateString() : "-"}</p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-[10px] font-bold font-mono uppercase tracking-widest text-zinc-400 bg-bg-elevated border border-border px-2.5 py-1 rounded shadow-sm">{levelLabels[inv.membership_level] ?? levelLabels[0]}</span>
-                    {inv.total_commission > 0 && <span className="text-sm font-black font-mono tracking-tight text-emerald-400">+${inv.total_commission.toFixed(2)}</span>}
-                  </div>
-                </motion.div>
-              ))}
+                <div className="relative bg-black border border-white/[0.05] py-20 text-center overflow-hidden">
+                   <Users size={32} className="mx-auto text-zinc-700 mb-6" />
+                   <p className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em]">{t('invitations.empty')}</p>
+                </div>
+              ) : (
+                <div className="relative bg-black border border-white/[0.05] p-6 lg:p-8 overflow-hidden">
+                   <div className="absolute top-0 right-0 w-8 h-[1px] bg-white/[0.2]" />
+                   <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500 mb-6">INVITATION_RECORDS</p>
+                   <div className="overflow-x-auto">
+                     <table className="w-full text-sm font-mono">
+                       <thead>
+                         <tr className="border-b border-white/[0.1]">
+                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">EMAIL_USER</th>
+                           <th className="pb-4 text-center text-[10px] font-bold text-zinc-600 tracking-widest uppercase">LEVEL</th>
+                           <th className="pb-4 text-center text-[10px] font-bold text-zinc-600 tracking-widest uppercase">DATE_REG</th>
+                           <th className="pb-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase">COMMISSION</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         {invitations.map((inv: Invitation, idx: number) => (
+                           <tr key={inv.user_id} className={`border-b border-white/[0.02] hover:bg-white/[0.02] transition-colors ${idx%2===0?'bg-white/[0.01]':''}`}>
+                             <td className="py-4 text-[11px] text-zinc-300 tracking-widest pl-2">{inv.email_masked}</td>
+                             <td className="py-4 text-center">
+                               <span className={`inline-flex px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.2em] border ${inv.membership_level > 0 ? 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10' : 'text-zinc-500 border-zinc-500/30 bg-zinc-500/10'}`}>
+                                 {levelLabels[inv.membership_level] ?? levelLabels[0]}
+                               </span>
+                             </td>
+                             <td className="py-4 text-center font-mono text-[10px] text-zinc-500 uppercase tracking-widest">
+                               {inv.registered_at ? new Date(inv.registered_at).toLocaleDateString() : "—"}
+                             </td>
+                             <td className="py-4 text-right font-mono text-[11px] font-black tracking-widest pr-2">
+                               {inv.total_commission > 0 ? <span className="text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">+${inv.total_commission.toFixed(2)}</span> : <span className="text-zinc-600">--</span>}
+                             </td>
+                           </tr>
+                         ))}
+                       </tbody>
+                     </table>
+                   </div>
+                </div>
+              )}
             </motion.div>
           )}
 
           {tab === "commissions" && (
-            <motion.div key="com" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-3">
+            <motion.div key="com" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
               {commissions.length === 0 ? (
-                <div className="bg-bg-surface border border-border rounded-xl py-16 text-center shadow-inner"><DollarSign size={32} className="mx-auto text-zinc-600 mb-4 opacity-50" /><p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">{t('commissions.empty')}</p></div>
-              ) : commissions.map((c: CommissionRecord, idx: number) => (
-                <motion.div key={c.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: idx * 0.03 }} className="flex items-center justify-between bg-bg-surface border border-border hover:border-zinc-700 transition-colors rounded-xl px-5 py-4 shadow-inner">
-                  <div>
-                    <p className="text-sm font-bold text-zinc-200 font-mono tracking-wide">{c.referee_email_masked}</p>
-                    <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest mt-1.5">${c.payment_amount_usd.toFixed(2)} × {(c.commission_rate * 100).toFixed(0)}%</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-base font-black font-mono tracking-tight text-emerald-400">+${c.commission_amount.toFixed(2)}</p>
-                    <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest mt-1">{new Date(c.created_at).toLocaleDateString()}</p>
-                  </div>
-                </motion.div>
-              ))}
+                <div className="relative bg-black border border-white/[0.05] py-20 text-center overflow-hidden">
+                   <DollarSign size={32} className="mx-auto text-zinc-700 mb-6" />
+                   <p className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em]">{t('commissions.empty')}</p>
+                </div>
+              ) : (
+                <div className="relative bg-black border border-white/[0.05] p-6 lg:p-8 overflow-hidden">
+                   <div className="absolute top-0 right-0 w-8 h-[1px] bg-white/[0.2]" />
+                   <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500 mb-6">COMMISSION_LOGS</p>
+                   <div className="overflow-x-auto">
+                     <table className="w-full text-sm font-mono">
+                       <thead>
+                         <tr className="border-b border-white/[0.1]">
+                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">FROM_USER</th>
+                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">DETAILS</th>
+                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">DATE</th>
+                           <th className="pb-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase">REWARD</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         {commissions.map((c: CommissionRecord, idx: number) => (
+                           <tr key={c.id} className={`border-b border-white/[0.02] hover:bg-white/[0.02] transition-colors ${idx%2===0?'bg-white/[0.01]':''}`}>
+                             <td className="py-4 text-[11px] text-zinc-300 tracking-widest pl-2">{c.referee_email_masked}</td>
+                             <td className="py-4">
+                               <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">${c.payment_amount_usd.toFixed(2)} × {(c.commission_rate * 100).toFixed(0)}%</p>
+                             </td>
+                             <td className="py-4 text-left font-mono text-[10px] text-zinc-500 uppercase tracking-widest">
+                               {new Date(c.created_at).toLocaleDateString()}
+                             </td>
+                             <td className="py-4 text-right font-mono text-[11px] font-black tracking-widest pr-2 text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">
+                               +${c.commission_amount.toFixed(2)}
+                             </td>
+                           </tr>
+                         ))}
+                       </tbody>
+                     </table>
+                   </div>
+                </div>
+              )}
             </motion.div>
           )}
 
           {tab === "wallet" && (
-            <motion.div key="wal" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-5">
+            <motion.div key="wal" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6 mt-6">
               {/* Wallet Binding */}
-              <div className="bg-bg-surface border border-border rounded-xl p-6 sm:p-8 shadow-inner relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-purple-500/5 to-transparent pointer-events-none" />
-                <h3 className="text-xs font-bold text-white mb-6 flex items-center gap-3 uppercase tracking-widest relative z-10">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-inner"><Wallet size={16} /></span>
-                  {t('wallet.title')}
+              <div className="relative bg-black border border-purple-500/20 p-6 sm:p-8 overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-purple-500/50" />
+                <div className="absolute top-0 right-0 w-8 h-[1px] bg-purple-500/50" />
+                
+                <h3 className="text-[10px] font-black text-purple-400 mb-6 flex items-center gap-3 uppercase tracking-[0.3em] relative z-10">
+                   SYS.{t('wallet.title')}_
                 </h3>
+                
                 {wallet?.trc20_address ? (
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 relative z-10">
-                    <code className="flex-1 truncate rounded-xl bg-bg-primary/50 border border-border px-4 py-3.5 text-sm text-zinc-300 font-mono shadow-inner">{wallet.trc20_address}</code>
-                    <span className="text-[10px] font-bold font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded flex items-center gap-1.5 uppercase tracking-widest w-fit"><CheckCircle2 size={12} /> {t('wallet.bound')}</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 relative z-10 mb-6">
+                    <code className="flex-1 truncate border border-white/[0.05] bg-white/[0.02] px-4 py-3 text-[11px] text-zinc-300 font-mono">{wallet.trc20_address}</code>
+                    <span className="text-[10px] font-black font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 flex items-center gap-2 uppercase tracking-[0.2em] w-fit shadow-[0_0_10px_rgba(16,185,129,0.1)]"><CheckCircle2 size={12} /> {t('wallet.bound')}</span>
                   </div>
                 ) : (
-                  <p className="text-[11px] font-bold font-mono text-zinc-500 uppercase tracking-widest mb-3 relative z-10">{t('wallet.unbound')}</p>
+                  <p className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em] mb-4 relative z-10">{t('wallet.unbound')}</p>
                 )}
-                <div className="mt-4 flex flex-col sm:flex-row gap-3 relative z-10">
+                
+                <div className="flex flex-col sm:flex-row gap-4 relative z-10">
                   <input value={trc20Input} onChange={(e) => setTrc20Input(e.target.value)} placeholder={t('wallet.addressPlaceholder')}
-                    className="flex-1 rounded-xl border border-border bg-bg-primary/50 px-4 py-3.5 text-sm font-mono text-zinc-200 placeholder:text-zinc-600 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 outline-none transition-all shadow-inner" />
+                    className="flex-1 border border-white/[0.1] bg-white/[0.02] px-4 py-3 text-[11px] font-mono text-zinc-200 placeholder:text-zinc-600 focus:border-purple-500/50 focus:bg-purple-500/5 outline-none transition-all" />
                   <button onClick={() => walletMut.mutate(trc20Input)} disabled={trc20Input.length !== 34 || walletMut.isPending}
-                    className="rounded-xl bg-bg-elevated border border-border px-6 py-3.5 text-[11px] font-bold font-mono uppercase tracking-widest text-zinc-300 hover:bg-bg-primary hover:text-white disabled:opacity-40 transition-all shadow-inner tabular-nums min-w-[120px]">
+                    className="border border-purple-500/40 bg-purple-600/20 px-8 py-3 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-purple-300 hover:bg-purple-600/40 hover:text-white disabled:opacity-40 transition-all shadow-[0_0_15px_rgba(168,85,247,0.1)] tabular-nums shrink-0">
                     {walletMut.isPending ? "..." : wallet?.trc20_address ? t('wallet.change') : t('wallet.bind')}
                   </button>
                 </div>
-                {walletMut.isError && <p className="mt-3 text-[10px] font-bold font-mono text-red-400 uppercase tracking-widest bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-md inline-block relative z-10 flex items-center gap-1.5"><XCircle size={12} /> {(walletMut.error as Error).message}</p>}
+                {walletMut.isError && <p className="mt-4 text-[10px] font-black font-mono text-red-400 uppercase tracking-[0.2em] bg-red-500/10 border border-red-500/20 px-4 py-2 inline-block relative z-10 flex items-center gap-2"><XCircle size={12} /> {(walletMut.error as Error).message}</p>}
               </div>
 
               {/* Withdraw */}
               <button onClick={() => withdrawMut.mutate()} disabled={d.balance <= 0 || withdrawMut.isPending || !wallet?.trc20_address}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-4 text-[11px] font-bold font-mono uppercase tracking-widest text-white hover:bg-emerald-500 disabled:opacity-40 disabled:hover:bg-emerald-600 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] active:scale-[0.98]">
+                className="flex w-full items-center justify-center gap-3 border border-emerald-500/40 bg-emerald-600/90 py-5 text-[11px] font-black font-mono uppercase tracking-[0.3em] text-white hover:bg-emerald-500 disabled:opacity-40 disabled:hover:bg-emerald-600 transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] active:scale-[0.98]">
                 <ArrowDownToLine size={16} />{withdrawMut.isPending ? t('wallet.withdrawing') : t('wallet.withdrawButton', { amount: d.balance.toFixed(2) })}
               </button>
-              {withdrawMut.isError && <div className="flex justify-center"><p className="text-[10px] font-bold font-mono text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 uppercase tracking-widest"><XCircle size={12} /> {(withdrawMut.error as Error).message}</p></div>}
-              {withdrawMut.isSuccess && <div className="flex justify-center"><p className="text-[10px] font-bold font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 uppercase tracking-widest"><CheckCircle2 size={12} /> Withdrawal Requested</p></div>}
+              
+              {withdrawMut.isError && <div className="flex justify-center mt-4"><p className="text-[10px] font-black font-mono text-red-400 bg-red-500/10 border border-red-500/20 px-4 py-2 inline-flex items-center gap-2 uppercase tracking-[0.2em]"><XCircle size={12} /> {(withdrawMut.error as Error).message}</p></div>}
+              {withdrawMut.isSuccess && <div className="flex justify-center mt-4"><p className="text-[10px] font-black font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 inline-flex items-center gap-2 uppercase tracking-[0.2em]"><CheckCircle2 size={12} /> Withdrawal Requested</p></div>}
 
               {/* History */}
-              <div className="space-y-4 pt-4 border-t border-border/50">
-                <h3 className="text-xs font-bold text-white uppercase tracking-widest px-1">{t('wallet.history.title')}</h3>
+              <div className="mt-8 pt-8 border-t border-white/[0.05]">
+                <h3 className="text-[10px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em] mb-6 px-1">{t('wallet.history.title')}</h3>
                 {withdrawals.length === 0 ? (
-                  <div className="bg-bg-surface border border-border rounded-xl py-12 text-center shadow-inner"><p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{t('wallet.history.empty')}</p></div>
-                ) : withdrawals.map((w: WithdrawalRecord) => {
-                  const st = withdrawalStatusMap[w.status as keyof typeof withdrawalStatusMap] ?? withdrawalStatusMap.pending;
-                  const Icon = st.icon;
-                  return (
-                    <div key={w.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-bg-surface border border-border hover:border-zinc-700 transition-colors rounded-xl px-5 py-4 shadow-inner">
-                      <div className="flex items-center gap-3.5">
-                        <div className={`flex h-8 w-8 items-center justify-center rounded-lg shadow-inner border border-white/5 bg-opacity-20 ${st.color.replace('text-', 'bg-')}`}><Icon size={14} className={st.color} /></div>
-                        <div className="min-w-0">
-                          <p className="text-base font-black font-mono tracking-tight text-white">${w.amount.toFixed(2)}</p>
-                          <p className="text-[10px] font-mono text-zinc-500 truncate max-w-[200px] mt-0.5">{w.trc20_address}</p>
-                        </div>
-                      </div>
-                      <div className="sm:text-right flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 border-border/50 pt-3 sm:pt-0">
-                        <span className={`text-[9px] font-bold font-mono uppercase tracking-widest ${st.color} bg-white/5 px-2 py-0.5 rounded border border-white/5 shadow-sm`}>{st.label}</span>
-                        <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest mt-1 sm:mt-1.5">{new Date(w.created_at).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                  );
-                })}
+                  <div className="relative bg-black border border-white/[0.05] py-16 text-center overflow-hidden"><p className="text-[10px] font-black font-mono text-zinc-600 uppercase tracking-widest">{t('wallet.history.empty')}</p></div>
+                ) : (
+                  <div className="overflow-x-auto border border-white/[0.05] bg-black">
+                     <table className="w-full text-sm font-mono">
+                       <thead>
+                         <tr className="border-b border-white/[0.05]">
+                           <th className="py-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase pl-6">AMOUNT</th>
+                           <th className="py-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">ADDRESS</th>
+                           <th className="py-4 text-center text-[10px] font-bold text-zinc-600 tracking-widest uppercase">STATUS</th>
+                           <th className="py-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase pr-6">DATE</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         {withdrawals.map((w: WithdrawalRecord, idx: number) => {
+                           const st = withdrawalStatusMap[w.status as keyof typeof withdrawalStatusMap] ?? withdrawalStatusMap.pending;
+                           return (
+                             <tr key={w.id} className={`border-b border-white/[0.02] hover:bg-white/[0.02] transition-colors ${idx%2===0?'bg-white/[0.01]':''}`}>
+                               <td className="py-4 pl-6 text-[12px] font-black text-white tracking-widest drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">${w.amount.toFixed(2)}</td>
+                               <td className="py-4 text-[10px] text-zinc-500 max-w-[150px] truncate">{w.trc20_address}</td>
+                               <td className="py-4 text-center">
+                                  <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.2em] border ${st.color.replace('text-', 'text-').replace('text-amber-', 'text-yellow-')} ${st.color.replace('text-', 'bg-').replace('text-amber-', 'bg-yellow-').replace('400', '500/10')} border-current/30`}>
+                                     {st.label}
+                                  </span>
+                               </td>
+                               <td className="py-4 pr-6 text-right text-[10px] font-bold text-zinc-600 uppercase tracking-widest">{new Date(w.created_at).toLocaleDateString()}</td>
+                             </tr>
+                           );
+                         })}
+                       </tbody>
+                     </table>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}

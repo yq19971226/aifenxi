@@ -422,12 +422,13 @@ function QuickActions() {
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
-  if (!user || user.role !== "admin") return null;
+  const [error, setError] = useState("");
+
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [llmCost, setLLMCost] = useState<LLMCostSummary | null>(null);
   const [crawlerStats, setCrawlerStats] = useState<CrawlerStats | null>(null);
   const [configs, setConfigs] = useState<SystemConfig[]>([]);
-  const [error, setError] = useState("");
+
   const [loading, setLoading] = useState(true);
 
   // Use the shared live hook for WebSocket stats
@@ -445,6 +446,8 @@ export default function AdminDashboardPage() {
     fetchCrawlerStats().then(setCrawlerStats).catch(() => {});
     fetchConfigs().then(setConfigs).catch(() => {});
   }, []);
+
+  if (!user || user.role !== "admin") return null;
 
   if (loading) {
     return (

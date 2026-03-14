@@ -47,11 +47,6 @@ export function GridStrategyCard({ report }: Props) {
   const strategy = report.strategy;
   const mode = report.mode;
 
-  // Only show for intraday / trend modes with valid strategy
-  if (mode === "scalping") return null;
-  if (!strategy || strategy.direction === "neutral" || strategy.is_fallback) return null;
-  if (!loaded) return null;
-
   const gridInput: GridStrategyInput | null = useMemo(() => {
     if (!preferences || !strategy) return null;
     if (mode !== "intraday" && mode !== "trend") return null;
@@ -69,6 +64,10 @@ export function GridStrategyCard({ report }: Props) {
     return calculateGridStrategy(gridInput);
   }, [gridInput]);
 
+  // Only show for intraday / trend modes with valid strategy
+  if (mode === "scalping") return null;
+  if (!strategy || strategy.direction === "neutral" || strategy.is_fallback) return null;
+  if (!loaded) return null;
   if (!grid) return null;
 
   const isLong = grid.direction === "long";

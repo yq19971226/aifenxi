@@ -112,7 +112,7 @@ export default function DashboardPage() {
   });
 
   // derived stats
-  const symbols = overview?.symbols ?? [];
+  const symbols = useMemo(() => overview?.symbols ?? [], [overview?.symbols]);
   const heroStats = useMemo(() => {
     let long = 0, short = 0, neutral = 0;
     let latest = "";
@@ -125,6 +125,8 @@ export default function DashboardPage() {
     return { long, short, neutral, latest };
   }, [symbols]);
 
+  // Make sure we resolve the dependencies
+  // We can just rely on symbols changing when sorted
   const sortedSymbols = useMemo(() => {
     return [...symbols].sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0));
   }, [symbols]);
