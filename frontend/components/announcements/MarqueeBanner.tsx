@@ -5,11 +5,9 @@ import { usePathname } from "next/navigation";
 import { Megaphone } from "lucide-react";
 import { fetchActiveAnnouncements } from "@/lib/api/announcements";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 
 export function MarqueeBanner() {
   const pathname = usePathname() || "/";
-  const t = useTranslations("announcements"); // if exists, or just use hardcoded
 
   const { data } = useQuery({
     queryKey: ["announcements", "active", pathname],

@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, BellDot, BellRing } from "lucide-react";
+import { Bell, BellRing } from "lucide-react";
 import { fetchActiveAnnouncements } from "@/lib/api/announcements";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -36,7 +34,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
         "relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200 transition-colors",
         className
       )}
-      aria-label="Notifications"
+      aria-label="消息通知"
     >
       {hasActiveUnread ? (
         <BellRing size={20} className="text-indigo-400 animate-pulse" />
