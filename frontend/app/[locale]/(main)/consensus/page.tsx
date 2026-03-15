@@ -138,7 +138,7 @@ export default function ConsensusPage() {
                     <div className="flex items-center gap-1.5 shrink-0 bg-amber-500/10 border border-amber-500/20 text-amber-500 px-2 py-1 rounded shadow-[0_0_10px_rgba(245,158,11,0.1)]">
                       <Lock size={12} />
                       <span className="text-[10px] font-black tracking-widest uppercase">
-                        {cfg.tierLabel || "PRO"}
+                        {cfg.tierLabel || "高级版"}
                       </span>
                     </div>
                   )}
@@ -302,7 +302,7 @@ export default function ConsensusPage() {
           <div className="text-center font-mono w-full">
             <p className="text-xs text-indigo-400/70 mb-3 flex items-center justify-center gap-2 font-bold tracking-[0.2em]">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping" />
-              SYSTEM.READY
+              系统就绪
             </p>
             <p className="text-xl text-zinc-300 font-semibold tracking-tight shadow-sm">
               {t("empty.message")}
