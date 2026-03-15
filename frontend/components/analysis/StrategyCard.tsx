@@ -52,7 +52,7 @@ export function StrategyRangeBar({
   return (
     <div className="mt-5 space-y-2">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-[11px] text-zinc-500 uppercase tracking-widest font-bold">价位分布 Price Map</p>
+        <p className="text-[11px] text-zinc-500 uppercase tracking-widest font-bold">价位分布图</p>
         <span className="text-[11px] text-zinc-600 font-mono">{(range).toFixed(2)} 差幅</span>
       </div>
       <div className="relative h-10 rounded-lg bg-black/40 border border-white/[0.04] overflow-hidden backdrop-blur-md">
@@ -130,7 +130,7 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.05] p-4 backdrop-blur-sm">
         <div className="flex items-center gap-2">
           <AlertTriangle className="h-5 w-5 text-amber-500" />
-          <span className="text-xs font-bold text-amber-500 uppercase tracking-wider">Strategy Generation Degraded</span>
+          <span className="text-xs font-bold text-amber-500 uppercase tracking-wider">策略生成降级</span>
         </div>
         <p className="mt-2 text-xs text-zinc-400">智能体返回了降级响应，策略数据不可用。请重试分析。</p>
       </div>
@@ -150,7 +150,7 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
           </div>
           <div>
             <span className={`text-sm font-black uppercase tracking-widest flex items-center gap-2 ${dirText}`}>
-              ACTION : {formatDirection(dir)}
+              操作方向：{formatDirection(dir)}
               {isFallback && <span className="text-[10px] font-mono text-amber-500 border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 rounded shadow-[0_0_10px_rgba(245,158,11,0.2)]">HFT</span>}
             </span>
             {symbol && <p className="text-xs text-zinc-500 font-mono mt-0.5 tracking-wider">{symbol}</p>}
@@ -167,7 +167,7 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
           {/* 入场区间 */}
           {(entryLow != null || entryHigh != null) && (
             <div className="rounded-xl bg-black/40 border border-white/[0.06] p-3 flex flex-col justify-center">
-              <p className="text-[11px] text-zinc-500 uppercase tracking-widest mb-1.5">进场区间 Entry Zone</p>
+              <p className="text-[11px] text-zinc-500 uppercase tracking-widest mb-1.5">进场区间</p>
               <div className="flex flex-col md:flex-row md:items-baseline md:gap-2">
                 <p className="text-sm md:text-[15px] font-mono font-bold text-white tracking-tight">
                   {entryLow != null ? formatPrice(entryLow) : "\u2014"}
@@ -183,7 +183,7 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
           {stopLoss != null && (
             <div className="rounded-xl bg-red-950/20 border border-red-500/10 p-3 flex flex-col justify-center relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-16 h-16 bg-red-500/10 rounded-full blur-xl -mr-8 -mt-8 transition-transform duration-500 group-hover:scale-150" />
-              <p className="text-[11px] text-red-500/80 uppercase tracking-widest mb-1.5 relative z-10">止损 Stop Loss</p>
+              <p className="text-[11px] text-red-500/80 uppercase tracking-widest mb-1.5 relative z-10">止损位</p>
               <p className="text-[15px] md:text-lg font-mono font-black text-red-400 drop-shadow-[0_0_8px_rgba(248,113,113,0.5)] tracking-tight relative z-10">
                 {formatPrice(stopLoss)}
               </p>
@@ -193,7 +193,7 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
           {(strategy.risk_reward_ratio ?? 0) > 0 && (
             <div className="rounded-xl bg-indigo-950/20 border border-indigo-500/10 p-3 flex flex-col justify-center relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-500/10 rounded-full blur-xl -mr-8 -mt-8 transition-transform duration-500 group-hover:scale-150" />
-              <p className="text-[11px] text-indigo-400/80 uppercase tracking-widest mb-1.5 relative z-10">盈亏比 R/R</p>
+              <p className="text-[11px] text-indigo-400/80 uppercase tracking-widest mb-1.5 relative z-10">盈亏比</p>
               <p className="text-[15px] md:text-lg font-mono font-black text-indigo-300 drop-shadow-[0_0_8px_rgba(165,180,252,0.3)] tracking-tight relative z-10">
                 1 : {(strategy.risk_reward_ratio ?? 0).toFixed(2)}
               </p>
@@ -204,7 +204,7 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
         {/* 目标位 */}
         {targets.length > 0 && (
           <div className="mt-4 p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/10">
-            <p className="text-[11px] text-emerald-500/80 uppercase tracking-widest mb-2.5">止盈目标 Targets</p>
+            <p className="text-[11px] text-emerald-500/80 uppercase tracking-widest mb-2.5">止盈目标</p>
             <div className="flex gap-2.5 flex-wrap">
               {targets.map((t, i) => (
                 <div key={i} className="flex flex-col rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 transition-all duration-300 hover:bg-emerald-500/20 hover:border-emerald-500/40 hover:shadow-[0_0_15px_rgba(52,211,153,0.15)] cursor-default">

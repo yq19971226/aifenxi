@@ -170,7 +170,7 @@ export function NotificationDrawer() {
 
             {/* Footer */}
             <div className="flex h-14 items-center justify-center border-t border-white/[0.06] bg-black/20 text-[11px] font-mono text-zinc-500">
-              AXIOM NOTIFICATION CENTER
+              AXIOM · 消息中心
             </div>
           </motion.div>
       )}

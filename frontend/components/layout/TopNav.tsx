@@ -236,7 +236,7 @@ export function TopNav() {
                     <div className="min-w-0">
                       <div className="text-sm font-bold truncate text-zinc-200">{user.email?.split("@")[0] ?? "User"}</div>
                       <div className="text-xs text-zinc-500 font-bold font-mono uppercase tracking-widest mt-0.5">
-                        {user.membership_level >= 2 ? "PRO PLAN" : "BASIC"}
+                      {user.membership_level >= 2 ? "旗舰会员" : user.membership_level >= 1 ? "专业会员" : "普通用户"}
                       </div>
                     </div>
                   </div>

@@ -120,7 +120,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
       : "—";
     const validUntilText = validUntil ? `${validUntil} ⏰` : "—";
 
-    const dirLabel = displayDirection === "long" ? "做多 BUY" : displayDirection === "short" ? "做空 SELL" : "观望";
+    const dirLabel = displayDirection === "long" ? "做多" : displayDirection === "short" ? "做空" : "观望";
 
     return (
       <div ref={ref} style={{...S.card, boxShadow: t.glow}}>
@@ -248,7 +248,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
           {consensus.total > 0 && (
             <div style={S.sectionBox("#f59e0b", "rgba(245,158,11,0.03)")}>
               <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 700, color: "#fbbf24", marginBottom: 12 }}>
-                🤖 Swarm Consensus
+                🤖 处群共识分析
               </div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" as const }}>
                 {consensus.bullish > 0 && (
@@ -290,7 +290,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
           {/* ── Disclaimer ── */}
           <div style={{ margin: "0 24px 16px", background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.1)", borderRadius: 12, padding: "12px 16px", position: "relative", zIndex: 10 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: "#71717a", marginBottom: 4 }}>
-              DISCLAIMER 免责声明
+              免责声明
             </div>
             <div style={{ fontSize: 11, color: "#71717a", lineHeight: 1.6 }}>
               此报告由多智能体深度网络推理生成。仅作研究用途，不构成直接财务建议。DYOR。
