@@ -388,7 +388,7 @@ class LearningService:
         changed_by: str = "admin",
     ) -> dict:
         """更新校准参数到 config_service，并写入 changelog。"""
-        from app.services.config_service import ConfigService
+        from app.services.config_service import ConfigService, ConfigCreate, ConfigUpdate
 
         svc = ConfigService(self._session)
         updated: dict[str, str] = {}
@@ -396,11 +396,9 @@ class LearningService:
         if signal_threshold is not None:
             old_val = await svc.get_config("consensus_signal_threshold", "0.35")
             new_val = str(round(signal_threshold, 4))
-            await svc.upsert_config(
-                key="consensus_signal_threshold",
-                value=new_val,
-                category="consensus",
-                updated_by=changed_by,
+            await self._upsert_config(
+                svc, "consensus_signal_threshold", new_val,
+                category="consensus", changed_by=changed_by,
             )
             updated["signal_threshold"] = new_val
             await self._write_changelog(
@@ -411,11 +409,9 @@ class LearningService:
         if min_agreement is not None:
             old_val = await svc.get_config("consensus_min_agreement", "2")
             new_val = str(min_agreement)
-            await svc.upsert_config(
-                key="consensus_min_agreement",
-                value=new_val,
-                category="consensus",
-                updated_by=changed_by,
+            await self._upsert_config(
+                svc, "consensus_min_agreement", new_val,
+                category="consensus", changed_by=changed_by,
             )
             updated["min_agreement"] = new_val
             await self._write_changelog(
@@ -423,7 +419,38 @@ class LearningService:
                 old_val, new_val, changed_by,
             )
 
+        await self._session.commit()
         return {"status": "updated", "params": updated}
+
+    async def _upsert_config(
+        self,
+        svc: "ConfigService",
+        key: str,
+        value: str,
+        category: str = "general",
+        changed_by: str = "system",
+    ) -> None:
+        """创建或更新配置项（ConfigService 没有 upsert，需手动判断）。"""
+        from app.services.config_service import ConfigCreate, ConfigUpdate
+
+        existing = await svc.get_config_detail(key)
+        if existing:
+            await svc.update_config(
+                key,
+                ConfigUpdate(value=value, is_secret=False),
+                admin_user_id=changed_by,
+            )
+        else:
+            await svc.create_config(
+                ConfigCreate(
+                    config_key=key,
+                    value=value,
+                    category=category,
+                    description=f"Calibration param: {key}",
+                    is_secret=False,
+                ),
+                admin_user_id=changed_by,
+            )
 
     # ── B4: 数据库维护 ───────────────────────────────────────
 
