@@ -97,7 +97,7 @@ export default function PartnerPage() {
             <span className="flex items-center justify-center w-8 h-8 bg-blue-500/10 border border-blue-500/30">
               <Users size={16} className="text-blue-400" />
             </span>
-            SYS.{t('title')}_
+            {t('title')}
           </h1>
           <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-[0.2em]">{t('subtitle')}</p>
         </div>
@@ -205,15 +205,15 @@ export default function PartnerPage() {
               ) : (
                 <div className="relative bg-black border border-white/[0.05] p-6 lg:p-8 overflow-hidden">
                    <div className="absolute top-0 right-0 w-8 h-[1px] bg-white/[0.2]" />
-                   <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500 mb-6">INVITATION_RECORDS</p>
+                   <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500 mb-6">邀请记录</p>
                    <div className="overflow-x-auto">
                      <table className="w-full text-sm font-mono">
                        <thead>
                          <tr className="border-b border-white/[0.1]">
-                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">EMAIL_USER</th>
-                           <th className="pb-4 text-center text-[10px] font-bold text-zinc-600 tracking-widest uppercase">LEVEL</th>
-                           <th className="pb-4 text-center text-[10px] font-bold text-zinc-600 tracking-widest uppercase">DATE_REG</th>
-                           <th className="pb-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase">COMMISSION</th>
+                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">用户邮箱</th>
+                           <th className="pb-4 text-center text-[10px] font-bold text-zinc-600 tracking-widest uppercase">等级</th>
+                           <th className="pb-4 text-center text-[10px] font-bold text-zinc-600 tracking-widest uppercase">注册日期</th>
+                           <th className="pb-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase">佣金</th>
                          </tr>
                        </thead>
                        <tbody>
@@ -251,15 +251,15 @@ export default function PartnerPage() {
               ) : (
                 <div className="relative bg-black border border-white/[0.05] p-6 lg:p-8 overflow-hidden">
                    <div className="absolute top-0 right-0 w-8 h-[1px] bg-white/[0.2]" />
-                   <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500 mb-6">COMMISSION_LOGS</p>
+                   <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500 mb-6">佣金记录</p>
                    <div className="overflow-x-auto">
                      <table className="w-full text-sm font-mono">
                        <thead>
                          <tr className="border-b border-white/[0.1]">
-                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">FROM_USER</th>
-                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">DETAILS</th>
-                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">DATE</th>
-                           <th className="pb-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase">REWARD</th>
+                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">来源用户</th>
+                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">详情</th>
+                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">日期</th>
+                           <th className="pb-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase">奖励</th>
                          </tr>
                        </thead>
                        <tbody>
@@ -293,7 +293,7 @@ export default function PartnerPage() {
                 <div className="absolute top-0 right-0 w-8 h-[1px] bg-purple-500/50" />
                 
                 <h3 className="text-[10px] font-black text-purple-400 mb-6 flex items-center gap-3 uppercase tracking-[0.3em] relative z-10">
-                   SYS.{t('wallet.title')}_
+                   {t('wallet.title')}
                 </h3>
                 
                 {wallet?.trc20_address ? (
@@ -323,7 +323,7 @@ export default function PartnerPage() {
               </button>
               
               {withdrawMut.isError && <div className="flex justify-center mt-4"><p className="text-[10px] font-black font-mono text-red-400 bg-red-500/10 border border-red-500/20 px-4 py-2 inline-flex items-center gap-2 uppercase tracking-[0.2em]"><XCircle size={12} /> {(withdrawMut.error as Error).message}</p></div>}
-              {withdrawMut.isSuccess && <div className="flex justify-center mt-4"><p className="text-[10px] font-black font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 inline-flex items-center gap-2 uppercase tracking-[0.2em]"><CheckCircle2 size={12} /> Withdrawal Requested</p></div>}
+              {withdrawMut.isSuccess && <div className="flex justify-center mt-4"><p className="text-[10px] font-black font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 inline-flex items-center gap-2 uppercase tracking-[0.2em]"><CheckCircle2 size={12} /> 提现申请已提交</p></div>}
 
               {/* History */}
               <div className="mt-8 pt-8 border-t border-white/[0.05]">
@@ -335,10 +335,10 @@ export default function PartnerPage() {
                      <table className="w-full text-sm font-mono">
                        <thead>
                          <tr className="border-b border-white/[0.05]">
-                           <th className="py-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase pl-6">AMOUNT</th>
-                           <th className="py-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">ADDRESS</th>
-                           <th className="py-4 text-center text-[10px] font-bold text-zinc-600 tracking-widest uppercase">STATUS</th>
-                           <th className="py-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase pr-6">DATE</th>
+                           <th className="py-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase pl-6">金额</th>
+                           <th className="py-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">地址</th>
+                           <th className="py-4 text-center text-[10px] font-bold text-zinc-600 tracking-widest uppercase">状态</th>
+                           <th className="py-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase pr-6">日期</th>
                          </tr>
                        </thead>
                        <tbody>
