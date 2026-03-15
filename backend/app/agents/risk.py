@@ -564,8 +564,9 @@ class RiskAgent(BaseAgent):
             if not isinstance(key_risks, list):
                 key_risks = []
 
-            # 构建 key_findings
-            key_findings: list[str] = [f"风险等级: {risk_level}"]
+            # 风险等级中文映射
+            _risk_level_zh = {"high": "高", "medium": "中", "low": "低"}.get(risk_level, risk_level)
+            key_findings: list[str] = [f"风险等级: {_risk_level_zh}"]
             key_findings.append(f"触发告警: {len(alerts)} 条")
             key_findings.extend(key_risks)
             key_findings.extend(f"建议: {r}" for r in recommendations)

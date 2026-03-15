@@ -177,7 +177,7 @@ class StrategyService:
             targets=targets,
             confidence=0.0,
             valid_until=datetime.now(timezone.utc) + timedelta(hours=1),
-            reasoning="Agent analysis failed to return valid data. A baseline safety strategy has been generated based on current market price levels.",
+            reasoning="智能体分析数据异常，已基于当前市场价格生成安全基准策略。",
             is_fallback=True,
         )
 
@@ -274,7 +274,7 @@ class StrategyService:
             targets=targets,
             confidence=safe_confidence,
             valid_until=datetime.now(timezone.utc) + timedelta(hours=4),
-            reasoning=report.reasoning or "Consensus reached based on multi-agent technical and fundamental analysis.",
+            reasoning=report.reasoning or "多维智能体协同分析已完成，合并技术面、链上数据、合约市场与情绪面总体判断。",
             risk_reward_ratio=rr,
             is_worth_taking=worth,
         )
@@ -434,19 +434,34 @@ class StrategyService:
         stop_loss = _fmt(stop_loss)
         targets = [_fmt(t) for t in targets]
 
-        # 构建 reasoning
-        regime_label = {"trending": "Trend", "volatile": "Volatile", "ranging": "Ranging"}.get(market_regime or "", "")
-        
-        # 统计 Agent 投票分布以增强专业感
+        # 市场模式中文标签
+        _regime_zh = {
+            "trending": "趋势",
+            "volatile": "高波动",
+            "ranging": "震荡",
+        }.get(market_regime or "", "")
+
+        # 共识信号中文
+        _signal_zh = {
+            "bullish": "看涨",
+            "bearish": "看跌",
+            "neutral": "中性",
+        }.get(report.consensus_signal, report.consensus_signal.upper())
+
+        # 投票分布
         bull_votes = sum(1 for v in report.model_votes if v.signal == "bullish")
         bear_votes = sum(1 for v in report.model_votes if v.signal == "bearish")
         total_votes = len(report.model_votes)
+        agree_votes = bull_votes if report.consensus_signal == "bullish" else bear_votes
 
-        reasoning = f"Consensus: {report.consensus_signal.upper()} ({bull_votes if report.consensus_signal == 'bullish' else bear_votes}/{total_votes} Agents concur). Confidence: {confidence:.0%}. Divergence: {report.divergence:.1f}%."
-        if regime_label:
-            reasoning = f"[{regime_label} Market] " + reasoning
+        reasoning = (
+            f"共识方向: {_signal_zh}（{agree_votes}/{total_votes} 个智能体一致）。"
+            f"置信度: {confidence:.0%}。分歧度: {report.divergence:.1f}%。"
+        )
+        if _regime_zh:
+            reasoning = f"【{_regime_zh}市场】" + reasoning
         if report.minority_warnings:
-            reasoning += "\nMinority Warnings: " + "; ".join([w.split("理由:")[0].strip() for w in report.minority_warnings])
+            reasoning += "\n少数派预警: " + "; ".join([w.split("理由:")[0].strip() for w in report.minority_warnings])
 
         rr, worth = self._calc_risk_reward(direction, entry_low, entry_high, stop_loss, targets)
         
