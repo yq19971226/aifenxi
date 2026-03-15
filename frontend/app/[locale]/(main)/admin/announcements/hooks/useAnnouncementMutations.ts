@@ -36,6 +36,14 @@ export function useAnnouncementMutations() {
 
   const saveMutation = useMutation({
     mutationFn: async ({ mode, formState, editingId, publishAfterSave }: SaveArgs) => {
+      // 前端校验
+      if (!formState.title.trim()) {
+        throw new Error("请填写公告标题");
+      }
+      if (!formState.content_md.trim()) {
+        throw new Error("请填写公告正文");
+      }
+
       let saved;
 
       if (mode === "create") {
