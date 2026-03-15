@@ -523,9 +523,14 @@ export function LandingPage() {
                 {t("nav.enterApp")}
               </Link>
             ) : (
-              <Link href={`/${locale}/login`} className="text-zinc-400 hover:text-white border px-4 py-1.5 border-white/10 hover:border-white/30 hover:bg-white/5 transition-colors">
-                {t("nav.login")}
-              </Link>
+              <>
+                <Link href={`/${locale}/insights`} className="text-zinc-500 font-bold hover:text-white transition-colors hidden sm:block">
+                  {locale.startsWith("zh") ? "洞察" : "Insights"}
+                </Link>
+                <Link href={`/${locale}/login`} className="text-zinc-400 hover:text-white border px-4 py-1.5 border-white/10 hover:border-white/30 hover:bg-white/5 transition-colors">
+                  {t("nav.login")}
+                </Link>
+              </>
             )}
           </div>
         </div>
@@ -546,6 +551,7 @@ export function LandingPage() {
       <footer className="py-12 border-t border-white/[0.04] bg-black text-center text-[10px] text-zinc-600 font-mono tracking-widest uppercase">
         <div className="flex flex-wrap items-center justify-center gap-8 mb-6 font-bold">
           <Link href={`/${locale}/guide`} className="hover:text-indigo-400 transition-colors">{t("footer.guide")}</Link>
+          <Link href={`/${locale}/insights`} className="hover:text-indigo-400 transition-colors">{locale.startsWith("zh") ? "洞察专区" : "Insights"}</Link>
           <Link href={`/${locale}/guide`} className="hover:text-indigo-400 transition-colors">{t("footer.docs")}</Link>
           <Link href={`/${locale}/guide#faq`} className="hover:text-indigo-400 transition-colors">{t("footer.faq")}</Link>
         </div>
