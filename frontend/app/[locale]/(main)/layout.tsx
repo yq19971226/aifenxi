@@ -5,6 +5,7 @@ import { TopNav } from "@/components/layout/TopNav";
 import { AuthGuard } from "@/components/layout/AuthGuard";
 import { PresenceHeartbeat } from "@/components/layout/PresenceHeartbeat";
 import { AnnouncementRuntime } from "@/components/announcements/AnnouncementRuntime";
+import { MarqueeBanner } from "@/components/announcements/MarqueeBanner";
 import { DataSourceBanner } from "@/components/cards/DataSourceBanner";
 import { OfflineBanner } from "@/components/ui/OfflineBanner";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
@@ -38,6 +39,10 @@ export default function MainLayout({ children }: MainLayoutProps) {
         <div className="flex min-w-0 flex-1 flex-col md:pl-[64px] transition-[padding] duration-200">
           <ErrorBoundary name="AnnouncementRuntime">
             <AnnouncementRuntime />
+          </ErrorBoundary>
+
+          <ErrorBoundary name="MarqueeBanner">
+            <MarqueeBanner />
           </ErrorBoundary>
 
           <div className="flex min-w-0 flex-1">
