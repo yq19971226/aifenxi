@@ -23,12 +23,12 @@ export function AICitationSnippet({ report }: AICitationSnippetProps) {
         ? t("card.baselineSafetyReasoning")
         : reasoningRaw || t("snippet.defaultReasoning");
     const targets = strategy?.targets;
-    const targetPart = targets?.length
-      ? targets.map((x) => (typeof x === "number" ? x.toLocaleString() : x)).join(" / ")
+    const tpPart = targets && targets.length > 0
+      ? targets.map((x) => (typeof x === "number" ? x.toLocaleString("en-US", { useGrouping: false }) : x)).join(" / ")
       : "";
-    const slPart = strategy?.stop_loss ? ` SL: ${strategy.stop_loss.toLocaleString()}` : "";
+    const slPart = strategy?.stop_loss ? ` SL: ${strategy.stop_loss.toLocaleString("en-US", { useGrouping: false })}` : "";
     const rrPart = strategy?.risk_reward_ratio ? ` R:R: ${strategy.risk_reward_ratio}` : "";
-    const levels = [targetPart, slPart, rrPart].filter(Boolean).join("") || "—";
+    const levels = [tpPart, slPart, rrPart].filter(Boolean).join("") || "—";
     const confStr = Math.min(95, Math.round((report.confidence ?? 0) * 100));
     const line1 = t("snippet.verifiedAt", { date });
     const line2 = t("snippet.assetSignal", {

@@ -298,5 +298,5 @@ function MetricItem({ label, value, sub, valueColor = "text-foreground", fontMon
 
 function formatPrice(val: number | string | null | undefined) {
   if (val == null) return "---";
-  return typeof val === "number" ? val.toLocaleString(undefined, { maximumFractionDigits: 2 }) : String(val);
+  return typeof val === "number" ? val.toLocaleString(undefined, { maximumFractionDigits: 2, useGrouping: false }) : String(val);
 }

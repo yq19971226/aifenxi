@@ -182,9 +182,9 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                 <div style={S.row}>
                   <span style={S.label}>进场区间 (Entry)</span>
                   <span style={{ ...S.value, fontFamily: 'monospace', fontSize: 14, color: "#60a5fa" }}>
-                    {report.strategy.entry_low != null ? report.strategy.entry_low.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
+                    {report.strategy.entry_low != null ? report.strategy.entry_low.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false }) : "—"}
                     {" - "}
-                    {report.strategy.entry_high != null ? report.strategy.entry_high.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
+                    {report.strategy.entry_high != null ? report.strategy.entry_high.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false }) : "—"}
                   </span>
                 </div>
               )}
@@ -192,7 +192,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                 <div style={S.row}>
                   <span style={S.label}>防守位 (Stop Loss)</span>
                   <span style={{ ...S.value, color: "#f87171", fontWeight: 800, fontFamily: 'monospace', fontSize: 14 }}>
-                    {report.strategy.stop_loss.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {report.strategy.stop_loss.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false })}
                   </span>
                 </div>
               )}
@@ -200,7 +200,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                 <div style={S.row}>
                   <span style={S.label}>目标位 (Target)</span>
                   <span style={{ ...S.value, color: "#34d399", fontWeight: 800, fontFamily: 'monospace', fontSize: 14 }}>
-                    {report.strategy.targets.slice(0, 3).map((t, i) => `T${i + 1}:${t.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`).join("  ")}
+                    {report.strategy.targets.slice(0, 3).map((t, i) => `T${i + 1}:${t.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false })}`).join("  ")}
                   </span>
                 </div>
               )}

@@ -113,7 +113,7 @@ export function isFallbackReasoning(text: string): boolean {
 }
 
 export function formatPrice(value: number): string {
-  if (value >= 1000) return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (value >= 1000) return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false });
   if (value >= 1) return value.toFixed(4);
   return value.toFixed(6);
 }
@@ -227,7 +227,7 @@ export function localizeText(text: string | null | undefined): string {
 export function formatValue(value: unknown): string {
   if (value === null || value === undefined) return "—";
   if (typeof value === "number") {
-    if (Number.isInteger(value)) return value.toLocaleString();
+    if (Number.isInteger(value)) return value.toString();
     return formatPrice(value);
   }
   if (typeof value === "boolean") return value ? "是" : "否";
