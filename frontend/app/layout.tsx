@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     icon: "/favicon.svg",
     apple: "/apple-touch-icon.svg",
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://axiom123.cc"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.axiom123.cc"),
   robots: {
     index: true,
     follow: true,

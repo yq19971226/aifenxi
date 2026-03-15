@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 import { LandingPage } from "./landing-sections";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axiom123.cc";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.axiom123.cc";
 
 export async function generateMetadata({
   params: { locale },

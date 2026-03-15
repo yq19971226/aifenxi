@@ -13,7 +13,7 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: 'metadata.site' });
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://axiom123.cc';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.axiom123.cc';
 
   const keywords = locale.startsWith('zh')
     ? '加密货币分析,庄家行为分析,AI智能分析,比特币分析,链上数据,AXIOM洞察'
