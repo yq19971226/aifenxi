@@ -104,7 +104,7 @@ export default function LoginPage() {
               <Loader2 size={16} className="animate-spin" />
             ) : (
               <>
-                AUTHENTICATE_ <span className="animate-pulse">_</span>
+                {t("page.submitButton")} <span className="animate-pulse">_</span>
               </>
             )}
           </span>
@@ -113,7 +113,7 @@ export default function LoginPage() {
         <div className="text-center mt-6 pt-6 border-t border-white/[0.04]">
           <span className="text-[10px] font-mono text-zinc-600 tracking-widest uppercase">{t("page.noAccount")}</span>
           <Link href={`/${locale}/register`} className="ml-3 text-[10px] font-mono font-bold tracking-[0.2em] text-white hover:text-indigo-400 transition-colors uppercase">
-            INITIATE_ACCESS
+            {t("page.applyForAccess")}
           </Link>
         </div>
       </form>

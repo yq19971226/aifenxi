@@ -85,16 +85,16 @@ export default function TaskTemplatesPage() {
       <div className="mx-auto max-w-5xl space-y-8 px-4 py-8">
         <div className="flex items-end justify-between border-b border-white/[0.05] pb-6">
           <div>
-            <h1 className="text-2xl font-black text-white font-mono tracking-widest uppercase mb-2">SYS.TASK_TEMPLATES_</h1>
+            <h1 className="text-2xl font-black text-white font-mono tracking-widest uppercase mb-2">任务模板</h1>
             <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-[0.3em]">
-              Admin Task Blueprint Management
+              任务模板管理
             </p>
           </div>
           <button
             onClick={openCreate}
             className="flex items-center gap-2 border border-indigo-500/40 bg-indigo-500/10 px-4 py-2 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-indigo-400 hover:bg-indigo-500 hover:text-white transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.1)]"
           >
-            <Plus size={14} /> NEW_BLUEPRINT
+            <Plus size={14} /> 新建模板
           </button>
         </div>
 
@@ -107,7 +107,7 @@ export default function TaskTemplatesPage() {
             <div className="flex items-center justify-between border-b border-white/[0.05] pb-4 mb-4">
               <h3 className="text-[11px] font-black font-mono text-indigo-400 uppercase tracking-[0.3em] flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-indigo-400 animate-pulse"></span>
-                {editingId ? "EDIT_BLUEPRINT" : "CREATE_BLUEPRINT"}
+                {editingId ? "编辑模板" : "创建模板"}
               </h3>
               <button onClick={() => setEditing(null)} className="text-zinc-500 hover:text-white transition-colors">
                 <X size={16} />
@@ -115,7 +115,7 @@ export default function TaskTemplatesPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">TEMPLATE_TITLE</label>
+                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">模板标题</label>
                 <input
                   value={editing.title ?? ""}
                   onChange={(e) => setEditing({ ...editing, title: e.target.value })}
@@ -123,21 +123,21 @@ export default function TaskTemplatesPage() {
                 />
               </div>
               <div>
-                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">PLATFORM</label>
+                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">平台</label>
                 <select
                   value={editing.platform ?? "twitter"}
                   onChange={(e) => setEditing({ ...editing, platform: e.target.value })}
                   className="w-full border border-white/[0.1] bg-[#0a0a0a] px-4 py-2.5 text-[11px] text-white font-mono tracking-widest focus:border-indigo-500/50 outline-none transition-all cursor-pointer"
                 >
-                  <option value="twitter">TWITTER_X</option>
-                  <option value="binance_square">BINANCE_SQUARE</option>
-                  <option value="telegram">TELEGRAM</option>
-                  <option value="reddit">REDDIT</option>
-                  <option value="xiaohongshu">XHS_DOUYIN</option>
+                  <option value="twitter">推特/X</option>
+                  <option value="binance_square">币安广场</option>
+                  <option value="telegram">电报群</option>
+                  <option value="reddit">论坛</option>
+                  <option value="xiaohongshu">小红书/抖音</option>
                 </select>
               </div>
               <div>
-                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">ICON_EMOJI</label>
+                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">图标</label>
                 <input
                   value={editing.icon ?? ""}
                   onChange={(e) => setEditing({ ...editing, icon: e.target.value })}
@@ -145,20 +145,20 @@ export default function TaskTemplatesPage() {
                 />
               </div>
               <div>
-                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">REWARD_MODE</label>
+                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">奖励模式</label>
                 <select
                   value={editing.reward_mode ?? "scalping"}
                   onChange={(e) => setEditing({ ...editing, reward_mode: e.target.value })}
                   className="w-full border border-white/[0.1] bg-[#0a0a0a] px-4 py-2.5 text-[11px] text-white font-mono tracking-widest focus:border-indigo-500/50 outline-none transition-all cursor-pointer"
                 >
-                  <option value="scalping">SCALPING (Daily)</option>
-                  <option value="intraday">INTRADAY (Weekly)</option>
-                  <option value="trend">TREND (Monthly)</option>
+                  <option value="scalping">超短线 (日归)</option>
+                  <option value="intraday">日内 (周归)</option>
+                  <option value="trend">趋势 (月归)</option>
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-5">
                 <div>
-                  <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">REWARD_AMT</label>
+                  <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">奖励数量</label>
                   <input
                     type="number"
                     min={1}
@@ -168,7 +168,7 @@ export default function TaskTemplatesPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">MIN_VIEWS</label>
+                  <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">最低浏览</label>
                   <input
                     type="number"
                     min={0}
@@ -182,7 +182,7 @@ export default function TaskTemplatesPage() {
             
             <div className="space-y-5 border-t border-white/[0.05] pt-5">
               <div>
-                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">DESCRIPTION</label>
+                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">描述</label>
                 <textarea
                   value={editing.description ?? ""}
                   onChange={(e) => setEditing({ ...editing, description: e.target.value })}
@@ -191,7 +191,7 @@ export default function TaskTemplatesPage() {
                 />
               </div>
               <div>
-                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">RULES_DETAILS</label>
+                <label className="mb-2 block text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest">规则详情</label>
                 <textarea
                   value={editing.rules ?? ""}
                   onChange={(e) => setEditing({ ...editing, rules: e.target.value })}
@@ -206,14 +206,14 @@ export default function TaskTemplatesPage() {
                 onClick={() => setEditing(null)}
                 className="border border-white/[0.1] bg-white/[0.02] px-6 py-2.5 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-zinc-400 hover:bg-white/[0.05] hover:text-white transition-all"
               >
-                CANCEL
+                取消
               </button>
               <button
                 onClick={handleSave}
                 disabled={!editing.title || createMutation.isPending || updateMutation.isPending}
                 className="border border-indigo-500/40 bg-indigo-600/80 px-8 py-2.5 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-white disabled:opacity-40 transition-all hover:bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
               >
-                SAVE_BLUEPRINT
+                保存模板
               </button>
             </div>
           </div>
@@ -222,11 +222,11 @@ export default function TaskTemplatesPage() {
         {/* Template List */}
         {isLoading ? (
           <div className="relative bg-black border border-white/[0.05] py-20 text-center overflow-hidden">
-             <span className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em] animate-pulse">LOADING_BLUEPRINTS...</span>
+             <span className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em] animate-pulse">加载中...</span>
           </div>
         ) : templates.length === 0 ? (
           <div className="relative bg-black border border-white/[0.05] py-20 text-center overflow-hidden">
-             <span className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em]">NO_BLUEPRINTS_FOUND</span>
+             <span className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em]">暂无模板</span>
           </div>
         ) : (
           <div className="space-y-4">
@@ -253,18 +253,18 @@ export default function TaskTemplatesPage() {
                       </span>
                       {!t.is_active && (
                         <span className="border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[9px] font-bold font-mono tracking-widest text-red-400 uppercase">
-                          INACTIVE
+                          已禁用
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-4 text-[10px] font-mono font-bold tracking-widest text-zinc-500 uppercase">
                       <span className="flex items-center gap-1.5">
                         <span className="w-1 h-3 bg-emerald-500/50 block"></span>
-                        REWARD: <span className="text-emerald-400">+{t.reward_amount} {t.reward_mode}</span>
+                        奖励: <span className="text-emerald-400">+{t.reward_amount} {t.reward_mode}</span>
                       </span>
                       <span className="flex items-center gap-1.5">
                         <span className="w-1 h-3 bg-zinc-600 block"></span>
-                        MIN_VIEWS: <span className="text-zinc-300">≥{t.min_views}</span>
+                        最低浏览: <span className="text-zinc-300">≥{t.min_views}</span>
                       </span>
                     </div>
                   </div>

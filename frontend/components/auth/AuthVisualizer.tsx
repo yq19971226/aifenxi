@@ -76,32 +76,32 @@ export function AuthVisualizer() {
       <div className="absolute top-8 left-8">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-1.5 h-1.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse" />
-          <span className="text-[9px] font-mono text-white tracking-[0.2em] uppercase">Auth Node</span>
+          <span className="text-[9px] font-mono text-white tracking-[0.2em] uppercase">认证节点</span>
         </div>
         <div className="space-y-1 text-[9px] font-mono text-zinc-600 tracking-[0.1em] uppercase">
-          <p>SYS.SECURE.LINK // ACTIVE</p>
-          <p>QUANT.ENGINE // WARMING_UP</p>
-          <p>LATENCY // 14MS</p>
+          <p>安全链路 // 已激活</p>
+          <p>量化引擎 // 预热中</p>
+          <p>延迟 // 14毫秒</p>
         </div>
       </div>
 
       <div className="absolute bottom-8 right-8 text-right">
         <div className="flex items-center justify-end gap-2 mb-2">
-          <span className="text-[9px] font-mono text-white tracking-[0.2em] uppercase">Global Swarm</span>
+          <span className="text-[9px] font-mono text-white tracking-[0.2em] uppercase">全球蜂群网络</span>
           <div className="w-1.5 h-1.5 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
         </div>
         <div className="space-y-1 text-[9px] font-mono text-zinc-600 tracking-[0.1em] uppercase">
           <div className="flex items-center justify-end gap-3">
-             <span>NODES</span>
+             <span>节点数</span>
              <span className="text-zinc-400">8,492</span>
           </div>
           <div className="flex items-center justify-end gap-3">
-             <span>OPS/SEC</span>
-             <span className="text-zinc-400">1.2M</span>
+             <span>运算/秒</span>
+             <span className="text-zinc-400">120万</span>
           </div>
           <div className="flex items-center justify-end gap-3">
-             <span>AI_MODELS</span>
-             <span className="text-zinc-400">V5-OMEGA</span>
+             <span>AI模型</span>
+             <span className="text-zinc-400">V5旗舰版</span>
           </div>
         </div>
       </div>
@@ -109,13 +109,13 @@ export function AuthVisualizer() {
       {/* 实时闪烁日志条 */}
       <div className="absolute bottom-8 left-8 p-3 bg-white/[0.02] border border-white/[0.05] rounded-lg backdrop-blur-md">
          <div className="font-mono text-[8px] uppercase tracking-[0.15em] text-indigo-400/80 mb-2 border-b border-indigo-500/20 pb-1 inline-block">
-           Authentication Stream
+           认证数据流
          </div>
          <div className="space-y-1 font-mono text-[9px] text-zinc-500 tracking-[0.05em] h-[40px] overflow-hidden">
            <motion.div animate={{ y: [0, -18, -18, -36, -36] }} transition={{ duration: 4, repeat: Infinity, times: [0, 0.1, 0.5, 0.6, 1] }}>
-             <p className="h-[18px]">Analyzing request headers...</p>
-             <p className="h-[18px]">Checking local node latency...</p>
-             <p className="h-[18px] text-emerald-500/70">Awaiting user credentials input ⚡</p>
+             <p className="h-[18px]">正在分析请求头信息...</p>
+             <p className="h-[18px]">检测本地节点延迟...</p>
+             <p className="h-[18px] text-emerald-500/70">等待用户凭证输入 ⚡</p>
            </motion.div>
          </div>
       </div>

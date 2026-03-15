@@ -61,9 +61,9 @@ export default function TaskReviewPage() {
       <div className="mx-auto max-w-5xl space-y-8 px-4 py-8">
         <div className="flex items-end justify-between border-b border-white/[0.05] pb-6">
           <div>
-            <h1 className="text-2xl font-black text-white font-mono tracking-widest uppercase mb-2">SYS.TASK_REVIEW_</h1>
+            <h1 className="text-2xl font-black text-white font-mono tracking-widest uppercase mb-2">任务审核</h1>
             <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-[0.3em]">
-              Admin Task Verification Queue
+              管理员任务审核队列
             </p>
           </div>
         </div>
@@ -72,10 +72,10 @@ export default function TaskReviewPage() {
         {stats && (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: "PENDING", value: stats.pending, color: "text-amber-400", border: "border-amber-500/30", bg: "bg-amber-500/5" },
-              { label: "APPROVED", value: stats.approved, color: "text-emerald-400", border: "border-emerald-500/30", bg: "bg-emerald-500/5"},
-              { label: "REJECTED", value: stats.rejected, color: "text-red-400", border: "border-red-500/30", bg: "bg-red-500/5" },
-              { label: "PARTICIPANTS", value: stats.unique_users, color: "text-indigo-400", border: "border-indigo-500/30", bg: "bg-indigo-500/5" },
+              { label: "待审", value: stats.pending, color: "text-amber-400", border: "border-amber-500/30", bg: "bg-amber-500/5" },
+              { label: "已通过", value: stats.approved, color: "text-emerald-400", border: "border-emerald-500/30", bg: "bg-emerald-500/5"},
+              { label: "已驳回", value: stats.rejected, color: "text-red-400", border: "border-red-500/30", bg: "bg-red-500/5" },
+              { label: "参与人数", value: stats.unique_users, color: "text-indigo-400", border: "border-indigo-500/30", bg: "bg-indigo-500/5" },
             ].map((s) => (
               <div key={s.label} className={`border ${s.border} ${s.bg} p-6 flex flex-col items-center justify-center shadow-inner relative overflow-hidden group`}>
                 <div className="absolute top-0 right-0 w-8 h-[1px] bg-white/[0.2]" />
@@ -102,7 +102,7 @@ export default function TaskReviewPage() {
                     : "border-white/[0.1] bg-black/40 text-zinc-500 hover:border-white/[0.2] hover:bg-white/[0.05] hover:text-zinc-300"
                 }`}
               >
-                {f === "" ? "ALL" : f === "pending" ? "PENDING" : f === "approved" ? "APPROVED" : "REJECTED"}
+                {f === "" ? "全部" : f === "pending" ? "待审" : f === "approved" ? "已通过" : "已驳回"}
               </button>
             );
           })}
@@ -111,11 +111,11 @@ export default function TaskReviewPage() {
         {/* List */}
         {isLoading ? (
           <div className="relative bg-black border border-white/[0.05] py-20 text-center overflow-hidden">
-             <span className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em] animate-pulse">LOADING_DATA...</span>
+             <span className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em] animate-pulse">加载中...</span>
           </div>
         ) : submissions.length === 0 ? (
           <div className="relative bg-black border border-white/[0.05] py-20 text-center overflow-hidden">
-             <span className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em]">NO_RECORDS_FOUND</span>
+             <span className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em]">暂无记录</span>
           </div>
         ) : (
           <div className="space-y-4">
@@ -143,7 +143,7 @@ export default function TaskReviewPage() {
                               : "border-red-500/30 bg-red-500/10 text-red-400"
                           }`}
                         >
-                          {s.status === "approved" ? "APPROVED" : "REJECTED"}
+                          {s.status === "approved" ? "已通过" : "已驳回"}
                         </span>
                       )}
                     </div>
@@ -155,7 +155,7 @@ export default function TaskReviewPage() {
                         rel="noopener noreferrer"
                         className="flex items-center gap-1.5 hover:text-indigo-400 transition-colors"
                       >
-                        <ExternalLink size={12} className="opacity-70" /> VIEW_POST
+                        <ExternalLink size={12} className="opacity-70" /> 查看帖子
                       </a>
                       <a
                         href={s.screenshot_url}
@@ -163,20 +163,20 @@ export default function TaskReviewPage() {
                         rel="noopener noreferrer"
                         className="flex items-center gap-1.5 hover:text-indigo-400 transition-colors"
                       >
-                        <ImageIcon size={12} className="opacity-70" /> VIEW_PROOF
+                        <ImageIcon size={12} className="opacity-70" /> 查看截图
                       </a>
                       <span className="flex items-center gap-1.5">
                         <span className="w-1 h-3 bg-zinc-600 block"></span>
-                        MIN_VIEWS: <span className="text-zinc-300">≥{s.min_views}</span>
+                        最低浏览: <span className="text-zinc-300">≥{s.min_views}</span>
                       </span>
                       <span className="flex items-center gap-1.5">
                         <span className="w-1 h-3 bg-emerald-500/50 block"></span>
-                        REWARD: <span className="text-emerald-400">+{s.reward_amount} {s.reward_mode}</span>
+                        奖励: <span className="text-emerald-400">+{s.reward_amount} {s.reward_mode}</span>
                       </span>
                     </div>
                     
                     <div className="mt-4 text-[9px] font-mono tracking-widest text-zinc-600 uppercase flex items-center gap-2">
-                      <Clock size={10} /> SUBMITTED: {new Date(s.submitted_at).toLocaleString("en-US", { hour12: false })}
+                      <Clock size={10} /> 提交于: {new Date(s.submitted_at).toLocaleString("zh-CN")}
                     </div>
                   </div>
 
@@ -188,13 +188,13 @@ export default function TaskReviewPage() {
                         disabled={approveMutation.isPending}
                         className="flex items-center gap-2 border border-emerald-500/40 bg-emerald-600/10 px-6 py-2.5 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all disabled:opacity-40"
                       >
-                        <CheckCircle2 size={14} /> APPROVE
+                        <CheckCircle2 size={14} /> 通过
                       </button>
                       <button
                         onClick={() => setRejectId(s.id)}
                         className="flex items-center gap-2 border border-red-500/40 bg-red-600/10 px-6 py-2.5 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-red-400 hover:bg-red-500 hover:text-white transition-all"
                       >
-                        <XCircle size={14} /> REJECT
+                        <XCircle size={14} /> 驳回
                       </button>
                     </div>
                   )}
@@ -206,7 +206,7 @@ export default function TaskReviewPage() {
                     <input
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
-                      placeholder="REJECT_REASON"
+                      placeholder="请输入驳回原因"
                       className="flex-1 border border-red-500/30 bg-red-500/5 px-4 py-3 text-[11px] text-white font-mono uppercase tracking-widest placeholder:text-zinc-600 focus:border-red-500/60 focus:bg-red-500/10 outline-none transition-all"
                     />
                     <button
@@ -216,13 +216,13 @@ export default function TaskReviewPage() {
                       disabled={!rejectReason || rejectMutation.isPending}
                       className="border border-red-500/40 bg-red-600/80 px-8 py-3 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-white disabled:opacity-40 transition-all hover:bg-red-500"
                     >
-                      CONFIRM
+                      确认驳回
                     </button>
                     <button
                       onClick={() => { setRejectId(null); setRejectReason(""); }}
                       className="border border-white/[0.1] bg-white/[0.02] px-8 py-3 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-zinc-400 hover:bg-white/[0.05] hover:text-white transition-all"
                     >
-                      CANCEL
+                      取消
                     </button>
                   </div>
                 )}

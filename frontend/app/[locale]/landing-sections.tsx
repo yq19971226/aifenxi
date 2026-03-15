@@ -75,7 +75,7 @@ function HeroSection() {
                 <span className="animate-ping absolute inline-flex h-full w-full bg-indigo-400 opacity-75"></span>
                 <span className="relative inline-flex h-1.5 w-1.5 bg-indigo-500"></span>
               </span>
-              SYS.STATUS // {t("hero.badge")}
+              {t("hero.badge")}
             </div>
           </FadeIn>
           
@@ -104,7 +104,7 @@ function HeroSection() {
               >
                 <div className="absolute inset-0 bg-indigo-500/20 w-0 group-hover:w-full transition-all duration-500 ease-out z-0" />
                 <span className="relative z-10 flex items-center gap-2">
-                  INITIATE_CORE <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  {t("hero.ctaPrimary")} <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                 </span>
                 <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-indigo-400 pointer-events-none" />
               </Link>
@@ -112,7 +112,7 @@ function HeroSection() {
                 href={`/${locale}/guide`}
                 className="h-14 px-8 border border-white/[0.1] bg-white/[0.02] backdrop-blur-md text-zinc-400 font-mono text-[11px] tracking-[0.2em] uppercase flex items-center hover:bg-white/[0.06] hover:text-white hover:border-white/[0.3] transition-colors relative"
               >
-                READ_DOCS
+                {t("hero.ctaSecondary")}
                 <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-zinc-500 pointer-events-none" />
               </Link>
             </div>
@@ -130,16 +130,16 @@ function HeroSection() {
 
 function TerminalBlock() {
   const fullLog = [
-    "> AUTHORIZING_ACCESS_TOKEN...",
-    "> SYNCING_GLOBAL_ORACLE_NODES... [OK]",
-    "> DEPLOYING_AI_AGENTS (QTY: 4)... [ACTIVE]",
-    "> AGENT[TECH]: DETECTED_VOLATILITY_SPIKE $BTC",
-    "> AGENT[RISK]: HEDGE_RATIO_ADJUSTED -> 0.45",
-    "> INITIATING_SWARM_DEBATE_PROTOCOL...",
-    "> ROUND_1: BULLISH_BIAS (65% CONFIDENCE)",
-    "> ROUND_2: CROSS_EXAMINING_ONCHAIN_DATA...",
-    "> CONSENSUS_ACHIEVED: STRONG_BUY (82%)",
-    "> EXECUTING_GRID_STRATEGY_GENERATION..."
+    "> 正在授权访问令牌...",
+    "> 同步全球预言节点... [OK]",
+    "> 部署 AI 智能体 (数量: 4)... [已激活]",
+    "> 智能体[技术]: 检测到 $BTC 波动率飙升",
+    "> 智能体[风险]: 对冲比率已调整 -> 0.45",
+    "> 启动蜂群辩论协议...",
+    "> 第1轮: 看多倾向 (65% 置信度)",
+    "> 第2轮: 交叉验证链上数据...",
+    "> 共识达成: 强力买入 (82%)",
+    "> 执行网格策略生成..."
   ];
 
   const [visibleCount, setVisibleCount] = useState(0);
@@ -165,11 +165,11 @@ function TerminalBlock() {
       <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.05] bg-white/[0.01]">
         <div className="text-[9px] font-bold text-indigo-400 uppercase tracking-[0.3em] flex items-center gap-2">
           <div className="w-1.5 h-1.5 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)] animate-pulse" />
-          AXIOM_TERMINAL_V5
+           AXIOM 终端 V5
         </div>
         <div className="flex gap-4 text-[8px] text-zinc-600 tracking-widest">
-          <span>PORT: 5092</span>
-          <span>NET: MAIN</span>
+           <span>端口: 5092</span>
+           <span>网络: 主网</span>
         </div>
       </div>
 
@@ -179,7 +179,7 @@ function TerminalBlock() {
         
         <div className="relative z-10 w-full flex flex-col gap-1.5">
           {lines.map((line, i) => {
-            const isHighlight = typeof line === "string" && line.includes("CONSENSUS");
+            const isHighlight = typeof line === "string" && line.includes("共识");
             return (
               <div key={i} className={`${isHighlight ? 'text-indigo-400 font-bold drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]' : 'text-emerald-400/70'} tracking-wider`}>
                 <span className="text-zinc-600 mr-3 hidden sm:inline-block">[{new Date().toISOString().split('T')[1].slice(0, 11)}]</span>

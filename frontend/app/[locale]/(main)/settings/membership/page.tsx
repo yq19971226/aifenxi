@@ -93,9 +93,9 @@ function CurrentStatusCard({ user, t }: CurrentStatusCardProps & { t: Membership
       <div className="flex items-end gap-4 mt-2">
         <span className={`text-4xl font-black font-mono tracking-tighter uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] ${color}`}>{name}</span>
         {level > 0 ? (
-           <span className={`text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 border ${level === 2 ? 'border-[#F5A623]/30 text-[#F5A623] bg-[#F5A623]/10' : 'border-indigo-500/30 text-indigo-400 bg-indigo-500/10'}`}>ACTIVE</span>
+           <span className={`text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 border ${level === 2 ? 'border-[#F5A623]/30 text-[#F5A623] bg-[#F5A623]/10' : 'border-indigo-500/30 text-indigo-400 bg-indigo-500/10'}`}>生效中</span>
         ) : (
-           <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 border border-zinc-500/30 text-zinc-400 bg-zinc-500/10">INACTIVE</span>
+           <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 border border-zinc-500/30 text-zinc-400 bg-zinc-500/10">未激活</span>
         )}
       </div>
       {expiryInfo && (
@@ -187,7 +187,7 @@ function PlanCard({ plan, name, monthlyPrice, totalPrice, durationMonths, color,
         ${selected ? `${borderColor} ${glow} bg-${plan === 2 ? '[#F5A623]' : 'indigo-500'}/10` : "border-white/[0.05] bg-black/40 hover:border-white/[0.2] hover:bg-white/[0.02]"}
       `}
     >
-      <div className={`absolute top-0 right-0 p-2 font-mono text-[8px] uppercase transition-opacity ${selected ? `opacity-100 ${color}` : 'opacity-20 group-hover:opacity-100 group-hover:text-zinc-500'}`}>SYS.PLAN_{plan}</div>
+      <div className={`absolute top-0 right-0 p-2 font-mono text-[8px] uppercase transition-opacity ${selected ? `opacity-100 ${color}` : 'opacity-20 group-hover:opacity-100 group-hover:text-zinc-500'}`}>方案 {plan}</div>
       <div className="flex items-center justify-between mb-4">
         <span className={`text-xl font-black font-mono tracking-widest uppercase ${color} drop-shadow-[0_0_10px_currentColor]`}>{name}</span>
         {selected && (
@@ -203,9 +203,9 @@ function PlanCard({ plan, name, monthlyPrice, totalPrice, durationMonths, color,
       </div>
       {hasSaving && (
         <div className="mt-4 flex items-center justify-between pt-4 border-t border-white/[0.05]">
-          <span className="text-[10px] font-mono text-zinc-600 line-through tracking-wider">REG: ${monthlyPrice}/mo</span>
+          <span className="text-[10px] font-mono text-zinc-600 line-through tracking-wider">原价: ${monthlyPrice}/月</span>
           <span className="text-[10px] font-black font-mono uppercase tracking-[0.2em] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
-            SAVE {Math.round((1 - avgMonthly / monthlyPrice) * 100)}%
+            省 {Math.round((1 - avgMonthly / monthlyPrice) * 100)}%
           </span>
         </div>
       )}
@@ -324,7 +324,7 @@ function PaymentDisplay({ payment, expiresAt }: PaymentDisplayProps) {
       
       <div className="mt-8 flex items-center justify-center sm:justify-start gap-3 pt-6 border-t border-white/[0.05]">
          <span className={`text-[10px] font-mono font-bold uppercase tracking-widest flex items-center gap-2 ${payment.status === "pending" && isExpired ? "text-zinc-500" : statusStyle.text}`}>
-             <span className="text-zinc-600">STATUS_</span> {statusMessage}
+             <span className="text-zinc-600">状态:</span> {statusMessage}
          </span>
       </div>
     </div>
@@ -566,9 +566,9 @@ export default function MembershipPage() {
     <div className="flex flex-col gap-10 p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto min-h-screen">
       <div className="pb-6 border-b border-white/[0.05]">
         <h1 className="text-3xl font-black text-white font-mono tracking-widest uppercase mb-2">
-           SYS.{t('title')}_
+           {t('title')}
         </h1>
-        <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-[0.3em]">MEMBER_STATUS &_ UPGRADES</p>
+        <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-[0.3em]">会员状态 & 升级</p>
       </div>
 
       {user && <CurrentStatusCard user={user} t={t} />}

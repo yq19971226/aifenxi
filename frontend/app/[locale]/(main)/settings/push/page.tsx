@@ -188,7 +188,7 @@ export default function PushSettingsPage() {
     <div className="flex flex-col gap-10 p-6 max-w-4xl mx-auto min-h-screen">
       {/* Header */}
       <div className="border-b border-white/[0.05] pb-6">
-        <h1 className="text-2xl font-black text-white font-mono tracking-widest uppercase mb-2">SYS.{t('title')}_</h1>
+        <h1 className="text-2xl font-black text-white font-mono tracking-widest uppercase mb-2">{t('title')}</h1>
         <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-[0.3em]">
           {t('subtitle')}
         </p>
