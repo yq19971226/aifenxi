@@ -413,7 +413,7 @@ function FreeTrialCard() {
       queryClient.invalidateQueries({ queryKey: ["analysis-quota"] });
     } catch (error: unknown) {
       console.error("Claim free trial failed", error);
-      setError(error instanceof Error ? error.message : "Claim failed");
+      setError(error instanceof Error ? error.message : "领取失败");
     } finally {
       setClaiming(false);
     }
@@ -555,7 +555,7 @@ export default function MembershipPage() {
       setPaymentExpiresAt(Date.now() + PAYMENT_TIMEOUT_MS);
       void queryClient.invalidateQueries({ queryKey: ["paymentHistory"] });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Payment creation failed";
+      const msg = err instanceof Error ? err.message : "创建支付失败";
       setError(msg);
     } finally {
       setCreating(false);
