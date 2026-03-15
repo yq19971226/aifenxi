@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 async def check_task_enabled() -> bool:
     """检查任务中心功能是否启用。"""
     enabled = await get_config_value("task_feature_enabled", "true")
-    return enabled.lower() == "true"
+    return enabled.lower() in ("true", "active")
 
 
 # ── 用户端：任务首页 ──────────────────────────────────────────

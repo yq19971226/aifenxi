@@ -219,7 +219,7 @@ async def grant_commission(
 
     # 检查合伙人功能是否启用
     enabled = await get_config_value("partner_feature_enabled", "true")
-    if enabled.lower() != "true":
+    if enabled.lower() not in ("true", "active"):
         return
 
     # 幂等：同一笔支付不重复发佣金

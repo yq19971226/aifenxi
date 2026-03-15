@@ -37,7 +37,7 @@ user_router = APIRouter(prefix="/api/partner", tags=["partner"])
 async def _check_partner_enabled():
     """检查合伙人功能开关。"""
     enabled = await get_config_value("partner_feature_enabled", "true")
-    if enabled.lower() != "true":
+    if enabled.lower() not in ("true", "active"):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="合伙人功能暂未开放",
