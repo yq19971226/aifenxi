@@ -298,6 +298,28 @@ export const FIELD_LABELS: Record<string, string> = {
   risk_score: "风险评分",
   detection_count: "检测数量",
   severity: "严重程度",
+
+  // ══════════════════════════════════════════════════════════
+  // ── AI操盘检测（AiManipulationAgent）──
+  // ══════════════════════════════════════════════════════════
+  ai_probability: "AI操盘概率",
+  operation_mode: "操盘模式",
+  detail_scores: "细项评分",
+  price_precision: "价格精度",
+  time_pattern: "时间模式",
+  stop_hunt_efficiency: "猎杀止损效率",
+  grind_pattern: "磨盘模式",
+  order_behavior: "下单行为",
+  cross_sync: "跨品种同步",
+  grind_active: "磨盘激活",
+
+  // ── 对倒交易 / 巨鲸联动 ──
+  volume_price_divergence: "量价背离",
+  symmetric_orders: "对称挂单",
+  obv_divergence: "OBV背离",
+  sync_detection: "同步运动检测",
+  net_flow_direction: "净动态方向",
+  entities_involved: "涉及实体",
 };
 
 export const HIDDEN_FIELDS = new Set([
