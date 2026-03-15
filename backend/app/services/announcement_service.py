@@ -428,7 +428,7 @@ async def get_announcement_history(
         text(
             """
             SELECT a.id, a.announcement_key, a.version, a.title, a.summary,
-                   a.display_mode, a.status, a.published_at, a.archived_at,
+                   a.content_md, a.display_mode, a.status, a.published_at, a.archived_at,
                    a.priority, a.target_roles_json, a.target_membership_levels_json,
                    a.target_path_prefixes_json, d.last_event, d.confirmed_at
             FROM announcements a
@@ -463,6 +463,7 @@ async def get_announcement_history(
                 "version": row["version"],
                 "title": row["title"],
                 "summary": row["summary"],
+                "content_md": _sanitize_content_md(row["content_md"]),
                 "display_mode": row["display_mode"],
                 "status": row["status"],
                 "published_at": _to_iso(row["published_at"]),
@@ -1121,3 +1122,47 @@ async def get_announcement_deliveries(
         "page": page,
         "page_size": page_size,
     }
+
+
+async def delete_announcement(
+    session: AsyncSession,
+    *,
+    announcement_id: str,
+    actor_user_id: str,
+) -> dict[str, Any]:
+    row = await _get_announcement_row(session, announcement_id)
+    if row is None:
+        raise ValueError("公告不存在")
+    if row["status"] == "published":
+        raise ValueError("已发布的公告请先归档后再删除")
+    if row["status"] == "scheduled":
+        raise ValueError("排期中的公告请先取消排期后再删除")
+
+    # Delete related deliveries and events first
+    await session.execute(
+        text("DELETE FROM announcement_delivery_events WHERE announcement_id = :aid"),
+        {"aid": announcement_id},
+    )
+    await session.execute(
+        text("DELETE FROM announcement_deliveries WHERE announcement_id = :aid"),
+        {"aid": announcement_id},
+    )
+
+    # Log deletion before removing the row
+    await _append_audit_log(
+        session,
+        announcement_id=announcement_id,
+        announcement_key=row["announcement_key"],
+        version=row["version"],
+        action="delete",
+        actor_user_id=actor_user_id,
+        change_summary={"title": row["title"], "status": row["status"]},
+    )
+
+    await session.execute(
+        text("DELETE FROM announcements WHERE id = :aid"),
+        {"aid": announcement_id},
+    )
+    await session.flush()
+
+    return {"deleted": True, "id": announcement_id}

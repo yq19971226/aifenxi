@@ -221,3 +221,15 @@ export async function getAnnouncementDeliveries(
   );
   return handleApiResponse(res, "查询公告投递记录失败");
 }
+
+export async function deleteAdminAnnouncement(
+  announcementId: string
+): Promise<{ deleted: boolean; id: string }> {
+  const res = await authFetch(
+    `${API_BASE}/api/admin/announcements/${encodeURIComponent(announcementId)}`,
+    {
+      method: "DELETE",
+    }
+  );
+  return handleApiResponse(res, "删除公告失败");
+}

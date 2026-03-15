@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { BellRing, CalendarClock, Eye, PencilLine, Send } from "lucide-react";
+import { BellRing, CalendarClock, Eye, PencilLine, Send, Trash2 } from "lucide-react";
 import type { AdminAnnouncementInfo, AdminAnnouncementListResponse } from "@/lib/api/admin-announcements";
 import {
   MODE_LABEL,
@@ -21,6 +21,7 @@ interface AnnouncementTableProps {
   onUnschedule: (item: AdminAnnouncementInfo) => void;
   onPublish: (item: AdminAnnouncementInfo) => void;
   onArchive: (item: AdminAnnouncementInfo) => void;
+  onDelete: (item: AdminAnnouncementInfo) => void;
   onOpenDeliveries: (item: AdminAnnouncementInfo) => void;
 }
 
@@ -35,6 +36,7 @@ export function AnnouncementTable({
   onUnschedule,
   onPublish,
   onArchive,
+  onDelete,
   onOpenDeliveries,
 }: AnnouncementTableProps) {
   const t = useTranslations("admin.announcements");
@@ -168,6 +170,20 @@ export function AnnouncementTable({
                           {t("actions.trace")}
                         </span>
                       </button>
+
+                      {(item.status === "draft" || item.status === "archived") ? (
+                        <button
+                          type="button"
+                          disabled={actingKey === `${item.id}:delete`}
+                          onClick={() => onDelete(item)}
+                          className={actionClass("danger")}
+                        >
+                          <span className="inline-flex items-center gap-1">
+                            <Trash2 size={12} />
+                            {actingKey === `${item.id}:delete` ? "删除中..." : "删除"}
+                          </span>
+                        </button>
+                      ) : null}
                     </div>
                   </td>
                 </tr>

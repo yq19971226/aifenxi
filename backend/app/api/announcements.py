@@ -326,6 +326,30 @@ async def archive_announcement(
         raise HTTPException(status_code=500, detail="归档公告失败")
 
 
+@admin_router.delete("/{announcement_id}")
+async def delete_announcement(
+    announcement_id: str,
+    admin: UserInfo = Depends(require_admin),
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        return await announcement_service.delete_announcement(
+            session,
+            announcement_id=announcement_id,
+            actor_user_id=admin.user_id,
+        )
+    except ValueError as exc:
+        _raise_service_value_error(exc)
+    except Exception as exc:
+        logger.error(
+            "delete_announcement failed: announcement=%s admin=%s error=%s",
+            announcement_id,
+            admin.user_id,
+            exc,
+        )
+        raise HTTPException(status_code=500, detail="删除公告失败")
+
+
 @admin_router.get("/{announcement_id}/deliveries")
 async def get_announcement_deliveries(
     announcement_id: str,

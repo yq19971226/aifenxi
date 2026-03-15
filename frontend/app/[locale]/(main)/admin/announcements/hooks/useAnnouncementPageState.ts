@@ -62,6 +62,7 @@ export function useAnnouncementPageState(enabled: boolean) {
     unscheduleMutation,
     publishMutation,
     archiveMutation,
+    deleteMutation,
   } = useAnnouncementMutations();
 
   const totalPages = useMemo(() => {
@@ -214,6 +215,15 @@ export function useAnnouncementPageState(enabled: boolean) {
     );
   }, [archiveMutation, runAction]);
 
+  const handleDelete = useCallback((item: AdminAnnouncementInfo) => {
+    if (!window.confirm(`确认永久删除公告《${item.title}》吗？此操作不可撤销。`)) return;
+    void runAction(
+      `${item.id}:delete`,
+      () => deleteMutation.mutateAsync(item.id),
+      "删除公告失败"
+    );
+  }, [deleteMutation, runAction]);
+
   return {
     openCreate,
     filters: {
@@ -258,6 +268,7 @@ export function useAnnouncementPageState(enabled: boolean) {
       onUnschedule: handleUnschedule,
       onPublish: handlePublish,
       onArchive: handleArchive,
+      onDelete: handleDelete,
       onOpenDeliveries: openDeliveries,
     },
     deliveries: {

@@ -29,6 +29,7 @@ export interface AnnouncementHistoryItem {
   version: number;
   title: string;
   summary: string | null;
+  content_md: string | null;
   display_mode: AnnouncementDisplayMode;
   status: "published" | "archived";
   published_at: string | null;

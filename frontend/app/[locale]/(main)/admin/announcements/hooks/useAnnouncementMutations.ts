@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   archiveAdminAnnouncement,
   createAdminAnnouncement,
+  deleteAdminAnnouncement,
   publishAdminAnnouncement,
   scheduleAdminAnnouncement,
   unscheduleAdminAnnouncement,
@@ -102,11 +103,20 @@ export function useAnnouncementMutations() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: deleteAdminAnnouncement,
+    onSuccess: invalidateAnnouncements,
+    onError: (error) => {
+      console.error("删除公告失败", error);
+    },
+  });
+
   return {
     saveMutation,
     scheduleMutation,
     unscheduleMutation,
     publishMutation,
     archiveMutation,
+    deleteMutation,
   };
 }

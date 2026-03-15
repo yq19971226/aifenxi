@@ -104,6 +104,7 @@ export default function AdminAnnouncementsPage() {
           onUnschedule={list.onUnschedule}
           onPublish={list.onPublish}
           onArchive={list.onArchive}
+          onDelete={list.onDelete}
           onOpenDeliveries={list.onOpenDeliveries}
         />
       ) : null}
