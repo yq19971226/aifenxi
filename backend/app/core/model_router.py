@@ -43,6 +43,20 @@ DEFAULT_ROUTES: dict[str, str] = {
     "consensus_qwen": "qwen3-max",
 }
 
+# ── 各模型超时配置（秒）────────────────────────────────────────
+# Thinking/Reasoning 模型需要更长超时，普通模型维持 30s
+MODEL_TIMEOUTS: dict[str, float] = {
+    "deepseek-r1": 90.0,              # 深度推理，需要更多思考时间
+    "deepseek-v3.2-thinking": 90.0,   # 思维链模型，响应较慢
+    "qwen3-next-thinking": 60.0,      # 推理增强版
+}
+DEFAULT_TIMEOUT: float = 30.0         # 普通模型默认超时
+
+
+def get_timeout_for_model(model_key: str) -> float:
+    """根据模型类型返回适配的超时时间。"""
+    return MODEL_TIMEOUTS.get(model_key, DEFAULT_TIMEOUT)
+
 # ── 可用模型列表（DMXAPI 网关支持的文本分析模型）────────────────
 
 AVAILABLE_MODELS: list[dict[str, Any]] = [

@@ -192,12 +192,18 @@ class UnifiedLLMClient:
         system_prompt: str,
         user_prompt: str,
         temperature: float = 0.1,
-        timeout_s: float = 30.0,
+        timeout_s: float | None = None,  # None = 自动按模型类型选择
     ) -> dict[str, Any]:
         """调用单个模型，返回解析后的 JSON dict。
 
         超时或异常时返回降级响应，不抛出异常。
+        timeout_s 为 None 时自动根据模型类型选择：
+          - Thinking/R1 推理模型 → 90s
+          - 普通快速模型 → 30s
         """
+        from app.core.model_router import get_timeout_for_model
+        if timeout_s is None:
+            timeout_s = get_timeout_for_model(model_key)
         # 范围校验：temperature 超出 [0.0, 1.0] 时裁剪至边界值
         if temperature < 0.0 or temperature > 1.0:
             clamped = max(0.0, min(1.0, temperature))
