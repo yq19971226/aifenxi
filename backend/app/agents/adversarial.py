@@ -285,11 +285,18 @@ class AdversarialAgent(BaseAgent):
                 latest = cg.netflow_snapshots[-1]
                 parts.append(f"期货净流入: {latest.get('netflow', 'N/A')}")
             if cg.large_orders:
-                parts.append(f"大单挂单数: {len(cg.large_orders)}")
-                for order in cg.large_orders[:5]:
+                # 过滤：只保留距当前价±15%以内的有效大单
+                current = data.current_price
+                relevant = [
+                    o for o in cg.large_orders
+                    if current > 0 and abs(float(o.get('price', 0)) - current) / current <= 0.15
+                ] if current else cg.large_orders
+                parts.append(f"大单挂单数: {len(cg.large_orders)}（有效范围内: {len(relevant)}）")
+                for order in relevant[:5]:
                     parts.append(
                         f"  价格={order.get('price', '?')} "
-                        f"量={order.get('quantity', '?')} "
+                        f"量={order.get('amount', '?')} "
+                        f"USD={order.get('usd_value', '?')} "
                         f"方向={order.get('side', '?')}"
                     )
             if cg.option_max_pain:

@@ -409,10 +409,16 @@ class CollusionDetector(BaseAgent):
                 for snap in cg.funding_rate_history[-5:]:
                     parts.append(f"  {snap.get('exchange', '?')}: {snap.get('rate', 'N/A')}")
             if cg.large_orders:
-                parts.append(f"大单挂单数: {len(cg.large_orders)}")
-                for order in cg.large_orders[:3]:
+                # 过滤：只保留距当前价±15%以内的有效大单
+                current = data.current_price
+                relevant = [
+                    o for o in cg.large_orders
+                    if current > 0 and abs(float(o.get('price', 0)) - current) / current <= 0.15
+                ] if current else cg.large_orders
+                parts.append(f"大单挂单数: {len(cg.large_orders)}（有效范围内: {len(relevant)}）")
+                for order in relevant[:3]:
                     parts.append(
-                        f"  价格={order.get('price', '?')} 量={order.get('quantity', '?')} "
+                        f"  价格={order.get('price', '?')} 量={order.get('amount', '?')} "
                         f"方向={order.get('side', '?')} 交易所={order.get('exchange', '?')}"
                     )
 

@@ -375,12 +375,19 @@ class OrderBookAgent(BaseAgent):
                         f"卖量={lvl.get('ask_qty', 'N/A')}"
                     )
             if cg.large_orders:
+                # 过滤：只保留距当前价±15%以内的有效大单
+                current = data.current_price
+                relevant = [
+                    o for o in cg.large_orders
+                    if current > 0 and abs(float(o.get('price', 0)) - current) / current <= 0.15
+                ] if current else cg.large_orders
                 lines.append("")
                 lines.append("── CoinGlass 大单挂单 ──")
-                for order in cg.large_orders[:10]:
+                for order in relevant[:10]:
                     lines.append(
                         f"  价格={order.get('price', 'N/A')} "
-                        f"数量={order.get('quantity', 'N/A')} "
+                        f"数量={order.get('amount', 'N/A')} "
+                        f"USD={order.get('usd_value', 'N/A')} "
                         f"方向={order.get('side', 'N/A')} "
                         f"交易所={order.get('exchange', 'N/A')}"
                     )
