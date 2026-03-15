@@ -28,10 +28,18 @@ async def check_task_enabled() -> bool:
 async def get_task_home(session: AsyncSession, user_id: str) -> dict:
     """任务中心首页数据：可用任务 + 今日提交状态 + 奖励余额。"""
     # 可用任务模板
-    templates = await _get_active_templates(session)
+    try:
+        templates = await _get_active_templates(session)
+    except Exception as exc:
+        logger.error("_get_active_templates failed: %s", exc)
+        templates = []
 
     # 今日提交状态
-    today_submission = await _get_today_submission(session, user_id)
+    try:
+        today_submission = await _get_today_submission(session, user_id)
+    except Exception as exc:
+        logger.error("_get_today_submission failed: %s", exc)
+        today_submission = None
 
     # 奖励余额
     bonus = await _get_bonus_balances(user_id)
@@ -113,13 +121,17 @@ async def _get_today_submission(session: AsyncSession, user_id: str) -> dict | N
 
 async def _get_bonus_balances(user_id: str) -> dict:
     """获取所有模式的奖励次数余额。"""
-    redis = get_redis_pool()
     modes = ["scalping", "intraday", "trend"]
-    result = {}
-    for mode in modes:
-        raw = await redis.get(f"bonus_credits:{user_id}:{mode}")
-        result[mode] = max(int(raw), 0) if raw else 0
-    return result
+    try:
+        redis = get_redis_pool()
+        result = {}
+        for mode in modes:
+            raw = await redis.get(f"bonus_credits:{user_id}:{mode}")
+            result[mode] = max(int(raw), 0) if raw else 0
+        return result
+    except Exception as exc:
+        logger.warning("_get_bonus_balances redis error: user=%s error=%s", user_id, exc)
+        return {mode: 0 for mode in modes}
 
 
 # ── 用户端：提交任务 ──────────────────────────────────────────

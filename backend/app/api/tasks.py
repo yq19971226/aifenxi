@@ -78,7 +78,11 @@ async def get_task_home(
 ):
     """任务中心首页。"""
     await _ensure_task_enabled()
-    return await task_service.get_task_home(session, user.user_id)
+    try:
+        return await task_service.get_task_home(session, user.user_id)
+    except Exception as exc:
+        logger.exception("get_task_home failed: user=%s error=%s", user.user_id, exc)
+        raise HTTPException(status_code=500, detail=f"任务数据加载失败: {exc}")
 
 
 @user_router.post("/generate-promo")
