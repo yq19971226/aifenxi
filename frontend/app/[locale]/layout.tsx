@@ -15,20 +15,34 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: 'metadata.site' });
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://axiom123.cc';
 
+  const keywords = locale.startsWith('zh')
+    ? '加密货币分析,庄家行为分析,AI智能分析,比特币分析,链上数据,AXIOM洞察'
+    : 'crypto analysis,market maker,AI trading,on-chain analytics,AXIOM Insight';
+
   return {
     title: t('title'),
     description: t('description'),
+    keywords,
     openGraph: {
       title: t('og_title'),
       description: t('og_description'),
       locale,
       type: 'website',
+      siteName: 'AXIOM洞察',
+      images: [{
+        url: `${baseUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
+      }],
     },
     alternates: {
       canonical: `${baseUrl}/${locale}`,
-      languages: Object.fromEntries(
-        locales.map((l) => [l, `${baseUrl}/${l}`])
-      ),
+      languages: {
+        ...Object.fromEntries(
+          locales.map((l) => [l, `${baseUrl}/${l}`])
+        ),
+        'x-default': `${baseUrl}/zh-CN`,
+      },
     },
   };
 }
