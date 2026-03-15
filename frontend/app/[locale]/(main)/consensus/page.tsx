@@ -110,35 +110,57 @@ export default function ConsensusPage() {
               type="button"
               onClick={() => handleModeSelect(cfg.value)}
               disabled={running}
-              className={`relative glass-card glass-card-hover p-5 text-left transition-all ${
+              className={`relative overflow-hidden p-5 text-left rounded-xl transition-all duration-300 ${
                 selected
-                  ? "ring-1 ring-indigo-500/50 bg-indigo-500/[0.05] shadow-[0_0_25px_rgba(99,102,241,0.08)]"
+                  ? "border border-indigo-500 bg-indigo-500/[0.08] shadow-[0_0_30px_rgba(99,102,241,0.15)] ring-1 ring-indigo-500 scale-[1.02] sm:scale-100"
                   : !canUseMode
-                    ? "opacity-50 cursor-not-allowed"
-                    : "cursor-pointer"
+                    ? "border border-white/5 bg-black/40 opacity-50 cursor-not-allowed"
+                    : "border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20 cursor-pointer glass-card"
               }`}
             >
-              {locked && !hasQuotaForMode(cfg.value) && (
-                <div className="absolute top-3 right-3">
-                  <Lock size={14} className="text-zinc-600" />
-                </div>
+              {/* Highlight active indicator for mobile clarity */}
+              {selected && (
+                <div className="absolute top-0 left-0 bottom-0 w-1 bg-indigo-500 shadow-[2px_0_12px_rgba(99,102,241,0.8)]" />
               )}
-              <div className={`${selected ? "text-indigo-400" : "text-zinc-500"}`}>
-                {cfg.icon}
+              
+              <div className="flex items-start justify-between mb-2">
+                <div className={`p-2 rounded-lg ${selected ? "bg-indigo-500/20 text-indigo-400" : "bg-white/[0.04] text-zinc-400"}`}>
+                  {cfg.icon}
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  {selected && (
+                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500/20 shrink-0">
+                      <div className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
+                    </div>
+                  )}
+                  {locked && !hasQuotaForMode(cfg.value) && (
+                    <div className="flex items-center gap-1.5 shrink-0 bg-amber-500/10 border border-amber-500/20 text-amber-500 px-2 py-1 rounded shadow-[0_0_10px_rgba(245,158,11,0.1)]">
+                      <Lock size={12} />
+                      <span className="text-[10px] font-black tracking-widest uppercase">
+                        {cfg.tierLabel || "PRO"}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
-              <h3 className="mt-2 text-base font-semibold text-white">{t(`modes.${cfg.value}.label`)}</h3>
-              <p className="mt-1 text-sm text-zinc-500">{t(`modes.${cfg.value}.desc`, { count: cfg.agents.split(" ")[0] })}</p>
-              <div className="mt-3 flex items-center gap-3 text-xs">
-                <span className="rounded bg-white/[0.06] px-2 py-0.5 font-mono text-zinc-300">
+
+              <h3 className={`mt-3 text-base font-bold tracking-wide ${selected ? "text-indigo-50" : "text-white"}`}>
+                {t(`modes.${cfg.value}.label`)}
+              </h3>
+              
+              <p className={`mt-1 text-xs leading-relaxed ${selected ? "text-indigo-200/80" : "text-zinc-500"}`}>
+                {t(`modes.${cfg.value}.desc`, { count: cfg.agents.split(" ")[0] })}
+              </p>
+              
+              <div className="mt-4 flex items-center gap-2 text-[11px]">
+                <span className={`rounded px-2 py-0.5 font-mono font-medium border ${selected ? "bg-indigo-500/20 border-indigo-500/30 text-indigo-300" : "bg-white/[0.04] border-white/5 text-zinc-400"}`}>
                   {cfg.agents}
                 </span>
-                <span className="text-zinc-500">{cfg.periods}</span>
-              </div>
-              {locked && !hasQuotaForMode(cfg.value) && cfg.tierLabel && (
-                <span className="mt-2 inline-block rounded bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">
-                  {t("modes.locked", { tier: cfg.tierLabel })}
+                <span className={`font-mono ${selected ? "text-indigo-300/60" : "text-zinc-500"}`}>
+                  {cfg.periods}
                 </span>
-              )}
+              </div>
             </button>
           );
         })}
