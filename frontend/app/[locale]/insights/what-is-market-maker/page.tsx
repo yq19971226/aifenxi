@@ -76,7 +76,7 @@ export default function ArticlePage({ params: { locale } }: { params: { locale: 
             <div className="prose-custom space-y-8 text-zinc-400 text-[15px] leading-relaxed font-mono">
               <section>
                 <h2 className="text-white font-black text-xl mb-4">庄家（主力）是谁？</h2>
-                <p>在加密货币市场中，"庄家"泛指拥有足够大量资金、能够对价格走势产生实质性影响的参与者。他们可能是：</p>
+                <p>在加密货币市场中，&ldquo;庄家&rdquo;泛指拥有足够大量资金、能够对价格走势产生实质性影响的参与者。他们可能是：</p>
                 <ul className="list-none space-y-2 mt-4 pl-4 border-l border-indigo-500/30">
                   <li className="flex items-start gap-3"><span className="text-indigo-400 mt-1">▸</span><span><strong className="text-white">大型交易所和做市商</strong>：负责提供市场流动性，同时也会博取价差利润</span></li>
                   <li className="flex items-start gap-3"><span className="text-indigo-400 mt-1">▸</span><span><strong className="text-white">项目方和早期投资人</strong>：持有大量代币，其卖出行为会直接压低价格</span></li>
@@ -113,7 +113,7 @@ export default function ArticlePage({ params: { locale } }: { params: { locale: 
                     { title: "1. 大额链上转账", desc: "当有超过 1000 BTC 的大额转账从冷钱包流向交易所时，往往预示着抛压临近；反之，从交易所流出到冷钱包则是长期持有信号。" },
                     { title: "2. 交易所存量变化", desc: "交易所的 BTC/ETH 余额持续下降（即用户提币到私钥钱包），说明市场整体看多，惜售情绪浓；余额上升则相反。" },
                     { title: "3. 合约未平仓量（OI）", desc: "大量合约多单被清算后价格未跌，是洗盘信号；未平仓量骤然增加配合价格横盘，可能是庄家在对冲操作。" },
-                    { title: "4. 资金费率异常", desc: "永续合约资金费率长期偏高（如>0.1%/8h），说明多头过度拥挤，是调整或插针风险的前兆。" },
+                    { title: "4. 资金费率异常", desc: "永续合约资金费率长期偏高（如 &gt;0.1%/8h），说明多头过度拥挤，是调整或插针风险的前兆。" },
                     { title: "5. 巨鲸持仓集中度", desc: "当持有 1000+ BTC 的地址数量快速增加（巨鲸在吸筹），或快速减少（巨鲸在分散出货），是重要的方向信号。" },
                   ].map((item) => (
                     <div key={item.title} className="border border-white/[0.06] p-5 hover:bg-white/[0.02] transition-colors">
@@ -138,7 +138,7 @@ export default function ArticlePage({ params: { locale } }: { params: { locale: 
             <div className="space-y-8 text-zinc-400 text-[15px] leading-relaxed font-mono">
               <section>
                 <h2 className="text-white font-black text-xl mb-4">Who Are Market Makers?</h2>
-                <p>In crypto markets, "market makers" refers to large capital participants who can materially influence price movements. They include large exchanges, project teams, whales (holders of 1000+ BTC), and quantitative trading firms.</p>
+                <p>In crypto markets, &ldquo;market makers&rdquo; refers to large capital participants who can materially influence price movements. They include large exchanges, project teams, whales (holders of 1000+ BTC), and quantitative trading firms.</p>
               </section>
               <section>
                 <h2 className="text-white font-black text-xl mb-4">The 4 Core Phases of Market Maker Activity</h2>
@@ -161,7 +161,7 @@ export default function ArticlePage({ params: { locale } }: { params: { locale: 
               </section>
               <section className="border border-indigo-500/20 bg-indigo-500/5 p-6">
                 <h2 className="text-white font-black text-lg mb-3">How AXIOM Insight Identifies Market Maker Behavior</h2>
-                <p className="text-zinc-400 text-sm mb-4">AXIOM's multi-agent system simultaneously analyzes technical indicators, on-chain data, derivatives markets, and sentiment to deliver a consolidated judgment — no manual research required.</p>
+                <p className="text-zinc-400 text-sm mb-4">AXIOM&apos;s multi-agent system simultaneously analyzes technical indicators, on-chain data, derivatives markets, and sentiment to deliver a consolidated judgment &mdash; no manual research required.</p>
                 <Link href={`/${locale}/login`} className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 font-black font-mono uppercase tracking-widest text-[11px] transition-all">
                   Try Free Analysis →
                 </Link>
