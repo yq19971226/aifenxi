@@ -376,11 +376,18 @@ class OrderBookAgent(BaseAgent):
                     )
             if cg.large_orders:
                 # 过滤：只保留距当前价±15%以内的有效大单
-                current = data.current_price
-                relevant = [
-                    o for o in cg.large_orders
-                    if current > 0 and abs(float(o.get('price', 0)) - current) / current <= 0.15
-                ] if current else cg.large_orders
+                current = data.current_price or 0
+                relevant = []
+                if current > 0:
+                    for o in cg.large_orders:
+                        try:
+                            p = float(o.get('price', 0) or 0)
+                            if p > 0 and abs(p - current) / current <= 0.15:
+                                relevant.append(o)
+                        except (ValueError, TypeError):
+                            continue
+                else:
+                    relevant = cg.large_orders
                 lines.append("")
                 lines.append("── CoinGlass 大单挂单 ──")
                 for order in relevant[:10]:

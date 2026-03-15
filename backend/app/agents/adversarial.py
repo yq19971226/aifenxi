@@ -286,11 +286,18 @@ class AdversarialAgent(BaseAgent):
                 parts.append(f"期货净流入: {latest.get('netflow', 'N/A')}")
             if cg.large_orders:
                 # 过滤：只保留距当前价±15%以内的有效大单
-                current = data.current_price
-                relevant = [
-                    o for o in cg.large_orders
-                    if current > 0 and abs(float(o.get('price', 0)) - current) / current <= 0.15
-                ] if current else cg.large_orders
+                current = data.current_price or 0
+                relevant = []
+                if current > 0:
+                    for o in cg.large_orders:
+                        try:
+                            p = float(o.get('price', 0) or 0)
+                            if p > 0 and abs(p - current) / current <= 0.15:
+                                relevant.append(o)
+                        except (ValueError, TypeError):
+                            continue
+                else:
+                    relevant = cg.large_orders
                 parts.append(f"大单挂单数: {len(cg.large_orders)}（有效范围内: {len(relevant)}）")
                 for order in relevant[:5]:
                     parts.append(
