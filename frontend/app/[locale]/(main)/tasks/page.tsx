@@ -17,6 +17,12 @@ import { MaintenancePlaceholder } from "@/components/layout/MaintenancePlacehold
 
 type Tab = "today" | "history";
 
+const MODE_LABELS: Record<string, string> = {
+  scalping: "超短线",
+  intraday: "日内",
+  trend: "趋势",
+};
+
 const STATUS_KEYS = ["pending", "approved", "rejected"] as const;
 
 export default function TasksPage() {
@@ -67,7 +73,7 @@ export default function TasksPage() {
               <span className="flex items-center justify-center w-8 h-8 bg-indigo-500/10 border border-indigo-500/30">
                 <Gift size={16} className="text-indigo-400" />
               </span>
-              SYS.TASKS_
+              {t('title')}
             </h1>
             <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-[0.2em]">{t('subtitle')}</p>
           </div>
@@ -77,7 +83,7 @@ export default function TasksPage() {
                 <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-amber-500/30 group-hover:border-amber-500" />
                 <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-amber-500/30 group-hover:border-amber-500" />
                 <p className="text-xl font-black font-mono text-amber-400 tracking-tight leading-none group-hover:drop-shadow-[0_0_10px_rgba(245,158,11,0.5)] transition-all">{count as number}</p>
-                <p className="text-[9px] font-bold font-mono text-amber-500/60 uppercase tracking-widest mt-2">{mode}</p>
+                <p className="text-[9px] font-bold font-mono text-amber-500/60 uppercase tracking-widest mt-2">{MODE_LABELS[mode] ?? mode}</p>
               </div>
             ))}
           </div>
@@ -126,15 +132,15 @@ export default function TasksPage() {
                     {t('today.step1')}
                   </h3>
                   <div className="grid gap-4 sm:grid-cols-2">
-                    {templates.map((t: TaskTemplate) => (
-                      <button key={t.id} onClick={() => setSelTpl(t.id)} className={`group relative border p-6 text-left transition-all duration-300 overflow-hidden ${selTpl === t.id ? "border-indigo-500 bg-indigo-500/5 shadow-[0_0_20px_rgba(99,102,241,0.1)]" : "border-white/[0.05] bg-white/[0.01] hover:border-white/[0.2] hover:bg-white/[0.03]"}`}>
-                        <div className={`absolute top-0 right-0 p-2 font-mono text-[8px] transition-opacity ${selTpl === t.id ? 'opacity-100 text-indigo-400' : 'opacity-20 group-hover:opacity-100 group-hover:text-zinc-400'}`}>TPL_{t.id.slice(0,4)}</div>
-                        {selTpl === t.id && <div className="absolute top-4 right-4"><span className="flex h-2 w-2 relative"><span className="animate-ping absolute inline-flex h-full w-full bg-indigo-400 opacity-75"/><span className="relative inline-flex h-2 w-2 bg-indigo-500 shadow-[0_0_5px_rgba(99,102,241,0.8)]"/></span></div>}
-                        <div className="flex items-center gap-4 mb-4"><span className="flex items-center justify-center w-10 h-10 border border-white/[0.1] bg-white/[0.02] text-xl grayscale group-hover:grayscale-0 transition-all">{t.icon || "📱"}</span><span className={`font-bold font-mono tracking-widest text-xs uppercase ${selTpl === t.id ? "text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" : "text-zinc-400 group-hover:text-white"}`}>{t.title}</span></div>
-                        <p className="text-[10px] font-mono text-zinc-500 leading-[1.8] mb-6 min-h-[44px] uppercase tracking-wide">{t.description}</p>
+                    {templates.map((tpl: TaskTemplate) => (
+                      <button key={tpl.id} onClick={() => setSelTpl(tpl.id)} className={`group relative border p-6 text-left transition-all duration-300 overflow-hidden ${selTpl === tpl.id ? "border-indigo-500 bg-indigo-500/5 shadow-[0_0_20px_rgba(99,102,241,0.1)]" : "border-white/[0.05] bg-white/[0.01] hover:border-white/[0.2] hover:bg-white/[0.03]"}`}>
+                        <div className={`absolute top-0 right-0 p-2 font-mono text-[8px] transition-opacity ${selTpl === tpl.id ? 'opacity-100 text-indigo-400' : 'opacity-20 group-hover:opacity-100 group-hover:text-zinc-400'}`}>TPL_{tpl.id.slice(0,4)}</div>
+                        {selTpl === tpl.id && <div className="absolute top-4 right-4"><span className="flex h-2 w-2 relative"><span className="animate-ping absolute inline-flex h-full w-full bg-indigo-400 opacity-75"/><span className="relative inline-flex h-2 w-2 bg-indigo-500 shadow-[0_0_5px_rgba(99,102,241,0.8)]"/></span></div>}
+                        <div className="flex items-center gap-4 mb-4"><span className="flex items-center justify-center w-10 h-10 border border-white/[0.1] bg-white/[0.02] text-xl grayscale group-hover:grayscale-0 transition-all">{tpl.icon || "📱"}</span><span className={`font-bold font-mono tracking-widest text-xs uppercase ${selTpl === tpl.id ? "text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" : "text-zinc-400 group-hover:text-white"}`}>{tpl.title}</span></div>
+                        <p className="text-[10px] font-mono text-zinc-500 leading-[1.8] mb-6 min-h-[44px] uppercase tracking-wide">{tpl.description}</p>
                         <div className="flex items-center justify-between pt-4 border-t border-white/[0.05]">
-                          <span className="text-[10px] font-bold font-mono text-emerald-400 uppercase tracking-widest bg-emerald-500/5 border border-emerald-500/20 px-2.5 py-1">+{t.reward_amount} {t.reward_mode}</span>
-                          <span className="text-[9px] font-bold font-mono text-zinc-600 uppercase tracking-[0.2em]">≥{t.min_views} VIEWS</span>
+                          <span className="text-[10px] font-bold font-mono text-emerald-400 uppercase tracking-widest bg-emerald-500/5 border border-emerald-500/20 px-2.5 py-1">+{tpl.reward_amount} {MODE_LABELS[tpl.reward_mode] ?? tpl.reward_mode}</span>
+                          <span className="text-[9px] font-bold font-mono text-zinc-600 uppercase tracking-[0.2em]">≥{tpl.min_views} 浏览</span>
                         </div>
                       </button>
                     ))}
@@ -231,7 +237,7 @@ export default function TasksPage() {
                   </div>
                   <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 border-white/[0.05] pt-4 sm:pt-0">
                     <span className={`text-[9px] font-black font-mono uppercase tracking-[0.3em] ${st.color}`}>{st.label}</span>
-                    {s.reward_granted && <p className="text-[11px] font-black font-mono tracking-widest text-emerald-400 mt-2 bg-emerald-500/10 px-2 py-0.5 border border-emerald-500/20">+{s.reward_amount} {s.reward_mode}</p>}
+                    {s.reward_granted && <p className="text-[11px] font-black font-mono tracking-widest text-emerald-400 mt-2 bg-emerald-500/10 px-2 py-0.5 border border-emerald-500/20">+{s.reward_amount} {MODE_LABELS[s.reward_mode] ?? s.reward_mode}</p>}
                   </div>
                 </motion.div>
               ); })}
