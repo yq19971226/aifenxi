@@ -23,6 +23,7 @@ import {
   LogOut,
   type LucideIcon,
 } from "lucide-react";
+import { NotificationBell } from "@/components/announcements/NotificationBell";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
@@ -105,15 +106,13 @@ export function TopNav() {
           <span className="font-bold tracking-tight text-sm">AXIOM</span>
         </Link>
 
-        <div className="flex items-center gap-4">
-          <button className="text-muted-foreground hover:text-foreground">
-            <Search size={20} />
-          </button>
+        <div className="flex items-center gap-1">
+          <NotificationBell />
           <button 
             onClick={() => setMobileMenuOpen(true)}
-            className="text-foreground"
+            className="flex items-center justify-center w-9 h-9 text-foreground rounded-lg hover:bg-white/[0.04]"
           >
-            <Menu size={24} />
+            <Menu size={22} />
           </button>
         </div>
       </header>
