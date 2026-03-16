@@ -1369,6 +1369,43 @@ class AnalysisOrchestrator:
             for aid in intraday_agg_ids
         ]
 
+        # --- 量价背离检测 V2（多因子）— 前置到聚合之前，参与信号决策 ---
+        vpd = None
+        try:
+            from app.services.volume_price_divergence_v2 import detect_volume_price_divergence_v2
+            vpd_klines = market_data.klines_1h or market_data.klines_4h or market_data.klines_15m
+            if vpd_klines and len(vpd_klines) >= 25:
+                vpd = await detect_volume_price_divergence_v2(
+                    vpd_klines, "neutral",  # 前置检测，此时还没有聚合信号
+                    indicators=market_data.indicators,
+                    derivatives=market_data.derivatives,
+                    coinglass=market_data.coinglass,
+                )
+        except Exception as exc:
+            logger.warning("量价背离V2前置检测失败: %s", exc)
+
+        # ── VPD 作为虚拟 agent 参与信号聚合（确定性锚定）──
+        if vpd is not None and vpd.data_completeness >= 0.5:
+            # 将 VPD 评分转换为 AgentReport 格式
+            if vpd.score > 0.15:
+                vpd_signal = "bullish"
+            elif vpd.score < -0.15:
+                vpd_signal = "bearish"
+            else:
+                vpd_signal = "neutral"
+            vpd_confidence = min(abs(vpd.score) * 1.5, 0.90)
+
+            vpd_virtual_report = AgentReport(
+                agent_id="vpd_factors",
+                signal=vpd_signal,
+                confidence=vpd_confidence,
+                symbol=symbol,
+                reasoning=vpd.description or "多因子量价验证",
+            )
+            # 将 VPD 虚拟 agent 加入聚合列表
+            intraday_agg_ids.append("vpd_factors")
+            intraday_agg_reports.append(vpd_virtual_report)
+
         # ── 迟滞锚定：读取上一次 intraday 信号 ──
         _prev_signal: str | None = None
         try:
@@ -1408,48 +1445,35 @@ class AnalysisOrchestrator:
                 status="completed",
             ))
 
-        # --- 量价背离检测 V2（多因子）---
-        try:
-            from app.services.volume_price_divergence_v2 import detect_volume_price_divergence_v2
-            vpd_klines = market_data.klines_1h or market_data.klines_4h or market_data.klines_15m
-            if vpd_klines and len(vpd_klines) >= 25:
-                vpd = await detect_volume_price_divergence_v2(
-                    vpd_klines, signal,
-                    indicators=market_data.indicators,
-                    derivatives=market_data.derivatives,
-                    coinglass=market_data.coinglass,
+        # --- 量价验证 section（展示用） ---
+        if vpd is not None:
+            vpd_data = {
+                "评分": f"{vpd.score:+.3f}",
+                "等级": vpd.grade,
+                "信号参与": "是（作为第5个虚拟Agent参与聚合）" if vpd.data_completeness >= 0.5 else "否（数据不完整）",
+                "位置": vpd.position,
+                "数据完整度": f"{vpd.data_completeness:.0%}",
+            }
+            for f in vpd.factors:
+                if abs(f.score) > 0.1 and f.available:
+                    vpd_data[f.factor_name] = f.detail
+            sections.append(ReportSection(
+                title="量价验证",
+                data=vpd_data,
+                summary=vpd.description,
+            ))
+            try:
+                from app.services.factor_learning import record_factor_snapshot
+                await record_factor_snapshot(
+                    symbol=symbol, analysis_mode="intraday",
+                    signal_direction=signal,
+                    signal_confidence=confidence,
+                    vpd_result=vpd.model_dump(),
+                    price_at_signal=market_data.current_price,
+                    atr_at_signal=market_data.indicators.atr if market_data.indicators else None,
                 )
-                if vpd.confidence_modifier != 1.0:
-                    confidence *= vpd.confidence_modifier
-                vpd_data = {
-                    "评分": f"{vpd.score:+.3f}",
-                    "等级": vpd.grade,
-                    "置信度修正": f"×{vpd.confidence_modifier}",
-                    "位置": vpd.position,
-                    "数据完整度": f"{vpd.data_completeness:.0%}",
-                }
-                for f in vpd.factors:
-                    if abs(f.score) > 0.1 and f.available:
-                        vpd_data[f.factor_name] = f.detail
-                sections.append(ReportSection(
-                    title="量价验证",
-                    data=vpd_data,
-                    summary=vpd.description,
-                ))
-                try:
-                    from app.services.factor_learning import record_factor_snapshot
-                    await record_factor_snapshot(
-                        symbol=symbol, analysis_mode="intraday",
-                        signal_direction=signal,
-                        signal_confidence=confidence,
-                        vpd_result=vpd.model_dump(),
-                        price_at_signal=market_data.current_price,
-                        atr_at_signal=market_data.indicators.atr if market_data.indicators else None,
-                    )
-                except Exception:
-                    pass
-        except Exception as exc:
-            logger.warning("量价背离V2检测失败: %s", exc)
+            except Exception:
+                pass
 
         # --- 策略生成（使用聚合信号而非单一 agent）---
         try:

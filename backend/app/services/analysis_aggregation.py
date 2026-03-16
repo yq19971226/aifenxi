@@ -77,43 +77,48 @@ def _weighted_average_fallback(
 # ---------------------------------------------------------------------------
 
 # 默认权重（trending / 无 regime 时使用）
+# vpd_factors: 确定性多因子量化锚定，权重 0.25
 _INTRADAY_AGENT_WEIGHTS: dict[str, float] = {
-    "technical": 0.25,
-    "onchain": 0.20,
-    "risk": 0.15,
-    "orderbook": 0.15,
-    "news_analyst": 0.15,
-    "calendar": 0.10,
+    "technical": 0.20,
+    "onchain": 0.15,
+    "risk": 0.12,
+    "orderbook": 0.10,
+    "news_analyst": 0.10,
+    "calendar": 0.08,
+    "vpd_factors": 0.25,
 }
 
 # ── 市场状态感知权重矩阵 ─────────────────────────────────────
-# trending:  技术趋势指标 + 链上周期指标权重最高，订单簿降权（易被打穿）
-# ranging:   订单簿 + 风控权重最高（支撑阻力有效），趋势指标降权（频繁假信号）
-# volatile:  风控权重最高 + 新闻事件权重提升，整体保守
+# trending:  技术趋势指标 + 链上周期指标权重最高，VPD 辅助验证
+# ranging:   VPD + 订单簿 + 风控权重最高，趋势指标降权（频繁假信号）
+# volatile:  风控权重最高 + VPD 辅助过滤噪声
 _REGIME_INTRADAY_WEIGHTS: dict[str, dict[str, float]] = {
     "trending": {
-        "technical": 0.30,
-        "onchain": 0.25,
-        "risk": 0.10,
-        "orderbook": 0.10,
-        "news_analyst": 0.15,
-        "calendar": 0.10,
+        "technical": 0.25,
+        "onchain": 0.20,
+        "risk": 0.08,
+        "orderbook": 0.08,
+        "news_analyst": 0.10,
+        "calendar": 0.09,
+        "vpd_factors": 0.20,
     },
     "ranging": {
-        "technical": 0.15,
-        "onchain": 0.15,
-        "risk": 0.20,
-        "orderbook": 0.25,
-        "news_analyst": 0.15,
+        "technical": 0.10,
+        "onchain": 0.10,
+        "risk": 0.15,
+        "orderbook": 0.15,
+        "news_analyst": 0.10,
         "calendar": 0.10,
+        "vpd_factors": 0.30,   # 震荡市 VPD 确定性最有价值
     },
     "volatile": {
-        "technical": 0.15,
-        "onchain": 0.15,
-        "risk": 0.25,
-        "orderbook": 0.10,
-        "news_analyst": 0.20,
-        "calendar": 0.15,
+        "technical": 0.12,
+        "onchain": 0.12,
+        "risk": 0.20,
+        "orderbook": 0.08,
+        "news_analyst": 0.15,
+        "calendar": 0.08,
+        "vpd_factors": 0.25,
     },
 }
 
@@ -252,9 +257,23 @@ def _intraday_aggregate(
     avg_score = weighted_score / total_effective_weight
     avg_confidence = weighted_confidence / total_effective_weight
 
+    # ── 市场状态前置过滤 ──
+    # 震荡市：提高方向信号阈值 + 置信度 penalty，防止频繁翻转
+    # 高波动：仅置信度 penalty
+    regime_confidence_penalty = 1.0
+    if regime == "ranging":
+        regime_confidence_penalty = 0.70  # 置信度衰减 30%
+        # 震荡市需要更强的信号才给方向
+        # （通过提高标准阈值实现，下方迟滞逻辑会用到）
+    elif regime == "volatile":
+        regime_confidence_penalty = 0.80  # 置信度衰减 20%
+
+    avg_confidence *= regime_confidence_penalty
+
     # ── 迟滞逻辑 ──
-    standard_threshold = 0.30
-    flip_threshold = 0.15  # 翻转需要更强信号
+    # 震荡市使用更高阈值（更难给方向信号，倾向 neutral/观望）
+    standard_threshold = 0.45 if regime == "ranging" else 0.30
+    flip_threshold = 0.25 if regime == "ranging" else 0.15
 
     if prev_signal == "bullish":
         if avg_score < -flip_threshold:
