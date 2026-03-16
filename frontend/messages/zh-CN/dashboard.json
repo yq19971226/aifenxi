@@ -52,6 +52,7 @@
   "connectionFailed": "系统连接失败",
   "connectionFailedDesc": "无法与分析节点建立安全连接。",
   "retryConnection": "重试连接",
+  "noData": "数据积累中",
   "goConsensus": "深度分析",
   "error": {
     "loadFailed": "加载失败",

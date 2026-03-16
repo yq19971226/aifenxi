@@ -52,6 +52,7 @@
   "connectionFailed": "Connection Failed",
   "connectionFailedDesc": "Unable to connect to analysis nodes.",
   "retryConnection": "Retry",
+  "noData": "Collecting data",
   "goConsensus": "Deep Analysis",
   "error": {
     "loadFailed": "Load failed",

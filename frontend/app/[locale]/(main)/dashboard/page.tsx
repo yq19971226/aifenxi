@@ -216,10 +216,14 @@ export default function DashboardPage() {
                 <Target size={12}/>{t("heroAccuracy", { days: 7 })}
               </span>
               {level >= 1 && accuracy ? (
+                accuracy.total > 0 ? (
                 <span className={`text-xl font-black tracking-tight z-10 ${accuracy.accuracy >= 0.65 ? "text-bull" : accuracy.accuracy >= 0.45 ? "text-warn" : "text-bear"}`}>
                   {(accuracy.accuracy * 100).toFixed(0)}%
                   <span className="text-[10px] font-mono font-bold text-zinc-500 ml-2 tracking-widest">{accuracy.hit_count}/{accuracy.total}</span>
                 </span>
+                ) : (
+                <span className="text-sm font-bold text-zinc-500 z-10">{t("noData")}</span>
+                )
               ) : level < 1 ? (
                 <span className="flex items-center gap-1.5 text-xs font-bold text-indigo-400 z-10 cursor-pointer hover:text-indigo-300 transition-colors uppercase tracking-widest">
                   <Lock size={12} /> {t("membership.upgradeHint")}
