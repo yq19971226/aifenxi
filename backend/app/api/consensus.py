@@ -5,13 +5,11 @@
 """
 
 import logging
-import re
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 
-from app.consensus.engine import ConsensusReport, ModelVote
+from app.consensus.engine import ConsensusReport
 from app.consensus.weights import get_current_weights
-from app.core.deps import UserInfo, require_level
 from app.core.redis import get_json
 
 logger = logging.getLogger(__name__)

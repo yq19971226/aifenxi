@@ -73,7 +73,11 @@ async def _build_feature_matrix() -> list[dict[str, str]]:
     flag_trend = await get_config_value("analysis_daily_limit_flagship_trend", "50")
     free_trial = await get_config_value("free_trial_intraday_count", "1")
 
-    free_intra_label = f"免费体验{free_trial}次" if int(free_trial) > 0 else "锁定"
+    try:
+        free_trial_count = int(free_trial)
+    except (ValueError, TypeError):
+        free_trial_count = 1
+    free_intra_label = f"免费体验{free_trial_count}次" if free_trial_count > 0 else "锁定"
 
     analysis_features = [
         {

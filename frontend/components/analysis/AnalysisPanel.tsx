@@ -199,9 +199,9 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
   }, [handleStart]);
 
   const handleModeSelect = useCallback((m: AnalysisMode) => {
-    const opt = MODE_OPTIONS.find((o) => o.value === m);
-    if (opt && opt.minLevel > userLevel) {
-      setUpgradeHint(`该模式需要${opt.tierLabel}会员，请升级后使用`);
+    if (isModeLocked(m)) {
+      const opt = MODE_OPTIONS.find((o) => o.value === m);
+      setUpgradeHint(`该模式需要${opt?.tierLabel ?? "高级版"}会员，请升级后使用`);
       return;
     }
     setUpgradeHint(null);
@@ -209,7 +209,7 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
     setReport(null);
     setError(null);
     setProgressSteps([]);
-  }, [userLevel]);
+  }, [isModeLocked]);
 
   return (
     <motion.div
