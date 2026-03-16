@@ -155,14 +155,23 @@ class AnalysisQuotaService:
         """检查并递增计数。返回 (是否允许, 剩余次数)。
 
         配额检查优先级:
+        0. 等级门控 → 等级不足直接拒绝（bonus 不能绕过等级限制）
         1. 先检查 bonus_credits → 有余额则扣减 bonus，放行
         2. bonus 用完 → 扣减日常配额 daily_limit
         3. 日常配额也用完 → 拒绝
-        特殊: 免费用户锁定模式日常配额=0，但若有 bonus 仍可使用
         """
+        # 等级门控（P0 安全修复）：bonus 不能绕过模式等级要求
+        required_level = MODE_LEVEL_REQUIREMENTS[mode]
+        if level < required_level:
+            logger.warning(
+                "等级门控拒绝: 用户 %s (等级=%d) 尝试使用模式=%s (需等级=%d)",
+                user_id, level, mode.value, required_level,
+            )
+            return False, 0
+
         limit = await _get_analysis_daily_limit(level, mode)
 
-        # 优先尝试使用奖励次数（即使日常配额为 0 / 锁定模式）
+        # 优先尝试使用奖励次数
         if await self._try_use_bonus(user_id, mode):
             bonus_remaining = await self.get_bonus_remaining(user_id, mode)
             daily_remaining = 0
@@ -170,7 +179,7 @@ class AnalysisQuotaService:
                 daily_remaining = await self.get_remaining(user_id, level, mode)
             return True, bonus_remaining + daily_remaining
 
-        # 锁定模式且无奖励次数：拒绝
+        # 日常配额为 0：拒绝
         if limit == 0:
             return False, 0
 
@@ -230,7 +239,10 @@ class AnalysisQuotaService:
     async def get_all_quotas(
         self, user_id: UUID, level: int,
     ) -> dict[str, QuotaInfo]:
-        """查询所有模式的配额信息，包含锁定状态。奖励次数（如免费体验）计入 remaining。"""
+        """查询所有模式的配额信息，包含锁定状态。
+
+        等级不足的模式标记为 locked，其 remaining 为 0（即使有 bonus）。
+        """
         result: dict[str, QuotaInfo] = {}
 
         for mode in AnalysisMode:
@@ -238,10 +250,20 @@ class AnalysisQuotaService:
             locked = level < MODE_LEVEL_REQUIREMENTS[mode]
             remaining = 0
 
-            if not locked and limit > 0:
+            if locked:
+                # 等级不足：强制 remaining=0，不计入 bonus
+                result[mode.value] = QuotaInfo(
+                    mode=mode,
+                    remaining=0,
+                    limit=limit,
+                    locked=True,
+                )
+                continue
+
+            if limit > 0:
                 remaining = await self.get_remaining(user_id, level, mode)
 
-            # 奖励次数（如日内免费体验）计入剩余，便于前端显示并允许发起分析
+            # 奖励次数计入剩余（仅非锁定模式）
             bonus = await self.get_bonus_remaining(user_id, mode)
             if bonus > 0:
                 remaining += bonus
@@ -250,7 +272,7 @@ class AnalysisQuotaService:
                 mode=mode,
                 remaining=remaining,
                 limit=limit,
-                locked=locked,
+                locked=False,
             )
 
         return result

@@ -340,8 +340,11 @@ async def register(
                 if bonus_amount > 0:
                     quota_svc = AnalysisQuotaService()
                     uid = _UUID(user_id)
+                    from app.models.analysis import MODE_LEVEL_REQUIREMENTS
                     for mode in AnalysisMode:
-                        await quota_svc.add_bonus_credits(uid, mode, bonus_amount)
+                        # 仅给免费用户可用的模式赠送 bonus（等级门控）
+                        if MODE_LEVEL_REQUIREMENTS[mode] <= 0:
+                            await quota_svc.add_bonus_credits(uid, mode, bonus_amount)
                     bonus_msg = f"，赠送 {bonus_amount} 次分析体验"
                     logger.info("新用户 bonus_credits 赠送: user_id=%s, amount=%d", user_id, bonus_amount)
         except Exception as exc:

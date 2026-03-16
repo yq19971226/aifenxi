@@ -52,6 +52,7 @@ from app.models.analysis import (
     ReportSection,
 )
 from app.models.market_data import KlineData, MarketData
+from app.services.analysis_action_log import log_analysis_action
 from app.services.analysis_quota import AnalysisQuotaService
 from app.services.fingerprint import MODE_KLINE_COUNT, compute_fingerprint
 from app.services.news_capital_validator import validate_news_with_capital
@@ -217,12 +218,18 @@ class AnalysisOrchestrator:
         mode: AnalysisMode,
         force_refresh: bool = False,
         locale: str = "zh-CN",
+        user_email: str = "",
     ) -> AsyncGenerator[str, None]:
         """执行分析流程，yield SSE 事件字符串。"""
 
         # 1. 权限检查
         required_level = MODE_LEVEL_REQUIREMENTS[mode]
         if level < required_level:
+            await log_analysis_action(
+                user_id, user_email, symbol, mode.value, level,
+                result="permission_denied",
+                detail=f"需等级{required_level}，当前{level}",
+            )
             yield _sse(ErrorEvent(
                 code="permission_denied",
                 message=f"该模式需要等级 {required_level}，当前等级 {level}",
@@ -330,6 +337,10 @@ class AnalysisOrchestrator:
                 return
 
             if not allowed:
+                await log_analysis_action(
+                    user_id, user_email, symbol, mode.value, level,
+                    result="quota_exceeded",
+                )
                 tomorrow_utc = "明日 UTC 00:00"
                 yield _sse(ErrorEvent(
                     code="quota_exceeded",
@@ -337,6 +348,12 @@ class AnalysisOrchestrator:
                     reset_time=tomorrow_utc,
                 ))
                 return
+
+            # 记录分析开始
+            await log_analysis_action(
+                user_id, user_email, symbol, mode.value, level,
+                result="started",
+            )
 
             # 5. 执行模式流程（总超时控制）
             total_timeout = MODE_TOTAL_TIMEOUT[mode]

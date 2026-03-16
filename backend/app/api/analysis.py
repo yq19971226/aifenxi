@@ -43,6 +43,7 @@ async def run_analysis(
             mode=body.mode,
             force_refresh=body.force_refresh,
             locale=body.locale,
+            user_email=user.email,
         ),
         media_type="text/event-stream",
     )

@@ -295,3 +295,100 @@ async def get_crawler_stats(
     except Exception as exc:
         logger.error("获取爬虫统计失败: %s", exc)
         return {"total_hits": 0, "bots": []}
+
+
+# ── 分析操作日志 ──────────────────────────────────────────────
+
+
+class AnalysisLogItem(BaseModel):
+    """单条分析操作日志。"""
+    id: int
+    user_id: str
+    email: str
+    symbol: str
+    mode: str
+    membership_level: int
+    result: str
+    detail: str
+    created_at: str
+
+
+class AnalysisLogsResponse(BaseModel):
+    """分析操作日志查询响应。"""
+    logs: list[AnalysisLogItem] = []
+    total: int = 0
+
+
+@router.get("/analysis-logs", response_model=AnalysisLogsResponse)
+async def get_analysis_logs(
+    mode: str | None = None,
+    email: str | None = None,
+    result: str | None = None,
+    limit: int = 50,
+    offset: int = 0,
+    admin: UserInfo = Depends(require_admin),
+    session: AsyncSession = Depends(get_db),
+) -> AnalysisLogsResponse:
+    """查询分析操作日志 — 管理员专用。
+
+    支持按模式、邮箱、结果过滤，按时间倒序分页。
+    """
+    try:
+        where_clauses = []
+        params: dict = {"limit": min(limit, 200), "offset": offset}
+
+        if mode:
+            where_clauses.append("mode = :mode")
+            params["mode"] = mode
+        if email:
+            where_clauses.append("email ILIKE :email")
+            params["email"] = f"%{email}%"
+        if result:
+            where_clauses.append("result = :result")
+            params["result"] = result
+
+        where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+
+        # 总数
+        count_row = (await session.execute(
+            text(f"SELECT COUNT(*) FROM analysis_logs {where_sql}"),
+            params,
+        )).scalar_one()
+
+        # 日志
+        rows = (await session.execute(
+            text(f"""
+                SELECT id, user_id, email, symbol, mode, membership_level,
+                       result, detail, created_at
+                FROM analysis_logs
+                {where_sql}
+                ORDER BY created_at DESC
+                LIMIT :limit OFFSET :offset
+            """),
+            params,
+        )).mappings().all()
+
+        logs = [
+            AnalysisLogItem(
+                id=r["id"],
+                user_id=str(r["user_id"]),
+                email=r["email"],
+                symbol=r["symbol"],
+                mode=r["mode"],
+                membership_level=r["membership_level"],
+                result=r["result"],
+                detail=r["detail"] or "",
+                created_at=r["created_at"].isoformat() if r["created_at"] else "",
+            )
+            for r in rows
+        ]
+
+        return AnalysisLogsResponse(logs=logs, total=count_row)
+
+    except Exception as exc:
+        logger.error("查询分析操作日志失败: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="查询日志失败",
+        )
+
