@@ -33,6 +33,7 @@ celery_app = Celery(
         "workers.fred_worker",
         "workers.snapshot_cleanup_worker",
         "workers.reconcile_worker",
+        "workers.glassnode_worker",
     ],
 )
 
@@ -149,6 +150,22 @@ celery_app.conf.update(
         "reconcile-balances-every-6h": {
             "task": "workers.reconcile_worker.reconcile_balances_task",
             "schedule": 21600.0,  # 6 小时（对账合伙人余额+奖励次数）
+        },
+        "collect-glassnode-high-every-15min": {
+            "task": "workers.glassnode_worker.collect_glassnode_high",
+            "schedule": 900.0,  # 15 分钟（SOPR, aSOPR, 交易所流量, MVRV, 活跃地址）
+        },
+        "collect-glassnode-mid-every-1h": {
+            "task": "workers.glassnode_worker.collect_glassnode_mid",
+            "schedule": 3600.0,  # 1 小时（NUPL, EA-MVRV, LTH/STH-SOPR, 积累评分）
+        },
+        "collect-glassnode-low-every-6h": {
+            "task": "workers.glassnode_worker.collect_glassnode_low",
+            "schedule": 21600.0,  # 6 小时（LTH/STH-NUPL, SSR, HODLer, Reserve Risk）
+        },
+        "collect-glassnode-daily": {
+            "task": "workers.glassnode_worker.collect_glassnode_daily",
+            "schedule": 86400.0,  # 24 小时（Hash Ribbon, S2F, Pi Cycle, RHODL）
         },
     },
 )

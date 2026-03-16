@@ -54,7 +54,7 @@ async def _cache_and_publish(snapshot: OnchainSnapshot) -> None:
     """缓存最新快照到 Redis 并发布到 Redis Stream。"""
     await init_redis()
 
-    cache_key = f"onchain:{snapshot.symbol}"
+    cache_key = f"legacy_onchain:{snapshot.symbol}"
     cache_data = snapshot.model_dump(mode="json")
     await set_with_ttl(cache_key, cache_data, _REDIS_TTL_SECONDS)
 

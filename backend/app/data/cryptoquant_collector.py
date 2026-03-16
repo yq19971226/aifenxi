@@ -94,16 +94,16 @@ class CryptoQuantCollector:
             miner_reserve_change=metrics.get("miner_reserve"),
         )
 
-        # 写入 CryptoQuant 主源缓存
+        # 写入 CryptoQuant 主源缓存（仅 CQ 专属 key，不覆盖 GlassNode 的 onchain:{symbol}）
         cache_key = f"cq_onchain:{symbol.upper()}"
         cache_data = snapshot.model_dump(mode="json")
         cache_data["_source"] = "cryptoquant"
         cache_data["_metrics_count"] = sum(1 for v in metrics.values() if v is not None)
         await set_with_ttl(cache_key, cache_data, _CACHE_TTL)
 
-        # 同时写入旧兼容键（过渡期）
-        legacy_key = f"onchain:{symbol.upper()}"
-        await set_with_ttl(legacy_key, snapshot.model_dump(mode="json"), _CACHE_TTL)
+        # 注意：不再写入 onchain:{symbol}，该 key 由 GlassnodeCollector 独占写入
+        # 以避免用 5 字段的 CQ 快照覆盖 30 字段的 Glassnode T3 快照。
+        # CQ 数据仅在 cq_onchain:{symbol} 中保留，可用于交叉验证。
 
         ok_count = sum(1 for v in metrics.values() if v is not None)
         logger.info(
