@@ -60,6 +60,8 @@ export function SignalStabilityBar({
     if (!symbol || !mode) return;
 
     const fetchStability = async () => {
+      // 延迟 800ms 等待后端 record_signal 写入 Redis 完成
+      await new Promise(r => setTimeout(r, 800));
       try {
         const res = await authFetch(`/api/analysis/signal-stability/${symbol}/${mode}`);
         if (res.ok) {
@@ -103,7 +105,7 @@ export function SignalStabilityBar({
           <div className="flex items-center gap-1">
             {data.recent_signals.map((s, i) => (
               <div
-                key={i}
+                key={s.time || `sig-${i}`}
                 className={cn(
                   "w-2.5 h-2.5 rounded-full transition-all",
                   SIGNAL_COLORS[s.signal] || "bg-zinc-600",

@@ -1421,13 +1421,27 @@ class AnalysisOrchestrator:
             intraday_agg_reports.append(vpd_virtual_report)
 
         # ── 迟滞锚定：读取上一次 intraday 信号 ──
+        # 注意：analysis:latest 只由 Trend 模式写入，不能用于 Intraday 锚定！
+        # 使用 signal:history 中的最新记录（按模式隔离）
         _prev_signal: str | None = None
         try:
-            _prev_cache = await get_json(f"analysis:latest:{symbol.upper()}")
-            if _prev_cache and isinstance(_prev_cache, dict):
-                _prev_signal = _prev_cache.get("signal")
+            import json as _json
+            _history_key = f"signal:history:{symbol.upper()}:intraday"
+            _latest_entries = await get_redis_pool().zrevrange(_history_key, 0, 0)
+            if _latest_entries:
+                _prev_entry = _json.loads(_latest_entries[0])
+                _prev_signal = _prev_entry.get("signal")
                 if _prev_signal not in ("bullish", "bearish", "neutral"):
                     _prev_signal = None
+
+                # ── 极端行情豁免：价格剧变时跳过迟滞 ──
+                # 防止黑天鹅事件中信号被"锁定"在错误方向
+                if _prev_signal and market_data.current_price > 0:
+                    _prev_conf = _prev_entry.get("confidence", 0)
+                    _prev_ts = _prev_entry.get("ts", 0)
+                    # 如果上次信号是低置信度的弱信号，不必锚定
+                    if _prev_conf < 0.35:
+                        _prev_signal = None
         except Exception:
             pass
 

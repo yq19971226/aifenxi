@@ -213,12 +213,19 @@ async def _maybe_auto_train() -> None:
             },
         )
 
-        # 运行 AI 训练
-        from app.services.factor_ai_trainer import run_ai_training
-        result = await run_ai_training(days=14)
+        # 运行 AI 训练（异常时释放锁以便下次重试）
+        train_ok = False
+        try:
+            from app.services.factor_ai_trainer import run_ai_training
+            result = await run_ai_training(days=14)
+            train_ok = bool(result.get("ok"))
+        except Exception as train_exc:
+            logger.warning("run_ai_training exception: %s", train_exc)
+            await redis.delete(lock_key)  # 释放锁以便下次重试
+            return
 
         # 缓存训练结果（管理员审核用，TTL=24 小时）
-        if result.get("ok"):
+        if train_ok:
             await set_with_ttl(
                 "factor:auto_train:latest_result",
                 result,
