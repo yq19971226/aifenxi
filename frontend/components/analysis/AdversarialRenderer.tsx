@@ -26,30 +26,32 @@ interface AdversarialData {
   defense_plan?: string[];  // backward compat
 }
 
-const STRATEGY_STYLES: Record<string, { icon: typeof ShieldCheck; color: string; bg: string; border: string; label: string }> = {
-  follow: { icon: TrendingUp, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30", label: "跟随策略" },
-  defend: { icon: ShieldCheck, color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/30", label: "防御策略" },
-  contra: { icon: Crosshair, color: "text-indigo-400", bg: "bg-indigo-500/10", border: "border-indigo-500/30", label: "逆向策略" },
-  wait:   { icon: Eye, color: "text-zinc-400", bg: "bg-zinc-500/10", border: "border-zinc-500/30", label: "观望策略" },
-};
-
-const PHASE_LABELS: Record<string, string> = {
-  accumulation: "吸筹期",
-  markup: "拉升期",
-  distribution: "派发期",
-  markdown: "砸盘期",
-  shakeout: "洗盘期",
-  hunt: "猎杀期",
-  unclear: "不明",
+const STRATEGY_CONFIG: Record<string, { icon: typeof ShieldCheck; color: string; bg: string; border: string; labelKey: string; planKey: string; planSubKey: string }> = {
+  follow: { icon: TrendingUp, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30", labelKey: "strategyFollow", planKey: "followPlan", planSubKey: "followPlanSubtitle" },
+  defend: { icon: ShieldCheck, color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/30", labelKey: "strategyDefend", planKey: "counterPlan", planSubKey: "counterPlanSubtitle" },
+  contra: { icon: Crosshair, color: "text-indigo-400", bg: "bg-indigo-500/10", border: "border-indigo-500/30", labelKey: "strategyContra", planKey: "contraPlan", planSubKey: "contraPlanSubtitle" },
+  wait:   { icon: Eye, color: "text-zinc-400", bg: "bg-zinc-500/10", border: "border-zinc-500/30", labelKey: "strategyWait", planKey: "waitPlan", planSubKey: "waitPlanSubtitle" },
 };
 
 export function AdversarialRenderer({ data }: { data: AdversarialData }) {
   const t = useTranslations("consensus");
   const strategyType = data.strategy_type || "defend";
-  const style = STRATEGY_STYLES[strategyType] || STRATEGY_STYLES.wait;
-  const StrategyIcon = style.icon;
-  const actionPlan = data.action_plan || data.defense_plan || [];
-  const phaseLabel = PHASE_LABELS[data.dealer_phase || ""] || data.dealer_phase || "";
+  const config = STRATEGY_CONFIG[strategyType] || STRATEGY_CONFIG.wait;
+  const StrategyIcon = config.icon;
+
+  // Backward compat: prefer action_plan if non-empty, else fall back to defense_plan
+  const actionPlan = (data.action_plan && data.action_plan.length > 0)
+    ? data.action_plan
+    : (data.defense_plan || []);
+
+  // Phase label via i18n
+  const phaseKey = data.dealer_phase || "";
+  let phaseLabel = "";
+  try {
+    phaseLabel = phaseKey ? t(`renderers.adversarial.phases.${phaseKey}`) : "";
+  } catch {
+    phaseLabel = phaseKey;
+  }
 
   return (
     <div className="space-y-6 relative">
@@ -77,9 +79,11 @@ export function AdversarialRenderer({ data }: { data: AdversarialData }) {
             </h4>
             
             {/* Strategy Type Badge */}
-            <div className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 border ${style.bg} ${style.border}`}>
-              <StrategyIcon size={14} className={style.color} />
-              <span className={`text-xs font-bold ${style.color}`}>{style.label}</span>
+            <div className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 border ${config.bg} ${config.border}`}>
+              <StrategyIcon size={14} className={config.color} />
+              <span className={`text-xs font-bold ${config.color}`}>
+                {t(`renderers.adversarial.${config.labelKey}`)}
+              </span>
               {phaseLabel && (
                 <span className="text-[10px] text-zinc-500 ml-1">| {phaseLabel}</span>
               )}
@@ -93,7 +97,7 @@ export function AdversarialRenderer({ data }: { data: AdversarialData }) {
           
           {/* Strategy Reason (if available) */}
           {data.strategy_reason && (
-            <p className={`mt-2 text-xs ${style.color} opacity-80`}>
+            <p className={`mt-2 text-xs ${config.color} opacity-80`}>
               → {localizeText(data.strategy_reason)}
             </p>
           )}
@@ -181,7 +185,7 @@ export function AdversarialRenderer({ data }: { data: AdversarialData }) {
         {data.opportunity_zones && data.opportunity_zones.length > 0 && (
           <div className="space-y-2">
             <h4 className="flex items-center gap-1.5 text-[10px] font-bold text-sky-500/80 uppercase tracking-widest">
-              <ArrowUpCircle size={12} /> 机会区间 / OPPORTUNITY
+              <ArrowUpCircle size={12} /> {t("renderers.adversarial.opportunityZone")} / {t("renderers.adversarial.opportunitySubtitle")}
             </h4>
             <div className="flex flex-wrap gap-1.5">
               {data.opportunity_zones.map((zone, i) => (
@@ -194,24 +198,17 @@ export function AdversarialRenderer({ data }: { data: AdversarialData }) {
         )}
       </div>
 
-      {/* 4. Action Plan (was Defense Plan) */}
+      {/* 4. Action Plan (dynamic title based on strategy_type) */}
       {actionPlan.length > 0 && (
-        <div className={`rounded-xl border p-4 ${style.border} ${style.bg}`}>
-          <h4 className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] mb-3 ${style.color}`}>
+        <div className={`rounded-xl border p-4 ${config.border} ${config.bg}`}>
+          <h4 className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] mb-3 ${config.color}`}>
             <StrategyIcon size={14} />
-            {strategyType === "follow" ? "跟随行动计划" :
-             strategyType === "contra" ? "逆向行动计划" :
-             strategyType === "wait" ? "观望要点" :
-             t("renderers.adversarial.counterPlan")} / {
-             strategyType === "follow" ? "FOLLOW PLAN" :
-             strategyType === "contra" ? "CONTRA PLAN" :
-             strategyType === "wait" ? "WATCH LIST" :
-             t("renderers.adversarial.counterPlanSubtitle")}
+            {t(`renderers.adversarial.${config.planKey}`)} / {t(`renderers.adversarial.${config.planSubKey}`)}
           </h4>
           <ul className="space-y-2">
             {actionPlan.map((item, i) => (
               <li key={i} className="flex items-start gap-2.5">
-                <div className={`mt-1 h-3 w-3 rounded flex items-center justify-center shrink-0 ${style.bg} ${style.color}`}>
+                <div className={`mt-1 h-3 w-3 rounded flex items-center justify-center shrink-0 ${config.bg} ${config.color}`}>
                   <span className="text-[8px] font-bold">{i+1}</span>
                 </div>
                 <span className="text-xs text-zinc-300 leading-relaxed">

@@ -299,7 +299,11 @@ def _evaluate_defense_risk(
     adversarial_report: AgentReport | None,
     collusion_report: AgentReport | None,
 ) -> int:
-    """评估防御风险等级。返回 0-4（0=none, 1=low, 2=medium, 3=high, 4=critical）。"""
+    """评估防御风险等级。返回 0-4（0=none, 1=low, 2=medium, 3=high, 4=critical）。
+
+    策略感知：当对抗推演的 strategy_type 为 follow/contra 时，
+    trap 信号不应触发高风险（因为 agent 明确认为庄家行为对散户有利）。
+    """
     level = 0
 
     if collusion_report and collusion_report.raw_data:
@@ -312,13 +316,24 @@ def _evaluate_defense_risk(
 
     if adversarial_report and adversarial_report.raw_data:
         raw = adversarial_report.raw_data
+        strategy_type = raw.get("strategy_type", "defend")
+
         for move in raw.get("predicted_moves", []):
             prob = move.get("probability", 0)
             trap = move.get("trap_type", "none")
             if prob >= 0.7 and trap != "none":
-                level = max(level, 3)
+                trap_level = 3
             elif prob >= 0.5 and trap != "none":
-                level = max(level, 2)
+                trap_level = 2
+            else:
+                trap_level = 0
+
+            # 策略感知降级：follow/contra 时 trap 不代表对散户的威胁
+            # 例如：吸筹期的"洗盘"trap 是庄家在清洗浮筹，对跟随者有利
+            if strategy_type in ("follow", "contra") and trap_level > 0:
+                trap_level = max(trap_level - 2, 0)
+
+            level = max(level, trap_level)
 
     return level
 

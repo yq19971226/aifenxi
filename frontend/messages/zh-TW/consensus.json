@@ -135,10 +135,31 @@
       "prob": "概率",
       "dangerZone": "風險區",
       "safeZone": "安全區",
+      "opportunityZone": "機會區間",
       "dangerSubtitle": "DANGER",
       "safeSubtitle": "SAFETY",
+      "opportunitySubtitle": "Opportunity",
       "counterPlan": "反制防禦計劃",
-      "counterPlanSubtitle": "REACTION PROTOCOL"
+      "counterPlanSubtitle": "REACTION PROTOCOL",
+      "followPlan": "跟隨行動計劃",
+      "followPlanSubtitle": "Follow Plan",
+      "contraPlan": "逆向行動計劃",
+      "contraPlanSubtitle": "Contra Plan",
+      "waitPlan": "觀望要點",
+      "waitPlanSubtitle": "Watch List",
+      "strategyFollow": "跟隨策略",
+      "strategyDefend": "防禦策略",
+      "strategyContra": "逆向策略",
+      "strategyWait": "觀望策略",
+      "phases": {
+        "accumulation": "吸籌期",
+        "markup": "拉升期",
+        "distribution": "派發期",
+        "markdown": "砸盤期",
+        "shakeout": "洗盤期",
+        "hunt": "獵殺期",
+        "unclear": "不明"
+      }
     },
     "collusion": {
       "title": "網絡合謀檢測周期",

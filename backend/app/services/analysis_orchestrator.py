@@ -2242,9 +2242,14 @@ class AnalysisOrchestrator:
         adversarial_report: AgentReport | None,
         collusion_report: AgentReport | None,
     ) -> None:
-        """当防御等级达到 medium+ 时推送 WebSocket 预警。"""
+        """当防御等级达到 medium+ 时推送 WebSocket 预警。
+
+        策略感知：根据 strategy_type 调整推送消息类型和内容。
+        """
         try:
             level = 0  # 0=none, 1=low, 2=medium, 3=high
+            strategy_type = "defend"
+            dealer_phase = ""
 
             # 合谋检测
             if collusion_report and collusion_report.raw_data:
@@ -2258,13 +2263,24 @@ class AnalysisOrchestrator:
             # 对抗推演
             if adversarial_report and adversarial_report.raw_data:
                 raw = adversarial_report.raw_data
+                strategy_type = raw.get("strategy_type", "defend")
+                dealer_phase = raw.get("dealer_phase", "")
+
                 for move in raw.get("predicted_moves", []):
                     prob = move.get("probability", 0)
                     trap = move.get("trap_type", "none")
                     if prob >= 0.7 and trap != "none":
-                        level = max(level, 3)
+                        trap_level = 3
                     elif prob >= 0.5 and trap != "none":
-                        level = max(level, 2)
+                        trap_level = 2
+                    else:
+                        trap_level = 0
+
+                    # 策略感知降级
+                    if strategy_type in ("follow", "contra") and trap_level > 0:
+                        trap_level = max(trap_level - 2, 0)
+
+                    level = max(level, trap_level)
 
             if level < 2:
                 return  # 低风险不推送
@@ -2272,13 +2288,27 @@ class AnalysisOrchestrator:
             level_labels = {2: "MEDIUM", 3: "HIGH", 4: "CRITICAL"}
             level_label = level_labels.get(level, "HIGH")
 
-            # 构建推送消息
-            parts: list[str] = [f"🛡️ {symbol.upper()} 防御预警 [{level_label}]"]
+            # 根据策略类型调整消息风格
+            strategy_icons = {
+                "follow": "📈",
+                "contra": "🔄",
+                "wait": "👁️",
+                "defend": "🛡️",
+            }
+            icon = strategy_icons.get(strategy_type, "🛡️")
+            parts: list[str] = [f"{icon} {symbol.upper()} 防御预警 [{level_label}]"]
 
             if adversarial_report and adversarial_report.raw_data:
                 intent = adversarial_report.raw_data.get("dealer_intent", "")
                 if intent:
                     parts.append(f"庄家意图: {intent}")
+                if strategy_type and strategy_type != "defend":
+                    strategy_labels = {
+                        "follow": "跟随策略",
+                        "contra": "逆向策略",
+                        "wait": "观望策略",
+                    }
+                    parts.append(f"建议策略: {strategy_labels.get(strategy_type, strategy_type)}")
 
             if collusion_report and collusion_report.raw_data:
                 if collusion_report.raw_data.get("collusion_detected"):
@@ -2291,6 +2321,8 @@ class AnalysisOrchestrator:
                 "alert_type": "defense_warning",
                 "symbol": symbol.upper(),
                 "level": level_label,
+                "strategy_type": strategy_type,
+                "dealer_phase": dealer_phase,
                 "message": " | ".join(parts),
             })
 

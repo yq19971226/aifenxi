@@ -129,10 +129,31 @@
       "prob": "PROB",
       "dangerZone": "Danger Zone",
       "safeZone": "Safe Zone",
+      "opportunityZone": "Opportunity Zone",
       "dangerSubtitle": "DANGER",
       "safeSubtitle": "SAFETY",
+      "opportunitySubtitle": "OPPORTUNITY",
       "counterPlan": "Counter-Defense Plan",
-      "counterPlanSubtitle": "REACTION PROTOCOL"
+      "counterPlanSubtitle": "REACTION PROTOCOL",
+      "followPlan": "Follow Action Plan",
+      "followPlanSubtitle": "FOLLOW PLAN",
+      "contraPlan": "Contra Action Plan",
+      "contraPlanSubtitle": "CONTRA PLAN",
+      "waitPlan": "Watch Points",
+      "waitPlanSubtitle": "WATCH LIST",
+      "strategyFollow": "Follow Strategy",
+      "strategyDefend": "Defense Strategy",
+      "strategyContra": "Contra Strategy",
+      "strategyWait": "Wait Strategy",
+      "phases": {
+        "accumulation": "Accumulation",
+        "markup": "Markup",
+        "distribution": "Distribution",
+        "markdown": "Markdown",
+        "shakeout": "Shakeout",
+        "hunt": "Stop Hunt",
+        "unclear": "Unclear"
+      }
     },
     "collusion": {
       "title": "Collusion Detection Cycle",
