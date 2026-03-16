@@ -130,8 +130,10 @@ def _build_user_prompt(data: MarketData) -> str:
 
         if oc.whale_change_24h is not None:
             parts.append(f"巨鲸持仓24h变化: {oc.whale_change_24h:+.4f}%")
+        elif oc.whale_address_count is not None:
+            parts.append(f"巨鲸地址数 (≥1k BTC): {oc.whale_address_count:,}")
         else:
-            parts.append("巨鲸持仓24h变化: 数据缺失")
+            parts.append("巨鲸持仓变化: 数据缺失")
 
         if oc.fear_greed_index is not None:
             parts.append(f"恐慌贪婪指数: {oc.fear_greed_index}/100")

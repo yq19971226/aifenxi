@@ -58,6 +58,7 @@ class OnchainSnapshot(BaseModel):
     # ── 基础字段 ──
     exchange_netflow: Optional[float] = None
     whale_change_24h: Optional[float] = None
+    whale_address_count: Optional[int] = None     # 巨鲸地址数 (≥1k BTC)
     fear_greed_index: Optional[int] = None
     mvrv: Optional[float] = None
     active_addresses: Optional[int] = None

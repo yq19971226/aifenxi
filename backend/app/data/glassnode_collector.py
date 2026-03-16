@@ -206,6 +206,7 @@ class GlassnodeCollector:
                 mvrv=_safe_float(merged.get("mvrv")),
                 active_addresses=_safe_int(merged.get("active_addresses")),
                 new_addresses=_safe_int(merged.get("new_addresses")),
+                whale_address_count=_safe_int(merged.get("whale_count")),
                 fear_greed_index=_safe_int(merged.get("fear_greed")),
                 miner_reserve_change=_safe_float(merged.get("miner_reserve_change")),
                 large_tx_count=_safe_int(merged.get("large_tx_count")),
