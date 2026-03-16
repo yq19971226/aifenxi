@@ -33,14 +33,16 @@ interface ModeSelectorProps {
   mode: AnalysisMode;
   userLevel: number;
   running: boolean;
+  lockedModes?: Record<string, boolean>;
   onSelect: (mode: AnalysisMode) => void;
 }
 
-export function ModeSelector({ mode, userLevel, running, onSelect }: ModeSelectorProps) {
+export function ModeSelector({ mode, userLevel, running, lockedModes, onSelect }: ModeSelectorProps) {
   return (
     <div className="grid grid-cols-3 gap-3">
       {MODE_OPTIONS.map((opt) => {
-        const locked = opt.minLevel > userLevel;
+        // 优先使用后端返回的 locked 状态（考虑了免费体验 bonus）
+        const locked = lockedModes?.[opt.value] ?? opt.minLevel > userLevel;
         const selected = mode === opt.value && !locked;
         const Icon = opt.icon;
         return (

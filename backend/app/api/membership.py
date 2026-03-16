@@ -45,12 +45,11 @@ class PlansResponse(BaseModel):
     features: list[PlanFeature]
 
 
-# ── 功能对比矩阵（静态） ──────────────────────────────────────
+# ── 功能对比矩阵（分析次数从动态配置读取） ──────────────────
 
-FEATURE_MATRIX: list[dict[str, str]] = [
-    {"name": "实时短线分析", "free": "5次/天", "pro": "50次/天", "flagship": "200次/天"},
-    {"name": "日内博弈分析", "free": "免费体验1次", "pro": "20次/天", "flagship": "100次/天"},
-    {"name": "趋势布局分析", "free": "锁定", "pro": "锁定", "flagship": "50次/天"},
+
+# 非分析次数的功能行 — 仍为静态
+_STATIC_FEATURES: list[dict[str, str]] = [
     {"name": "链上数据", "free": "延迟15分钟", "pro": "实时", "flagship": "实时"},
     {"name": "多智能体共识", "free": "—", "pro": "—", "flagship": "✓"},
     {"name": "策略推送", "free": "—", "pro": "邮件", "flagship": "邮件+TG"},
@@ -61,7 +60,43 @@ FEATURE_MATRIX: list[dict[str, str]] = [
 ]
 
 
-# ── 路由 ──────────────────────────────────────────────────────
+async def _build_feature_matrix() -> list[dict[str, str]]:
+    """构建功能对比矩阵 — 分析次数从动态配置读取。"""
+    from app.services.config_service import get_config_value
+
+    # 读取各等级分析次数（与 analysis_quota.py 使用相同 config key）
+    free_scalp = await get_config_value("analysis_daily_limit_free_scalping", "5")
+    pro_scalp = await get_config_value("analysis_daily_limit_pro_scalping", "50")
+    flag_scalp = await get_config_value("analysis_daily_limit_flagship_scalping", "200")
+    pro_intra = await get_config_value("analysis_daily_limit_pro_intraday", "20")
+    flag_intra = await get_config_value("analysis_daily_limit_flagship_intraday", "100")
+    flag_trend = await get_config_value("analysis_daily_limit_flagship_trend", "50")
+    free_trial = await get_config_value("free_trial_intraday_count", "1")
+
+    free_intra_label = f"免费体验{free_trial}次" if int(free_trial) > 0 else "锁定"
+
+    analysis_features = [
+        {
+            "name": "实时短线分析",
+            "free": f"{free_scalp}次/天",
+            "pro": f"{pro_scalp}次/天",
+            "flagship": f"{flag_scalp}次/天",
+        },
+        {
+            "name": "日内博弈分析",
+            "free": free_intra_label,
+            "pro": f"{pro_intra}次/天",
+            "flagship": f"{flag_intra}次/天",
+        },
+        {
+            "name": "趋势布局分析",
+            "free": "锁定",
+            "pro": "锁定",
+            "flagship": f"{flag_trend}次/天",
+        },
+    ]
+
+    return analysis_features + _STATIC_FEATURES
 
 
 @router.get("/plans", response_model=PlansResponse)
@@ -96,7 +131,17 @@ async def get_plans() -> PlansResponse:
         ),
     ]
 
-    features = [PlanFeature(**f) for f in FEATURE_MATRIX]
+    try:
+        feature_matrix = await _build_feature_matrix()
+    except Exception:
+        logger.warning("读取动态功能矩阵失败，使用静态默认值")
+        feature_matrix = [
+            {"name": "实时短线分析", "free": "5次/天", "pro": "50次/天", "flagship": "200次/天"},
+            {"name": "日内博弈分析", "free": "免费体验1次", "pro": "20次/天", "flagship": "100次/天"},
+            {"name": "趋势布局分析", "free": "锁定", "pro": "锁定", "flagship": "50次/天"},
+        ] + _STATIC_FEATURES
+
+    features = [PlanFeature(**f) for f in feature_matrix]
 
     return PlansResponse(plans=plans, features=features)
 

@@ -91,9 +91,15 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
 
   const currentQuota = quota?.quotas?.[mode] ?? null;
   const isModeLocked = useCallback((m: AnalysisMode): boolean => {
+    // 优先使用后端返回的 locked 状态（后端考虑了免费体验 bonus）
+    const backendQuota = quota?.quotas?.[m];
+    if (backendQuota !== undefined) {
+      return backendQuota.locked;
+    }
+    // fallback: 本地计算
     const opt = MODE_OPTIONS.find((o) => o.value === m);
     return (opt?.minLevel ?? 0) > userLevel;
-  }, [userLevel]);
+  }, [userLevel, quota]);
   const isQuotaExhausted = currentQuota !== null && currentQuota.remaining === 0;
 
   const modeLocked = isModeLocked(mode);
@@ -222,7 +228,15 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
       </div>
 
       {/* Mode selector */}
-      <ModeSelector mode={mode} userLevel={userLevel} running={running} onSelect={handleModeSelect} />
+      <ModeSelector
+        mode={mode}
+        userLevel={userLevel}
+        running={running}
+        lockedModes={quota?.quotas ? Object.fromEntries(
+          Object.entries(quota.quotas).map(([k, v]) => [k, v.locked])
+        ) : undefined}
+        onSelect={handleModeSelect}
+      />
 
       {/* Market regime badge */}
       {regime && !running && !report && <MarketRegimeBadge regime={regime} />}
