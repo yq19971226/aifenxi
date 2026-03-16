@@ -208,6 +208,8 @@ class GlassnodeCollector:
                 new_addresses=_safe_int(merged.get("new_addresses")),
                 fear_greed_index=_safe_int(merged.get("fear_greed")),
                 miner_reserve_change=_safe_float(merged.get("miner_reserve_change")),
+                large_tx_count=_safe_int(merged.get("large_tx_count")),
+                large_tx_volume=_safe_float(merged.get("large_tx_volume")),
                 # ── T3 新增字段 ──
                 nupl=_safe_float(merged.get("nupl")),
                 sopr=_safe_float(merged.get("sopr")),

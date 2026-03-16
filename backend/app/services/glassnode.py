@@ -221,6 +221,26 @@ METRIC_REGISTRY: dict[str, dict[str, Any]] = {
         "assets": ["BTC"],
         "description": "恐慌贪婪指数 (Glassnode版)",
     },
+
+    # ── 🟣 巨鲸 & 大额转账 ────────────────────────────────────
+    "whale_count": {
+        "path": "/addresses/min_1k_count",
+        "tier": "mid",
+        "assets": ["BTC"],
+        "description": "巨鲸地址数 (持有 ≥1000 BTC)",
+    },
+    "large_tx_count": {
+        "path": "/transactions/transfers_count_large",
+        "tier": "mid",
+        "assets": ["BTC", "ETH"],
+        "description": "大额转账笔数",
+    },
+    "large_tx_volume": {
+        "path": "/transactions/transfers_volume_large_sum",
+        "tier": "mid",
+        "assets": ["BTC", "ETH"],
+        "description": "大额转账总量",
+    },
 }
 
 # 币种符号映射 (Binance 交易对 → Glassnode 资产标识)
