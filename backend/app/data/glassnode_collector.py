@@ -155,6 +155,20 @@ class GlassnodeCollector:
                 metrics = tier_data.get("metrics", {})
                 merged.update(metrics)
 
+        # 补充 Alternative.me 恐慌贪婪指数（legacy_onchain 由旧 onchain_collector 写入）
+        legacy = await get_json(f"legacy_onchain:{symbol.upper()}")
+        if legacy and isinstance(legacy, dict):
+            fg = legacy.get("fear_greed_index")
+            if fg is not None and merged.get("fear_greed") is None:
+                merged["fear_greed"] = fg
+
+        # 补充 CryptoQuant 的矿工储备（GlassNode 不提供）
+        cq = await get_json(f"cq_onchain:{symbol.upper()}")
+        if cq and isinstance(cq, dict):
+            mr = cq.get("miner_reserve_change")
+            if mr is not None:
+                merged["miner_reserve_change"] = mr
+
         if not merged:
             return None
 
@@ -192,7 +206,8 @@ class GlassnodeCollector:
                 mvrv=_safe_float(merged.get("mvrv")),
                 active_addresses=_safe_int(merged.get("active_addresses")),
                 new_addresses=_safe_int(merged.get("new_addresses")),
-                miner_reserve_change=None,
+                fear_greed_index=_safe_int(merged.get("fear_greed")),
+                miner_reserve_change=_safe_float(merged.get("miner_reserve_change")),
                 # ── T3 新增字段 ──
                 nupl=_safe_float(merged.get("nupl")),
                 sopr=_safe_float(merged.get("sopr")),
@@ -228,8 +243,8 @@ class GlassnodeCollector:
         cache_data = snapshot.model_dump(mode="json")
         cache_data["_source"] = "glassnode"
         cache_data["_metrics_count"] = sum(1 for v in merged.values() if v is not None)
-        await set_with_ttl(f"gn_onchain:{symbol.upper()}", cache_data, _TTL_HIGH)
-        await set_with_ttl(f"onchain:{symbol.upper()}", cache_data, _TTL_HIGH)
+        await set_with_ttl(f"gn_onchain:{symbol.upper()}", cache_data, _TTL_HIGH * 2)
+        await set_with_ttl(f"onchain:{symbol.upper()}", cache_data, _TTL_HIGH * 2)
 
         logger.info("gn_snapshot_built", extra={
             "symbol": symbol,

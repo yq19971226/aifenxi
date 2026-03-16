@@ -24,7 +24,7 @@ async def _collect_all() -> dict[str, int]:
     if not await is_enabled("cryptoquant"):
         logger.info("CryptoQuant 数据源已关闭，跳过采集")
         from app.core.capability_state import set_capability_status, CapabilityStatus
-        await set_capability_status("onchain", CapabilityStatus.DISABLED, reason="datasource disabled by admin")
+        await set_capability_status("cryptoquant", CapabilityStatus.DISABLED, reason="datasource disabled by admin")
         return {"success": 0, "errors": 0, "total": 0}
 
     collector = CryptoQuantCollector()
@@ -67,8 +67,8 @@ def collect_cryptoquant_data(self) -> dict[str, int]:
 
 
 async def _set_cq_cap(status_str: str, reason: str = "") -> None:
-    """写入 onchain capability 运行时状态。"""
+    """写入 cryptoquant capability 运行时状态（不再覆盖 GlassNode 的 onchain 状态）。"""
     from app.core.capability_state import CapabilityStatus, set_capability_status
     await init_redis()
     status = CapabilityStatus(status_str.lower())
-    await set_capability_status("onchain", status, reason=reason)
+    await set_capability_status("cryptoquant", status, reason=reason)

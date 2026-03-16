@@ -179,82 +179,36 @@ class OnchainCollector:
     # ── 聚合采集 ─────────────────────────────────────────────
 
     async def collect_snapshot(self, symbol: str) -> OnchainSnapshot:
-        """并行采集所有数据源，组装为 OnchainSnapshot。
+        """采集 Alternative.me 恐慌贪婪指数（仅此一项）。
 
-        任一数据源失败不影响其他，对应字段为 None。
-        各子数据源受 source_gate 开关控制。
+        注意：GlassNode 链上指标（MVRV, SOPR, NUPL 等）已由 glassnode_worker
+        分层定时采集（15m/1h/6h/24h），本方法不再重复调用以节省 API 配额。
 
         Args:
             symbol: 交易对，如 "BTCUSDT"
 
         Returns:
-            OnchainSnapshot（部分字段可能为 None）
+            OnchainSnapshot（仅 fear_greed_index 有值）
         """
         from app.data.source_gate import is_enabled
 
-        # 根据开关决定是否采集
         alt_enabled = await is_enabled("alternative_me")
-        gn_enabled = await is_enabled("glassnode")
 
-        async def _noop():
-            return None
-
-        (
-            fear_greed,
-            mvrv,
-            nvt,
-            active_addr,
-            exchange_flow,
-            price,
-        ) = await asyncio.gather(
-            SentimentCollector(timeout=self._timeout).collect_sentiment() if alt_enabled else _noop(),
-            self.fetch_mvrv(symbol) if gn_enabled else _noop(),
-            self.fetch_nvt(symbol) if gn_enabled else _noop(),
-            self.fetch_active_addresses(symbol) if gn_enabled else _noop(),
-            self.fetch_exchange_flow(symbol) if gn_enabled else _noop(),
-            self.fetch_price(symbol) if gn_enabled else _noop(),
-            return_exceptions=True,
-        )
-
-        # 将异常转为 None，确保不会因单个数据源崩溃整个快照
-        if isinstance(fear_greed, BaseException):
-            logger.error("fear_greed raised exception", extra={"error": str(fear_greed)})
-            fear_greed = None
-        if isinstance(mvrv, BaseException):
-            logger.error("mvrv raised exception", extra={"error": str(mvrv)})
-            mvrv = None
-        if isinstance(nvt, BaseException):
-            logger.error("nvt raised exception", extra={"error": str(nvt)})
-            nvt = None
-        if isinstance(active_addr, BaseException):
-            logger.error("active_addresses raised exception", extra={"error": str(active_addr)})
-            active_addr = None
-        if isinstance(exchange_flow, BaseException):
-            logger.error("exchange_flow raised exception", extra={"error": str(exchange_flow)})
-            exchange_flow = None
-        if isinstance(price, BaseException):
-            logger.error("price raised exception", extra={"error": str(price)})
-            price = None
+        fear_greed = None
+        if alt_enabled:
+            try:
+                fear_greed = await SentimentCollector(timeout=self._timeout).collect_sentiment()
+            except Exception as exc:
+                logger.error("fear_greed raised exception", extra={"error": str(exc)})
 
         snapshot = OnchainSnapshot(
             time=datetime.now(timezone.utc),
             symbol=symbol.upper(),
-            exchange_netflow=exchange_flow,
             fear_greed_index=fear_greed,
-            mvrv=mvrv,
-            active_addresses=active_addr,
         )
 
         logger.info(
-            "Onchain snapshot collected",
-            extra={
-                "symbol": symbol,
-                "has_fear_greed": fear_greed is not None,
-                "has_mvrv": mvrv is not None,
-                "has_nvt": nvt is not None,
-                "has_active_addr": active_addr is not None,
-                "has_exchange_flow": exchange_flow is not None,
-                "has_price": price is not None,
-            },
+            "Legacy onchain snapshot collected (fear_greed only)",
+            extra={"symbol": symbol, "has_fear_greed": fear_greed is not None},
         )
         return snapshot
