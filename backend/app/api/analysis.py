@@ -89,3 +89,31 @@ async def get_ai_detection(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="获取AI检测结果失败",
         )
+
+
+@router.get("/signal-stability/{symbol}/{mode}")
+async def get_signal_stability_endpoint(
+    symbol: str,
+    mode: str,
+    _user: UserInfo = Depends(get_current_user),
+) -> dict:
+    """获取信号稳定度指标 — 供前端展示信号连续性和可信度。
+
+    返回最近信号的一致性、连续次数、持续时间和稳定度等级。
+    """
+    valid_modes = {"scalping", "intraday", "trend"}
+    if mode not in valid_modes:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"无效模式: {mode}，有效值: {', '.join(valid_modes)}",
+        )
+
+    try:
+        from app.services.signal_history import get_signal_stability
+        return await get_signal_stability(symbol.upper(), mode)
+    except Exception:
+        logger.exception("获取信号稳定度失败 symbol=%s mode=%s", symbol, mode)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="获取信号稳定度失败",
+        )

@@ -165,10 +165,75 @@ async def record_factor_snapshot(
             await session.commit()
             snapshot_id = row[0] if row else None
             logger.debug("factor_snapshot_recorded", extra={"id": snapshot_id, "symbol": symbol})
+
+            # ── 自动训练触发检查（每 50 条检查一次）──
+            if snapshot_id and snapshot_id % 50 == 0:
+                try:
+                    await _maybe_auto_train()
+                except Exception as train_exc:
+                    logger.warning("auto_train_check failed: %s", train_exc)
+
             return snapshot_id
     except Exception as exc:
         logger.warning("Failed to record factor snapshot: %s", exc)
         return None
+
+
+async def _maybe_auto_train() -> None:
+    """当样本量达标时自动运行 AI 训练并缓存结果供管理员审核。
+
+    安全约束：
+    - Redis 分布式锁防止并发触发（锁 1 小时）
+    - 只缓存训练结果，不自动应用权重
+    - 管理员在后台查看并一键应用
+    """
+    try:
+        from app.core.redis import get_redis_pool, set_with_ttl
+
+        redis = get_redis_pool()
+        lock_key = "factor:auto_train:lock"
+
+        # 尝试获取锁（1 小时内不重复触发）
+        acquired = await redis.set(lock_key, "1", nx=True, ex=3600)
+        if not acquired:
+            return  # 已有训练在运行或最近已触发过
+
+        # 获取统计数据检查是否达标
+        stats = await get_factor_stats(days=14)
+        if stats["total_analyses"] < 200 or stats["tracked_count"] < 100:
+            # 未达标，释放锁（下次 50 条后再检查）
+            await redis.delete(lock_key)
+            return
+
+        logger.info(
+            "Auto-training triggered",
+            extra={
+                "total_analyses": stats["total_analyses"],
+                "tracked_count": stats["tracked_count"],
+            },
+        )
+
+        # 运行 AI 训练
+        from app.services.factor_ai_trainer import run_ai_training
+        result = await run_ai_training(days=14)
+
+        # 缓存训练结果（管理员审核用，TTL=24 小时）
+        if result.get("ok"):
+            await set_with_ttl(
+                "factor:auto_train:latest_result",
+                result,
+                ttl_seconds=86400,
+            )
+            logger.info(
+                "Auto-training completed, result cached for admin review",
+                extra={"tokens_used": result.get("tokens_used", 0)},
+            )
+        else:
+            logger.warning("Auto-training failed: %s", result.get("error"))
+            # 释放锁以便下次重试
+            await redis.delete(lock_key)
+    except Exception as exc:
+        logger.warning("_maybe_auto_train error: %s", exc)
 
 
 # ══════════════════════════════════════════════════════════════

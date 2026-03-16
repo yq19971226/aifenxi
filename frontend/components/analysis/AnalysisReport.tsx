@@ -10,6 +10,7 @@ import { UnifiedResultCard } from "./UnifiedResultCard";
 import { DeepAnalysis } from "./DeepAnalysis";
 import { ShareModal } from "./ShareModal";
 import { AICitationSnippet } from "./AICitationSnippet";
+import { SignalStabilityBar } from "./SignalStabilityBar";
 import { useShareCardConfig } from "@/lib/hooks/useShareCardConfig";
 
 interface AnalysisReportProps {
@@ -43,6 +44,11 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
             {t("card.share")}
           </button>
         </div>
+      )}
+
+      {/* Signal Stability Bar — shows history consistency */}
+      {!isBlocked && (
+        <SignalStabilityBar symbol={report.symbol} mode={report.mode} />
       )}
 
       {/* Unified result card: signal → prices → consensus → findings → risk */}

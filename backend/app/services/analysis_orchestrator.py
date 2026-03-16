@@ -431,6 +431,20 @@ class AnalysisOrchestrator:
             except Exception as exc:
                 logger.warning("缓存写入失败: %s", exc)
 
+            # 6.5 记录信号历史（用于稳定度展示，非缓存命中时才记）
+            if not getattr(report, "cached", False):
+                try:
+                    from app.services.signal_history import record_signal
+                    await record_signal(
+                        symbol=symbol,
+                        mode=mode.value,
+                        signal=report.signal,
+                        confidence=report.confidence,
+                        market_regime=report.market_regime,
+                    )
+                except Exception:
+                    pass  # 不影响主流程
+
             # 7. 推送完成事件
             yield _sse(CompleteEvent(report=report))
 
