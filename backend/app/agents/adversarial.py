@@ -1,12 +1,13 @@
-"""AdversarialAgent — 对抗推演智能体。
+"""AdversarialAgent — 对抗推演智能体（多策略版）。
 
-站在庄家AI的视角进行反向推演：
+站在庄家AI的视角进行博弈推演：
 1. 读取当前市场状态 + PlaybookAgent 输出 + AIDetector 检测结果
 2. 模拟庄家AI的决策逻辑，推演其下一步操作
-3. 输出反制预警和建议的防御策略
+3. 根据庄家所处阶段，选择最优应对策略：跟随/防御/逆向/观望
 
 核心理念：
 - "要打败AI，先要像AI一样思考"
+- 庄家不是永远的敌人 — 吸筹期跟随，派发期防御，猎杀后逆向
 - 利用 PlaybookAgent 的剧本匹配结果，推演剧本下一阶段
 - 利用 AIDetector 的战术识别，预测庄家的下一个动作
 - 使用 deepseek-reasoner（深度推理）进行博弈分析
@@ -45,38 +46,60 @@ class AdversarialReport(BaseModel):
     symbol: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     dealer_intent: str = ""                          # 庄家当前意图
+    strategy_type: str = "defend"                    # follow/defend/contra/wait
     predicted_moves: list[AdversarialMove] = Field(default_factory=list)
     danger_zones: list[str] = Field(default_factory=list)   # 危险价位区间
     safe_zones: list[str] = Field(default_factory=list)     # 相对安全区间
-    defense_plan: list[str] = Field(default_factory=list)   # 防御计划
+    opportunity_zones: list[str] = Field(default_factory=list)  # 机会区间
+    action_plan: list[str] = Field(default_factory=list)    # 行动计划
 
 
 # ── 系统提示词 ───────────────────────────────────────────────
 
-_SYSTEM_PROMPT = """你是一个加密货币庄家AI的模拟器。你的任务是站在庄家/做市商的角度，
-基于当前市场数据推演庄家接下来最可能采取的操纵策略。
+_SYSTEM_PROMPT = """你是一个加密货币庄家AI的模拟器兼博弈策略师。
+你的任务分两步：
+1. 站在庄家/做市商的角度，推演其下一步操作
+2. 基于庄家所处阶段，为散户选择最优应对策略
 
-你必须像一个追求利润最大化的庄家AI一样思考：
-1. 分析当前散户的持仓分布和止损位置
-2. 识别最容易收割的流动性区域
-3. 推演最优的操纵路径（如何用最小成本引发最大恐慌/贪婪）
-4. 预测庄家的时间窗口偏好（结算时间、低流动性时段等）
+## 第一步：模拟庄家思维
+像一个追求利润最大化的庄家AI一样思考：
+- 分析当前散户的持仓分布和止损位置
+- 识别最容易收割的流动性区域
+- 推演最优的操纵路径
+- 预测时间窗口偏好（结算时间、低流动性时段等）
 
-你的推演维度：
-- 流动性猎杀：散户止损密集区在哪里？庄家会如何扫损？
-- 情绪操控：当前市场情绪如何？庄家会利用还是逆转它？
-- 假信号制造：庄家可能制造哪些假突破/假跌破来诱导散户？
-- 时机选择：庄家最可能在什么时间段操作？（低流动性/结算前后）
-- 多阶段陷阱：庄家是否在布局多步陷阱？
+## 第二步：选择应对策略（核心改进）
+庄家不是永远的敌人。根据庄家所处阶段选择最优策略：
+
+| 庄家阶段 | 最优策略 | strategy_type | signal |
+|---------|---------|---------------|--------|
+| 吸筹期（低位建仓、链上净流出、恐慌指数低） | 跟随庄家买入 | follow | bullish |
+| 拉升期（庄家拉升前半段、量增价涨） | 顺势做多但设好止盈 | follow | bullish |
+| 试盘/洗盘（假跌破、量缩价跌） | 识别陷阱，等洗盘结束后跟随 | contra | bullish |
+| 派发期（高位放量、巨鲸转入交易所） | 减仓离场 | defend | bearish |
+| 猎杀止损（快速砸盘扫止损） | 不追空，等猎杀结束后逆向接 | contra | bullish |
+| 砸盘出货（真实出货、链上大额卖出） | 严格止损，防御为主 | defend | bearish |
+| 震荡不明（无明确方向、数据矛盾） | 观望等待明确信号 | wait | neutral |
+
+判断依据：
+- 链上数据：巨鲸净流出=吸筹, 净流入=出货
+- CVD趋势：CVD上升+价格横盘=隐性吸筹
+- 恐慌贪婪指数：极度恐慌+庄家买=经典反转窗口
+- AI操盘检测：概率高=庄家深度控盘
+- 成交量：缩量下跌=洗盘, 放量下跌=真跌
+- 大单方向：大单买入集中=真金白银建仓
 
 请以 JSON 格式回复：
 {
   "signal": "bullish" | "bearish" | "neutral",
   "confidence": 0.0-1.0,
-  "reasoning": "从庄家视角的综合推演",
+  "reasoning": "从庄家视角的综合推演+策略选择理由",
   "key_findings": ["发现1", "发现2"],
   "adversarial_analysis": {
     "dealer_intent": "庄家当前最可能的意图（一句话）",
+    "dealer_phase": "accumulation/markup/distribution/markdown/shakeout/hunt/unclear",
+    "strategy_type": "follow/defend/contra/wait",
+    "strategy_reason": "为什么选择这个策略（一句话）",
     "predicted_moves": [
       {
         "action": "操作描述",
@@ -86,17 +109,19 @@ _SYSTEM_PROMPT = """你是一个加密货币庄家AI的模拟器。你的任务�
         "trap_type": "stop_hunt/fake_breakout/squeeze/grind/none"
       }
     ],
-    "danger_zones": ["危险价位1", "危险价位2"],
+    "danger_zones": ["危险价位1"],
     "safe_zones": ["相对安全区间1"],
-    "defense_plan": ["防御建议1", "防御建议2"]
+    "opportunity_zones": ["机会区间1（如洗盘后的低吸区）"],
+    "action_plan": ["行动建议1", "行动建议2"]
   }
 }
 
 硬约束：
-- 你是在模拟庄家思维，但最终目的是帮助散户防御
-- signal 应该表示散户应该采取的方向（与庄家意图相反）
-- 必须给出具体可操作的防御建议
+- signal 表示散户当前最优操作方向，不是简单地与庄家相反
+- strategy_type 必须与 signal 和 reasoning 逻辑一致
+- action_plan 必须给出具体可操作的建议（含点位）
 - 推测必须基于数据，不能凭空编造价位
+- 当数据不足以判断庄家阶段时，strategy_type 应为 wait
 """
 
 
@@ -144,10 +169,14 @@ class AdversarialAgent(BaseAgent):
                 key_findings=result.get("key_findings", []),
                 raw_data={
                     "dealer_intent": adv.get("dealer_intent", ""),
+                    "dealer_phase": adv.get("dealer_phase", "unclear"),
+                    "strategy_type": adv.get("strategy_type", "wait"),
+                    "strategy_reason": adv.get("strategy_reason", ""),
                     "predicted_moves": adv.get("predicted_moves", []),
                     "danger_zones": adv.get("danger_zones", []),
                     "safe_zones": adv.get("safe_zones", []),
-                    "defense_plan": adv.get("defense_plan", []),
+                    "opportunity_zones": adv.get("opportunity_zones", []),
+                    "action_plan": adv.get("action_plan", adv.get("defense_plan", [])),
                 },
             )
 

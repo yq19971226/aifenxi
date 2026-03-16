@@ -320,6 +320,13 @@ export const FIELD_LABELS: Record<string, string> = {
   sync_detection: "同步运动检测",
   net_flow_direction: "净动态方向",
   entities_involved: "涉及实体",
+
+  // ── 对抗推演（多策略版）──
+  dealer_phase: "庄家阶段",
+  strategy_type: "应对策略",
+  strategy_reason: "策略理由",
+  opportunity_zones: "机会区间",
+  action_plan: "行动计划",
 };
 
 export const HIDDEN_FIELDS = new Set([
