@@ -127,12 +127,12 @@ export function ExpandedDetail({ item, capabilities = null }: ExpandedDetailProp
                     {"综合分析"}
                   </Link>
                   <Link
-                    href={`/${locale}/playbook-sim?symbol=${item.symbol}`}
+                    href={`/${locale}/adversarial?symbol=${item.symbol}`}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-white/[0.08] text-zinc-300 hover:bg-white/[0.04] transition-colors"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Activity size={12} />
-                    {"剧本推演"}
+                    {"对抗推演"}
                   </Link>
                 </div>
               </div>

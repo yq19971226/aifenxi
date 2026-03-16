@@ -440,7 +440,7 @@ export default function AutopilotsPage() {
                     animate={{ scale: 1, opacity: 1 }}
                     className="flex justify-center mt-4"
                   >
-                    <Link href={`/${locale}/playbook-sim`} className="px-6 py-2 bg-emerald-500 text-black text-sm font-bold rounded-lg hover:bg-emerald-400 transition-colors">
+                    <Link href={`/${locale}/adversarial`} className="px-6 py-2 bg-emerald-500 text-black text-sm font-bold rounded-lg hover:bg-emerald-400 transition-colors">
                       {t("step4.goCommand")}
                     </Link>
                   </motion.div>

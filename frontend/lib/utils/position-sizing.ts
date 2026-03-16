@@ -7,8 +7,14 @@
  */
 
 import type { StrategyData } from "@/lib/types/strategy";
-import type { DefenseStrategy } from "@/lib/api/playbook-sim";
 import type { SymbolOverview } from "@/lib/api/dashboard";
+
+/** Inline type — previously from playbook-sim (removed). */
+interface DefenseStrategy {
+  entry?: { price?: number };
+  stop_loss?: { price?: number };
+  take_profit?: Array<{ price?: number }>;
+}
 
 // ── Types ────────────────────────────────────────────────────
 

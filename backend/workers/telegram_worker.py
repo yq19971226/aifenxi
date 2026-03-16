@@ -43,7 +43,7 @@ _ALERT_TYPE_TO_EVENT: dict[str, str] = {
     "fear_greed_extreme": "risk_alert",
     "kill_zone_warning": "kill_zone_warning",
     "strategy_update": "strategy_update",
-    "playbook_switch": "playbook_switch",
+
 }
 
 
@@ -160,8 +160,7 @@ async def _dispatch_alert(data: dict[str, Any]) -> int:
                 ok = await _notifier.send_kill_zone_alert(chat_id, data)
             elif event_type == "strategy_update":
                 ok = await _notifier.send_strategy_alert(chat_id, data)
-            elif event_type == "playbook_switch":
-                ok = await _notifier.send_playbook_alert(chat_id, data)
+
             else:
                 ok = await _notifier.send_risk_alert(chat_id, data)
 

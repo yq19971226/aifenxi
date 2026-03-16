@@ -25,9 +25,7 @@ DEFAULT_ROUTES: dict[str, str] = {
     "onchain": "deepseek-v3.2-thinking",   # 首选 DeepSeek V3.2 Thinking，备选 claude-sonnet
     "sentiment": "grok-fast",              # 首选 Grok-4 Fast，备选 grok-code-fast
     "orderbook": "qwen3-max",              # 首选 Qwen3 Max，备选 qwen3-next-thinking
-    "playbook_dealer": "deepseek-r1",        # 剧本L2: 庄家推演
-    "playbook_defense": "claude-sonnet",     # 剧本L3: 防御反制
-    "playbook_judge": "claude-haiku",          # 剧本L4: 裁判采纳（原 grok-fast，分散限频风险）
+
     "risk": "claude-haiku",                # 首选 Claude Haiku 4.5，备选 claude-sonnet
     # 增强层
     "news_analyst": "grok-fast",           # Grok-4 Fast 实时信息
@@ -180,9 +178,7 @@ AGENT_META: list[dict[str, str]] = [
     {"agent_id": "onchain", "name": "链上数据", "desc": "巨鲸动向、交易所流入流出", "phase": "核心层"},
     {"agent_id": "sentiment", "name": "舆情分析", "desc": "恐慌贪婪指数、社交热度", "phase": "核心层"},
     {"agent_id": "orderbook", "name": "订单簿", "desc": "买卖盘深度、大单检测", "phase": "核心层"},
-    {"agent_id": "playbook_dealer", "name": "庄家AI", "desc": "站庄家视角推演操盘计划", "phase": "剧本对抗"},
-    {"agent_id": "playbook_defense", "name": "防御AI", "desc": "散户视角生成反制策略", "phase": "剧本对抗"},
-    {"agent_id": "playbook_judge", "name": "裁判AI", "desc": "综合两方输出最终建议", "phase": "剧本对抗"},
+
     {"agent_id": "risk", "name": "风险评估", "desc": "仓位风险、止损建议", "phase": "核心层"},
     {"agent_id": "news_analyst", "name": "新闻分析", "desc": "全球加密新闻解读", "phase": "增强层"},
     {"agent_id": "calendar", "name": "日历事件", "desc": "代币解锁、减半等事件影响评估", "phase": "增强层"},

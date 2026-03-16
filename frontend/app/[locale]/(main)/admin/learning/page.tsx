@@ -31,7 +31,15 @@ import {
   type WeightAuditEntry,
 } from "@/lib/api/vpd-factors";
 import { useAuth } from "@/lib/auth-context";
-import { getMarketStructureLabel } from "../../playbook-sim/playbook-constants";
+
+/** Inline helper — previously from playbook-constants (removed). */
+function getMarketStructureLabel(type: string | null | undefined): string {
+  const MAP: Record<string, string> = {
+    accumulation: "吸筹", markup: "拉升", distribution: "出货",
+    decline: "下跌", re_accumulation: "二次吸筹", capitulation: "恐慌抛售",
+  };
+  return type ? MAP[type] ?? type : "";
+}
 
 // ── Tab 定义 ──────────────────────────────────────────────────
 

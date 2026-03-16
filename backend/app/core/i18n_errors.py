@@ -202,17 +202,8 @@ _ERROR_MESSAGES: dict[str, dict[str, str]] = {
         "en": "Analysis quota exceeded",
     },
 
-    # ── 剧本 ──
-    "playbook.sim_failed": {
-        "zh-CN": "剧本演练失败",
-        "zh-TW": "劇本演練失敗",
-        "en": "Playbook simulation failed",
-    },
-    "playbook.query_failed": {
-        "zh-CN": "剧本查询失败",
-        "zh-TW": "劇本查詢失敗",
-        "en": "Playbook query failed",
-    },
+
+
 
     # ── 情绪 ──
     "sentiment.fetch_failed": {

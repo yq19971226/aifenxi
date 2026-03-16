@@ -28,7 +28,7 @@ celery_app = Celery(
         "workers.anomaly_stats_worker",
         "workers.calendar_worker",
         "workers.orderbook_worker",
-        "workers.playbook_verify_worker",
+
         "workers.cryptoquant_worker",
         "workers.fred_worker",
         "workers.snapshot_cleanup_worker",
@@ -115,10 +115,7 @@ celery_app.conf.update(
             "task": "workers.orderbook_worker.collect_orderbook_task",
             "schedule": 10.0,  # 10 秒
         },
-        "verify-playbook-predictions-every-1h": {
-            "task": "workers.playbook_verify_worker.verify_playbook_predictions_task",
-            "schedule": 3600.0,  # 1 小时
-        },
+
         "probe-proxy-recovery-every-5min": {
             "task": "workers.coinglass_worker.probe_proxy_recovery",
             "schedule": 300.0,  # 5 分钟（T7.3：定时主动恢复 proxy）

@@ -36,11 +36,11 @@ def _is_streams_unsupported(exc: Exception) -> bool:
     return "unknown command" in msg or "not supported" in msg
 
 # 只处理策略更新类型的邮件推送
-_EMAIL_EVENT_TYPES: set[str] = {"strategy_update", "playbook_switch"}
+_EMAIL_EVENT_TYPES: set[str] = {"strategy_update"}
 
 _ALERT_TYPE_TO_EVENT: dict[str, str] = {
     "strategy_update": "strategy_update",
-    "playbook_switch": "playbook_switch",
+
 }
 
 
