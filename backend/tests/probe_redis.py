@@ -29,11 +29,11 @@ for s in symbols:
 
 print("\n=== OnChain ===")
 for s in symbols:
+    gn = r.get(f"gn_onchain:{s}")
     cq = r.get(f"cq_onchain:{s}")
-    fb = r.get(f"onchain:{s}")
-    c = "OK" if cq else "MISS"
-    f = "OK" if fb else "MISS"
-    print(f"  {s}: cryptoquant={c}, fallback={f}")
+    lg = r.get(f"legacy_onchain:{s}")
+    oc = r.get(f"onchain:{s}")
+    print(f"  {s}: glassnode={'OK' if gn else 'MISS'}, cryptoquant={'OK' if cq else 'MISS'}, legacy={'OK' if lg else 'MISS'}, onchain={'OK' if oc else 'MISS'}")
 
 print("\n=== Macro ===")
 fred = r.get("fred_snapshot")
