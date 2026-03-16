@@ -1,0 +1,16 @@
+{
+  "title": "AI 對抗推演",
+  "subtitle": "站在莊家AI視角反推下一步操盤策略 · 每分鐘自動更新",
+  "refresh": "刷新",
+  "loading": "正在加載對抗推演分析...",
+  "signal": "信號方向",
+  "confidence": "置信度",
+  "strategy": "策略類型",
+  "alertLevel": "威脅等級",
+  "keyFindings": "關鍵發現",
+  "reasoning": "推理邏輯",
+  "lastUpdated": "最後更新",
+  "autoRefresh": "每60秒自動刷新",
+  "emptyTitle": "暫無對抗推演數據",
+  "emptySubtitle": "請等待系統自動分析或選擇其他交易對"
+}

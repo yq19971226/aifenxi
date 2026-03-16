@@ -9,6 +9,7 @@ export type FeatureFlags = Record<string, FeatureState>;
 
 const FEATURE_FLAG_MAP: Record<string, string> = {
   "/playbook-sim": "playbook",
+  "/adversarial": "adversarial",
   "/leaderboard": "leaderboard",
   "/tasks": "task",
   "/partner": "partner",

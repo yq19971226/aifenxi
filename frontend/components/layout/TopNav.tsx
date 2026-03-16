@@ -58,7 +58,7 @@ const MOBILE_MENU_GROUPS: MobileMenuGroup[] = [
   {
     labelKey: "tools",
     items: [
-      { key: "playbook", href: "/playbook-sim", icon: History, minRole: "user", featureFlag: "playbook" },
+      { key: "adversarial", href: "/adversarial", icon: Shield, minRole: "user", featureFlag: "adversarial" },
       { key: "autopilots", href: "/autopilots", icon: Rocket, minRole: "user" },
       { key: "leaderboard", href: "/leaderboard", icon: TrendingUp, minRole: "user", featureFlag: "leaderboard" },
     ],

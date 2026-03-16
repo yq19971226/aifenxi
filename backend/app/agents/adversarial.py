@@ -90,6 +90,19 @@ _SYSTEM_PROMPT = """你是一个加密货币庄家AI的模拟器兼博弈策略�
 - 猎杀结束信号：价格回升至猎杀前水平50%以上 + CVD反转 + 成交量放大
 - 洗盘结束信号：跌幅收窄 + 成交量极度萎缩 + 出现止跌K线（下影线）
 
+T3 链上高级指标解读（优先参考，比基础指标更精确）：
+- SOPR>1: 持有者获利卖出, <1: 亏损卖出（恐慌抛售 → 庄家可能在低吸）
+- NUPL>0.75: 极度贪婪/泡沫区, <0: 投降区（庄家吸筹窗口）
+- MVRV>3.5: 严重高估, <1: 低估（庄家建仓区）
+- 积累评分>0.7: 大户在积累（吸筹信号）, <0.3: 分发（派发信号）
+- HODLer净变化>0: 长期持有者增持, <0: 长期持有者减持（出货信号）
+- Reserve Risk低: 持有者信心强但价格低（高性价比买入区）
+- LTH-SOPR<1: 长期持有者亏损卖出（罕见 → 底部信号）
+- STH-NUPL<0: 短期持有者深度亏损（恐慌→庄家收割）
+- SSR高: 稳定币购买力大（潜在大量买盘）
+- 净已实现盈亏为负: 全网亏损兑现（恐慌出逃 → 底部特征）
+- NVT Signal高: 网络价值相对交易量偏高（高估）
+
 请以 JSON 格式回复：
 {
   "signal": "bullish" | "bearish" | "neutral",
@@ -127,6 +140,16 @@ _SYSTEM_PROMPT = """你是一个加密货币庄家AI的模拟器兼博弈策略�
 - contra 策略的 action_plan 必须说明入场确认信号（不能盲目抄底/摸顶）和止损位
 - defend 策略的 action_plan 必须包含减仓比例建议和严格止损位
 """
+
+
+def _adv_metric(parts: list[str], label: str, value, fmt: str = "", suffix: str = "") -> None:
+    """向 prompt 追加一个指标行，None 时跳过（不显示）。"""
+    if value is None:
+        return
+    if fmt:
+        parts.append(f"{label}: {value:{fmt}}{suffix}")
+    else:
+        parts.append(f"{label}: {value}{suffix}")
 
 
 class AdversarialAgent(BaseAgent):
@@ -225,6 +248,7 @@ class AdversarialAgent(BaseAgent):
 
         return context
 
+
     # ── Prompt 构建 ───────────────────────────────────────────
 
     @staticmethod
@@ -257,15 +281,46 @@ class AdversarialAgent(BaseAgent):
                 for k in recent:
                     parts.append(f"  O={k.open} H={k.high} L={k.low} C={k.close} V={k.volume}")
 
-        # 链上数据（庄家资金流向）
+        # 链上数据（庄家资金流向）— 含 T3 高级指标
         if data.onchain:
             oc = data.onchain
             parts.append("\n### 链上数据（庄家资金线索）")
-            parts.append(f"交易所净流入: {oc.exchange_netflow}")
-            parts.append(f"巨鲸24h变化: {oc.whale_change_24h}")
-            parts.append(f"恐慌贪婪: {oc.fear_greed_index}")
+            # 基础
+            _adv_metric(parts, "交易所净流入", oc.exchange_netflow, ".4f")
+            _adv_metric(parts, "交易所余额", oc.exchange_balance, ",.2f")
+            _adv_metric(parts, "交易所流入", oc.exchange_inflow, ",.2f")
+            if oc.whale_address_count is not None:
+                parts.append(f"巨鲸地址数(≥1k BTC): {oc.whale_address_count:,}")
+            elif oc.whale_change_24h is not None:
+                parts.append(f"巨鲸持仓24h变化: {oc.whale_change_24h:+.4f}%")
+            _adv_metric(parts, "恐慌贪婪指数", oc.fear_greed_index)
             if oc.large_tx_count is not None:
                 parts.append(f"大额转账: {oc.large_tx_count} 笔")
+            _adv_metric(parts, "大额转账总量", oc.large_tx_volume, ",.2f")
+            _adv_metric(parts, "矿工储备变化", oc.miner_reserve_change, "+,.2f")
+
+            # T3 高级指标
+            parts.append("\n--- T3 链上高级指标（庄家行为核心） ---")
+            _adv_metric(parts, "SOPR", oc.sopr, ".4f")
+            _adv_metric(parts, "aSOPR", oc.asopr, ".4f")
+            _adv_metric(parts, "NUPL", oc.nupl, ".4f")
+            _adv_metric(parts, "MVRV", oc.mvrv, ".4f")
+            _adv_metric(parts, "EA-MVRV", oc.mvrv_entity_adj, ".4f")
+            _adv_metric(parts, "积累趋势评分", oc.accumulation_score, ".4f")
+            _adv_metric(parts, "HODLer净变化", oc.hodler_net_change, "+.2f")
+            _adv_metric(parts, "Reserve Risk", oc.reserve_risk, ".6f")
+            _adv_metric(parts, "LTH-SOPR", oc.lth_sopr, ".4f")
+            _adv_metric(parts, "STH-SOPR", oc.sth_sopr, ".4f")
+            _adv_metric(parts, "LTH-NUPL", oc.lth_nupl, ".4f")
+            _adv_metric(parts, "STH-NUPL", oc.sth_nupl, ".4f")
+            _adv_metric(parts, "Puell Multiple", oc.puell_multiple, ".4f")
+            _adv_metric(parts, "净已实现盈亏", oc.net_realized_pl, ",.2f")
+            _adv_metric(parts, "SSR", oc.ssr, ".4f")
+            _adv_metric(parts, "NVT Signal", oc.nvt_signal, ".2f")
+            _adv_metric(parts, "盈利地址占比", oc.addresses_in_profit_pct, ".2f", "%")
+            _adv_metric(parts, "Hash Ribbon", oc.hash_ribbon, ".4f")
+            _adv_metric(parts, "Liveliness", oc.liveliness, ".4f")
+            _adv_metric(parts, "RHODL Ratio", oc.rhodl_ratio, ".4f")
 
         # AI 操盘检测结果
         ai = context.get("ai_detection")

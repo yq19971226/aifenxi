@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 const pageTitles: Record<string, string> = {
   "/dashboard": "看板",
   "/consensus": "综合分析",
-  "/playbook-sim": "剧本推演",
+  "/adversarial": "AI 对抗推演",
   "/performance": "策略绩效",
   "/alerts": "预警管理",
   "/backtest": "策略回测",
