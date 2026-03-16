@@ -485,11 +485,14 @@ class PerformanceTracker:
             return None
 
     async def _get_current_price(self, symbol: str) -> float:
-        """获取当前价格：先查 Redis 缓存，miss 则查 klines 表最新收盘价。"""
-        # 1. 尝试从 Redis 缓存获取
-        cached = await get_json(f"strategy:latest:{symbol}")
-        if cached and "price_at_generation" in cached:
-            return float(cached["price_at_generation"])
+        """获取当前价格：先查 Redis latest_price 实时缓存，miss 则查 klines 表最新收盘价。"""
+        # 1. 从 latest_price 实时缓存获取（由 Binance WS / KlineScheduler 持续更新）
+        try:
+            raw = await get_json(f"latest_price:{symbol}")
+            if isinstance(raw, (int, float)) and raw > 0:
+                return float(raw)
+        except Exception:
+            pass
 
         # 2. 尝试从 klines 表获取最新价格
         try:

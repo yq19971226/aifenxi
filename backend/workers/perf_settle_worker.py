@@ -3,6 +3,7 @@
 import asyncio
 import logging
 
+from app.core.redis import init_redis
 from app.services.performance import PerformanceTracker
 from workers.celery_app import celery_app
 from workers.db import worker_engine
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 async def _settle_all() -> dict[str, int]:
     """遍历所有未结算策略快照，逐条检查并结算。"""
+    await init_redis()
     settled = 0
     errors = 0
 
