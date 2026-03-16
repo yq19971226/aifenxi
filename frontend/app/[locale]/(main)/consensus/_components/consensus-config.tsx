@@ -14,6 +14,12 @@ export const DEFAULT_SYMBOL = "BTCUSDT";
 // ── Brand colors per model ──────────────────────────────────
 
 export const MODEL_COLORS: Record<string, { border: string; text: string; bg: string; hex: string }> = {
+  // 匿名代号（后端 API 返回的 key）
+  "axiom-alpha":             { border: "border-l-[#00D4AA]", text: "text-[#00D4AA]", bg: "bg-[#00D4AA]", hex: "#00D4AA" },
+  "axiom-beta":              { border: "border-l-[#D97706]", text: "text-[#D97706]", bg: "bg-[#D97706]", hex: "#D97706" },
+  "axiom-gamma":             { border: "border-l-[#10A37F]", text: "text-[#10A37F]", bg: "bg-[#10A37F]", hex: "#10A37F" },
+  "axiom-delta":             { border: "border-l-[#4285F4]", text: "text-[#4285F4]", bg: "bg-[#4285F4]", hex: "#4285F4" },
+  // 兼容旧缓存数据
   "deepseek-r1":             { border: "border-l-[#00D4AA]", text: "text-[#00D4AA]", bg: "bg-[#00D4AA]", hex: "#00D4AA" },
   "deepseek-v3.2-thinking":  { border: "border-l-[#00D4AA]", text: "text-[#00D4AA]", bg: "bg-[#00D4AA]", hex: "#00D4AA" },
   "claude-sonnet":           { border: "border-l-[#D97706]", text: "text-[#D97706]", bg: "bg-[#D97706]", hex: "#D97706" },
@@ -30,19 +36,25 @@ export const MODEL_COLORS: Record<string, { border: string; text: string; bg: st
 };
 
 export const MODEL_NAMES: Record<string, string> = {
-  "deepseek-r1": "DeepSeek R1",
-  "deepseek-v3.2-thinking": "DeepSeek V3.2",
-  "claude-sonnet": "Claude Sonnet",
-  "grok-fast": "Grok-4 Fast",
-  "grok-code-fast": "Grok Code",
-  "qwen3-max": "Qwen3 Max",
-  "qwen3-next-thinking": "Qwen3 Next",
-  "claude-haiku": "Claude Haiku",
-  deepseek: "DeepSeek",
-  "deepseek-reasoner": "DeepSeek R1",
-  grok: "Grok-4",
-  claude: "Claude",
-  qwen: "Qwen3",
+  // 匿名代号（后端 API 返回的 key）
+  "axiom-alpha": "Axiom Alpha",
+  "axiom-beta": "Axiom Beta",
+  "axiom-gamma": "Axiom Gamma",
+  "axiom-delta": "Axiom Delta",
+  // 兼容旧缓存数据
+  "deepseek-r1": "Axiom Alpha",
+  "deepseek-v3.2-thinking": "Axiom Alpha",
+  "claude-sonnet": "Axiom Beta",
+  "grok-fast": "Axiom Gamma",
+  "grok-code-fast": "Axiom Gamma",
+  "qwen3-max": "Axiom Delta",
+  "qwen3-next-thinking": "Axiom Delta",
+  "claude-haiku": "Axiom Beta",
+  deepseek: "Axiom Alpha",
+  "deepseek-reasoner": "Axiom Alpha",
+  grok: "Axiom Gamma",
+  claude: "Axiom Beta",
+  qwen: "Axiom Delta",
 };
 
 export const SIGNAL_COLORS: Record<string, { text: string; bg: string }> = {

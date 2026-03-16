@@ -53,7 +53,7 @@ export function WeightDonut({ weights }: { weights: Record<string, number> }) {
             return (
               <div key={key} className="flex items-center gap-1.5">
                 <span className={`h-2 w-2 rounded-full ${c.bg}`} />
-                <span className="text-xs text-zinc-400">{MODEL_NAMES[key] ?? key}</span>
+                <span className="text-xs text-zinc-400">{MODEL_NAMES[key] ?? "Axiom Agent"}</span>
                 <span className="font-mono text-xs text-zinc-300">
                   {(w * 100).toFixed(0)}%
                 </span>

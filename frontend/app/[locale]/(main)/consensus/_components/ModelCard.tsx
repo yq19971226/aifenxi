@@ -9,7 +9,7 @@ import { localizeText } from "@/components/analysis/helpers";
 export function ModelCard({ vote }: { vote: ModelVote }) {
   const t = useTranslations("consensus");
   const colors = MODEL_COLORS[vote.model_key] ?? MODEL_COLORS.deepseek;
-  const name = MODEL_NAMES[vote.model_key] ?? vote.model_key;
+  const name = MODEL_NAMES[vote.model_key] ?? "Axiom Agent";
   const sigStyle = SIGNAL_COLORS[vote.signal] ?? SIGNAL_COLORS.neutral;
 
   return (
