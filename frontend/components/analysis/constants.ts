@@ -153,10 +153,15 @@ export const FIELD_LABELS: Record<string, string> = {
   validation_type: "验证类型",
   // ── 对抗推演 ──
   dealer_intent: "庄家意图",
+  dealer_phase: "庄家阶段",
+  strategy_type: "策略类型",
+  strategy_reason: "策略理由",
   predicted_moves: "预测操作",
   danger_zones: "危险区域",
   safe_zones: "安全区域",
+  opportunity_zones: "机会区间",
   defense_plan: "防御计划",
+  action_plan: "行动计划",
   action: "操作",
   timeframe: "时间窗口",
   target_price: "目标价位",
@@ -320,13 +325,6 @@ export const FIELD_LABELS: Record<string, string> = {
   sync_detection: "同步运动检测",
   net_flow_direction: "净动态方向",
   entities_involved: "涉及实体",
-
-  // ── 对抗推演（多策略版）──
-  dealer_phase: "庄家阶段",
-  strategy_type: "应对策略",
-  strategy_reason: "策略理由",
-  opportunity_zones: "机会区间",
-  action_plan: "行动计划",
 };
 
 export const HIDDEN_FIELDS = new Set([
