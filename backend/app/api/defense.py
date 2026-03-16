@@ -142,7 +142,7 @@ async def get_alert_level(
                 collusion_detected=collusion.get("collusion_detected", False) if collusion else False,
                 collusion_risk=collusion.get("risk_level", "none") if collusion else "none",
                 danger_zones=adversarial.get("danger_zones", []) if adversarial else [],
-                defense_tips=(adversarial.get("defense_plan", []) if adversarial else [])[:3],
+                defense_tips=(adversarial.get("action_plan", adversarial.get("defense_plan", [])) if adversarial else [])[:3],
                 top_threat=_get_top_threat(adversarial, collusion),
             )
 
@@ -157,7 +157,7 @@ async def get_alert_level(
             collusion_detected=col.get("collusion_detected", False),
             collusion_risk=col.get("risk_level", "none"),
             danger_zones=adv.get("danger_zones", []),
-            defense_tips=adv.get("defense_plan", [])[:3],
+            defense_tips=adv.get("action_plan", adv.get("defense_plan", []))[:3],
             top_threat=_get_top_threat(adv, col),
         )
 
@@ -238,14 +238,21 @@ def _compute_alert_level(
             level = max(level, 2)
 
     if adversarial:
+        strategy_type = adversarial.get("strategy_type", "defend")
         moves = adversarial.get("predicted_moves", [])
         for move in moves:
             prob = move.get("probability", 0)
             trap = move.get("trap_type", "none")
             if prob >= 0.8 and trap != "none":
-                level = max(level, 3)
+                trap_level = 3
             elif prob >= 0.6 and trap != "none":
-                level = max(level, 2)
+                trap_level = 2
+            else:
+                trap_level = 0
+            # 策略感知降级
+            if strategy_type in ("follow", "contra") and trap_level > 0:
+                trap_level = max(trap_level - 2, 0)
+            level = max(level, trap_level)
 
         danger = adversarial.get("danger_zones", [])
         if len(danger) >= 3:

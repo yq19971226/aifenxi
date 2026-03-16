@@ -344,7 +344,7 @@ class AdversarialAgent(BaseAgent):
 
         parts.append(
             "\n\n请站在庄家AI的角度，推演接下来最可能的操纵策略，"
-            "并给出散户应采取的防御措施。"
+            "判断庄家当前所处阶段，并为散户选择最优应对策略（跟随/防御/逆向/观望）。"
         )
 
         return "\n".join(parts)
