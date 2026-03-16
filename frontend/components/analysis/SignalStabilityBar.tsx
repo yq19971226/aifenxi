@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Activity, TrendingUp, TrendingDown, Minus, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { authFetch } from "@/lib/api/auth";
 
 interface SignalStabilityData {
   recent_signals: Array<{
@@ -56,14 +57,11 @@ export function SignalStabilityBar({
   const [data, setData] = useState<SignalStabilityData | null>(null);
 
   useEffect(() => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("jwt") : null;
-    if (!token || !symbol || !mode) return;
+    if (!symbol || !mode) return;
 
     const fetchStability = async () => {
       try {
-        const res = await fetch(`/api/analysis/signal-stability/${symbol}/${mode}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await authFetch(`/api/analysis/signal-stability/${symbol}/${mode}`);
         if (res.ok) {
           setData(await res.json());
         }
