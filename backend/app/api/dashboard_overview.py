@@ -393,8 +393,12 @@ async def get_strategy_accuracy(
     """计算近 N 日策略方向准确率。
 
     逻辑：取 strategies 表中 direction != neutral 的记录，
-    对比创建时价格与 24 小时后的实际价格变化是否与预测方向一致。
+    仅评估创建超过 4 小时的策略（给价格足够时间验证），
+    对比创建时入场中位价与当前价格是否与预测方向一致。
+
+    置信度门槛 0.30（市场状态过滤会降低置信度，0.5 过于严格）。
     """
+    await init_redis()
     from app.core.database import AsyncSessionLocal
     from sqlalchemy import text as sa_text
 
@@ -417,9 +421,10 @@ async def get_strategy_accuracy(
                         FROM strategies s
                         WHERE s.direction IN ('long', 'short')
                           AND s.created_at > NOW() - MAKE_INTERVAL(days => :days)
-                          AND s.confidence >= 0.5
+                          AND s.created_at < NOW() - INTERVAL '4 hours'
+                          AND s.confidence >= 0.30
                     )
-                    SELECT symbol, direction, entry_low, entry_high, created_at
+                    SELECT symbol, direction, confidence, entry_low, entry_high, created_at
                     FROM ranked
                     WHERE rn = 1
                     ORDER BY created_at DESC
@@ -429,10 +434,12 @@ async def get_strategy_accuracy(
             )
             rows = result.mappings().all()
 
+        logger.info("accuracy query returned %d rows (days=%d)", len(rows), days)
+
         if not rows:
             return AccuracyResponse(period_days=days)
 
-        # 从 Redis 读取当前价格用于比较（简化版本）
+        # 对比当前价格验证方向是否正确
         hit = 0
         total = 0
         for row in rows:
@@ -446,19 +453,21 @@ async def get_strategy_accuracy(
 
             current_price_raw = await get_json(f"latest_price:{symbol}")
             if not isinstance(current_price_raw, (int, float)):
+                logger.debug("accuracy: no latest_price for %s, skip", symbol)
                 continue
 
             current_price = float(current_price_raw)
             price_change_pct = (current_price - entry_mid) / entry_mid
 
             total += 1
-            # 方向一致即命中
+            # 方向一致即命中（0.1% 最小变动过滤噪音）
             if direction == "long" and price_change_pct > 0.001:
                 hit += 1
             elif direction == "short" and price_change_pct < -0.001:
                 hit += 1
 
         accuracy = round(hit / total, 4) if total > 0 else 0.0
+        logger.info("accuracy result: %d/%d = %.2f%%", hit, total, accuracy * 100)
         return AccuracyResponse(
             hit_count=hit, total=total, accuracy=accuracy, period_days=days,
         )
