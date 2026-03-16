@@ -199,7 +199,7 @@ async def _round2_cross_review(
                 model_key=vote.model_key,
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
-                temperature=0.3,
+                temperature=0.1,
             )
             return _parse_model_vote(vote.model_key, raw)
         except Exception as exc:
@@ -239,6 +239,7 @@ def _weighted_aggregate(
     weights: dict[str, float],
     signal_threshold: float = 0.35,
     min_agreement: int = 2,
+    prev_signal: str | None = None,
 ) -> tuple[Literal["bullish", "bearish", "neutral"], float]:
     """加权聚合信号，返回 (consensus_signal, consensus_confidence)。
 
@@ -246,6 +247,10 @@ def _weighted_aggregate(
     score > signal_threshold 且 bullish_count >= min_agreement → bullish
     score < -signal_threshold 且 bearish_count >= min_agreement → bearish
     否则 → neutral
+
+    迟滞机制（Hysteresis）：
+    当 prev_signal 存在时，翻转到相反方向需要更低的阈值（flip_threshold=0.20），
+    防止信号在阈值边界来回跳动。从 prev_signal 保持原方向使用标准阈值。
     """
     weighted_score = 0.0
     total_weight = 0.0
@@ -265,12 +270,34 @@ def _weighted_aggregate(
     bullish_count = sum(1 for v in votes if v.signal == "bullish")
     bearish_count = sum(1 for v in votes if v.signal == "bearish")
 
-    if weighted_score > signal_threshold and bullish_count >= min_agreement:
-        consensus_signal: Literal["bullish", "bearish", "neutral"] = "bullish"
-    elif weighted_score < -signal_threshold and bearish_count >= min_agreement:
-        consensus_signal = "bearish"
+    # ── 迟滞逻辑 ──
+    # 翻转阈值比标准阈值更低 — 需要更强的反转信号才能翻转
+    flip_threshold = 0.20
+
+    if prev_signal == "bullish":
+        # 已看多 → 维持只需 score > 0，翻空需 score < -flip_threshold
+        if weighted_score < -flip_threshold and bearish_count >= min_agreement:
+            consensus_signal: Literal["bullish", "bearish", "neutral"] = "bearish"
+        elif weighted_score > 0 and bullish_count >= 1:
+            consensus_signal = "bullish"  # 惯性维持
+        else:
+            consensus_signal = "neutral"
+    elif prev_signal == "bearish":
+        # 已看空 → 维持只需 score < 0，翻多需 score > flip_threshold
+        if weighted_score > flip_threshold and bullish_count >= min_agreement:
+            consensus_signal = "bullish"
+        elif weighted_score < 0 and bearish_count >= 1:
+            consensus_signal = "bearish"  # 惯性维持
+        else:
+            consensus_signal = "neutral"
     else:
-        consensus_signal = "neutral"
+        # 无历史或中性 → 用标准阈值
+        if weighted_score > signal_threshold and bullish_count >= min_agreement:
+            consensus_signal = "bullish"
+        elif weighted_score < -signal_threshold and bearish_count >= min_agreement:
+            consensus_signal = "bearish"
+        else:
+            consensus_signal = "neutral"
 
     return consensus_signal, round(max(0.0, min(0.95, weighted_confidence)), 4)
 
@@ -306,10 +333,12 @@ def _round3_aggregate(
     symbol: str,
     signal_threshold: float = 0.35,
     min_agreement: int = 2,
+    prev_signal: str | None = None,
 ) -> ConsensusReport:
     """Round 3: 加权聚合 + 分歧度 + 少数派检测，生成最终报告。"""
     consensus_signal, consensus_confidence = _weighted_aggregate(
         votes, weights, signal_threshold, min_agreement,
+        prev_signal=prev_signal,
     )
     divergence = _calculate_divergence(votes)
     minority_warnings = _detect_minority(votes, consensus_signal)
@@ -392,7 +421,28 @@ async def run_nsed(market_data: MarketData) -> ConsensusReport:
         _min_agr = int(await get_config_value("consensus_min_agreement", "2"))
     except Exception:
         _sig_thr, _min_agr = 0.35, 2
-    report = _round3_aggregate(r2_votes, weights, market_data.symbol, _sig_thr, _min_agr)
+
+    # ── 迟滞锚定：读取上一次共识信号 ──
+    prev_signal: str | None = None
+    try:
+        cache_key = f"consensus:latest:{market_data.symbol}"
+        prev_report = await get_json(cache_key)
+        if prev_report and isinstance(prev_report, dict):
+            prev_signal = prev_report.get("consensus_signal")
+            if prev_signal not in ("bullish", "bearish", "neutral"):
+                prev_signal = None
+            else:
+                logger.info(
+                    "Hysteresis anchor loaded",
+                    extra={"prev_signal": prev_signal, "symbol": market_data.symbol},
+                )
+    except Exception:
+        pass  # 读取失败不影响，降级为无锚定
+
+    report = _round3_aggregate(
+        r2_votes, weights, market_data.symbol, _sig_thr, _min_agr,
+        prev_signal=prev_signal,
+    )
     logger.info(
         "Round 3 complete — consensus reached",
         extra={
@@ -400,13 +450,14 @@ async def run_nsed(market_data: MarketData) -> ConsensusReport:
             "confidence": report.consensus_confidence,
             "divergence": report.divergence,
             "minority_count": len(report.minority_warnings),
+            "prev_signal": prev_signal,
         },
     )
 
-    # 缓存到 Redis（TTL=15 分钟）
+    # 缓存到 Redis（TTL 使用合同定义）
     try:
         cache_key = f"consensus:latest:{market_data.symbol}"
-        await set_with_ttl(cache_key, report.model_dump(mode="json"), ttl_seconds=900)
+        await set_with_ttl(cache_key, report.model_dump(mode="json"), ttl_seconds=14400)
     except Exception as exc:
         logger.error("Failed to cache consensus report", extra={"error": str(exc)})
 

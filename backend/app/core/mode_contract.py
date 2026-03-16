@@ -67,7 +67,7 @@ SCALPING_CONTRACT = ModeContract(
     consensus_layer=None,
     defense_layer=(),
     timeout_seconds=90,
-    cache_ttl_seconds=120,
+    cache_ttl_seconds=480,      # 8 分钟（等 ≈2 根 5m K 线收盘）
     min_level=0,
 )
 
@@ -82,7 +82,7 @@ INTRADAY_CONTRACT = ModeContract(
     consensus_layer=None,
     defense_layer=(),
     timeout_seconds=180,
-    cache_ttl_seconds=900,
+    cache_ttl_seconds=2700,     # 45 分钟（等 ≈3 根 15m K 线收盘）
     min_level=1,
 )
 
@@ -100,7 +100,7 @@ TREND_CONTRACT = ModeContract(
     consensus_layer="nsed",
     defense_layer=("adversarial", "collusion_detector"),
     timeout_seconds=300,
-    cache_ttl_seconds=1800,
+    cache_ttl_seconds=14400,    # 4 小时（等 ≈1 根 4h K 线收盘）
     min_level=2,
 )
 

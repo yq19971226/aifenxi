@@ -151,7 +151,7 @@ class AdversarialAgent(BaseAgent):
                 model_key=_model_key,
                 system_prompt=enriched_prompt,
                 user_prompt=user_prompt,
-                temperature=0.3,
+                temperature=0.1,
                 timeout_s=110.0,
             )
 

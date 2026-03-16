@@ -206,6 +206,7 @@ def _intraday_aggregate(
     reports: list[AgentReport | None],
     agent_ids: list[str],
     regime: str | None = None,
+    prev_signal: str | None = None,
 ) -> tuple[str, float]:
     """intraday 聚合：signal_value × confidence × agent_weight × reliability_weight。
 
@@ -213,6 +214,7 @@ def _intraday_aggregate(
         reports: agent 结果列表（可能含 None）
         agent_ids: 与 reports 一一对应的 agent_id 列表
         regime: 市场状态 ("trending" / "ranging" / "volatile" / None)
+        prev_signal: 上一次分析信号（用于迟滞机制）
 
     Returns:
         (signal, confidence) 元组
@@ -250,12 +252,34 @@ def _intraday_aggregate(
     avg_score = weighted_score / total_effective_weight
     avg_confidence = weighted_confidence / total_effective_weight
 
-    if avg_score > 0.3:
-        return "bullish", round(min(avg_confidence, 1.0), 4)
-    elif avg_score < -0.3:
-        return "bearish", round(min(avg_confidence, 1.0), 4)
+    # ── 迟滞逻辑 ──
+    standard_threshold = 0.30
+    flip_threshold = 0.15  # 翻转需要更强信号
+
+    if prev_signal == "bullish":
+        if avg_score < -flip_threshold:
+            signal = "bearish"
+        elif avg_score > 0:
+            signal = "bullish"  # 惯性维持
+        else:
+            signal = "neutral"
+    elif prev_signal == "bearish":
+        if avg_score > flip_threshold:
+            signal = "bullish"
+        elif avg_score < 0:
+            signal = "bearish"  # 惯性维持
+        else:
+            signal = "neutral"
     else:
-        return "neutral", round(min(avg_confidence, 1.0), 4)
+        # 无历史或中性 → 标准阈值
+        if avg_score > standard_threshold:
+            signal = "bullish"
+        elif avg_score < -standard_threshold:
+            signal = "bearish"
+        else:
+            signal = "neutral"
+
+    return signal, round(min(avg_confidence, 1.0), 4)
 
 
 # ---------------------------------------------------------------------------

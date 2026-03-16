@@ -120,7 +120,7 @@ async def deepseek_analyze(data: MarketData) -> ModelVote:
             model_key=_model_key,
             system_prompt=_DEEPSEEK_SYSTEM,
             user_prompt=_build_deepseek_user_prompt(data),
-            temperature=0.3,
+            temperature=0.1,
         )
         return _parse_model_vote(_model_key, raw)
     except Exception as exc:
@@ -192,7 +192,7 @@ async def grok_analyze(data: MarketData) -> ModelVote:
             model_key=_model_key,
             system_prompt=_GROK_SYSTEM,
             user_prompt=_build_grok_user_prompt(data),
-            temperature=0.3,
+            temperature=0.1,
         )
         return _parse_model_vote(_model_key, raw)
     except Exception as exc:
@@ -277,7 +277,7 @@ async def claude_analyze(data: MarketData) -> ModelVote:
             model_key=_model_key,
             system_prompt=_CLAUDE_SYSTEM,
             user_prompt=_build_claude_user_prompt(data),
-            temperature=0.3,
+            temperature=0.1,
         )
         return _parse_model_vote(_model_key, raw)
     except Exception as exc:
@@ -362,7 +362,7 @@ async def qwen_analyze(data: MarketData) -> ModelVote:
             model_key=_model_key,
             system_prompt=_QWEN_SYSTEM,
             user_prompt=_build_qwen_user_prompt(data),
-            temperature=0.3,
+            temperature=0.1,
         )
         return _parse_model_vote(_model_key, raw)
     except Exception as exc:

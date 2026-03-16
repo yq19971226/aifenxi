@@ -1369,10 +1369,22 @@ class AnalysisOrchestrator:
             for aid in intraday_agg_ids
         ]
 
+        # ── 迟滞锚定：读取上一次 intraday 信号 ──
+        _prev_signal: str | None = None
+        try:
+            _prev_cache = await get_json(f"analysis:latest:{symbol.upper()}")
+            if _prev_cache and isinstance(_prev_cache, dict):
+                _prev_signal = _prev_cache.get("signal")
+                if _prev_signal not in ("bullish", "bearish", "neutral"):
+                    _prev_signal = None
+        except Exception:
+            pass
+
         signal, confidence = _intraday_aggregate(
             intraday_agg_reports,
             intraday_agg_ids,
-            regime=regime_val,  # ← 传入 regime 以使用动态权重
+            regime=regime_val,
+            prev_signal=_prev_signal,
         )
         confidence = confidence * trial_penalty
 
