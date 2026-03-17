@@ -32,7 +32,7 @@ DEEPSEEK_MODEL = "deepseek-chat"  # V3.2, 128K context
 # 系统 prompt — 专业量化因子分析师
 _SYSTEM_PROMPT = """你是一位资深的加密货币量化因子分析师。你的任务是分析多因子系统的历史表现数据，并建议优化因子权重。
 
-你管理的因子系统包含 7 个因子：
+你管理的因子系统包含 13 个因子：
 - f1_peak_divergence: 极值点量价背离（核心因子）
 - f2_volume_zscore: Log-Z-Score 成交量异常度
 - f3_cmf_divergence: Chaikin Money Flow 资金流背离
@@ -40,6 +40,12 @@ _SYSTEM_PROMPT = """你是一位资深的加密货币量化因子分析师。你
 - f5_obv_divergence: OBV 趋势背离
 - f6_derivatives_health: 衍生品健康度（OI+Funding Rate）
 - f7_vsa_efficiency: VSA K线效率分析
+- f9_bb_squeeze: 布林带挤压（波动率收缩突破信号）
+- f10_exchange_netflow: 交易所净流量（仅BTC/ETH，Glassnode）
+- f11_ls_ratio_extreme: 多空比极端（逆向拥挤信号）
+- f12_vwap_deviation: VWAP偏离（机构成本线回归）
+- f13_fear_greed: 恐惧贪婪指数（仅BTC，逆向情绪）
+- f14_mvrv: MVRV估值（仅BTC/ETH，周期定位）
 
 分析原则：
 1. 命中率高且样本量充足的因子应提高权重
@@ -48,6 +54,7 @@ _SYSTEM_PROMPT = """你是一位资深的加密货币量化因子分析师。你
 4. 所有权重之和应为 1.0
 5. 变化应该保守，单次调整幅度不超过 ±0.05
 6. 考虑因子间的互补性，不要让相关因子（如 F1 和 F5）权重之和过高
+7. 仅部分币种可用的因子（F10/F13/F14）权重不宜过高
 
 你必须返回严格的 JSON 格式。"""
 
@@ -76,7 +83,13 @@ _USER_PROMPT_TEMPLATE = """以下是过去 {days} 天的因子表现数据：
     "f4_macd_rsi_divergence": 0.xx,
     "f5_obv_divergence": 0.xx,
     "f6_derivatives_health": 0.xx,
-    "f7_vsa_efficiency": 0.xx
+    "f7_vsa_efficiency": 0.xx,
+    "f9_bb_squeeze": 0.xx,
+    "f10_exchange_netflow": 0.xx,
+    "f11_ls_ratio_extreme": 0.xx,
+    "f12_vwap_deviation": 0.xx,
+    "f13_fear_greed": 0.xx,
+    "f14_mvrv": 0.xx
   }},
   "changes": [
     {{"factor": "factor_id", "old": 0.xx, "new": 0.xx, "reason": "调整原因"}}

@@ -761,6 +761,12 @@ const FACTOR_NAMES: Record<string, string> = {
   f5_obv_divergence: "OBV趋势",
   f6_derivatives_health: "衍生品健康度",
   f7_vsa_efficiency: "VSA效率",
+  f9_bb_squeeze: "BB挤压",
+  f10_exchange_netflow: "交易所净流",
+  f11_ls_ratio_extreme: "多空比极端",
+  f12_vwap_deviation: "VWAP偏离",
+  f13_fear_greed: "恐惧贪婪",
+  f14_mvrv: "MVRV估值",
 };
 
 const FACTOR_COLORS: Record<string, string> = {
@@ -771,6 +777,12 @@ const FACTOR_COLORS: Record<string, string> = {
   f5_obv_divergence: "#10B981",
   f6_derivatives_health: "#EF4444",
   f7_vsa_efficiency: "#EC4899",
+  f9_bb_squeeze: "#A855F7",
+  f10_exchange_netflow: "#14B8A6",
+  f11_ls_ratio_extreme: "#F97316",
+  f12_vwap_deviation: "#6366F1",
+  f13_fear_greed: "#FACC15",
+  f14_mvrv: "#22D3EE",
 };
 
 function FactorTab() {
