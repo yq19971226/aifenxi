@@ -126,7 +126,10 @@
     "blockedReasoning_weekly_bias_conflict": "Short-term signal direction conflicts with the weekly trend. Positions against the higher timeframe carry elevated risk. Consider waiting for timeframe alignment.",
     "blockedReasoning_defense_risk_high": "Potential market manipulation detected with abnormal smart money activity. Trading risk is extremely high. Consider staying on the sidelines.",
     "blockedReasoning_risk_guardrail_triggered": "Risk guardrail triggered — composite risk exceeds safety thresholds. Reduce position size or wait for risk to subside.",
-    "blockedReasoning_timeout": "Analysis timed out before completing. Please retry later."
+    "blockedReasoning_timeout": "Analysis timed out before completing. Please retry later.",
+    "lowConfTitle": "Low confidence signal — for reference only",
+    "lowConfDesc": "Analysis results show some disagreement or incomplete data coverage. Consider using your own judgment or wait for a clearer signal before taking action.",
+    "weakSignal": "Weak Signal"
   },
   "snippet": {
     "title": "AI Citation Snippet",

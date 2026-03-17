@@ -113,7 +113,10 @@
     "blockedReasoning_weekly_bias_conflict": "短周期信号方向与周线级别趋势存在冲突。顺大周期逆小周期的仓位风险较高，建议等待周期共振后再建仓。",
     "blockedReasoning_defense_risk_high": "检测到当前市场可能存在操纵行为，主力资金活动异常。此时参与交易风险极高，建议回避。",
     "blockedReasoning_risk_guardrail_triggered": "系统风控护栏触发，综合风险超出安全阈值。请降低仓位或等待风险消退后再操作。",
-    "blockedReasoning_timeout": "分析过程超时，未能获取完整结果。请稍后重试。"
+    "blockedReasoning_timeout": "分析过程超时，未能获取完整结果。请稍后重试。",
+    "lowConfTitle": "当前信号置信度偏低，仅供参考",
+    "lowConfDesc": "多维分析结果存在一定分歧或部分数据域覆盖不足，建议结合自身判断谨慎操作，或等待更明确的信号出现后再做决策。",
+    "weakSignal": "信号偏弱"
   },
   "snippet": {
     "title": "共识引用片段",

@@ -68,7 +68,10 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
   const confidence = confidenceValue.toString();
   const { avgConf } = useConsensusData(report.sections);
 
-  const glowClass = rawSignal === "bullish" ? "glow-green" : rawSignal === "bearish" ? "glow-red" : "";
+  // Confidence level classification
+  const isLowConf = !isBlocked && confidenceValue > 0 && confidenceValue < 40;
+  const confBarColor = confidenceValue >= 60 ? "bg-bull" : confidenceValue >= 40 ? "bg-amber-400" : "bg-red-400";
+  const glowClass = isBlocked || isLowConf ? "" : rawSignal === "bullish" ? "glow-green" : rawSignal === "bearish" ? "glow-red" : "";
 
   return (
     <motion.div
@@ -115,7 +118,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
           rawSignal === 'bearish' ? 'border-bear/30 bg-bear/10 text-bear shadow-[0_0_20px_rgba(239,68,68,0.1)]' :
           'border-zinc-500/30 bg-zinc-500/10 text-zinc-300'
         )}>
-          <signalConfig.icon size={18} strokeWidth={3} className="animate-pulse" />
+          <signalConfig.icon size={18} strokeWidth={3} className={isLowConf ? "" : "animate-pulse"} />
           <div className="flex flex-col leading-none">
             <span className="text-[10px] uppercase font-bold tracking-widest opacity-80 mb-1">
               {t("card.decision")}
@@ -142,6 +145,21 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
             </p>
             <p className="text-xs text-zinc-400 mt-1">
               {t(`card.blockedDesc_${report.blocked_reason}`)}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Low Confidence Banner ── */}
+      {isLowConf && (
+        <div className="mx-5 mt-4 flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3">
+          <AlertTriangle className="h-5 w-5 text-amber-400 mt-0.5 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-amber-300">
+              {t("card.lowConfTitle")}
+            </p>
+            <p className="text-xs text-zinc-400 mt-1">
+              {t("card.lowConfDesc")}
             </p>
           </div>
         </div>
@@ -247,13 +265,13 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
               <div className="flex justify-between items-end">
                 <div>
                   <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-1.5">{t("card.assessment")}</p>
-                  <p className="text-xs font-mono text-emerald-400 uppercase tracking-widest font-bold">{t("card.activeTracking")}</p>
+                  <p className={cn("text-xs font-mono uppercase tracking-widest font-bold", isLowConf ? "text-amber-400" : "text-emerald-400")}>{isLowConf ? t("card.weakSignal") : t("card.activeTracking")}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-1.5">{t("card.confidence")}</p>
                   <div className="flex items-center gap-2">
                     <div className="w-16 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-bull" style={{ width: `${confidence}%` }} />
+                      <div className={`h-full ${confBarColor}`} style={{ width: `${confidence}%` }} />
                     </div>
                     <span className="text-xs font-mono font-bold text-zinc-300">{confidence}%</span>
                   </div>

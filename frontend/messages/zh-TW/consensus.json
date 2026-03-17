@@ -126,7 +126,10 @@
     "blockedReasoning_weekly_bias_conflict": "短週期信號方向與週線級別趨勢存在衝突。順大週期逆小週期的倉位風險較高，建議等待週期共振後再建倉。",
     "blockedReasoning_defense_risk_high": "檢測到當前市場可能存在操縱行為，主力資金活動異常。此時參與交易風險極高，建議迴避。",
     "blockedReasoning_risk_guardrail_triggered": "系統風控護欄觸發，綜合風險超出安全閾值。請降低倉位或等待風險消退後再操作。",
-    "blockedReasoning_timeout": "分析過程超時，未能獲取完整結果。請稍後重試。"
+    "blockedReasoning_timeout": "分析過程超時，未能獲取完整結果。請稍後重試。",
+    "lowConfTitle": "當前信號置信度偏低，僅供參考",
+    "lowConfDesc": "多維分析結果存在一定分歧或部分數據域覆蓋不足，建議結合自身判斷謹慎操作，或等待更明確的信號出現後再做決策。",
+    "weakSignal": "信號偏弱"
   },
   "snippet": {
     "title": "共識引用片段",
