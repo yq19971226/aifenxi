@@ -23,26 +23,15 @@ import type { UserInfo } from "@/lib/api/auth";
 import { EmptyPayments } from "@/components/ui/EmptyState";
 import { STATUS_STYLES, getPaymentStatusMessage } from "@/lib/payment-status";
 
-// Level names resolved via t('currentStatus.levels.X') — kept as key map for PaymentHistory
+// Level names resolved via t('currentStatus.levels.X')
 const LEVEL_NAME_KEYS: Record<number, string> = { 0: "0", 1: "1", 2: "2" };
 const LEVEL_COLORS: Record<number, string> = {
   0: "text-zinc-400",
-  1: "text-accent",
+  1: "text-indigo-400",
   2: "text-[#F5A623]",
-};
-const LEVEL_BORDER: Record<number, string> = {
-  0: "border-zinc-500/30",
-  1: "border-accent/40",
-  2: "border-[#F5A623]/40",
-};
-const LEVEL_GLOW: Record<number, string> = {
-  0: "",
-  1: "shadow-[0_0_20px_rgba(42,109,255,0.15)]",
-  2: "shadow-[0_0_20px_rgba(245,166,35,0.15)]",
 };
 
 const NETWORKS: PaymentNetwork[] = ["TRC-20", "ERC-20", "BEP-20"];
-
 const PAYMENT_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
 
 interface PlanFeature {
@@ -52,165 +41,21 @@ interface PlanFeature {
   flagship: string;
 }
 
-// PLAN_FEATURES is a static fallback only used when API doesn't return features.
-// The actual display data comes from plansData.features via API.
 const PLAN_FEATURES: PlanFeature[] = [];
 
-interface CurrentStatusCardProps {
-  user: UserInfo;
-}
+type MembershipTranslator = any; // (key: string, values?: any) => string;
 
-type MembershipTranslateValues = Record<string, string | number | Date>;
-type MembershipTranslator = (key: string, values?: MembershipTranslateValues) => string;
-
-function CurrentStatusCard({ user, t }: CurrentStatusCardProps & { t: MembershipTranslator }) {
-  const locale = useLocale();
-  const level = user.membership_level;
-  const name = t(`currentStatus.levels.${level}`);
-  const color = LEVEL_COLORS[level] ?? "text-zinc-500";
-
-  const expiresAt = user.membership_expires_at;
-  let expiryInfo: { dateStr: string; daysLeft: number } | null = null;
-  if (level > 0 && expiresAt) {
-    const expDate = new Date(expiresAt);
-    const diffMs = expDate.getTime() - Date.now();
-    const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    if (daysLeft > 0) {
-      expiryInfo = {
-        dateStr: expDate.toLocaleDateString(locale, { year: "numeric", month: "2-digit", day: "2-digit" }),
-        daysLeft,
-      };
-    }
-  }
-
-  return (
-    <div className="relative bg-black border border-white/[0.05] p-6 overflow-hidden">
-      <div className={`absolute left-0 top-0 bottom-0 w-1 ${level === 2 ? 'bg-[#F5A623]' : level === 1 ? 'bg-indigo-500' : 'bg-zinc-600'}`} />
-      <div className="flex items-center justify-between border-b border-white/[0.05] pb-4 mb-4">
-        <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500">{t('currentStatus.title')}</p>
-        <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest">{user.email}</span>
-      </div>
-      <div className="flex items-end gap-4 mt-2">
-        <span className={`text-4xl font-black font-mono tracking-tighter uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] ${color}`}>{name}</span>
-        {level > 0 ? (
-           <span className={`text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 border ${level === 2 ? 'border-[#F5A623]/30 text-[#F5A623] bg-[#F5A623]/10' : 'border-indigo-500/30 text-indigo-400 bg-indigo-500/10'}`}>生效中</span>
-        ) : (
-           <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 border border-zinc-500/30 text-zinc-400 bg-zinc-500/10">未激活</span>
-        )}
-      </div>
-      {expiryInfo && (
-        <div className={`mt-6 flex items-center justify-between p-4 border border-white/[0.05] bg-white/[0.02] text-[10px] font-mono font-bold uppercase tracking-widest ${expiryInfo.daysLeft <= 7 ? "text-red-400 border-red-500/20 bg-red-500/5" : expiryInfo.daysLeft <= 30 ? "text-amber-400" : "text-zinc-400"}`}>
-          <div className="flex items-center gap-3">
-            {expiryInfo.daysLeft <= 7 && (
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full bg-red-400 opacity-75"/>
-                <span className="relative inline-flex h-2 w-2 bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)]"/>
-              </span>
-            )}
-            <span>{t('currentStatus.expiresAt', { date: expiryInfo.dateStr })}</span>
-          </div>
-          <span className="text-zinc-500">{t('currentStatus.daysLeft', { count: expiryInfo.daysLeft })}</span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-interface PlanComparisonTableProps {
-  plansData: PlansResponse | undefined;
-}
-
-function PlanComparisonTable({ plansData, t }: PlanComparisonTableProps & { t: MembershipTranslator }) {
-  const features = plansData?.features ?? PLAN_FEATURES;
-  const proPrice = plansData?.plans?.find((p) => p.plan === 1)?.price_monthly ?? 99;
-  const flagshipPrice = plansData?.plans?.find((p) => p.plan === 2)?.price_monthly ?? 299;
-
-  return (
-    <div className="relative bg-black border border-white/[0.05] p-6 lg:p-8 mt-4 overflow-hidden">
-      <div className="absolute top-0 right-0 w-8 h-[1px] bg-white/[0.2]" />
-      <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500 mb-6">{t('planComparison.title')}</p>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm font-mono">
-          <thead>
-            <tr className="border-b border-white/[0.1]">
-              <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">{t('planComparison.feature')}</th>
-              <th className="pb-4 text-center text-[10px] font-bold text-zinc-500 tracking-widest uppercase">{t('planComparison.free')} <br/><span className="text-[9px] text-zinc-600">$0</span></th>
-              <th className="pb-4 text-center text-[10px] font-bold text-indigo-400 tracking-widest uppercase">{t('planComparison.pro')} <br/><span className="text-[9px] text-indigo-500/70">${proPrice}/{t('planSelection.perMonth')}</span></th>
-              <th className="pb-4 text-center text-[10px] font-bold text-[#F5A623] tracking-widest uppercase">{t('planComparison.flagship')} <br/><span className="text-[9px] text-[#F5A623]/70">${flagshipPrice}/{t('planSelection.perMonth')}</span></th>
-            </tr>
-          </thead>
-          <tbody>
-            {features.map((f, i) => (
-              <tr key={f.name} className={`border-b border-white/[0.02] hover:bg-white/[0.02] transition-colors ${i%2===0?'bg-white/[0.01]':''}`}>
-                <td className="py-4 text-[11px] text-zinc-400 pl-2 uppercase tracking-wider">{f.name}</td>
-                <td className="py-4 text-center text-[10px] text-zinc-600 uppercase">{f.free}</td>
-                <td className="py-4 text-center text-[10px] text-zinc-300 uppercase">{f.pro}</td>
-                <td className="py-4 text-center text-[10px] text-white font-bold uppercase">{f.flagship}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-interface PlanCardProps {
-  plan: 1 | 2;
-  name: string;
-  monthlyPrice: number;
-  totalPrice: number;
-  durationMonths: DurationMonths;
-  color: string;
-  borderColor: string;
-  glow: string;
-  selected: boolean;
-  onSelect: () => void;
-}
-
-const DURATION_LABEL_KEYS: Record<DurationMonths, string> = {
-  1: "perMonth",
-  3: "perQuarter",
-  12: "perYear",
-};
-
-function PlanCard({ plan, name, monthlyPrice, totalPrice, durationMonths, color, borderColor, glow, selected, onSelect }: PlanCardProps) {
-  const avgMonthly = durationMonths > 1 ? Math.round(totalPrice / durationMonths * 100) / 100 : monthlyPrice;
-  const hasSaving = durationMonths > 1 && avgMonthly < monthlyPrice;
-
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={`
-        relative w-full border p-6 text-left transition-all duration-300 overflow-hidden group
-        ${selected ? `${borderColor} ${glow} bg-${plan === 2 ? '[#F5A623]' : 'indigo-500'}/10` : "border-white/[0.05] bg-black/40 hover:border-white/[0.2] hover:bg-white/[0.02]"}
-      `}
-    >
-      <div className={`absolute top-0 right-0 p-2 font-mono text-[8px] uppercase transition-opacity ${selected ? `opacity-100 ${color}` : 'opacity-20 group-hover:opacity-100 group-hover:text-zinc-500'}`}>方案 {plan}</div>
-      <div className="flex items-center justify-between mb-4">
-        <span className={`text-xl font-black font-mono tracking-widest uppercase ${color} drop-shadow-[0_0_10px_currentColor]`}>{name}</span>
-        {selected && (
-          <span className="flex h-2 w-2 relative">
-            <span className={`animate-ping absolute inline-flex h-full w-full opacity-75 bg-current ${color}`}/>
-            <span className={`relative inline-flex h-2 w-2 bg-current ${color}`}/>
-          </span>
-        )}
-      </div>
-      <div className="flex items-end gap-2 mb-2">
-        <span className="font-mono text-3xl font-black text-white tracking-tighter">${totalPrice}</span>
-        <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest border-l border-white/[0.1] pl-2 pb-1.5">{DURATION_LABEL_KEYS[durationMonths]}</span>
-      </div>
-      {hasSaving && (
-        <div className="mt-4 flex items-center justify-between pt-4 border-t border-white/[0.05]">
-          <span className="text-[10px] font-mono text-zinc-600 line-through tracking-wider">原价: ${monthlyPrice}/月</span>
-          <span className="text-[10px] font-black font-mono uppercase tracking-[0.2em] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
-            省 {Math.round((1 - avgMonthly / monthlyPrice) * 100)}%
-          </span>
-        </div>
-      )}
-    </button>
-  );
+// ==========================================
+// UTILS
+// ==========================================
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleString(undefined, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function useCountdown(targetMs: number | null): string {
@@ -246,139 +91,229 @@ function useCountdown(targetMs: number | null): string {
   return remaining;
 }
 
-interface PaymentDisplayProps {
-  payment: PaymentInfo;
-  expiresAt: number;
-}
+// ==========================================
+// COMPONENTS
+// ==========================================
 
-function PaymentDisplay({ payment, expiresAt }: PaymentDisplayProps) {
-  const t = useTranslations('settings.membership');
-  const countdown = useCountdown(expiresAt);
-  const [copied, setCopied] = useState(false);
-  const isExpired = countdown === "00:00";
-  const statusStyle = STATUS_STYLES[payment.status] ?? STATUS_STYLES.pending;
-  const statusMessage = getPaymentStatusMessage(
-    payment.status,
-    payment.status_reason,
-    isExpired
-  );
+function AccountHeroStrip({ user, t }: { user: UserInfo; t: MembershipTranslator }) {
+  const locale = useLocale();
+  const level = user.membership_level;
+  const name = t(`currentStatus.levels.${level}`);
+  const color = LEVEL_COLORS[level] ?? "text-zinc-500";
+  const isPremium = level > 0;
 
-  const handleCopy = useCallback(async () => {
-    if (!payment.pay_address) return;
-    try {
-      await navigator.clipboard.writeText(payment.pay_address);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error: unknown) {
-      console.error("Copy payment address failed", error);
+  const expiresAt = user.membership_expires_at;
+  let expiryInfo: { dateStr: string; daysLeft: number } | null = null;
+  if (isPremium && expiresAt) {
+    const expDate = new Date(expiresAt);
+    const diffMs = expDate.getTime() - Date.now();
+    const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    if (daysLeft > 0) {
+      expiryInfo = {
+        dateStr: expDate.toLocaleDateString(locale, { year: "numeric", month: "2-digit", day: "2-digit" }),
+        daysLeft,
+      };
     }
-  }, [payment.pay_address]);
+  }
+
+  // Trial Integration
+  const queryClient = useQueryClient();
+  const [claiming, setClaiming] = useState(false);
+  const [trialError, setTrialError] = useState<string | null>(null);
+
+  const { data: trial } = useQuery<FreeTrialStatus>({
+    queryKey: ["freeTrial"],
+    queryFn: fetchFreeTrialStatus,
+  });
+
+  const handleClaim = useCallback(async () => {
+    if (claiming || !trial?.enabled || trial?.claimed) return;
+    setClaiming(true);
+    setTrialError(null);
+    try {
+      await claimFreeTrial();
+      queryClient.invalidateQueries({ queryKey: ["freeTrial"] });
+      queryClient.invalidateQueries({ queryKey: ["analysis-quota"] });
+    } catch (error: unknown) {
+      console.error("Claim free trial failed", error);
+      setTrialError(error instanceof Error ? error.message : "领取失败");
+    } finally {
+      setClaiming(false);
+    }
+  }, [claiming, queryClient, trial?.claimed, trial?.enabled]);
 
   return (
-    <div className="relative bg-black border border-white/[0.05] p-6 lg:p-8 mt-6">
-      <div className={`absolute top-0 right-0 w-1/3 h-[1px] ${payment.status === 'pending' ? 'bg-[#F5A623]/50' : 'bg-white/[0.1]'}`} />
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/[0.05]">
-        <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500">{t('payment.info.title')}</p>
-        <div className="flex items-center gap-4">
-          {payment.status === "pending" && !isExpired ? (
-            <div className="flex items-center gap-3 border border-[#F5A623]/30 px-3 py-1 bg-[#F5A623]/5">
-              <span className="flex h-1.5 w-1.5 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full bg-[#F5A623] opacity-75"/>
-                <span className="relative inline-flex h-1.5 w-1.5 bg-[#F5A623]"/>
-              </span>
-              <span className="text-[9px] font-bold font-mono text-zinc-400 uppercase tracking-widest">{t('payment.info.timeRemaining')}</span>
-              <span className="font-mono text-sm font-black text-[#F5A623] drop-shadow-[0_0_8px_rgba(245,166,35,0.4)]">{countdown}</span>
-            </div>
-          ) : (
-            <span className={`px-3 py-1 font-mono text-[10px] font-black uppercase tracking-[0.2em] border ${payment.status === "pending" ? "border-zinc-500/30 text-zinc-500 bg-zinc-500/10" : `${statusStyle.bg} ${statusStyle.text} border-current/30`}`}>
-              {payment.status === "pending" ? t('payment.info.expired') : statusStyle.label}
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div className="grid gap-8 sm:grid-cols-2">
-        <div>
-          <p className="text-[9px] font-bold font-mono uppercase tracking-[0.3em] text-zinc-600 mb-2">{t('payment.info.amount')}</p>
-          <p className="font-mono text-3xl font-black text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-            {payment.pay_amount} <span className="text-sm text-zinc-500 font-bold ml-1">{payment.pay_currency?.toUpperCase()}</span>
-          </p>
-        </div>
-
-        <div>
-          <p className="text-[9px] font-bold font-mono uppercase tracking-[0.3em] text-zinc-600 mb-2">{t('payment.info.address')}</p>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <code className="block flex-1 border border-white/[0.1] bg-white/[0.02] px-4 py-3 font-mono text-[10px] text-indigo-300 break-all text-center sm:text-left">
-              {payment.pay_address}
-            </code>
-            <button
-              type="button"
-              onClick={handleCopy}
-              className={`w-full sm:w-auto shrink-0 border px-6 py-3 font-mono text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:bg-white/5 ${copied ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10' : 'border-white/[0.1] text-zinc-400'}`}
-            >
-              {copied ? t('payment.info.copied') : t('payment.info.copy')}
-            </button>
+    <div className="relative w-full rounded-2xl bg-[#0a0a0a] border border-white/5 overflow-hidden group">
+      {/* Background Ambience */}
+      <div className={`absolute inset-0 opacity-10 blur-3xl transition-opacity duration-1000 ${level === 2 ? 'bg-[#F5A623]/20' : level === 1 ? 'bg-indigo-500/20' : 'bg-transparent'}`} />
+      
+      <div className="relative p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+        
+        {/* Left: User Identity */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-500">{t('currentStatus.title')}</span>
+            <span className="text-xs font-mono text-zinc-400 bg-white/[0.03] px-2 py-0.5 rounded-sm border border-white/[0.05]">{user.email}</span>
+          </div>
+          
+          <div className="flex items-end gap-4 mt-2">
+            <h2 className={`text-4xl sm:text-5xl font-black font-mono tracking-tighter uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] ${color}`}>
+              {name}
+            </h2>
+            {isPremium ? (
+              <div className="flex flex-col gap-1 pb-1">
+                 <span className={`text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-[4px] border border-current/30 ${color} bg-current/10 w-max`}>
+                   Active
+                 </span>
+                 {expiryInfo && (
+                   <span className={`text-[10px] font-mono whitespace-nowrap ${expiryInfo.daysLeft <= 7 ? "text-red-400 animate-pulse" : expiryInfo.daysLeft <= 30 ? "text-amber-400" : "text-zinc-500"}`}>
+                     {expiryInfo.daysLeft} DAYS LEFT
+                   </span>
+                 )}
+              </div>
+            ) : (
+               <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-[4px] border border-zinc-500/30 text-zinc-500 bg-zinc-500/10 mb-1 w-max">
+                 Inactive
+               </span>
+            )}
           </div>
         </div>
-      </div>
-      
-      <div className="mt-8 flex items-center justify-center sm:justify-start gap-3 pt-6 border-t border-white/[0.05]">
-         <span className={`text-[10px] font-mono font-bold uppercase tracking-widest flex items-center gap-2 ${payment.status === "pending" && isExpired ? "text-zinc-500" : statusStyle.text}`}>
-             <span className="text-zinc-600">状态:</span> {statusMessage}
-         </span>
+
+        {/* Right: Trial Card (if applicable and not premium) */}
+        {!isPremium && trial?.enabled && (
+          <div className="w-full md:w-auto shrink-0 bg-[#111] border border-indigo-500/20 rounded-xl p-5 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[40px] rounded-full pointer-events-none" />
+            <div className="relative z-10 flex flex-col sm:flex-row items-center gap-6 justify-between">
+              <div>
+                <p className="text-xs font-black font-mono uppercase tracking-[0.2em] text-white mb-1.5 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
+                  {t('freeTrial.title')}
+                </p>
+                <p className="text-[10px] text-zinc-400 font-mono tracking-wider max-w-[200px]">
+                  {trial.claimed
+                    ? trial.remaining > 0
+                      ? t('freeTrial.remaining', { count: trial.remaining })
+                      : t('freeTrial.exhausted')
+                    : t('freeTrial.description', { count: trial.total })}
+                </p>
+              </div>
+              
+              <div className="shrink-0 w-full sm:w-auto">
+                {!trial.claimed ? (
+                  <button
+                    onClick={handleClaim}
+                    disabled={claiming}
+                    className="w-full sm:w-auto relative group overflow-hidden rounded-md border border-indigo-500/40 bg-indigo-600/20 px-6 py-2.5 text-[10px] font-bold font-mono tracking-[0.2em] text-white transition-all hover:bg-indigo-600/40"
+                  >
+                    <span className="relative z-10">{claiming ? t('freeTrial.claiming') : t('freeTrial.claim')}</span>
+                    <div className="absolute inset-0 h-full w-full scale-0 rounded-md transition-all duration-300 group-hover:scale-100 group-hover:bg-indigo-500/30" />
+                  </button>
+                ) : (
+                  <span className={`inline-flex items-center justify-center w-full sm:w-auto rounded-md border px-4 py-2.5 text-[10px] font-black font-mono tracking-[0.2em] uppercase ${trial.remaining > 0 ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400' : 'border-zinc-700 bg-zinc-800/50 text-zinc-500'}`}>
+                    {trial.remaining > 0 ? `${trial.remaining} ${t('freeTrial.claimed')}` : t('freeTrial.used')}
+                  </span>
+                )}
+                {trialError && <p className="mt-2 text-[9px] text-red-400 text-center font-mono absolute -bottom-5 left-0 w-full">{trialError}</p>}
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
 }
 
-interface PaymentHistoryProps {
-  payments: PaymentInfo[];
-}
 
-function PaymentHistory({ payments }: PaymentHistoryProps) {
-  const t = useTranslations('settings.membership');
-  if (payments.length === 0) {
-    return (
-      <div className="relative bg-black border border-white/[0.05] p-20 text-center overflow-hidden">
-        <EmptyPayments />
-      </div>
-    );
-  }
+function PlanComparisonTable({ plansData, t }: { plansData: PlansResponse | undefined; t: MembershipTranslator }) {
+  const features = plansData?.features ?? PLAN_FEATURES;
+  const proPrice = plansData?.plans?.find((p) => p.plan === 1)?.price_monthly ?? 99;
+  const flagshipPrice = plansData?.plans?.find((p) => p.plan === 2)?.price_monthly ?? 299;
 
   return (
-    <div className="relative bg-black border border-white/[0.05] p-6 lg:p-8 overflow-hidden">
-      <div className="absolute top-0 right-0 w-8 h-[1px] bg-white/[0.2]" />
-      <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500 mb-6">{t('history.title')}</p>
+    <div className="rounded-2xl bg-[#0a0a0a] border border-white/5 p-6 lg:p-8 mt-6">
+      <div className="flex items-center justify-between mb-8">
+        <h3 className="text-sm font-black text-white font-mono tracking-widest uppercase flex items-center gap-3">
+           <svg className="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+           {t('planComparison.title')}
+        </h3>
+      </div>
+      
       <div className="overflow-x-auto">
-        <table className="w-full text-sm font-mono">
+        <table className="w-full text-sm font-mono whitespace-nowrap">
           <thead>
-            <tr className="border-b border-white/[0.1]">
-              <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.date')}</th>
-              <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.plan')}</th>
-              <th className="pb-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.amount')}</th>
-              <th className="pb-4 text-left pl-4 text-[10px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.network')}</th>
-              <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.status')}</th>
+            <tr>
+              <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase border-b border-white/[0.05]">{t('planComparison.feature')}</th>
+              <th className="pb-4 text-center text-[10px] font-bold text-zinc-500 tracking-widest uppercase border-b border-white/[0.05]">
+                <div className="mb-1">{t('planComparison.free')}</div>
+                <div className="text-[9px] text-zinc-700 bg-white/5 inline-block px-2 py-0.5 rounded">$0 / M</div>
+              </th>
+              <th className="pb-4 text-center text-[10px] font-bold tracking-widest uppercase border-b border-white/[0.05]">
+                <div className="mb-1 text-indigo-400">{t('planComparison.pro')}</div>
+                <div className="text-[9px] text-indigo-300/70 bg-indigo-500/10 inline-block px-2 py-0.5 rounded border border-indigo-500/20">${proPrice} / M</div>
+              </th>
+              <th className="pb-4 text-center text-[10px] font-bold tracking-widest uppercase border-b border-white/[0.05]">
+                <div className="mb-1 text-[#F5A623]">{t('planComparison.flagship')}</div>
+                <div className="text-[9px] text-[#F5A623]/70 bg-[#F5A623]/10 inline-block px-2 py-0.5 rounded border border-[#F5A623]/20">${flagshipPrice} / M</div>
+              </th>
             </tr>
           </thead>
           <tbody>
-            {payments.map((p, i) => {
+            {features.map((f, i) => (
+              <tr key={f.name} className="group transition-colors hover:bg-white/[0.02]">
+                <td className={`py-4 text-[11px] text-zinc-400 pl-2 pr-4 uppercase tracking-wider border-b border-white/[0.02] group-hover:text-white ${i === 0 ? 'pt-6' : ''}`}>{f.name}</td>
+                <td className={`py-4 text-center text-[10px] text-zinc-600 uppercase border-b border-white/[0.02] ${i === 0 ? 'pt-6' : ''}`}>{f.free}</td>
+                <td className={`py-4 text-center text-[10px] text-zinc-300 uppercase border-b border-white/[0.02] ${i === 0 ? 'pt-6' : ''}`}>{f.pro}</td>
+                <td className={`py-4 text-center text-[10px] font-bold uppercase border-b border-white/[0.02] text-[#F5A623] drop-shadow-[0_0_5px_rgba(245,166,35,0.2)] ${i === 0 ? 'pt-6' : ''}`}>{f.flagship}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+
+function PaymentHistoryBlock({ payments, t }: { payments: PaymentInfo[]; t: MembershipTranslator }) {
+  if (payments.length === 0) return null;
+
+  return (
+    <div className="mt-6 rounded-2xl bg-[#0a0a0a] border border-white/5 p-6 lg:p-8">
+      <h3 className="text-xs font-black text-zinc-500 font-mono tracking-widest uppercase flex items-center gap-3 mb-6">
+         <svg className="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+         {t('history.title')}
+      </h3>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm font-mono whitespace-nowrap">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th className="pb-3 text-left text-[9px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.date')}</th>
+              <th className="pb-3 text-left text-[9px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.plan')}</th>
+              <th className="pb-3 text-right text-[9px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.amount')}</th>
+              <th className="pb-3 pl-6 text-left text-[9px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.network')}</th>
+              <th className="pb-3 pl-4 text-left text-[9px] font-bold text-zinc-600 tracking-widest uppercase">{t('history.columns.status')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {payments.slice(0, 10).map((p, i) => {
               const st = STATUS_STYLES[p.status] ?? STATUS_STYLES.pending;
               return (
-                <tr key={p.id} className={`border-b border-white/[0.02] hover:bg-white/[0.02] transition-colors ${i%2===0?'bg-white/[0.01]':''}`}>
-                  <td className="py-4 font-mono text-[10px] text-zinc-500 uppercase tracking-widest">
-                    {p.created_at ? formatDate(p.created_at) : "—"}
+                <tr key={p.id} className="border-b border-white/[0.02] hover:bg-white/[0.02] transition-colors">
+                  <td className="py-4 font-mono text-[10px] text-zinc-500 tracking-widest">
+                    {p.created_at ? formatDate(p.created_at).replace(',', '') : "—"}
                   </td>
-                  <td className="py-4 text-[11px] text-zinc-300 uppercase tracking-wider font-bold">
+                  <td className="py-4 text-[10px] text-zinc-300 uppercase tracking-widest font-bold">
                     {t(`currentStatus.levels.${LEVEL_NAME_KEYS[p.plan] ?? p.plan}`)}
                   </td>
                   <td className="py-4 text-right font-mono text-[11px] font-black text-white">
                     ${p.amount_usd}
                   </td>
-                  <td className="py-4 text-[10px] text-zinc-500 pl-4 uppercase tracking-widest">
-                    {p.network ?? "—"}
+                  <td className="py-4 pl-6 text-[9px] text-zinc-500 uppercase tracking-widest">
+                    <span className="bg-white/[0.03] px-1.5 py-0.5 rounded border border-white/[0.05]">{p.network ?? "—"}</span>
                   </td>
-                  <td className="py-4">
-                    <span className={`inline-flex px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.2em] border ${st.text} ${st.bg} border-current/30`}>
+                  <td className="py-4 pl-4">
+                    <span className={`inline-flex px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-sm border ${st.text} ${st.bg} border-current/30`}>
                       {st.label}
                     </span>
                   </td>
@@ -392,87 +327,234 @@ function PaymentHistory({ payments }: PaymentHistoryProps) {
   );
 }
 
-function FreeTrialCard() {
-  const t = useTranslations('settings.membership');
-  const queryClient = useQueryClient();
-  const [claiming, setClaiming] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const { data: trial } = useQuery<FreeTrialStatus>({
-    queryKey: ["freeTrial"],
-    queryFn: fetchFreeTrialStatus,
-  });
+function LiveCheckoutSidebar({
+  selectedPlan, setSelectedPlan,
+  selectedDuration, setSelectedDuration,
+  selectedNetwork, setSelectedNetwork,
+  proPrice, flagshipPrice,
+  proTotal, flagshipTotal,
+  creating, error, handleCreatePayment,
+  currentPayment, paymentExpiresAt, t
+}: any) {
+  
+  const selectedTotal = selectedPlan === 1 ? proTotal : flagshipTotal;
+  const isFlagship = selectedPlan === 2;
+  const planName = t(isFlagship ? 'planSelection.plans.flagship' : 'planSelection.plans.pro');
 
-  const handleClaim = useCallback(async () => {
-    if (claiming || !trial?.enabled || trial?.claimed) return;
-    setClaiming(true);
-    setError(null);
+  const [copied, setCopied] = useState(false);
+  const handleCopy = useCallback(async () => {
+    if (!currentPayment?.pay_address) return;
     try {
-      await claimFreeTrial();
-      queryClient.invalidateQueries({ queryKey: ["freeTrial"] });
-      queryClient.invalidateQueries({ queryKey: ["analysis-quota"] });
-    } catch (error: unknown) {
-      console.error("Claim free trial failed", error);
-      setError(error instanceof Error ? error.message : "领取失败");
-    } finally {
-      setClaiming(false);
-    }
-  }, [claiming, queryClient, trial?.claimed, trial?.enabled]);
+      await navigator.clipboard.writeText(currentPayment.pay_address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {}
+  }, [currentPayment?.pay_address]);
 
-  if (!trial?.enabled) return null;
+  // Duration Options (Months)
+  const DURATION_OPTS = [
+    { m: 1 as DurationMonths, label: t('planSelection.duration.monthly'), badge: null },
+    { m: 3 as DurationMonths, label: t('planSelection.duration.quarterly'), badge: t('planSelection.duration.discount.quarterly') },
+    { m: 12 as DurationMonths, label: t('planSelection.duration.yearly'), badge: t('planSelection.duration.discount.yearly') },
+  ];
+
+  const countdown = useCountdown(paymentExpiresAt);
+  const isExpired = countdown === "00:00";
+  const st = currentPayment ? (STATUS_STYLES[currentPayment.status] ?? STATUS_STYLES.pending) : null;
+  const statusMsg = currentPayment ? getPaymentStatusMessage(currentPayment.status, currentPayment.status_reason, isExpired) : "";
 
   return (
-    <div className="relative bg-black border border-indigo-500/20 p-6 overflow-hidden">
-      <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-indigo-500/50" />
-      <div className="absolute top-0 right-0 w-8 h-[1px] bg-indigo-500/50" />
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <p className="text-[11px] font-black font-mono uppercase tracking-[0.3em] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] mb-2">{t('freeTrial.title')}</p>
-          <p className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase">
-            {trial.claimed
-              ? trial.remaining > 0
-                ? t('freeTrial.remaining', { count: trial.remaining })
-                : t('freeTrial.exhausted')
-              : t('freeTrial.description', { count: trial.total })}
-          </p>
-        </div>
-        <div className="mt-4 sm:mt-0">
-          {!trial.claimed && (
-            <button
-              type="button"
-              onClick={handleClaim}
-              disabled={claiming}
-              className="border border-indigo-500/40 bg-indigo-600/90 px-6 py-2.5 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-white hover:bg-indigo-500 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] disabled:opacity-50 transition-all duration-300"
-            >
-              {claiming ? t('freeTrial.claiming') : t('freeTrial.claim')}
-            </button>
-          )}
-          {trial.claimed && trial.remaining > 0 && (
-            <span className="inline-block border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-[10px] font-black font-mono tracking-[0.2em] text-emerald-400 uppercase">
-              {trial.remaining} {t('freeTrial.claimed')}
-            </span>
-          )}
-          {trial.claimed && trial.remaining === 0 && (
-            <span className="inline-block border border-zinc-500/30 bg-zinc-500/10 px-4 py-2 text-[10px] font-black font-mono tracking-[0.2em] text-zinc-500 uppercase">
-              {t('freeTrial.used')}
-            </span>
-          )}
-        </div>
-      </div>
-      {error && <p className="mt-4 text-[10px] font-mono text-red-400 tracking-widest uppercase">{error}</p>}
+    <div className="sticky top-24 rounded-2xl bg-[#0a0a0a] border border-white/10 p-1 overflow-hidden shadow-2xl z-10">
+       
+       {/* Ambient Glow for Flagship */}
+       {isFlagship && !currentPayment && <div className="absolute inset-x-0 -top-40 h-80 bg-[#F5A623]/20 blur-[100px] pointer-events-none" />}
+       {!isFlagship && !currentPayment && <div className="absolute inset-x-0 -top-40 h-80 bg-indigo-500/20 blur-[100px] pointer-events-none" />}
+
+       {/* Active Payment Flow Overrides Checkout Panel if pending */}
+       <AnimatePresence mode="wait">
+       {currentPayment ? (
+         <motion.div 
+            key="payment_active"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative bg-black rounded-xl p-6 lg:p-8 flex flex-col gap-6"
+          >
+            <div className="flex items-center justify-between border-b border-white/5 pb-4">
+               <div>
+                 <p className="text-[10px] font-bold font-mono text-zinc-500 tracking-widest uppercase mb-1">{t('payment.info.title')}</p>
+                 <div className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#F5A623] animate-pulse" />
+                    <span className="text-xs font-mono font-bold text-white uppercase">{t(`currentStatus.levels.${currentPayment.plan}`)}</span>
+                 </div>
+               </div>
+               
+               {currentPayment.status === "pending" && !isExpired ? (
+                  <div className="flex flex-col items-end">
+                    <span className="text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-widest mb-1">{t('payment.info.timeRemaining')}</span>
+                    <span className="font-mono text-xl font-black text-[#F5A623]">{countdown}</span>
+                  </div>
+               ) : (
+                  <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest border ${isExpired && currentPayment.status === 'pending' ? 'border-zinc-500/30 text-zinc-400 bg-zinc-500/10' : `${st?.bg} ${st?.text} border-current/30`}`}>
+                     {isExpired && currentPayment.status === 'pending' ? t('payment.info.expired') : st?.label}
+                  </span>
+               )}
+            </div>
+
+            <div className="flex flex-col gap-2 bg-white/[0.02] border border-white/5 rounded-lg p-5">
+              <p className="text-[9px] font-bold font-mono uppercase tracking-widest text-zinc-500">{t('payment.info.amount')}</p>
+              <div className="flex items-baseline gap-2">
+                <span className="font-mono text-4xl font-black text-white">{currentPayment.pay_amount}</span>
+                <span className="text-sm font-bold text-zinc-400">{currentPayment.pay_currency?.toUpperCase()}</span>
+              </div>
+              <p className="text-[10px] font-mono text-zinc-500 tracking-wide mt-1">Network: <span className="text-white ml-1">{currentPayment.network}</span></p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <p className="text-[9px] font-bold font-mono uppercase tracking-widest text-zinc-500">{t('payment.info.address')}</p>
+              <div className="relative group">
+                 <div className="absolute inset-0 bg-white/[0.03] rounded-lg -z-10 group-hover:bg-white/[0.05] transition-colors" />
+                 <p className="font-mono text-[10px] text-indigo-300 break-all leading-relaxed p-4 pr-16 border border-white/10 rounded-lg">
+                    {currentPayment.pay_address}
+                 </p>
+                 <button 
+                   onClick={handleCopy}
+                   className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black border border-white/10 rounded hover:bg-white/10 transition-colors"
+                 >
+                   {copied ? (
+                      <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                   ) : (
+                      <svg className="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                   )}
+                 </button>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-lg border border-white/5 bg-black">
+               <span className={`text-[10px] font-mono font-bold uppercase tracking-widest flex items-center gap-2 ${currentPayment.status === "pending" && isExpired ? "text-zinc-500" : st?.text}`}>
+                   <span className="h-1.5 w-1.5 rounded-full bg-current opacity-70" />
+                   {statusMsg}
+               </span>
+               <p className="mt-2 text-[9px] text-zinc-500 font-mono italic">Please transfer the exact amount within the time limit. The system will auto-confirm upon blockchain confirmation.</p>
+            </div>
+         </motion.div>
+       ) : (
+         <motion.div 
+            key="checkout_form"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="relative bg-[#0f0f0f] rounded-xl p-5 lg:p-7 flex flex-col gap-6"
+          >
+            <h3 className="text-xs font-black text-white font-mono tracking-widest uppercase border-b border-white/5 pb-4">{t('planSelection.title')} Checkout</h3>
+
+            {/* Plan Toggle */}
+            <div className="flex p-1 bg-black rounded-lg border border-white/10 relative">
+               <button 
+                 onClick={() => setSelectedPlan(1)}
+                 className={`flex-1 relative z-10 py-3 text-xs font-black font-mono tracking-widest uppercase transition-colors rounded-md ${!isFlagship ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+               >
+                  {t('planSelection.plans.pro')}
+               </button>
+               <button 
+                 onClick={() => setSelectedPlan(2)}
+                 className={`flex-1 relative z-10 py-3 text-xs font-black font-mono tracking-widest uppercase transition-colors rounded-md ${isFlagship ? 'text-black' : 'text-zinc-500 hover:text-zinc-300'}`}
+               >
+                  {t('planSelection.plans.flagship')}
+               </button>
+               
+               {/* Animated Slider */}
+               <div 
+                 className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-md transition-all duration-500 ease-out-expo ${isFlagship ? 'left-1/2 bg-[#F5A623] shadow-[0_0_15px_rgba(245,166,35,0.4)]' : 'left-1 bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.4)]'}`}
+               />
+            </div>
+
+            {/* Billing Cycle */}
+            <div className="flex flex-col gap-3">
+              <span className="text-[9px] font-black text-zinc-500 tracking-widest uppercase font-mono">Billing Cycle</span>
+              <div className="grid grid-cols-3 gap-2">
+                {DURATION_OPTS.map(opt => (
+                  <button 
+                    key={opt.m}
+                    onClick={() => setSelectedDuration(opt.m)}
+                    className={`relative rounded-md border py-3 flex flex-col items-center justify-center gap-1 transition-all ${selectedDuration === opt.m ? 'bg-white/10 border-white/30 shadow-inner' : 'bg-black/50 border-white/5 hover:border-white/10 hover:bg-white/5'}`}
+                  >
+                    <span className={`text-[10px] font-black font-mono uppercase tracking-wider ${selectedDuration === opt.m ? 'text-white' : 'text-zinc-500'}`}>{opt.label}</span>
+                    {opt.badge && (
+                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-[1px] bg-red-500/20 border border-red-500/30 text-red-400 text-[8px] font-bold rounded-sm whitespace-nowrap">
+                        {opt.badge}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Network Protocol */}
+            <div className="flex flex-col gap-3">
+              <span className="text-[9px] font-black text-zinc-500 tracking-widest uppercase font-mono">{t('payment.network')} • USDT Only</span>
+              <div className="grid grid-cols-3 gap-2">
+                {NETWORKS.map(net => (
+                  <button 
+                    key={net}
+                    onClick={() => setSelectedNetwork(net)}
+                    className={`rounded-md border py-2 text-[10px] font-bold font-mono tracking-wider transition-all ${selectedNetwork === net ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400' : 'bg-black/50 border-white/5 text-zinc-500 hover:text-zinc-300'}`}
+                  >
+                    {net}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Total / Summary */}
+            <div className="mt-4 pt-6 border-t border-white/5 flex flex-col gap-4">
+               <div className="flex items-end justify-between">
+                 <div className="flex flex-col">
+                   <span className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase mb-1">Total Due</span>
+                   <span className="text-zinc-400 text-xs font-mono">{planName} · {DURATION_OPTS.find(x => x.m === selectedDuration)?.label}</span>
+                 </div>
+                 <div className="text-right">
+                   <div className="flex items-end gap-1 text-white pb-0.5">
+                     <span className="text-xl font-bold font-mono">$</span>
+                     <span className="text-4xl font-black font-mono leading-none tracking-tighter">{selectedTotal}</span>
+                   </div>
+                   {selectedDuration > 1 && (
+                     <span className="text-[10px] text-emerald-400 font-mono tracking-tight bg-emerald-500/10 px-1.5 py-[1px] rounded inline-block mt-1">
+                       Avg ${(selectedTotal/selectedDuration).toFixed(2)} / MO
+                     </span>
+                   )}
+                 </div>
+               </div>
+
+               <button
+                 onClick={handleCreatePayment}
+                 disabled={creating}
+                 className={`group relative w-full rounded-lg h-14 overflow-hidden mt-2 font-mono text-xs font-black uppercase tracking-[0.2em] transition-all disabled:opacity-50 disabled:cursor-not-allowed ${isFlagship ? 'bg-[#F5A623] hover:bg-[#F5A623]/90 text-black shadow-[0_0_20px_rgba(245,166,35,0.2)] hover:shadow-[0_0_30px_rgba(245,166,35,0.4)]' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)]'}`}
+               >
+                 <span className="relative z-10 flex items-center justify-center gap-2">
+                   {creating ? (
+                     <><span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" /> PROCCESSING...</>
+                   ) : (
+                     <>PAY {selectedTotal} USDT <svg className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${isFlagship ? 'text-black/50' : 'text-white/50'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></>
+                   )}
+                 </span>
+               </button>
+               
+               {error && (
+                  <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-md animate-in slide-in-from-top-2">
+                    <p className="text-[10px] font-mono text-center font-bold text-red-400">{error}</p>
+                  </div>
+               )}
+            </div>
+         </motion.div>
+       )}
+       </AnimatePresence>
     </div>
   );
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString(undefined, {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+// ==========================================
+// MAIN PAGE VIEW
+// ==========================================
 
 export default function MembershipPage() {
   const t = useTranslations('settings.membership');
@@ -483,6 +565,7 @@ export default function MembershipPage() {
   const [paymentExpiresAt, setPaymentExpiresAt] = useState<number | null>(null);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
   const queryClient = useQueryClient();
   const completedSyncRef = useRef(false);
 
@@ -499,9 +582,7 @@ export default function MembershipPage() {
   const { history, currentPayment: syncedCurrentPayment } = usePaymentStatusSync(currentPayment);
 
   useEffect(() => {
-    if (!currentPayment || !syncedCurrentPayment) {
-      return;
-    }
+    if (!currentPayment || !syncedCurrentPayment) return;
     if (
       currentPayment.payment_id === syncedCurrentPayment.payment_id && (
         currentPayment.status !== syncedCurrentPayment.status ||
@@ -540,7 +621,6 @@ export default function MembershipPage() {
 
   const proTotal = getPlanTotal(proPlan, selectedDuration);
   const flagshipTotal = getPlanTotal(flagshipPlan, selectedDuration);
-  const selectedTotal = selectedPlan === 1 ? proTotal : flagshipTotal;
 
   const handleCreatePayment = useCallback(async () => {
     setCreating(true);
@@ -555,137 +635,42 @@ export default function MembershipPage() {
       setPaymentExpiresAt(Date.now() + PAYMENT_TIMEOUT_MS);
       void queryClient.invalidateQueries({ queryKey: ["paymentHistory"] });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "创建支付失败";
-      setError(msg);
+      setError(err instanceof Error ? err.message : "创建支付失败");
     } finally {
       setCreating(false);
     }
   }, [queryClient, selectedPlan, selectedNetwork, selectedDuration]);
 
   return (
-    <div className="flex flex-col gap-10 p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto min-h-screen">
-      <div className="pb-6 border-b border-white/[0.05]">
-        <h1 className="text-3xl font-black text-white font-mono tracking-widest uppercase mb-2">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto text-white selection:bg-indigo-500/30">
+      <div className="mb-10 lg:mb-12">
+        <h1 className="text-3xl lg:text-4xl font-black font-mono tracking-widest uppercase mb-3">
            {t('title')}
         </h1>
-        <p className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-[0.3em]">会员状态 & 升级</p>
+        <p className="text-[11px] font-bold font-mono text-zinc-500 uppercase tracking-[0.3em]">Billing & Subscriptions</p>
       </div>
 
-      {user && <CurrentStatusCard user={user} t={t} />}
-
-      <FreeTrialCard />
-
-      <PlanComparisonTable plansData={plansData} t={t} />
-
-      <div className="relative bg-black border border-white/[0.05] p-6 lg:p-8 overflow-hidden">
-        <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20" />
-        <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20" />
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8 pb-6 border-b border-white/[0.05]">
-          <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500">{t('planSelection.title')}</p>
-
-          <div className="inline-flex bg-black border border-white/[0.1] p-1 shadow-inner">
-            {([1, 3, 12] as DurationMonths[]).map((dur) => {
-              const labelKeys: Record<DurationMonths, string> = { 1: "monthly", 3: "quarterly", 12: "yearly" };
-              const badgeKeys: Record<DurationMonths, string | null> = { 1: null, 3: "quarterly", 12: "yearly" };
-              return (
-                <button
-                  key={dur}
-                  type="button"
-                  onClick={() => setSelectedDuration(dur)}
-                  className={`relative px-6 py-2.5 text-[10px] font-black font-mono uppercase tracking-widest transition-all duration-300 ${
-                    selectedDuration === dur
-                      ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.4)]"
-                      : "text-zinc-500 hover:text-white"
-                  }`}
-                >
-                  {t(`planSelection.duration.${labelKeys[dur]}`)}
-                  {badgeKeys[dur] && (
-                    <span className="absolute -top-2 -right-2 text-[8px] font-bold text-bull bg-[var(--color-bull)]/20 border border-[var(--color-bull)]/40 px-1.5 py-0.5 shadow-sm">
-                      {t(`planSelection.duration.discount.${badgeKeys[dur]}`)}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        {/* LEFT COLUMN: Data & Tables */}
+        <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-8">
+          {user && <AccountHeroStrip user={user} t={t} />}
+          <PlanComparisonTable plansData={plansData} t={t} />
+          <PaymentHistoryBlock payments={history} t={t} />
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <PlanCard
-            plan={1}
-            name={t('planSelection.plans.pro')}
-            monthlyPrice={proPrice}
-            totalPrice={proTotal}
-            durationMonths={selectedDuration}
-            color="text-indigo-400"
-            borderColor="border-indigo-500/50"
-            glow={LEVEL_GLOW[1]}
-            selected={selectedPlan === 1}
-            onSelect={() => setSelectedPlan(1)}
-          />
-          <PlanCard
-            plan={2}
-            name={t('planSelection.plans.flagship')}
-            monthlyPrice={flagshipPrice}
-            totalPrice={flagshipTotal}
-            durationMonths={selectedDuration}
-            color="text-[#F5A623]"
-            borderColor={LEVEL_BORDER[2]}
-            glow={LEVEL_GLOW[2]}
-            selected={selectedPlan === 2}
-            onSelect={() => setSelectedPlan(2)}
+        {/* RIGHT COLUMN: Sticky Checkout Terminal */}
+        <div className="lg:col-span-5 xl:col-span-4 relative">
+          <LiveCheckoutSidebar 
+            selectedPlan={selectedPlan} setSelectedPlan={setSelectedPlan}
+            selectedDuration={selectedDuration} setSelectedDuration={setSelectedDuration}
+            selectedNetwork={selectedNetwork} setSelectedNetwork={setSelectedNetwork}
+            proPrice={proPrice} flagshipPrice={flagshipPrice}
+            proTotal={proTotal} flagshipTotal={flagshipTotal}
+            creating={creating} error={error} handleCreatePayment={handleCreatePayment}
+            currentPayment={syncedCurrentPayment} paymentExpiresAt={paymentExpiresAt}
+            t={t}
           />
         </div>
-
-        <div className="mt-10 pt-8 border-t border-white/[0.05]">
-          <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500 mb-4">{t('payment.network')}</p>
-          <div className="flex flex-wrap gap-4">
-            {NETWORKS.map((net) => (
-              <button
-                key={net}
-                type="button"
-                onClick={() => setSelectedNetwork(net)}
-                className={`
-                  border px-6 py-3 text-[11px] font-black font-mono uppercase tracking-widest transition-all duration-300
-                  ${
-                    selectedNetwork === net
-                      ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.15)]"
-                      : "bg-black text-zinc-600 border-white/[0.1] hover:border-white/[0.3] hover:text-zinc-400"
-                  }
-                `}
-              >
-                {net}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleCreatePayment}
-          disabled={creating}
-          className="mt-10 w-full border border-indigo-500/40 bg-indigo-600/90 px-8 py-5 text-sm font-black font-mono tracking-[0.2em] uppercase text-white transition-all duration-300 hover:bg-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] disabled:opacity-40 disabled:hover:bg-indigo-600"
-        >
-          {creating ? t('payment.creating') : `${t('payment.createButton', { amount: selectedTotal })}`}
-        </button>
-
-        {error && (
-          <div className="mt-4 border border-red-500/30 bg-red-500/10 px-4 py-3 text-center">
-             <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-red-400">{error}</p>
-          </div>
-        )}
-      </div>
-
-      <AnimatePresence>
-        {syncedCurrentPayment && paymentExpiresAt && (
-          <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} exit={{opacity:0}}>
-             <PaymentDisplay payment={syncedCurrentPayment} expiresAt={paymentExpiresAt} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="mt-4">
-        <PaymentHistory payments={history} />
       </div>
     </div>
   );
