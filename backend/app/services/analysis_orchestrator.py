@@ -1113,7 +1113,7 @@ class AnalysisOrchestrator:
                     "评分": f"{vpd.score:+.3f}",
                     "等级": vpd.grade,
                     "置信度修正": f"×{vpd.confidence_modifier}",
-                    "位置": vpd.position,
+                    "位置": {"above_value": "价值区上方", "below_value": "价值区下方"}.get(vpd.position, "价值区内"),
                     "数据完整度": f"{vpd.data_completeness:.0%}",
                 }
                 for f in vpd.factors:
@@ -1496,7 +1496,7 @@ class AnalysisOrchestrator:
                 "评分": f"{vpd.score:+.3f}",
                 "等级": vpd.grade,
                 "信号参与": "是（作为第5个虚拟Agent参与聚合）" if vpd.data_completeness >= 0.5 else "否（数据不完整）",
-                "位置": vpd.position,
+                "位置": {"above_value": "价值区上方", "below_value": "价值区下方"}.get(vpd.position, "价值区内"),
                 "数据完整度": f"{vpd.data_completeness:.0%}",
             }
             for f in vpd.factors:
@@ -2144,7 +2144,7 @@ class AnalysisOrchestrator:
                     "评分": f"{vpd.score:+.3f}",
                     "等级": vpd.grade,
                     "置信度修正": f"×{vpd.confidence_modifier}",
-                    "位置": vpd.position,
+                    "位置": {"above_value": "价值区上方", "below_value": "价值区下方"}.get(vpd.position, "价值区内"),
                     "数据完整度": f"{vpd.data_completeness:.0%}",
                 }
                 for f in vpd.factors:
