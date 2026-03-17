@@ -303,19 +303,30 @@ async def track_outcomes():
             tracking_id = row[5]
             existing_15m, existing_1h, existing_4h, existing_24h = row[6], row[7], row[8], row[9]
 
-            # 从 Redis 获取当前价格（尝试多种 key 格式）
+            # 从 Redis 获取当前价格
             sym_upper = symbol.upper()
             current_price = 0.0
-            for key_pattern in [f"market:{sym_upper}", f"kline:{sym_upper}:5m", f"kline:{sym_upper}:15m"]:
-                market_data = await get_json(key_pattern)
-                if market_data:
-                    current_price = float(
-                        market_data.get("price",
-                        market_data.get("close",
-                        market_data.get("c", 0)))
-                    )
-                    if current_price > 0:
-                        break
+
+            # 1) 优先读 latest_price（标量值，由 kline_scheduler 写入）
+            try:
+                from app.core.redis import get_redis_pool as _get_pool
+                _raw = await _get_pool().get(f"latest_price:{sym_upper}")
+                if _raw:
+                    current_price = float(_raw)
+            except Exception:
+                pass
+
+            # 2) 回退：从 klines 列表取最新 close
+            if current_price <= 0:
+                for itv in ["5m", "15m", "1h"]:
+                    kline_list = await get_json(f"klines:{sym_upper}:{itv}")
+                    if kline_list and isinstance(kline_list, list) and len(kline_list) > 0:
+                        last = kline_list[-1]
+                        if isinstance(last, dict):
+                            current_price = float(last.get("close", last.get("c", 0)))
+                        if current_price > 0:
+                            break
+
             if current_price <= 0:
                 continue
 
