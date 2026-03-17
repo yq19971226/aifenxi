@@ -72,12 +72,22 @@ class CoinGlassWSClient:
 
         try:
             extra_headers = {"CG-API-KEY": api_key}
-            self._ws = await websockets.connect(
-                _WS_URL,
-                additional_headers=extra_headers,
-                ping_interval=30,
-                ping_timeout=10,
-            )
+            # websockets >=13.0 renamed additional_headers → extra_headers
+            try:
+                self._ws = await websockets.connect(
+                    _WS_URL,
+                    extra_headers=extra_headers,
+                    ping_interval=30,
+                    ping_timeout=10,
+                )
+            except TypeError:
+                # Fallback for older websockets versions
+                self._ws = await websockets.connect(
+                    _WS_URL,
+                    additional_headers=extra_headers,
+                    ping_interval=30,
+                    ping_timeout=10,
+                )
             self._running = True
             self._reconnect_count = 0
             logger.info("ws_connected", url=_WS_URL, tier=tier.value)
