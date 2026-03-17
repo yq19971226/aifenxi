@@ -168,14 +168,12 @@ class AdversarialAgent(BaseAgent):
         # 3. 调用 deepseek-reasoner 进行深度博弈推理
         try:
             enriched_prompt = await self._enrich_prompt(_SYSTEM_PROMPT, data.symbol)
-            from app.core.model_router import get_model_for_agent
-            _model_key = await get_model_for_agent("adversarial")
-            result = await llm_client.call_model(
-                model_key=_model_key,
+            from app.core.model_router import call_with_fallback
+            _model_key, result = await call_with_fallback(
+                "adversarial",
                 system_prompt=enriched_prompt,
                 user_prompt=user_prompt,
                 temperature=0.1,
-                timeout_s=110.0,
             )
 
             signal = result.get("signal", "neutral")

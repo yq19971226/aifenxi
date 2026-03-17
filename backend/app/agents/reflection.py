@@ -122,14 +122,12 @@ class ReflectionAgent:
 
         # 3. 调用 DeepSeek-Reasoner 深度推理
         try:
-            from app.core.model_router import get_model_for_agent
-            _model_key = await get_model_for_agent("reflection")
-            result = await llm_client.call_model(
-                model_key=_model_key,
+            from app.core.model_router import call_with_fallback
+            _model_key, result = await call_with_fallback(
+                "reflection",
                 system_prompt=_REFLECTION_SYSTEM,
                 user_prompt=user_prompt,
                 temperature=0.2,
-                timeout_s=60.0,
             )
         except Exception as exc:
             logger.error("ReflectionAgent LLM call failed", extra={"error": str(exc)})

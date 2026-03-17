@@ -167,10 +167,9 @@ class TechnicalAgent(BaseAgent):
             locale = getattr(data, "locale", "zh-CN")
             system_prompt = get_system_prompt("technical", locale)
             enriched_prompt = await self._enrich_prompt(system_prompt, data.symbol)
-            from app.core.model_router import get_model_for_agent
-            _model_key = await get_model_for_agent("technical")
-            result = await llm_client.call_model(
-                model_key=_model_key,
+            from app.core.model_router import call_with_fallback
+            _model_key, result = await call_with_fallback(
+                "technical",
                 system_prompt=enriched_prompt,
                 user_prompt=user_prompt,
             )

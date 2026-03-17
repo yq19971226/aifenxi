@@ -117,10 +117,9 @@ class NewsAnalystAgent(BaseAgent):
         # 3. 调用 Grok-4（实时信息整合最佳）
         try:
             enriched_prompt = await self._enrich_prompt(_SYSTEM_PROMPT, data.symbol)
-            from app.core.model_router import get_model_for_agent
-            _model_key = await get_model_for_agent("news_analyst")
-            result = await llm_client.call_model(
-                model_key=_model_key,
+            from app.core.model_router import call_with_fallback
+            _model_key, result = await call_with_fallback(
+                "news_analyst",
                 system_prompt=enriched_prompt,
                 user_prompt=user_prompt,
             )

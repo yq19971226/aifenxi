@@ -158,10 +158,9 @@ class CollusionDetector(BaseAgent):
         # 4. 调用 Claude（逻辑一致性 + 链上时序分析最佳）
         try:
             enriched_prompt = await self._enrich_prompt(_SYSTEM_PROMPT, data.symbol)
-            from app.core.model_router import get_model_for_agent
-            _model_key = await get_model_for_agent("collusion_detector")
-            result = await llm_client.call_model(
-                model_key=_model_key,
+            from app.core.model_router import call_with_fallback
+            _model_key, result = await call_with_fallback(
+                "collusion_detector",
                 system_prompt=enriched_prompt,
                 user_prompt=user_prompt,
                 temperature=0.2,

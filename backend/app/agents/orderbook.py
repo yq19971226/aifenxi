@@ -166,10 +166,9 @@ class OrderBookAgent(BaseAgent):
 
         try:
             enriched_prompt = await self._enrich_prompt(_SYSTEM_PROMPT, data.symbol)
-            from app.core.model_router import get_model_for_agent
-            _model_key = await get_model_for_agent("orderbook")
-            result = await llm_client.call_model(
-                model_key=_model_key,
+            from app.core.model_router import call_with_fallback
+            _model_key, result = await call_with_fallback(
+                "orderbook",
                 system_prompt=enriched_prompt,
                 user_prompt=user_prompt,
             )
