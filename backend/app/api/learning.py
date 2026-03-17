@@ -9,9 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.deps import UserInfo, require_admin
 from app.services.learning_service import LearningService
-from app.services.playbook_prediction_maintenance import (
-    backfill_playbook_prediction_market_structures,
-)
+
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +49,6 @@ async def performance_review(
     """绩效回顾 — 统计 + 趋势 + 智能体准确率 + 信号分布 + 按模式胜率。"""
     svc = LearningService(session)
     try:
-        await backfill_playbook_prediction_market_structures(session)
         return await svc.get_performance_review(days=days, symbol=symbol)
     except Exception as exc:
         logger.error("绩效回顾查询失败: %s", exc)

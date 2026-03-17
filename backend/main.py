@@ -37,13 +37,13 @@ from app.api.push import router as push_router
 from app.api.symbols import router as symbols_router
 from app.api.ws import router as ws_router, start_stream_consumers, stop_stream_consumers
 from app.api.datasources import router as datasources_router
-from app.api.playbook import router as playbook_router
+
 from app.api.reflection import router as reflection_router
 from app.api.defense import router as defense_router
 from app.api.admin_models import router as admin_models_router
 from app.api.learning import router as learning_router
 from app.api.membership import router as membership_router
-from app.api.playbook_sim import router as playbook_sim_router, admin_router as playbook_sim_admin_router
+
 from app.api.backtest import router as backtest_router
 from app.api.partner import user_router as partner_user_router, admin_router as partner_admin_router, withdrawal_admin_router
 from app.api.tasks import user_router as tasks_user_router, admin_router as tasks_admin_router
@@ -57,9 +57,7 @@ from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.redis import init_redis, close_redis
 from app.core.sentry import init_sentry
-from app.services.playbook_prediction_maintenance import (
-    backfill_playbook_prediction_market_structures,
-)
+
 from app.middleware.crawler_tracker import AICrawlerMiddleware
 
 _DEFAULT_KLINE_INTERVALS_CSV = ",".join(ALL_MODE_KLINE_INTERVALS)
@@ -100,49 +98,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     except Exception as exc:
         import logging
         logging.getLogger(__name__).warning("params_changelog 表初始化失败: %s", exc)
-    # 确保 playbook_predictions 表存在（D5）
-    try:
-        async with AsyncSessionLocal() as session:
-            _spk = serial_pk()
-            _v20 = varchar(20)
-            _v100 = varchar(100)
-            _ts = timestamptz_default()
-            await session.execute(text(f"""
-                CREATE TABLE IF NOT EXISTS playbook_predictions (
-                    id {_spk},
-                    symbol {_v20} NOT NULL,
-                    playbook_name {_v100} NOT NULL,
-                    match_pct FLOAT DEFAULT 0,
-                    current_stage_idx INT DEFAULT -1,
-                    stages_json TEXT DEFAULT '[]',
-                    created_at {_ts},
-                    verified_stages INT DEFAULT 0,
-                    status {_v20} DEFAULT 'active',
-                    final_accuracy FLOAT DEFAULT NULL,
-                    published BOOLEAN DEFAULT FALSE,
-                    signal {_v20} DEFAULT 'neutral',
-                    market_structure_type VARCHAR(64) DEFAULT NULL,
-                    snapshot_price FLOAT DEFAULT NULL,
-                    stage_entry_price FLOAT DEFAULT NULL,
-                    stage_entered_at TIMESTAMP DEFAULT NULL,
-                    failure_reason TEXT DEFAULT NULL,
-                    risk_flag BOOLEAN DEFAULT FALSE,
-                    risk_note TEXT DEFAULT NULL,
-                    dominant_factors_json TEXT DEFAULT NULL,
-                    ranking_reason_summary TEXT DEFAULT NULL,
-                    decision_sentence TEXT DEFAULT NULL,
-                    inferred_market_structures_json TEXT DEFAULT NULL,
-                    matched_confidence_boosters_json TEXT DEFAULT NULL,
-                    matched_invalidation_signals_json TEXT DEFAULT NULL,
-                    structure_explanation TEXT DEFAULT NULL
-                )
-            """))
-            await session.commit()
-            await backfill_playbook_prediction_market_structures(session)
-            await session.commit()
-    except Exception as exc:
-        import logging
-        logging.getLogger(__name__).warning("playbook_predictions 建表失败: %s", exc)
+
     # 确保 push_templates 表存在（F1）
     try:
         async with AsyncSessionLocal() as session:
@@ -328,7 +284,7 @@ app.include_router(coingecko_router)
 app.include_router(consensus_router)
 app.include_router(payment_router)
 app.include_router(symbols_router)
-app.include_router(playbook_router)
+
 app.include_router(reflection_router)
 app.include_router(defense_router)
 app.include_router(ws_router)
@@ -339,8 +295,7 @@ app.include_router(partner_admin_router)
 app.include_router(withdrawal_admin_router)
 app.include_router(learning_router)
 app.include_router(membership_router)
-app.include_router(playbook_sim_router)
-app.include_router(playbook_sim_admin_router)
+
 app.include_router(backtest_router)
 app.include_router(tasks_user_router)
 app.include_router(tasks_admin_router)

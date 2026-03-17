@@ -35,7 +35,7 @@ interface EventMeta {
 }
 
 const EVENT_KEYS: (keyof PushSettings["events"])[] = [
-  "strategy_update", "price_alert", "playbook_switch",
+  "strategy_update", "price_alert",
   "risk_warning", "defense_alert", "high_confidence_signal", "strategy_settlement",
 ];
 
@@ -48,7 +48,7 @@ const DEFAULT_SETTINGS: PushSettings = {
   events: {
     strategy_update: true,
     price_alert: true,
-    playbook_switch: false,
+
     risk_warning: true,
     defense_alert: true,
     high_confidence_signal: true,

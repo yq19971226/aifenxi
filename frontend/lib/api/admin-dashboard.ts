@@ -46,7 +46,6 @@ export async function fetchLLMCost(): Promise<LLMCostSummary> {
 }
 
 export interface AdminBadges {
-  playbookReview: number;
   taskReview: number;
   withdrawals: number;
 }

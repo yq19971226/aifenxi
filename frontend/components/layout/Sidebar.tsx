@@ -79,7 +79,7 @@ const adminNavItem: NavItem = {
     { key: "symbols", href: "/admin/symbols" },
     { key: "notifications", href: "/admin/notifications" },
     { key: "monitor", href: "/admin/monitor" },
-    { key: "playbook_review", href: "/admin/playbook-review" },
+
     { key: "task_review", href: "/admin/task-review" },
     { key: "task_templates", href: "/admin/task-templates" },
     { key: "withdrawals", href: "/admin/withdrawals" },

@@ -17,7 +17,7 @@ async function loadMessages(locale: string): Promise<Record<string, any>> {
   const namespaces = [
     'common', 'nav', 'dashboard', 'consensus', 'analysis', 'login',
     'alerts', 'performance', 'settings', 'onchain', 'errors', 'metadata',
-    'playbook-sim', 'adversarial', 'tasks', 'partner', 'leaderboard', 'backtest', 'announcements', 'landing', 'guide', 'admin',
+    'adversarial', 'tasks', 'partner', 'leaderboard', 'backtest', 'announcements', 'landing', 'guide', 'admin',
     'autopilots', 'position', 'grid',
   ];
   for (const ns of namespaces) {

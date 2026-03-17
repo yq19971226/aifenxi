@@ -14,7 +14,7 @@ export interface PushChannelConfig {
 export interface PushEventConfig {
   strategy_update: boolean;
   price_alert: boolean;
-  playbook_switch: boolean;
+
   risk_warning: boolean;
   defense_alert: boolean;
   high_confidence_signal: boolean;

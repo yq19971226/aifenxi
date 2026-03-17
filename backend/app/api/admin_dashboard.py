@@ -233,17 +233,11 @@ async def get_sidebar_badges(
 ) -> dict:
     """获取侧边栏各模块的待处理项数量（Badge计数）。"""
     badges = {
-        "playbookReview": 0,
         "taskReview": 0,
         "withdrawals": 0
     }
     
     try:
-        # playbookReview: playbook_predictions WHERE published = false
-        row = (await session.execute(text(
-            "SELECT COUNT(*) AS cnt FROM playbook_predictions WHERE published = false"
-        ))).scalar_one()
-        badges["playbookReview"] = row
 
         # taskReview: task_submissions WHERE status = 'pending'
         row = (await session.execute(text(

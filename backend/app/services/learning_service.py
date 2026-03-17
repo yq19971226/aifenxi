@@ -156,77 +156,12 @@ class LearningService:
             return []
 
     async def _get_playbook_win_rates(self, days: int) -> list[dict]:
-        """从 playbook_predictions 表统计各剧本的预测准确率（D8）。"""
-        try:
-            _age_pp = age_filter("created_at", ":days")
-            _ci = cast_int
-            _cf = count_filter
-            _af = avg_filter
-            result = await self._session.execute(
-                text(f"""
-                    SELECT
-                        playbook_name,
-                        COALESCE(market_structure_type, 'unknown') AS market_structure_type,
-                        {_ci('COUNT(*)')} AS total,
-                        {_ci(_cf("status = 'completed'"))} AS completed,
-                        COALESCE({_af('final_accuracy', "status = 'completed'")}, 0) AS avg_accuracy
-                    FROM playbook_predictions
-                    WHERE {_age_pp}
-                    GROUP BY playbook_name, COALESCE(market_structure_type, 'unknown')
-                    ORDER BY total DESC
-                """),
-                {"days": days},
-            )
-            rows = result.mappings().all()
-            return [
-                {
-                    "playbook_name": row["playbook_name"],
-                    "market_structure_type": row["market_structure_type"],
-                    "total": row["total"],
-                    "completed": row["completed"],
-                    "avg_accuracy": round(float(row["avg_accuracy"]), 4),
-                }
-                for row in rows
-            ]
-        except Exception:
-            return []
+        """剧本功能已移除，返回空列表。"""
+        return []
 
     async def _get_structure_win_rates(self, days: int) -> list[dict]:
-        """按市场结构聚合剧本预测表现。"""
-        try:
-            _age_pp = age_filter("created_at", ":days")
-            _ci = cast_int
-            _cf = count_filter
-            _af = avg_filter
-            result = await self._session.execute(
-                text(f"""
-                    SELECT
-                        COALESCE(market_structure_type, 'unknown') AS market_structure_type,
-                        {_ci('COUNT(*)')} AS total,
-                        {_ci(_cf("status = 'completed'"))} AS completed,
-                        {_ci('COUNT(DISTINCT playbook_name)')} AS playbook_count,
-                        COALESCE({_af('final_accuracy', "status = 'completed'")}, 0) AS avg_accuracy
-                    FROM playbook_predictions
-                    WHERE {_age_pp}
-                    GROUP BY COALESCE(market_structure_type, 'unknown')
-                    ORDER BY avg_accuracy DESC, total DESC
-                """),
-                {"days": days},
-            )
-            rows = result.mappings().all()
-            return [
-                {
-                    "market_structure_type": row["market_structure_type"],
-                    "total": row["total"],
-                    "completed": row["completed"],
-                    "playbook_count": row["playbook_count"],
-                    "avg_accuracy": round(float(row["avg_accuracy"]), 4),
-                }
-                for row in rows
-            ]
-        except Exception as exc:
-            logger.error("查询市场结构表现失败: %s", exc)
-            return []
+        """剧本功能已移除，返回空列表。"""
+        return []
 
     async def _get_changelog_markers(self, days: int) -> list[dict]:
         """从 params_changelog 表获取参数变更标记（B6 预留）。"""

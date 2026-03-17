@@ -22,7 +22,7 @@ export interface AdminMenuItem {
   labelKey: string;
   href: string;
   icon: LucideIcon;
-  badgeKey?: "playbookReview" | "taskReview" | "withdrawals";
+  badgeKey?: "taskReview" | "withdrawals";
   badgeColor?: "red" | "amber" | "blue";
   frequency?: "high" | "low";
 }
@@ -56,7 +56,7 @@ export const ADMIN_MENU_GROUPS: AdminMenuGroup[] = [
     labelKey: "operations",
     items: [
       { labelKey: "users", href: "/admin/users", icon: Users, frequency: "high" },
-      { labelKey: "playbookReview", href: "/admin/playbook-review", icon: FileCheck, badgeKey: "playbookReview", badgeColor: "amber", frequency: "high" },
+
       { labelKey: "taskReview", href: "/admin/task-review", icon: ClipboardCheck, badgeKey: "taskReview", badgeColor: "amber" },
       { labelKey: "taskTemplates", href: "/admin/task-templates", icon: ListChecks },
       { labelKey: "announcements", href: "/admin/announcements", icon: Bell },
