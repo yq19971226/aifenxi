@@ -15,7 +15,6 @@ import {
 
 import type { AnalysisReport as AnalysisReportType } from "@/lib/api/analysis";
 import {
-  blockedReasonLabel,
   formatCachedTime,
   modeLabel,
 } from "./helpers";
