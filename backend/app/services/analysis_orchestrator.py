@@ -389,6 +389,11 @@ class AnalysisOrchestrator:
                     "分析总超时: symbol=%s mode=%s elapsed=%dms",
                     symbol, mode.value, elapsed_ms,
                 )
+                await log_analysis_action(
+                    user_id, user_email, symbol, mode.value, level,
+                    result="timeout",
+                    detail=f"耗时{elapsed_ms}ms超时",
+                )
                 from app.core.mode_contract import MODE_CONTRACT_VERSION as _MCV, get_contract as _gc
                 _timeout_contract = _partial_ctx.get("contract") or _gc(mode.value)
                 report = AnalysisReport(
@@ -413,6 +418,11 @@ class AnalysisOrchestrator:
                 ))
             except Exception as exc:
                 logger.error("分析执行异常: %s", exc)
+                await log_analysis_action(
+                    user_id, user_email, symbol, mode.value, level,
+                    result="failed",
+                    detail=str(exc)[:500],
+                )
                 yield _sse(ErrorEvent(code="internal", message=f"分析执行异常: {exc}"))
                 return
             else:
@@ -445,7 +455,12 @@ class AnalysisOrchestrator:
                 except Exception:
                     pass  # 不影响主流程
 
-            # 7. 推送完成事件
+            # 7. 记录分析完成 + 推送完成事件
+            await log_analysis_action(
+                user_id, user_email, symbol, mode.value, level,
+                result="completed",
+                detail=f"signal={report.signal} confidence={report.confidence:.2f} elapsed={report.execution_time_ms}ms",
+            )
             yield _sse(CompleteEvent(report=report))
 
             # 8-9. 后置任务改为后台执行，避免阻塞 SSE 结束
