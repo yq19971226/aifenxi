@@ -21,7 +21,7 @@
       "notifications": "通知管理",
 
       "announcements": "公告管理",
-      "playbookReview": "剧本审核",
+
       "taskReview": "任务审核",
       "taskTemplates": "任务模板",
       "withdrawals": "提现审核",
@@ -104,7 +104,7 @@
       "maintenanceAll": "维护"
     },
     "features": {
-      "playbook": "剧本推演",
+      "adversarial": "AI对抗推演",
       "leaderboard": "排行榜",
       "task": "任务中心",
       "partner": "合伙人",
@@ -113,7 +113,7 @@
       "online_count": "在线人数"
     },
     "paths": {
-      "playbook": "/playbook-sim",
+      "adversarial": "/adversarial",
       "leaderboard": "/leaderboard",
       "task": "/tasks",
       "partner": "/partner",
@@ -474,9 +474,9 @@
       "hidden": "隐藏"
     },
     "features": {
-      "playbook": {
-        "label": "剧本推演",
-        "desc": "/playbook-sim — AI对抗剧本推演系统"
+      "adversarial": {
+        "label": "AI对抗推演",
+        "desc": "/adversarial — AI对抗推演系统"
       },
       "leaderboard": {
         "label": "排行榜",

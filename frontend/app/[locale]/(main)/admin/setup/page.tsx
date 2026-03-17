@@ -12,12 +12,12 @@ import SetupWizard from "@/components/admin/SetupWizard";
 type FeatureState = "active" | "maintenance" | "hidden";
 
 interface FeatureItem {
-  key: "playbook" | "leaderboard" | "task" | "partner" | "push" | "alerts" | "online_count";
+  key: "adversarial" | "leaderboard" | "task" | "partner" | "push" | "alerts" | "online_count";
   configKey: string;
 }
 
 const FEATURES: FeatureItem[] = [
-  { key: "playbook", configKey: "playbook_feature_enabled" },
+  { key: "adversarial", configKey: "adversarial_feature_enabled" },
   { key: "leaderboard", configKey: "leaderboard_feature_enabled" },
   { key: "task", configKey: "task_feature_enabled" },
   { key: "partner", configKey: "partner_feature_enabled" },

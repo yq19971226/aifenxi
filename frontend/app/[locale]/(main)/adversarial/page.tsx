@@ -49,7 +49,7 @@ interface DefenseData {
 export default function AdversarialPage() {
   const t = useTranslations("adversarial");
   const { getState } = useFeatureFlags();
-  const featureState = getState("adversarial") ?? getState("playbook") ?? "active";
+  const featureState = getState("adversarial") ?? "active";
 
   const searchParams = useSearchParams();
   const initialSymbol = searchParams.get("symbol") || "BTCUSDT";

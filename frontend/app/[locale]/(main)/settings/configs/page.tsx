@@ -79,7 +79,7 @@ const CONFIG_GROUPS: ConfigGroup[] = [
       { key: "perf_days_free", isSecret: false, defaultValue: "7", unit: "天", category: "tier" },
       { key: "new_user_bonus_credits", isSecret: false, defaultValue: "5", unit: "次", category: "tier" },
       { key: "new_user_bonus_enabled", isSecret: false, defaultValue: "true", category: "tier" },
-      { key: "playbook_sim_min_level", isSecret: false, defaultValue: "1", category: "tier" },
+      { key: "adversarial_min_level", isSecret: false, defaultValue: "1", category: "tier" },
       { key: "backtest_free_days", isSecret: false, defaultValue: "7", unit: "天", category: "tier" },
     ],
   },

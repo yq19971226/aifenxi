@@ -20,7 +20,7 @@
       "notifications": "通知管理",
 
       "announcements": "公告管理",
-      "playbookReview": "劇本審核",
+
       "taskReview": "任務審核",
       "taskTemplates": "任務模板",
       "withdrawals": "提現審核",
@@ -103,7 +103,7 @@
       "maintenanceAll": "維護"
     },
     "features": {
-      "playbook": "劇本推演",
+      "adversarial": "AI對抗推演",
       "leaderboard": "排行榜",
       "task": "任務中心",
       "partner": "合夥人",
@@ -112,7 +112,7 @@
       "online_count": "線上人數"
     },
     "paths": {
-      "playbook": "/playbook-sim",
+      "adversarial": "/adversarial",
       "leaderboard": "/leaderboard",
       "task": "/tasks",
       "partner": "/partner",
@@ -473,9 +473,9 @@
       "hidden": "隱藏"
     },
     "features": {
-      "playbook": {
-        "label": "劇本推演",
-        "desc": "/playbook-sim — AI 對抗劇本推演系統"
+      "adversarial": {
+        "label": "AI對抗推演",
+        "desc": "/adversarial — AI 對抗推演系統"
       },
       "leaderboard": {
         "label": "排行榜",

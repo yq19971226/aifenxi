@@ -25,7 +25,7 @@ router = APIRouter(prefix="/api/admin/configs", tags=["admin-configs"])
 public_router = APIRouter(tags=["feature-flags"])
 
 FEATURE_FLAG_CONFIG_MAP: dict[str, str] = {
-    "playbook": "playbook_feature_enabled",
+    "adversarial": "adversarial_feature_enabled",
     "leaderboard": "leaderboard_feature_enabled",
     "task": "task_feature_enabled",
     "partner": "partner_feature_enabled",
