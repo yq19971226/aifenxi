@@ -1105,6 +1105,7 @@ class AnalysisOrchestrator:
                     indicators=market_data.indicators,
                     derivatives=market_data.derivatives,
                     coinglass=market_data.coinglass,
+                    onchain=market_data.onchain,
                 )
                 if vpd.confidence_modifier != 1.0:
                     final_confidence *= vpd.confidence_modifier
@@ -1409,6 +1410,7 @@ class AnalysisOrchestrator:
                     indicators=market_data.indicators,
                     derivatives=market_data.derivatives,
                     coinglass=market_data.coinglass,
+                    onchain=market_data.onchain,
                 )
         except Exception as exc:
             logger.warning("量价背离V2前置检测失败: %s", exc)
@@ -2134,6 +2136,7 @@ class AnalysisOrchestrator:
                     indicators=market_data.indicators,
                     derivatives=market_data.derivatives,
                     coinglass=market_data.coinglass,
+                    onchain=market_data.onchain,
                 )
                 if vpd.confidence_modifier != 1.0:
                     confidence *= vpd.confidence_modifier

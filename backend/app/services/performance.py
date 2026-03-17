@@ -544,9 +544,9 @@ class PerformanceTracker:
                 },
                 table="strategy_snapshots",
             )
-            await self._session.commit()
             row = result.mappings().first()
             snapshot_id = UUID(str(row["id"]))
+            await self._session.commit()
             logger.info(
                 "快照已创建: snapshot=%s, strategy=%s, symbol=%s",
                 snapshot_id, snapshot.strategy_id, snapshot.symbol,

@@ -28,6 +28,7 @@ from app.models.market_data import (
     DerivativesData,
     IndicatorResult,
     KlineData,
+    OnchainSnapshot,
 )
 
 logger = logging.getLogger(__name__)
@@ -35,14 +36,20 @@ logger = logging.getLogger(__name__)
 # ── 默认因子权重（可被数据库覆盖）──────────────────────────────
 
 DEFAULT_WEIGHTS: dict[str, float] = {
-    "f1_peak_divergence": 0.20,
-    "f2_volume_zscore": 0.12,
-    "f3_cmf_divergence": 0.12,
-    "f4_macd_rsi_divergence": 0.15,
-    "f5_obv_divergence": 0.08,
-    "f6_derivatives_health": 0.15,
-    "f7_vsa_efficiency": 0.10,
+    "f1_peak_divergence": 0.15,
+    "f2_volume_zscore": 0.09,
+    "f3_cmf_divergence": 0.09,
+    "f4_macd_rsi_divergence": 0.12,
+    "f5_obv_divergence": 0.06,
+    "f6_derivatives_health": 0.11,
+    "f7_vsa_efficiency": 0.08,
     # f8_position 是乘法器，不参与加权
+    "f9_bb_squeeze": 0.08,
+    "f10_exchange_netflow": 0.06,
+    "f11_ls_ratio_extreme": 0.06,
+    "f12_vwap_deviation": 0.06,
+    "f13_fear_greed": 0.02,
+    "f14_mvrv": 0.02,
 }
 
 # ── 评分到置信度修正的映射 ──────────────────────────────────────
@@ -557,6 +564,196 @@ def _calc_f8_position(
         return 0.7, f"价值区内(POC={poc_price:.1f})"
 
 
+def _calc_f9_bb_squeeze(
+    indicators: IndicatorResult | None,
+    klines: list[KlineData],
+) -> tuple[float, str]:
+    """F9：布林带挤压 — 波动率收缩预示突破。
+
+    BBW (Bollinger Band Width) = (upper - lower) / middle × 100%
+    当前 BBW 与历史 20 期均值比较，判断挤压/扩张状态。
+    """
+    if indicators is None:
+        return 0.0, "指标不可用"
+    bb_upper = indicators.bb_upper
+    bb_lower = indicators.bb_lower
+    bb_middle = indicators.bb_middle
+    if bb_upper is None or bb_lower is None or bb_middle is None or bb_middle <= 0:
+        return 0.0, "BB数据缺失"
+
+    current_bbw = (bb_upper - bb_lower) / bb_middle
+
+    # 用 K 线重算历史 BBW（最近 20 期）
+    if len(klines) < 40:
+        return 0.0, "数据不足"
+
+    closes = [k.close for k in klines]
+    bbw_history: list[float] = []
+    period = 20
+    for i in range(period - 1, len(closes)):
+        window = closes[i - period + 1 : i + 1]
+        sma = sum(window) / period
+        if sma <= 0:
+            continue
+        std = (sum((v - sma) ** 2 for v in window) / period) ** 0.5
+        bbw = (2 * 2.0 * std) / sma  # BB 默认 2 倍标准差
+        bbw_history.append(bbw)
+
+    if len(bbw_history) < 10:
+        return 0.0, "BBW历史不足"
+
+    avg_bbw = sum(bbw_history[-20:]) / min(len(bbw_history), 20)
+    if avg_bbw <= 0:
+        return 0.0, "BBW均值为零"
+
+    squeeze_ratio = current_bbw / avg_bbw
+
+    if squeeze_ratio < 0.5:
+        return -0.8, f"极端挤压(BBW比={squeeze_ratio:.2f},即将突破)"
+    elif squeeze_ratio < 0.7:
+        return -0.5, f"明显挤压(BBW比={squeeze_ratio:.2f})"
+    elif squeeze_ratio < 0.85:
+        return -0.2, f"温和收窄(BBW比={squeeze_ratio:.2f})"
+    elif squeeze_ratio > 2.0:
+        return 0.6, f"极端扩张(BBW比={squeeze_ratio:.2f},趋势强劲)"
+    elif squeeze_ratio > 1.5:
+        return 0.3, f"波动放大(BBW比={squeeze_ratio:.2f})"
+    return 0.0, f"BB正常(BBW比={squeeze_ratio:.2f})"
+
+
+def _calc_f10_exchange_netflow(
+    onchain: "OnchainSnapshot | None",
+    symbol: str,
+) -> tuple[float, str]:
+    """F10：交易所净流量 — 流入=抛压，流出=囤积。
+
+    仅 BTC/ETH 有数据（Glassnode Professional）。
+    """
+    if onchain is None or onchain.exchange_netflow is None:
+        return 0.0, "链上数据不可用"
+
+    netflow = onchain.exchange_netflow
+
+    # ETH 阈值按 BTC 的 1/5 缩放
+    sym_upper = symbol.upper().replace("USDT", "")
+    scale = 5.0 if sym_upper == "ETH" else 1.0
+    t_huge = 5000 / scale
+    t_large = 2000 / scale
+    t_mild = 500 / scale
+
+    if netflow > t_huge:
+        return -0.9, f"巨额流入({netflow:+.0f},强抛压)"
+    elif netflow > t_large:
+        return -0.6, f"大额流入({netflow:+.0f})"
+    elif netflow > t_mild:
+        return -0.3, f"温和流入({netflow:+.0f})"
+    elif netflow < -t_huge:
+        return 0.9, f"巨额流出({netflow:+.0f},强囤积)"
+    elif netflow < -t_large:
+        return 0.6, f"大额流出({netflow:+.0f})"
+    elif netflow < -t_mild:
+        return 0.3, f"温和流出({netflow:+.0f})"
+    return 0.0, f"净流量中性({netflow:+.0f})"
+
+
+def _calc_f11_ls_ratio(
+    derivatives: DerivativesData | None,
+) -> tuple[float, str]:
+    """F11：多空比极端 — 逆向拥挤信号。
+
+    ratio > 1 表示多头多于空头。极端值是反转信号。
+    """
+    if derivatives is None or derivatives.long_short_ratio is None:
+        return 0.0, "多空比不可用"
+
+    ratio = derivatives.long_short_ratio
+
+    if ratio > 2.5:
+        return -0.8, f"极端偏多(L/S={ratio:.2f},拥挤风险)"
+    elif ratio > 1.8:
+        return -0.4, f"偏多拥挤(L/S={ratio:.2f})"
+    elif ratio < 0.4:
+        return 0.8, f"极端偏空(L/S={ratio:.2f},反弹概率高)"
+    elif ratio < 0.55:
+        return 0.4, f"偏空拥挤(L/S={ratio:.2f})"
+    return 0.0, f"多空均衡(L/S={ratio:.2f})"
+
+
+def _calc_f12_vwap_deviation(
+    indicators: IndicatorResult | None,
+    current_price: float,
+) -> tuple[float, str]:
+    """F12：VWAP 偏离 — 机构成本线回归信号。
+
+    价格远离 VWAP 有回归倾向。
+    """
+    if indicators is None or indicators.vwap is None or indicators.vwap <= 0:
+        return 0.0, "VWAP不可用"
+
+    if current_price <= 0:
+        return 0.0, "价格无效"
+
+    vwap = indicators.vwap
+    deviation_pct = (current_price - vwap) / vwap * 100
+
+    if deviation_pct > 3.0:
+        return -0.7, f"大幅高于VWAP({deviation_pct:+.1f}%,回落风险)"
+    elif deviation_pct > 1.5:
+        return -0.3, f"温和高于VWAP({deviation_pct:+.1f}%)"
+    elif deviation_pct < -3.0:
+        return 0.7, f"大幅低于VWAP({deviation_pct:+.1f}%,反弹概率)"
+    elif deviation_pct < -1.5:
+        return 0.3, f"温和低于VWAP({deviation_pct:+.1f}%)"
+    return 0.0, f"贴近VWAP({deviation_pct:+.1f}%)"
+
+
+def _calc_f13_fear_greed(
+    onchain: "OnchainSnapshot | None",
+) -> tuple[float, str]:
+    """F13：恐惧贪婪指数 — 逆向情绪指标。
+
+    仅 BTC 有数据。极端恐惧 = 买入机会，极端贪婪 = 风险。
+    """
+    if onchain is None or onchain.fear_greed_index is None:
+        return 0.0, "恐惧贪婪数据不可用"
+
+    fg = onchain.fear_greed_index
+
+    if fg <= 15:
+        return 0.9, f"极端恐惧(FG={fg},历史底部区域)"
+    elif fg <= 25:
+        return 0.5, f"恐惧(FG={fg})"
+    elif fg >= 85:
+        return -0.9, f"极端贪婪(FG={fg},历史顶部区域)"
+    elif fg >= 75:
+        return -0.5, f"贪婪(FG={fg})"
+    return 0.0, f"情绪中性(FG={fg})"
+
+
+def _calc_f14_mvrv(
+    onchain: "OnchainSnapshot | None",
+) -> tuple[float, str]:
+    """F14：MVRV 估值 — 全网浮盈/浮亏周期指标。
+
+    仅 BTC/ETH 有数据（Glassnode Professional）。
+    MVRV > 3.5 周期顶部，< 1.0 周期底部。
+    """
+    if onchain is None or onchain.mvrv is None:
+        return 0.0, "MVRV数据不可用"
+
+    mvrv = onchain.mvrv
+
+    if mvrv >= 3.5:
+        return -0.9, f"严重高估(MVRV={mvrv:.2f},周期顶部)"
+    elif mvrv >= 2.5:
+        return -0.5, f"偏高估(MVRV={mvrv:.2f})"
+    elif mvrv <= 0.8:
+        return 0.9, f"严重低估(MVRV={mvrv:.2f},周期底部)"
+    elif mvrv <= 1.0:
+        return 0.5, f"偏低估(MVRV={mvrv:.2f})"
+    return 0.0, f"合理区间(MVRV={mvrv:.2f})"
+
+
 # ══════════════════════════════════════════════════════════════
 # 主入口
 # ══════════════════════════════════════════════════════════════
@@ -598,6 +795,7 @@ async def detect_volume_price_divergence_v2(
     indicators: IndicatorResult | None = None,
     derivatives: DerivativesData | None = None,
     coinglass: CoinGlassData | None = None,
+    onchain: "OnchainSnapshot | None" = None,
 ) -> VolumePriceDivergenceV2:
     """多因子量价背离检测 V2 — 完整版。
 
@@ -735,6 +933,61 @@ async def detect_volume_price_divergence_v2(
     position_label = "above_value" if pos_coeff > 1.0 and closes[-1] > sum(closes[-50:]) / 50 else (
         "below_value" if pos_coeff > 1.0 else "inside_value"
     )
+
+    # F9: BB 挤压
+    f9_avail = indicators is not None and indicators.bb_upper is not None
+    f9_score, f9_detail = _calc_f9_bb_squeeze(indicators, klines) if f9_avail else (0.0, "BB不可用")
+    factor_results.append(FactorResult(
+        factor_id="f9_bb_squeeze", factor_name="BB挤压",
+        score=f9_score, weight=weights.get("f9_bb_squeeze", 0.08),
+        available=f9_avail, detail=f9_detail,
+    ))
+
+    # F10: 交易所净流量
+    f10_avail = onchain is not None and onchain.exchange_netflow is not None
+    sym_for_netflow = klines[0].symbol if klines else ""
+    f10_score, f10_detail = _calc_f10_exchange_netflow(onchain, sym_for_netflow) if f10_avail else (0.0, "链上不可用")
+    factor_results.append(FactorResult(
+        factor_id="f10_exchange_netflow", factor_name="交易所净流",
+        score=f10_score, weight=weights.get("f10_exchange_netflow", 0.06),
+        available=f10_avail, detail=f10_detail,
+    ))
+
+    # F11: 多空比极端
+    f11_avail = derivatives is not None and derivatives.long_short_ratio is not None
+    f11_score, f11_detail = _calc_f11_ls_ratio(derivatives) if f11_avail else (0.0, "多空比不可用")
+    factor_results.append(FactorResult(
+        factor_id="f11_ls_ratio_extreme", factor_name="多空比极端",
+        score=f11_score, weight=weights.get("f11_ls_ratio_extreme", 0.06),
+        available=f11_avail, detail=f11_detail,
+    ))
+
+    # F12: VWAP 偏离
+    f12_avail = indicators is not None and indicators.vwap is not None
+    f12_score, f12_detail = _calc_f12_vwap_deviation(indicators, closes[-1]) if f12_avail else (0.0, "VWAP不可用")
+    factor_results.append(FactorResult(
+        factor_id="f12_vwap_deviation", factor_name="VWAP偏离",
+        score=f12_score, weight=weights.get("f12_vwap_deviation", 0.06),
+        available=f12_avail, detail=f12_detail,
+    ))
+
+    # F13: 恐惧贪婪
+    f13_avail = onchain is not None and onchain.fear_greed_index is not None
+    f13_score, f13_detail = _calc_f13_fear_greed(onchain) if f13_avail else (0.0, "恐惧贪婪不可用")
+    factor_results.append(FactorResult(
+        factor_id="f13_fear_greed", factor_name="恐惧贪婪",
+        score=f13_score, weight=weights.get("f13_fear_greed", 0.04),
+        available=f13_avail, detail=f13_detail,
+    ))
+
+    # F14: MVRV 估值
+    f14_avail = onchain is not None and onchain.mvrv is not None
+    f14_score, f14_detail = _calc_f14_mvrv(onchain) if f14_avail else (0.0, "MVRV不可用")
+    factor_results.append(FactorResult(
+        factor_id="f14_mvrv", factor_name="MVRV估值",
+        score=f14_score, weight=weights.get("f14_mvrv", 0.04),
+        available=f14_avail, detail=f14_detail,
+    ))
 
     # ══════════════════════════════════════════════════════════
     # 加权评分（自动重分配不可用因子的权重）

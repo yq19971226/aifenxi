@@ -307,14 +307,10 @@ async def track_outcomes():
             sym_upper = symbol.upper()
             current_price = 0.0
 
-            # 1) 优先读 latest_price（标量值，由 kline_scheduler 写入）
-            try:
-                from app.core.redis import get_redis_pool as _get_pool
-                _raw = await _get_pool().get(f"latest_price:{sym_upper}")
-                if _raw:
-                    current_price = float(_raw)
-            except Exception:
-                pass
+            # 1) 优先读 latest_price（由 kline_scheduler 写入）
+            raw_price = await get_json(f"latest_price:{sym_upper}")
+            if raw_price is not None and isinstance(raw_price, (int, float)) and raw_price > 0:
+                current_price = float(raw_price)
 
             # 2) 回退：从 klines 列表取最新 close
             if current_price <= 0:
@@ -328,6 +324,10 @@ async def track_outcomes():
                             break
 
             if current_price <= 0:
+                continue
+
+            # 防御：price_at 为 0 时跳过（不应发生，但防止除零）
+            if not price_at or float(price_at) <= 0:
                 continue
 
             age = datetime.now(timezone.utc) - (created_at if created_at.tzinfo else created_at.replace(tzinfo=timezone.utc))

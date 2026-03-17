@@ -356,6 +356,12 @@ _FACTOR_DESCRIPTIONS: dict[str, dict[str, str]] = {
     "f5_obv_divergence": {"name": "OBV趋势", "desc": "OBV累积量能趋势背离"},
     "f6_derivatives_health": {"name": "衍生品健康度", "desc": "OI持仓量 + 资金费率拥挤度"},
     "f7_vsa_efficiency": {"name": "VSA效率", "desc": "K线穿越效率 + 影线比率 + E/R比"},
+    "f9_bb_squeeze": {"name": "BB挤压", "desc": "布林带宽度收窄预示突破"},
+    "f10_exchange_netflow": {"name": "交易所净流", "desc": "链上交易所净流入/流出(仅BTC/ETH)"},
+    "f11_ls_ratio_extreme": {"name": "多空比极端", "desc": "多空比逆向拥挤信号"},
+    "f12_vwap_deviation": {"name": "VWAP偏离", "desc": "价格偏离VWAP机构成本线"},
+    "f13_fear_greed": {"name": "恐惧贪婪", "desc": "逆向情绪指标(仅BTC)"},
+    "f14_mvrv": {"name": "MVRV估值", "desc": "全网浮盈浮亏周期指标(仅BTC/ETH)"},
 }
 
 
