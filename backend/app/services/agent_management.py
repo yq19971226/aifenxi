@@ -43,13 +43,7 @@ AGENT_METADATA = {
         "priority": 9,
         "default_enabled": True,
     },
-    "playbook": {
-        "name": "剧本推演智能体",
-        "description": "识别庄家操盘手法，推演剧本阶段",
-        "category": "market",
-        "priority": 8,
-        "default_enabled": True,
-    },
+
     "risk": {
         "name": "风险预警智能体",
         "description": "监控风险指标，触发预警",

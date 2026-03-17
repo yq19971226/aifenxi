@@ -15,7 +15,7 @@ export interface AgentAccuracyCardProps {
 const AGENT_LABELS: Record<string, string> = {
   technical: "技术分析",
   onchain: "链上解读",
-  playbook: "剧本推演",
+  adversarial: "对抗推演",
   risk: "风险预警",
 };
 

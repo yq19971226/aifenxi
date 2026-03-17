@@ -46,7 +46,7 @@ const AGENT_ICONS: Record<string, React.ReactNode> = {
   onchain: <Database size={16} />,
   sentiment: <Activity size={16} />,
   orderbook: <BarChart3 size={16} />,
-  playbook: <Brain size={16} />,
+
   risk: <Shield size={16} />,
   news_analyst: <Newspaper size={16} />,
   calendar: <Clock size={16} />,

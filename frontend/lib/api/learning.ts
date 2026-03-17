@@ -39,6 +39,7 @@ export interface ChangelogMarker {
   note: string;
 }
 
+/** @deprecated Playbook feature removed — backend always returns []. */
 export interface PlaybookWinRate {
   playbook_name: string;
   market_structure_type?: string | null;
@@ -47,6 +48,7 @@ export interface PlaybookWinRate {
   avg_accuracy: number;
 }
 
+/** @deprecated Playbook feature removed — backend always returns []. */
 export interface StructureWinRate {
   market_structure_type?: string | null;
   total: number;

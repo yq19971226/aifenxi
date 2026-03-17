@@ -110,7 +110,7 @@ function StepModels({ onNext, onPrev, data, setData }: WizardStepProps) {
     { id: "technical", label: "技术分析 (Technical Analyst)" },
     { id: "onchain", label: "链上分析 (Onchain Analyst)" },
     { id: "sentiment", label: "舆情分析 (Sentiment Analyst)" },
-    { id: "playbook_dealer", label: "庄家推演 (Playbook Dealer)" },
+    { id: "adversarial", label: "对抗推演 (Adversarial)" },
   ];
 
   const models = availableModelsData?.models || [];
@@ -146,7 +146,7 @@ function StepFeatures({ onNext, onPrev, data, setData }: WizardStepProps) {
   const t = useTranslations("admin.wizard");
   
   const FEATURES = [
-    { key: "playbook", configKey: "playbook_feature_enabled", label: "策略剧本 (Playbook)" },
+    { key: "adversarial", configKey: "adversarial_feature_enabled", label: "AI对抗推演 (Adversarial)" },
     { key: "leaderboard", configKey: "leaderboard_feature_enabled", label: "收益榜单 (Leaderboard)" },
     { key: "task", configKey: "task_feature_enabled", label: "任务回核 (Task Review)" },
     { key: "partner", configKey: "partner_feature_enabled", label: "合伙人系统 (Partner)" },
@@ -183,7 +183,7 @@ export default function SetupWizard({ onFinish }: { onFinish?: () => void }) {
   const t = useTranslations("admin.wizard");
   const [step, setStep] = useState(0);
   const [data, setData] = useState<any>({
-    playbook_feature_enabled: "active",
+    adversarial_feature_enabled: "active",
     leaderboard_feature_enabled: "active",
     task_feature_enabled: "active",
     partner_feature_enabled: "active",
