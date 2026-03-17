@@ -111,7 +111,22 @@
     "initialResistance": "Initial Resistance",
     "secondaryExtension": "Secondary Extension",
     "trendObjective": "Trend Objective",
-    "activeTracking": "Active Tracking"
+    "activeTracking": "Active Tracking",
+    "blockedTitle": "High bull-bear divergence — no directional signal available",
+    "blockedDesc_consensus_divergence_high": "AI agents have significant disagreement on market direction. No directional signal is provided as a risk control measure. Individual expert analyses are shown below for reference.",
+    "blockedDesc_data_incomplete": "Some critical data sources are unavailable. No directional signal is provided until complete data is available.",
+    "blockedDesc_capability_missing": "Critical analysis capabilities are unavailable. No directional signal can be provided.",
+    "blockedDesc_weekly_bias_conflict": "Short-term signals conflict with weekly timeframe bias. No directional signal is provided.",
+    "blockedDesc_defense_risk_high": "High manipulation risk detected in the current market. No directional signal is provided.",
+    "blockedDesc_risk_guardrail_triggered": "Risk guardrail triggered. No directional signal is provided.",
+    "blockedDesc_timeout": "Analysis timed out. No directional signal is available.",
+    "blockedReasoning_consensus_divergence_high": "AI agents show significant disagreement: some experts are bullish, others bearish, and some neutral. When bull-bear forces are near equilibrium, the market may be in consolidation or at a turning point. Opening positions carries elevated risk. Consider waiting for divergence to narrow before making decisions.",
+    "blockedReasoning_data_incomplete": "Some critical data sources (on-chain, order book, etc.) are temporarily unavailable, resulting in insufficient analysis coverage. Please retry later for a complete analysis.",
+    "blockedReasoning_capability_missing": "Some critical analysis modules are unavailable. A reliable composite signal cannot be provided. Please retry later.",
+    "blockedReasoning_weekly_bias_conflict": "Short-term signal direction conflicts with the weekly trend. Positions against the higher timeframe carry elevated risk. Consider waiting for timeframe alignment.",
+    "blockedReasoning_defense_risk_high": "Potential market manipulation detected with abnormal smart money activity. Trading risk is extremely high. Consider staying on the sidelines.",
+    "blockedReasoning_risk_guardrail_triggered": "Risk guardrail triggered — composite risk exceeds safety thresholds. Reduce position size or wait for risk to subside.",
+    "blockedReasoning_timeout": "Analysis timed out before completing. Please retry later."
   },
   "snippet": {
     "title": "AI Citation Snippet",

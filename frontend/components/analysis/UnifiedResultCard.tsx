@@ -9,11 +9,13 @@ import {
   Activity,
   Clock,
   Database,
-  Shield
+  Shield,
+  AlertTriangle,
 } from "lucide-react";
 
 import type { AnalysisReport as AnalysisReportType } from "@/lib/api/analysis";
 import {
+  blockedReasonLabel,
   formatCachedTime,
   modeLabel,
 } from "./helpers";
@@ -29,6 +31,7 @@ import type { StrategyData } from "@/lib/types/strategy";
 export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
   const t = useTranslations("consensus");
   const strategy = report.strategy;
+  const isBlocked = !!report.blocked_reason;
 
   const rawSignal = strategy?.direction === "long" ? "bullish" : strategy?.direction === "short" ? "bearish" : report.signal;
 
@@ -130,6 +133,21 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
         </div>
       </div>
 
+      {/* ── Blocked Reason Banner ── */}
+      {isBlocked && (
+        <div className="mx-5 mt-4 flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3">
+          <AlertTriangle className="h-5 w-5 text-amber-400 mt-0.5 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-amber-300">
+              {t("card.blockedTitle")}
+            </p>
+            <p className="text-xs text-zinc-400 mt-1">
+              {t(`card.blockedDesc_${report.blocked_reason}`)}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* ── Key Metrics Grid ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border border-b border-border bg-bg-surface/30">
         <MetricItem
@@ -170,9 +188,11 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
             </h4>
             <div className="bg-bg-primary/50 border border-border/50 p-5 rounded-xl shadow-inner">
               <p className="text-sm leading-relaxed text-zinc-300 whitespace-pre-wrap">
-                {report.strategy?.reasoning === "Agent analysis failed to return valid data. A baseline safety strategy has been generated based on current market price levels."
-                  ? t("card.baselineSafetyReasoning")
-                  : (report.strategy?.reasoning || t("progress.analyzing"))}
+                {isBlocked
+                  ? t(`card.blockedReasoning_${report.blocked_reason}`)
+                  : report.strategy?.reasoning === "Agent analysis failed to return valid data. A baseline safety strategy has been generated based on current market price levels."
+                    ? t("card.baselineSafetyReasoning")
+                    : (report.strategy?.reasoning || t("progress.analyzing"))}
               </p>
             </div>
           </div>

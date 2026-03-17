@@ -98,7 +98,22 @@
     "share": "分享",
     "deepAnalysis": "深度研究报告",
     "confidence": "置信度",
-    "noData": "暂无数据"
+    "noData": "暂无数据",
+    "blockedTitle": "当前市场多空分歧较大，暂无信号方向推荐",
+    "blockedDesc_consensus_divergence_high": "多个AI智能体对市场方向存在严重分歧，系统出于风控要求暂不给出方向性信号。以下仍展示各专家的独立分析供参考。",
+    "blockedDesc_data_incomplete": "部分关键数据源不可用，分析结果可能不完整，系统暂不给出方向性信号。",
+    "blockedDesc_capability_missing": "关键分析能力不可用，系统暂不给出方向性信号。",
+    "blockedDesc_weekly_bias_conflict": "短周期与周线级别信号存在冲突，系统暂不给出方向性信号。",
+    "blockedDesc_defense_risk_high": "当前市场存在较高的操纵风险，系统暂不给出方向性信号。",
+    "blockedDesc_risk_guardrail_triggered": "风控护栏触发，系统暂不给出方向性信号。",
+    "blockedDesc_timeout": "分析超时，系统暂不给出方向性信号。",
+    "blockedReasoning_consensus_divergence_high": "AI智能体群对当前市场方向存在严重分歧：部分专家看多，部分看空，部分持中性观点。当多空双方力量接近均衡时，市场可能处于震荡或转折阶段，贸然建仓风险较大。建议观望等待多空分歧收敛后再做决策。",
+    "blockedReasoning_data_incomplete": "部分关键数据源（如链上数据、订单簿等）暂时不可用，导致分析覆盖维度不足。建议稍后重试获取完整分析。",
+    "blockedReasoning_capability_missing": "部分关键分析模块不可用，无法提供可靠的综合信号。请稍后重试。",
+    "blockedReasoning_weekly_bias_conflict": "短周期信号方向与周线级别趋势存在冲突。顺大周期逆小周期的仓位风险较高，建议等待周期共振后再建仓。",
+    "blockedReasoning_defense_risk_high": "检测到当前市场可能存在操纵行为，主力资金活动异常。此时参与交易风险极高，建议回避。",
+    "blockedReasoning_risk_guardrail_triggered": "系统风控护栏触发，综合风险超出安全阈值。请降低仓位或等待风险消退后再操作。",
+    "blockedReasoning_timeout": "分析过程超时，未能获取完整结果。请稍后重试。"
   },
   "snippet": {
     "title": "共识引用片段",
