@@ -79,6 +79,14 @@ AVAILABLE_MODELS: list[dict[str, Any]] = [
         "strengths": ["剧本推演", "反思复盘", "对抗推演"],
     },
     {
+        "model_key": "deepseek-v3.2",
+        "model_name": "deepseek-v3.2",
+        "display_name": "DeepSeek V3.2 标准",
+        "description": "V3.2 标准分析版，比 Thinking 更快更便宜，适合轻量级分析",
+        "pricing": {"input": 0.0002, "output": 0.0003},
+        "strengths": ["通用分析", "快速响应", "极致性价比"],
+    },
+    {
         "model_key": "deepseek-v3.2-thinking",
         "model_name": "deepseek-v3.2-exp-thinking",
         "display_name": "DeepSeek V3.2 Thinking",

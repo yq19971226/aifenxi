@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 MODELS: dict[str, str] = {
     # ── 精选首选模型 ──────────────────────────────────────────
     "deepseek-r1": "deepseek-reasoner",                     # DeepSeek R1-671B — 深度推理
+    "deepseek-v3.2": "deepseek-v3.2",                        # DeepSeek V3.2 标准分析
     "deepseek-v3.2-thinking": "deepseek-v3.2-exp-thinking", # DeepSeek V3.2 Thinking
     "claude-sonnet": "claude-sonnet-4-5-20250929",          # Claude Sonnet 4.5
     "grok-fast": "grok-4-fast",                             # Grok-4 Fast — 高性价比
@@ -47,6 +48,7 @@ MODELS: dict[str, str] = {
 # Format: {model_name: (input_price_per_1k, output_price_per_1k)}
 MODEL_PRICING: dict[str, tuple[float, float]] = {
     "deepseek-reasoner": (0.004, 0.016),
+    "deepseek-v3.2": (0.0002, 0.0003),
     "deepseek-v3.2-exp-thinking": (0.0003, 0.0004),
     "claude-sonnet-4-5-20250929": (0.003, 0.015),
     "grok-4-fast": (0.001, 0.004),
