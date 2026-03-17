@@ -143,7 +143,7 @@ async def record_factor_snapshot(
                     VALUES
                     (:symbol, :mode, :direction, :confidence,
                      :score, :grade, :modifier, :position,
-                     :completeness, :factors::jsonb, :price, :atr)
+                     :completeness, CAST(:factors AS jsonb), :price, :atr)
                     RETURNING id
                 """),
                 {
@@ -477,7 +477,7 @@ async def log_weight_change(
                     INSERT INTO vpd_weight_audit_log
                     (changed_by, source, old_weights, new_weights,
                      ai_accuracy, sample_count, notes)
-                    VALUES (:by, :source, :old::jsonb, :new::jsonb,
+                    VALUES (:by, :source, CAST(:old AS jsonb), CAST(:new AS jsonb),
                             :acc, :count, :notes)
                 """),
                 {

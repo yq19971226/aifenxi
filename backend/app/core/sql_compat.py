@@ -189,10 +189,14 @@ def now_func() -> str:
 
 
 def jsonb_cast(param: str) -> str:
-    """PostgreSQL ``:param::jsonb`` → SQLite just ``:param`` (stored as TEXT)."""
+    """PostgreSQL ``CAST(:param AS jsonb)`` → SQLite just ``:param`` (stored as TEXT).
+
+    NOTE: 不能使用 ``:param::jsonb`` 语法，因为 SQLAlchemy 会将 ``::`` 前的
+    ``:param`` 视为命名参数边界，导致 PostgresSyntaxError。
+    """
     if is_sqlite:
         return param
-    return f"{param}::jsonb"
+    return f"CAST({param} AS jsonb)"
 
 
 def jsonb_func_cast(param: str) -> str:
@@ -215,7 +219,7 @@ def jsonb_contains(column: str, param: str) -> str:
         # Use instr() for a basic substring check.  Callers should also pass
         # the bare event key string as :param value.
         return f"instr({column}, {param}) > 0"
-    return f"{column} @> {param}::jsonb"
+    return f"{column} @> CAST({param} AS jsonb)"
 
 
 # ── DDL helpers ──────────────────────────────────────────────
