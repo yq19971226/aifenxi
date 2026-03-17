@@ -199,7 +199,7 @@ async def _persist_strategy(
             )
             await session.commit()
     except Exception as exc:
-        logger.warning("策略持久化失败（不影响分析结果）: %s", exc)
+        logger.warning("策略持久化失败（不影响分析结果）: %s", exc, exc_info=True)
 
 
 async def run_post_complete_tasks(
@@ -228,10 +228,10 @@ async def run_post_complete_tasks(
     try:
         await asyncio.wait_for(
             _persist_strategy(user_id, symbol, mode, report),
-            timeout=5.0,
+            timeout=15.0,
         )
     except Exception as exc:
-        logger.warning("策略持久化后置任务失败或超时: %s", exc)
+        logger.warning("策略持久化后置任务失败或超时: %s", exc, exc_info=True)
 
     try:
         await asyncio.wait_for(
