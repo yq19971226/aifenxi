@@ -10,8 +10,10 @@ from pydantic import BaseModel
 from app.core.deps import require_admin
 from app.core.model_router import (
     AVAILABLE_MODELS,
+    DEFAULT_CHAINS,
     get_all_assignments,
     set_model_for_agent,
+    set_chain_for_agent,
     invalidate_cache,
 )
 
@@ -25,6 +27,10 @@ router = APIRouter(prefix="/api/admin/models", tags=["admin-models"])
 
 class UpdateAssignmentRequest(BaseModel):
     model_key: str
+
+
+class UpdateChainRequest(BaseModel):
+    chain: list[str]  # 有序 model_key 列表
 
 
 class BatchUpdateRequest(BaseModel):
@@ -73,27 +79,40 @@ async def batch_update_assignments(
     return {"results": results}
 
 
+@router.put("/chain/{agent_id}")
+async def update_chain(
+    agent_id: str,
+    body: UpdateChainRequest,
+    _=Depends(require_admin),
+):
+    """更新单个智能体的降级链。"""
+    if not body.chain:
+        raise HTTPException(status_code=400, detail="降级链不能为空")
+    ok = await set_chain_for_agent(agent_id, body.chain)
+    if not ok:
+        raise HTTPException(status_code=400, detail="无效的智能体 ID 或模型 Key")
+    return {"ok": True, "agent_id": agent_id, "chain": body.chain}
+
+
 @router.post("/reset/{agent_id}")
 async def reset_assignment(agent_id: str, _=Depends(require_admin)):
-    """重置单个智能体的模型分配为默认值。"""
-    from app.core.model_router import DEFAULT_ROUTES
-    default_key = DEFAULT_ROUTES.get(agent_id)
-    if not default_key:
+    """重置单个智能体的模型分配为默认降级链。"""
+    default_chain = DEFAULT_CHAINS.get(agent_id)
+    if not default_chain:
         raise HTTPException(status_code=400, detail="无效的智能体 ID")
-    ok = await set_model_for_agent(agent_id, default_key)
+    ok = await set_chain_for_agent(agent_id, default_chain)
     if not ok:
         raise HTTPException(status_code=500, detail="重置失败")
-    return {"ok": True, "agent_id": agent_id, "model_key": default_key}
+    return {"ok": True, "agent_id": agent_id, "chain": default_chain}
 
 
 @router.post("/reset")
 async def reset_all_assignments(_=Depends(require_admin)):
-    """重置所有智能体的模型分配为默认值。"""
-    from app.core.model_router import DEFAULT_ROUTES
+    """重置所有智能体的模型分配为默认降级链。"""
     results = []
-    for agent_id, default_key in DEFAULT_ROUTES.items():
-        ok = await set_model_for_agent(agent_id, default_key)
-        results.append({"agent_id": agent_id, "model_key": default_key, "ok": ok})
+    for agent_id, default_chain in DEFAULT_CHAINS.items():
+        ok = await set_chain_for_agent(agent_id, default_chain)
+        results.append({"agent_id": agent_id, "chain": default_chain, "ok": ok})
     invalidate_cache()
     return {"results": results}
 
@@ -250,11 +269,11 @@ async def add_model(body: AddModelRequest, _=Depends(require_admin)):
 @router.delete("/remove-model/{model_key}")
 async def remove_model(model_key: str, _=Depends(require_admin)):
     """删除一个旧模型（不能删除正在被智能体使用的模型）。"""
-    from app.core.model_router import AVAILABLE_MODELS, ALL_MODEL_NAMES, DEFAULT_ROUTES
+    from app.core.model_router import AVAILABLE_MODELS, ALL_MODEL_NAMES, DEFAULT_CHAINS
     from app.core.llm_client import MODELS
 
-    # 检查是否被默认路由使用
-    agent_using = [aid for aid, mk in DEFAULT_ROUTES.items() if mk == model_key]
+    # 检查是否被默认降级链使用
+    agent_using = [aid for aid, chain in DEFAULT_CHAINS.items() if model_key in chain]
     # 检查是否被自定义路由使用
     assignments = await get_all_assignments()
     custom_using = [a["agent_id"] for a in assignments if a["current_model_key"] == model_key]

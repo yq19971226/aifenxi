@@ -112,20 +112,19 @@ def _build_deepseek_user_prompt(data: MarketData) -> str:
 
 
 async def deepseek_analyze(data: MarketData) -> ModelVote:
-    """DeepSeek 链上数据解读专责分析。"""
-    from app.core.model_router import get_model_for_agent
-    _model_key = await get_model_for_agent("consensus_deepseek")
+    """DeepSeek 链上数据解读专责分析（支持降级链）。"""
+    from app.core.model_router import call_with_fallback
     try:
-        raw: dict[str, Any] = await llm_client.call_model(
-            model_key=_model_key,
+        model_key, raw = await call_with_fallback(
+            "consensus_deepseek",
             system_prompt=_DEEPSEEK_SYSTEM,
             user_prompt=_build_deepseek_user_prompt(data),
             temperature=0.1,
         )
-        return _parse_model_vote(_model_key, raw)
+        return _parse_model_vote(model_key, raw)
     except Exception as exc:
         logger.error("deepseek_analyze failed", extra={"error": str(exc)})
-        return _fallback_vote(_model_key, exc)
+        return _fallback_vote("consensus_deepseek", exc)
 
 
 # ── Grok-4: 宏观叙事 + 实时信息专责 ─────────────────────────
@@ -184,20 +183,19 @@ def _build_grok_user_prompt(data: MarketData) -> str:
 
 
 async def grok_analyze(data: MarketData) -> ModelVote:
-    """Grok-4 宏观叙事 + 实时信息专责分析。"""
-    from app.core.model_router import get_model_for_agent
-    _model_key = await get_model_for_agent("consensus_grok")
+    """Grok-4 宏观叙事 + 实时信息专责分析（支持降级链）。"""
+    from app.core.model_router import call_with_fallback
     try:
-        raw: dict[str, Any] = await llm_client.call_model(
-            model_key=_model_key,
+        model_key, raw = await call_with_fallback(
+            "consensus_grok",
             system_prompt=_GROK_SYSTEM,
             user_prompt=_build_grok_user_prompt(data),
             temperature=0.1,
         )
-        return _parse_model_vote(_model_key, raw)
+        return _parse_model_vote(model_key, raw)
     except Exception as exc:
         logger.error("grok_analyze failed", extra={"error": str(exc)})
-        return _fallback_vote(_model_key, exc)
+        return _fallback_vote("consensus_grok", exc)
 
 
 # ── Claude: 风险识别 + 逻辑一致性专责 ────────────────────────
@@ -269,20 +267,19 @@ def _build_claude_user_prompt(data: MarketData) -> str:
 
 
 async def claude_analyze(data: MarketData) -> ModelVote:
-    """Claude 风险识别 + 逻辑一致性专责分析。"""
-    from app.core.model_router import get_model_for_agent
-    _model_key = await get_model_for_agent("consensus_claude")
+    """Claude 风险识别 + 逻辑一致性专责分析（支持降级链）。"""
+    from app.core.model_router import call_with_fallback
     try:
-        raw: dict[str, Any] = await llm_client.call_model(
-            model_key=_model_key,
+        model_key, raw = await call_with_fallback(
+            "consensus_claude",
             system_prompt=_CLAUDE_SYSTEM,
             user_prompt=_build_claude_user_prompt(data),
             temperature=0.1,
         )
-        return _parse_model_vote(_model_key, raw)
+        return _parse_model_vote(model_key, raw)
     except Exception as exc:
         logger.error("claude_analyze failed", extra={"error": str(exc)})
-        return _fallback_vote(_model_key, exc)
+        return _fallback_vote("consensus_claude", exc)
 
 
 # ── Qwen3 Max: 模式匹配 + 历史相似专责 ──────────────────────
@@ -354,17 +351,16 @@ def _build_qwen_user_prompt(data: MarketData) -> str:
 
 
 async def qwen_analyze(data: MarketData) -> ModelVote:
-    """Qwen3 Max 模式匹配 + 历史相似专责分析。"""
-    from app.core.model_router import get_model_for_agent
-    _model_key = await get_model_for_agent("consensus_qwen")
+    """Qwen3 Max 模式匹配 + 历史相似专责分析（支持降级链）。"""
+    from app.core.model_router import call_with_fallback
     try:
-        raw: dict[str, Any] = await llm_client.call_model(
-            model_key=_model_key,
+        model_key, raw = await call_with_fallback(
+            "consensus_qwen",
             system_prompt=_QWEN_SYSTEM,
             user_prompt=_build_qwen_user_prompt(data),
             temperature=0.1,
         )
-        return _parse_model_vote(_model_key, raw)
+        return _parse_model_vote(model_key, raw)
     except Exception as exc:
         logger.error("qwen_analyze failed", extra={"error": str(exc)})
-        return _fallback_vote(_model_key, exc)
+        return _fallback_vote("consensus_qwen", exc)

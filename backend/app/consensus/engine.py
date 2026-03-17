@@ -201,6 +201,13 @@ async def _round2_cross_review(
                 user_prompt=user_prompt,
                 temperature=0.1,
             )
+            # 如果模型返回降级响应，保留 Round1 原始投票
+            if raw.get("is_fallback", False):
+                logger.warning(
+                    "Round2 cross review got fallback, keeping R1 vote",
+                    extra={"model_key": vote.model_key},
+                )
+                return vote
             return _parse_model_vote(vote.model_key, raw)
         except Exception as exc:
             logger.error(

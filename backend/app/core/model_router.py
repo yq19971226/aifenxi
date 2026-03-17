@@ -1,17 +1,22 @@
 """动态模型路由 — 智能体和共识分析器的模型分配从配置读取，支持后台实时切换。
 
-用法：
-    from app.core.model_router import get_model_for_agent
+支持降级链：每个智能体配置有序模型列表，主模型失败后自动尝试备用模型。
 
-    model_key = await get_model_for_agent("technical")
-    result = await llm_client.call_model(model_key=model_key, ...)
+用法：
+    from app.core.model_router import call_with_fallback
+
+    model_key, result = await call_with_fallback(
+        "technical", system_prompt, user_prompt
+    )
 
 配置键格式：
-    model_route:{agent_id} → model_key（如 "deepseek", "grok", "claude" 等）
+    model_route:{agent_id} → model_key（主模型，向后兼容）
+    model_chain:{agent_id} → JSON list of model_keys（降级链）
 
-未配置时回退到 DEFAULT_ROUTES 中的默认值。
+未配置时回退到 DEFAULT_CHAINS 中的默认值。
 """
 
+import json as _json
 import logging
 from typing import Any
 
@@ -19,26 +24,32 @@ logger = logging.getLogger(__name__)
 
 # ── 默认路由（回退值，与当前硬编码一致）────────────────────────
 
-DEFAULT_ROUTES: dict[str, str] = {
-    # 核心层智能体
-    "technical": "claude-sonnet",          # 首选 Claude Sonnet 4.5，备选 qwen3-max
-    "onchain": "deepseek-v3.2-thinking",   # 首选 DeepSeek V3.2 Thinking，备选 claude-sonnet
-    "sentiment": "grok-fast",              # 首选 Grok-4 Fast，备选 grok-code-fast
-    "orderbook": "qwen3-max",              # 首选 Qwen3 Max，备选 qwen3-next-thinking
+# ── 默认降级链（有序：主模型 → 备用1 → 备用2）─────────────────
 
-    "risk": "claude-haiku",                # 首选 Claude Haiku 4.5，备选 claude-sonnet
+DEFAULT_CHAINS: dict[str, list[str]] = {
+    # 核心层智能体
+    "technical":          ["claude-sonnet", "qwen3-max", "deepseek-v3.2-thinking"],
+    "onchain":            ["deepseek-v3.2-thinking", "deepseek-r1", "qwen3-max"],
+    "sentiment":          ["grok-fast", "grok-code-fast", "qwen3-max"],
+    "orderbook":          ["qwen3-max", "qwen3-next-thinking", "deepseek-v3.2-thinking"],
+    "risk":               ["claude-haiku", "claude-sonnet", "deepseek-v3.2-thinking"],
     # 增强层
-    "news_analyst": "grok-fast",           # Grok-4 Fast 实时信息
-    "calendar": "qwen3-next-thinking",      # 日历事件分析（原 grok-fast，分散限频风险）
-    "reflection": "deepseek-r1",           # 首选 DeepSeek R1-671B，备选 qwen3-next-thinking
+    "news_analyst":       ["grok-fast", "grok-code-fast", "qwen3-max"],
+    "calendar":           ["qwen3-next-thinking", "qwen3-max", "deepseek-v3.2-thinking"],
+    "reflection":         ["deepseek-r1", "qwen3-next-thinking", "deepseek-v3.2-thinking"],
     # 对抗层
-    "adversarial": "deepseek-r1",          # 深度博弈推理
-    "collusion_detector": "claude-sonnet", # 逻辑一致性
+    "adversarial":        ["deepseek-r1", "deepseek-v3.2-thinking", "claude-sonnet"],
+    "collusion_detector": ["claude-sonnet", "claude-haiku", "deepseek-v3.2-thinking"],
     # 共识引擎 4 分析器
-    "consensus_deepseek": "deepseek-v3.2-thinking",
-    "consensus_grok": "grok-fast",
-    "consensus_claude": "claude-sonnet",
-    "consensus_qwen": "qwen3-max",
+    "consensus_deepseek": ["deepseek-v3.2-thinking", "deepseek-r1", "qwen3-max"],
+    "consensus_grok":     ["grok-fast", "grok-code-fast", "qwen3-max"],
+    "consensus_claude":   ["claude-sonnet", "claude-haiku", "deepseek-v3.2-thinking"],
+    "consensus_qwen":     ["qwen3-max", "qwen3-next-thinking", "deepseek-v3.2-thinking"],
+}
+
+# 向后兼容：DEFAULT_ROUTES 取每条链的第一个
+DEFAULT_ROUTES: dict[str, str] = {
+    k: v[0] for k, v in DEFAULT_CHAINS.items()
 }
 
 # ── 各模型超时配置（秒）────────────────────────────────────────
@@ -193,18 +204,34 @@ AGENT_META: list[dict[str, str]] = [
 
 # ── 内存缓存 ──────────────────────────────────────────────────
 
-_cache: dict[str, str] = {}
+_cache: dict[str, str] = {}          # agent_id → primary model_key
+_chain_cache: dict[str, list[str]] = {}  # agent_id → ordered chain
 _cache_loaded = False
 
 
 async def _load_all_routes() -> None:
-    """从 ConfigService 加载所有 model_route:* 配置到内存缓存。"""
-    global _cache, _cache_loaded
+    """从 ConfigService 加载所有 model_route:* 和 model_chain:* 配置到内存缓存。"""
+    global _cache, _chain_cache, _cache_loaded
     try:
         from app.services.config_service import get_config_value
-        for agent_id in DEFAULT_ROUTES:
+        for agent_id in DEFAULT_CHAINS:
+            # 加载降级链配置
+            chain_raw = await get_config_value(f"model_chain:{agent_id}", default=None)
+            if chain_raw:
+                try:
+                    chain = _json.loads(chain_raw)
+                    if isinstance(chain, list) and all(isinstance(m, str) for m in chain):
+                        # 只保留合法的 model_key
+                        valid = [m for m in chain if m in ALL_MODEL_NAMES]
+                        if valid:
+                            _chain_cache[agent_id] = valid
+                            _cache[agent_id] = valid[0]
+                            continue
+                except (_json.JSONDecodeError, TypeError):
+                    pass
+            # 向后兼容：读取旧的单模型配置
             val = await get_config_value(f"model_route:{agent_id}", default=None)
-            if val and val in ALL_MODEL_NAMES:  # noqa: E501
+            if val and val in ALL_MODEL_NAMES:
                 _cache[agent_id] = val
         _cache_loaded = True
     except Exception as exc:
@@ -213,31 +240,54 @@ async def _load_all_routes() -> None:
 
 
 async def get_model_for_agent(agent_id: str) -> str:
-    """获取指定智能体应使用的 model_key。
+    """获取指定智能体应使用的主模型 model_key（降级链第一个）。
 
-    优先级：ConfigService 配置 > 内存缓存 > DEFAULT_ROUTES 默认值。
+    优先级：ConfigService 配置 > 内存缓存 > DEFAULT_CHAINS 默认值。
+    """
+    global _cache_loaded
+    if not _cache_loaded:
+        await _load_all_routes()
+    if agent_id in _cache:
+        return _cache[agent_id]
+    chain = DEFAULT_CHAINS.get(agent_id, ["deepseek"])
+    return chain[0] if chain else "deepseek"
+
+
+async def get_chain_for_agent(agent_id: str) -> list[str]:
+    """获取指定智能体的完整降级链。
+
+    优先级：缓存降级链 > 缓存主模型 + 默认链剩余 > DEFAULT_CHAINS。
     """
     global _cache_loaded
     if not _cache_loaded:
         await _load_all_routes()
 
-    if agent_id in _cache:
-        return _cache[agent_id]
+    # 1. 有完整降级链配置
+    if agent_id in _chain_cache:
+        return _chain_cache[agent_id]
 
-    return DEFAULT_ROUTES.get(agent_id, "deepseek")
+    # 2. 有单模型配置 → 将其置顶，拼接默认链剩余模型
+    default_chain = DEFAULT_CHAINS.get(agent_id, ["deepseek"])
+    if agent_id in _cache:
+        primary = _cache[agent_id]
+        # 主模型 + 默认链中排除主模型的其他模型
+        rest = [m for m in default_chain if m != primary]
+        return [primary] + rest
+
+    # 3. 无任何配置 → 用默认
+    return list(default_chain)
 
 
 async def set_model_for_agent(agent_id: str, model_key: str) -> bool:
-    """设置指定智能体使用的模型，持久化到 ConfigService。
+    """设置指定智能体使用的主模型，持久化到 ConfigService。
 
     Returns:
         True 设置成功，False 参数无效
     """
-    if agent_id not in DEFAULT_ROUTES:
+    if agent_id not in DEFAULT_CHAINS:
         logger.warning("Unknown agent_id", extra={"agent_id": agent_id})
         return False
     if model_key not in ALL_MODEL_NAMES:
-        # 也检查 llm_client 的动态 MODELS 字典
         from app.core.llm_client import MODELS as _LLM_MODELS
         if model_key not in _LLM_MODELS:
             logger.warning("Unknown model_key", extra={"model_key": model_key})
@@ -249,10 +299,12 @@ async def set_model_for_agent(agent_id: str, model_key: str) -> bool:
             f"model_route:{agent_id}",
             model_key,
             category="model_route",
-            description=f"智能体 {agent_id} 使用的模型",
+            description=f"智能体 {agent_id} 使用的主模型",
             is_secret=False,
         )
         _cache[agent_id] = model_key
+        # 清除链缓存，下次会重新组合
+        _chain_cache.pop(agent_id, None)
         logger.info("Model route updated", extra={"agent_id": agent_id, "model_key": model_key})
         return True
     except Exception as exc:
@@ -260,8 +312,49 @@ async def set_model_for_agent(agent_id: str, model_key: str) -> bool:
         return False
 
 
+async def set_chain_for_agent(agent_id: str, chain: list[str]) -> bool:
+    """设置指定智能体的完整降级链，持久化到 ConfigService。
+
+    Args:
+        chain: 有序 model_key 列表，第一个为主模型
+
+    Returns:
+        True 设置成功，False 参数无效
+    """
+    if agent_id not in DEFAULT_CHAINS:
+        logger.warning("Unknown agent_id", extra={"agent_id": agent_id})
+        return False
+    if not chain:
+        logger.warning("Empty chain", extra={"agent_id": agent_id})
+        return False
+
+    # 验证所有 model_key
+    from app.core.llm_client import MODELS as _LLM_MODELS
+    for mk in chain:
+        if mk not in ALL_MODEL_NAMES and mk not in _LLM_MODELS:
+            logger.warning("Unknown model_key in chain", extra={"model_key": mk})
+            return False
+
+    try:
+        from app.services.config_service import set_config_value
+        await set_config_value(
+            f"model_chain:{agent_id}",
+            _json.dumps(chain),
+            category="model_chain",
+            description=f"智能体 {agent_id} 的降级链",
+            is_secret=False,
+        )
+        _chain_cache[agent_id] = chain
+        _cache[agent_id] = chain[0]
+        logger.info("Model chain updated", extra={"agent_id": agent_id, "chain": chain})
+        return True
+    except Exception as exc:
+        logger.error("Failed to set model chain", extra={"agent_id": agent_id, "error": str(exc)})
+        return False
+
+
 async def get_all_assignments() -> list[dict[str, Any]]:
-    """获取所有智能体的模型分配列表（供 API/前端使用）。"""
+    """获取所有智能体的模型分配列表（含降级链，供 API/前端使用）。"""
     global _cache_loaded
     if not _cache_loaded:
         await _load_all_routes()
@@ -269,12 +362,27 @@ async def get_all_assignments() -> list[dict[str, Any]]:
     result = []
     for meta in AGENT_META:
         agent_id = meta["agent_id"]
-        current_model_key = _cache.get(agent_id, DEFAULT_ROUTES.get(agent_id, "deepseek"))
-        default_model_key = DEFAULT_ROUTES.get(agent_id, "deepseek")
-        is_custom = agent_id in _cache and _cache[agent_id] != default_model_key
+        chain = await get_chain_for_agent(agent_id)
+        current_model_key = chain[0] if chain else "deepseek"
+        default_chain = DEFAULT_CHAINS.get(agent_id, ["deepseek"])
+        default_model_key = default_chain[0]
+        is_custom = (
+            agent_id in _chain_cache
+            or (agent_id in _cache and _cache[agent_id] != default_model_key)
+        )
 
         # 找到模型元信息
         model_info = next((m for m in AVAILABLE_MODELS if m["model_key"] == current_model_key), None)
+
+        # 链中每个模型的展示名称
+        chain_display = []
+        for mk in chain:
+            mi = next((m for m in AVAILABLE_MODELS if m["model_key"] == mk), None)
+            chain_display.append({
+                "model_key": mk,
+                "model_name": ALL_MODEL_NAMES.get(mk, mk),
+                "display_name": mi["display_name"] if mi else mk,
+            })
 
         result.append({
             "agent_id": agent_id,
@@ -285,14 +393,83 @@ async def get_all_assignments() -> list[dict[str, Any]]:
             "current_model_name": ALL_MODEL_NAMES.get(current_model_key, current_model_key),
             "current_model_display": model_info["display_name"] if model_info else current_model_key,
             "default_model_key": default_model_key,
+            "default_chain": default_chain,
+            "chain": chain,
+            "chain_display": chain_display,
             "is_custom": is_custom,
         })
 
     return result
 
 
+# ── 降级链调用 ────────────────────────────────────────
+
+
+async def call_with_fallback(
+    agent_id: str,
+    system_prompt: str,
+    user_prompt: str,
+    temperature: float = 0.1,
+) -> tuple[str, dict[str, Any]]:
+    """按降级链调用模型：主模型失败后自动尝试备用模型。
+
+    Returns:
+        (actual_model_key, result_dict) — 实际使用的模型和结果
+
+    Raises:
+        不抛出异常。如果所有模型均失败，返回最后一个模型的降级响应。
+    """
+    from app.core.llm_client import llm_client
+
+    chain = await get_chain_for_agent(agent_id)
+    last_result: dict[str, Any] = {}
+
+    for i, model_key in enumerate(chain):
+        result = await llm_client.call_model(
+            model_key=model_key,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            temperature=temperature,
+        )
+
+        # 检查是否降级响应
+        if not result.get("is_fallback", False):
+            if i > 0:
+                logger.warning(
+                    "模型降级成功",
+                    extra={
+                        "agent_id": agent_id,
+                        "primary": chain[0],
+                        "actual": model_key,
+                        "attempt": i + 1,
+                    },
+                )
+            return model_key, result
+
+        # 记录失败，尝试下一个
+        last_result = result
+        if i < len(chain) - 1:
+            logger.warning(
+                "模型调用失败，尝试降级",
+                extra={
+                    "agent_id": agent_id,
+                    "failed_model": model_key,
+                    "next_model": chain[i + 1],
+                    "reason": result.get("reasoning", ""),
+                },
+            )
+
+    # 所有模型均失败
+    logger.error(
+        "降级链全部失败",
+        extra={"agent_id": agent_id, "chain": chain},
+    )
+    return chain[-1], last_result
+
+
 def invalidate_cache() -> None:
     """清除内存缓存，下次调用 get_model_for_agent 时重新加载。"""
-    global _cache, _cache_loaded
+    global _cache, _chain_cache, _cache_loaded
     _cache = {}
+    _chain_cache = {}
     _cache_loaded = False
