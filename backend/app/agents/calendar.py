@@ -17,7 +17,6 @@ import logging
 from datetime import datetime, timedelta, timezone
 
 from app.agents.base import AgentReport, BaseAgent
-from app.core.llm_client import llm_client
 from app.models.market_data import MarketData
 
 logger = logging.getLogger(__name__)

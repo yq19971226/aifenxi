@@ -12,7 +12,6 @@
 import logging
 from typing import Any
 
-from app.core.llm_client import llm_client
 from app.models.market_data import MarketData
 
 # ModelVote / _parse_model_vote / _build_market_summary 由 engine 提供

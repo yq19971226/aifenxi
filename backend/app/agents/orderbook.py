@@ -10,7 +10,6 @@ from datetime import datetime, timezone
 from typing import Any
 
 from app.agents.base import AgentReport, BaseAgent
-from app.core.llm_client import llm_client
 from app.models.market_data import MarketData
 
 logger = logging.getLogger(__name__)

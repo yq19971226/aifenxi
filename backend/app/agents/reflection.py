@@ -19,7 +19,6 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
-from app.core.llm_client import llm_client
 from app.core.redis import get_json, get_redis_pool, set_with_ttl
 
 logger = logging.getLogger(__name__)

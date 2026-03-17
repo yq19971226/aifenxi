@@ -18,7 +18,6 @@ from datetime import datetime, timezone
 from typing import Any
 
 from app.agents.base import AgentReport, BaseAgent
-from app.core.llm_client import llm_client
 from app.data.blockbeats import BlockBeatsCollector
 from app.data.news import NewsCollector, NewsItem
 from app.models.market_data import MarketData

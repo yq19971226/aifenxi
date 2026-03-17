@@ -22,7 +22,6 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 from app.agents.base import AgentReport, BaseAgent
-from app.core.llm_client import llm_client
 from app.core.redis import get_json
 from app.models.market_data import MarketData
 

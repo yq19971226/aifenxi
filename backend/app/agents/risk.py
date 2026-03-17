@@ -21,7 +21,6 @@ from pydantic import BaseModel, Field
 from app.agents.base import AgentReport, BaseAgent
 from app.agents.i18n_prompts import get_system_prompt
 from app.agents.language_detect import check_language_mismatch
-from app.core.llm_client import llm_client
 from app.core.redis import publish_stream
 from app.models.market_data import MarketData
 
