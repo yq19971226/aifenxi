@@ -466,11 +466,19 @@
       },
       "trend_confluence_enabled": {
         "label": "跨周期共振開關",
-        "help": "開啟後，高周期趨勢信號將對低周期信號進行共振加權（true/false，預設 false）"
+        "help": "開啟後，高周期趨勢信號將對低周期信號進行共振加權（預設 關閉）",
+        "options": {
+          "false": "關閉",
+          "true": "開啟"
+        }
       },
       "whale_trap_enabled": {
         "label": "巨鲸陷阱檢測開關",
-        "help": "開啟後，資金費率、爆倉、鏈上流入等異常將降低信號置信度（true/false，預設 false）"
+        "help": "開啟後，資金費率、爆倉、鏈上流入等異常將降低信號置信度（預設 關閉）",
+        "options": {
+          "false": "關閉",
+          "true": "開啟"
+        }
       },
       "risk_threshold_exchange_inflow_btc": {
         "label": "交易所流入預警",

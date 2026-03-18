@@ -121,7 +121,9 @@ async def _apply_trend_confluence(
 _FR_EXTREME_THRESHOLD    = 0.0008   # 资金费率绝对值 >0.08% 为极端
 _LIQ_LARGE_THRESHOLD     = 50_000_000  # 1h爆仓 >5000万 USD
 _NETFLOW_LARGE_THRESHOLD = 1000     # 链上流入>1000 BTC/h
-_LSR_CROWDED_THRESHOLD   = 0.70     # 散户多头占比>70%
+# long_short_ratio 是比值（多头持仓 / 空头持仓）
+# >2.0 = 多头是空头 2 倍以上 → 多头拥挤；<0.5 = 空头拥挤
+_LSR_LONG_CROWDED        = 2.0      # 多头拥挤阈值（看多信号时风险）
 
 _WHALE_RISK_FACTORS: dict[str, float] = {
     "funding_rate_extreme": 0.55,   # 资金费率极端 + 信号同向
@@ -168,7 +170,7 @@ async def _apply_whale_trap_filter(
 
             # ③ 散户多空比极端偏多（看多信号时更危险）
             lsr = getattr(deriv, "long_short_ratio", None)
-            if lsr is not None and signal == "bullish" and lsr > _LSR_CROWDED_THRESHOLD:
+            if lsr is not None and signal == "bullish" and lsr > _LSR_LONG_CROWDED:
                 risks.append("lsr_crowded")
                 factors.append(_WHALE_RISK_FACTORS["lsr_crowded"])
 
@@ -224,16 +226,29 @@ async def apply_confluence_filter(
         result.final_confidence = confidence
         return result
 
-    # ── 读取功能开关 ──────────────────────────────────────────
+    # ── 读取功能开关（Redis 缓存 5min，降低 DB 读频率）──────────────
     trend_enabled = False
     whale_enabled = False
     try:
-        from app.core.database import AsyncSessionLocal
-        from app.services.config_service import ConfigService
-        async with AsyncSessionLocal() as session:
-            svc = ConfigService(session)
-            trend_enabled = (await svc.get_config("trend_confluence_enabled", "false")).lower() == "true"
-            whale_enabled = (await svc.get_config("whale_trap_enabled", "false")).lower() == "true"
+        from app.core.redis import get_redis_pool
+        _redis = get_redis_pool()
+        _cfg_key = "confluence_filter:config_cache"
+        _cached_cfg = await _redis.hgetall(_cfg_key)
+        if _cached_cfg:
+            trend_enabled = (_cached_cfg.get(b"trend", b"false") == b"true")
+            whale_enabled = (_cached_cfg.get(b"whale", b"false") == b"true")
+        else:
+            from app.core.database import AsyncSessionLocal
+            from app.services.config_service import ConfigService
+            async with AsyncSessionLocal() as session:
+                svc = ConfigService(session)
+                trend_enabled = (await svc.get_config("trend_confluence_enabled", "false")).lower() == "true"
+                whale_enabled = (await svc.get_config("whale_trap_enabled", "false")).lower() == "true"
+            await _redis.hset(_cfg_key, mapping={
+                "trend": "true" if trend_enabled else "false",
+                "whale": "true" if whale_enabled else "false",
+            })
+            await _redis.expire(_cfg_key, 300)  # 5分钟缓存
     except Exception as exc:
         logger.debug("confluence_filter: config read failed, skipping: %s", exc)
 
@@ -251,7 +266,7 @@ async def apply_confluence_filter(
 
     # ── 最终置信度 ────────────────────────────────────────────
     final = round(confidence * trend_factor * whale_factor, 4)
-    final = max(0.10, min(0.95, final))
+    final = max(0.05, min(0.95, final))  # 最低 5%，保留细粒度
 
     # ── 组装标签 ─────────────────────────────────────────────
     tags: list[str] = []

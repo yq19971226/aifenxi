@@ -476,11 +476,19 @@
       },
       "trend_confluence_enabled": {
         "label": "Cross-Timeframe Confluence",
-        "help": "When enabled, higher-timeframe trend signals weight lower-timeframe signals (true/false, default false)"
+        "help": "When enabled, higher-timeframe trend signals weight lower-timeframe signals (default: Off)",
+        "options": {
+          "false": "Off",
+          "true": "On"
+        }
       },
       "whale_trap_enabled": {
         "label": "Whale Trap Detector",
-        "help": "When enabled, extreme funding rates, liquidation surges, and on-chain inflows reduce signal confidence (true/false, default false)"
+        "help": "When enabled, extreme funding rates, liquidation surges, and on-chain inflows reduce signal confidence (default: Off)",
+        "options": {
+          "false": "Off",
+          "true": "On"
+        }
       },
       "risk_threshold_exchange_inflow_btc": {
         "label": "Exchange Inflow Alert",

@@ -98,8 +98,10 @@ const CONFIG_GROUPS: ConfigGroup[] = [
       { key: "publish_dedup_scalping_hours", isSecret: false, defaultValue: "4", unit: "小时", category: "publish" },
       { key: "publish_dedup_intraday_hours", isSecret: false, defaultValue: "12", unit: "小时", category: "publish" },
       { key: "publish_dedup_trend_days", isSecret: false, defaultValue: "3", unit: "天", category: "publish" },
-      { key: "trend_confluence_enabled", isSecret: false, defaultValue: "false", category: "confluence" },
-      { key: "whale_trap_enabled", isSecret: false, defaultValue: "false", category: "confluence" },
+      { key: "trend_confluence_enabled", isSecret: false, defaultValue: "false", category: "confluence",
+        options: ["false", "true"] },
+      { key: "whale_trap_enabled", isSecret: false, defaultValue: "false", category: "confluence",
+        options: ["false", "true"] },
     ],
   },
   {
