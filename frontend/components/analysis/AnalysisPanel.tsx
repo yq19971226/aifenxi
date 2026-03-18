@@ -101,12 +101,14 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
     return (opt?.minLevel ?? 0) > userLevel;
   }, [userLevel, quota]);
   const isQuotaExhausted = currentQuota !== null && currentQuota.remaining === 0;
+  const isMaintenance = quota?.maintenance === true;
 
   const modeLocked = isModeLocked(mode);
   const canStart =
     symbol.trim().length > 0 &&
     !modeLocked &&
     !isQuotaExhausted &&
+    !isMaintenance &&
     !running;
 
   const handleStart = useCallback(
@@ -262,35 +264,34 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
       {/* Progress indicator */}
       {running && <AnalysisProgress steps={progressSteps} startTime={startTime} />}
 
-      {/* Error / Maintenance display */}
-      {error && !running && (
-        error.includes("维护") || error.includes("maintenance") ? (
-          /* ── 维护模式专属横幅 ── */
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="rounded-xl border border-sky-500/20 bg-sky-500/[0.06] px-5 py-5 text-center space-y-3"
+      {/* Maintenance banner */}
+      {isMaintenance && !running && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-xl border border-sky-500/20 bg-sky-500/[0.06] px-5 py-5 text-center space-y-3"
+        >
+          <div className="text-3xl">🔧</div>
+          <p className="text-sm font-bold text-sky-300">综合分析模块维护中</p>
+          <p className="text-xs text-zinc-400 leading-relaxed max-w-sm mx-auto">
+            系统正在进行升级维护，分析功能暂时不可用。后台数据正常运行，维护完成后将自动恢复。
+          </p>
+        </motion.div>
+      )}
+
+      {/* Error display */}
+      {error && !running && !isMaintenance && (
+        <div className="space-y-2 rounded-lg border border-red-500/20 bg-red-500/[0.05] px-3 py-3">
+          <p className="text-xs text-red-400">{error}</p>
+          <button
+            type="button"
+            onClick={handleRetry}
+            className="flex items-center gap-1.5 rounded-md bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
           >
-            <div className="text-3xl">🔧</div>
-            <p className="text-sm font-bold text-sky-300">综合分析模块维护中</p>
-            <p className="text-xs text-zinc-400 leading-relaxed max-w-sm mx-auto">
-              系统正在进行升级维护，功能暂时不可用。请稍后再试，维护完成后将自动恢复。
-            </p>
-          </motion.div>
-        ) : (
-          /* ── 普通错误显示 ── */
-          <div className="space-y-2 rounded-lg border border-red-500/20 bg-red-500/[0.05] px-3 py-3">
-            <p className="text-xs text-red-400">{error}</p>
-            <button
-              type="button"
-              onClick={handleRetry}
-              className="flex items-center gap-1.5 rounded-md bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
-            >
-              <RefreshCw size={12} />
-              重试
-            </button>
-          </div>
-        )
+            <RefreshCw size={12} />
+            重试
+          </button>
+        </div>
       )}
 
       {/* Report display */}

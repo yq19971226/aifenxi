@@ -134,6 +134,7 @@ export interface QuotaInfo {
 export interface AnalysisQuotaResponse {
   quotas: Record<string, QuotaInfo>;
   level: number;
+  maintenance?: boolean;
 }
 
 // ── SSE 流式分析请求 ────────────────────────────────────────

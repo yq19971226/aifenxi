@@ -72,6 +72,7 @@ class AnalysisQuotaResponse(BaseModel):
 
     quotas: dict[str, QuotaInfo]
     level: int
+    maintenance: bool = False
 
 
 # ---------------------------------------------------------------------------
