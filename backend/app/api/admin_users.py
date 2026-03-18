@@ -172,3 +172,88 @@ async def update_membership_route(
     except Exception as exc:
         logger.error("update_membership_route error: %s", exc)
         raise HTTPException(status_code=500, detail="调整会员等级失败")
+
+
+# ── 手动充值 ──────────────────────────────────────────────────
+
+
+class AddCreditsBody(BaseModel):
+    """充值分析次数请求体。"""
+
+    mode: str
+    amount: int
+    note: str = "手动充值"
+
+
+@router.post("/{user_id}/add-credits")
+async def add_credits_route(
+    user_id: str,
+    body: AddCreditsBody,
+    admin: UserInfo = Depends(require_admin),
+    session: AsyncSession = Depends(get_db),
+) -> dict:
+    """为指定用户充值分析次数（仅管理员）。"""
+    from uuid import UUID
+    from app.models.analysis import AnalysisMode
+    from app.services.analysis_quota import AnalysisQuotaService
+
+    # 验证模式
+    try:
+        mode = AnalysisMode(body.mode)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"无效模式: {body.mode}，有效值: {[m.value for m in AnalysisMode]}",
+        )
+
+    if body.amount <= 0 or body.amount > 9999:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="充值数量必须在 1~9999 之间",
+        )
+
+    # 验证用户存在
+    from sqlalchemy import text as sql_text
+    result = await session.execute(
+        sql_text("SELECT id, email FROM users WHERE id = :uid"),
+        {"uid": user_id},
+    )
+    user_row = result.mappings().first()
+    if user_row is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="用户不存在",
+        )
+
+    # 充值
+    uid = UUID(user_id)
+    quota_svc = AnalysisQuotaService()
+    new_balance = await quota_svc.add_bonus_credits(uid, mode, body.amount)
+
+    logger.info(
+        "管理员充值: admin=%s, target=%s(%s), mode=%s, amount=%d, balance=%d, note=%s",
+        admin.email, user_row["email"], user_id, mode.value, body.amount, new_balance, body.note,
+    )
+
+    return {
+        "message": f"充值成功：{user_row['email']} {mode.value} +{body.amount}次",
+        "balance": new_balance,
+    }
+
+
+@router.get("/{user_id}/bonus")
+async def get_user_bonus(
+    user_id: str,
+    admin: UserInfo = Depends(require_admin),
+) -> dict:
+    """查询指定用户的 bonus 余额（仅管理员）。"""
+    from uuid import UUID
+    from app.models.analysis import AnalysisMode
+    from app.services.analysis_quota import AnalysisQuotaService
+
+    uid = UUID(user_id)
+    quota_svc = AnalysisQuotaService()
+    bonus = {}
+    for mode in AnalysisMode:
+        bonus[mode.value] = await quota_svc.get_bonus_remaining(uid, mode)
+    return {"user_id": user_id, "bonus": bonus}

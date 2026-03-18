@@ -9,6 +9,7 @@ import {
   createUser,
   toggleUserActive,
   updateMembership,
+  addCredits,
   type AdminUserInfo,
   type AdminUserListResponse,
 } from "@/lib/api/admin-users";
@@ -225,6 +226,174 @@ function CreateUserDialog({
   );
 }
 
+// ── Add Credits Dialog ───────────────────────────────────────
+
+function AddCreditsDialog({
+  user: targetUser,
+  onClose,
+  onSuccess,
+}: {
+  user: AdminUserInfo;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [mode, setMode] = useState("intraday");
+  const [amount, setAmount] = useState("");
+  const [note, setNote] = useState("手动充值");
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [onClose]);
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setFormError(null);
+      setSuccessMsg(null);
+
+      const num = parseInt(amount, 10);
+      if (!num || num <= 0 || num > 9999) {
+        setFormError("请输入 1~9999 的整数");
+        return;
+      }
+
+      setSubmitting(true);
+      try {
+        const res = await addCredits(targetUser.id, {
+          mode,
+          amount: num,
+          note: note || "手动充值",
+        });
+        setSuccessMsg(res.message);
+        setAmount("");
+        onSuccess();
+      } catch (err: unknown) {
+        setFormError(err instanceof Error ? err.message : "充值失败");
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [targetUser.id, mode, amount, note, onSuccess]
+  );
+
+  const MODE_OPTIONS = [
+    { value: "scalping", label: "超短线" },
+    { value: "intraday", label: "日内博弈" },
+    { value: "trend", label: "趋势布局" },
+  ];
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        className="card-surface p-6 w-full max-w-md mx-4 shadow-xl border border-border rounded-xl"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-5 border-b border-border/50 pb-4">
+          <div>
+            <h2 className="text-[14px] font-bold font-mono tracking-widest uppercase text-zinc-100">充值分析次数</h2>
+            <p className="text-[11px] font-mono text-zinc-500 mt-1">{targetUser.email}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 rounded-md text-zinc-500 hover:text-white hover:bg-bg-elevated transition-colors"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-bold font-mono tracking-widest uppercase text-zinc-500">分析模式</label>
+            <div className="grid grid-cols-3 gap-2">
+              {MODE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setMode(opt.value)}
+                  className={`rounded-lg border py-2.5 px-3 text-[11px] font-bold font-mono tracking-wider transition-all ${
+                    mode === opt.value
+                      ? "bg-indigo-500/15 border-indigo-500/40 text-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.15)]"
+                      : "bg-bg-surface/50 border-border text-zinc-500 hover:text-zinc-300 hover:border-border/80"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-bold font-mono tracking-widest uppercase text-zinc-500">充值数量</label>
+            <input
+              type="number"
+              min={1}
+              max={9999}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="请输入次数（1~9999）"
+              className="input font-mono bg-bg-surface/50"
+              autoFocus
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-bold font-mono tracking-widest uppercase text-zinc-500">备注</label>
+            <input
+              type="text"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="手动充值"
+              className="input font-mono bg-bg-surface/50 text-xs"
+            />
+          </div>
+
+          {formError && (
+            <div className="rounded-lg bg-bear/10 border border-bear/20 p-3 text-[11px] font-mono font-bold text-bear">
+              {formError}
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="rounded-lg bg-bull/10 border border-bull/20 p-3 text-[11px] font-mono font-bold text-bull">
+              {successMsg}
+            </div>
+          )}
+
+          <div className="flex items-center justify-end gap-3 pt-5 border-t border-border/50 mt-6">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-secondary !py-2 !px-5 font-bold font-mono tracking-widest uppercase text-[11px]"
+            >
+              关闭
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="btn-primary !py-2 !px-5 font-bold font-mono tracking-widest uppercase text-[11px]"
+            >
+              {submitting ? "充值中..." : "确认充值"}
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  );
+}
+
 // ── Main Page ────────────────────────────────────────────────
 
 export default function AdminUsersPage() {
@@ -244,6 +413,7 @@ export default function AdminUsersPage() {
   // action states
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [rechargeUser, setRechargeUser] = useState<AdminUserInfo | null>(null);
   const [editLevel, setEditLevel] = useState(0);
   const [editExpires, setEditExpires] = useState("");
   const [saving, setSaving] = useState(false);
@@ -367,6 +537,15 @@ export default function AdminUsersPage() {
             setPage(1);
             fetchUsers();
           }}
+        />
+      )}
+
+      {/* Recharge Dialog */}
+      {rechargeUser && (
+        <AddCreditsDialog
+          user={rechargeUser}
+          onClose={() => setRechargeUser(null)}
+          onSuccess={() => {}}
         />
       )}
 
@@ -570,6 +749,12 @@ export default function AdminUsersPage() {
                               </>
                             ) : (
                               <>
+                                <button
+                                  onClick={() => setRechargeUser(u)}
+                                  className="btn-secondary !py-1 !px-3 text-amber-400 font-mono font-bold tracking-widest uppercase text-[10px]"
+                                >
+                                  充值
+                                </button>
                                 <button
                                   onClick={() => startEdit(u)}
                                   className="btn-secondary !py-1 !px-3 text-indigo-400 font-mono font-bold tracking-widest uppercase text-[10px]"

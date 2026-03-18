@@ -101,3 +101,43 @@ export async function updateMembership(
   );
   return handleApiResponse(res, "调整会员等级失败");
 }
+
+export interface AddCreditsParams {
+  mode: string;
+  amount: number;
+  note?: string;
+}
+
+export interface AddCreditsResponse {
+  message: string;
+  balance: number;
+}
+
+export async function addCredits(
+  userId: string,
+  params: AddCreditsParams
+): Promise<AddCreditsResponse> {
+  const res = await authFetch(
+    `${API_BASE}/api/admin/users/${encodeURIComponent(userId)}/add-credits`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(params),
+    }
+  );
+  return handleApiResponse(res, "充值失败");
+}
+
+export interface UserBonusResponse {
+  user_id: string;
+  bonus: Record<string, number>;
+}
+
+export async function getUserBonus(
+  userId: string
+): Promise<UserBonusResponse> {
+  const res = await authFetch(
+    `${API_BASE}/api/admin/users/${encodeURIComponent(userId)}/bonus`
+  );
+  return handleApiResponse(res, "查询余额失败");
+}
