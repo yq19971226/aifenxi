@@ -120,6 +120,24 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
       : "—";
     const validUntilText = validUntil ? `${validUntil} ⏰` : "—";
 
+    // ── 共振标签映射 ──────────────────────────────────────────
+    const TREND_TAG_MAP: Record<string, { label: string; color: string; bg: string }> = {
+      "trend:resonant": { label: "🟢 顺势共振",  color: "#34d399", bg: "rgba(16,185,129,0.12)" },
+      "trend:counter":  { label: "🔴 逆势信号",  color: "#f87171", bg: "rgba(239,68,68,0.12)" },
+      "trend:neutral":  { label: "⚪ 趋势中性",  color: "#a1a1aa", bg: "rgba(255,255,255,0.06)" },
+      "trend:stale":    { label: "⏱️ 趋势过时",  color: "#71717a", bg: "rgba(255,255,255,0.04)" },
+    };
+    const WHALE_TAG_MAP: Record<string, { label: string; color: string; bg: string }> = {
+      "whale:funding_rate_extreme": { label: "🚨 资金费率极端", color: "#fbbf24", bg: "rgba(245,158,11,0.12)" },
+      "whale:liquidation_surge":    { label: "⚡ 清算潮警告",   color: "#f97316", bg: "rgba(249,115,22,0.12)" },
+      "whale:netflow_dump_risk":    { label: "🐋 巨鲸出货风险", color: "#a78bfa", bg: "rgba(139,92,246,0.12)" },
+      "whale:lsr_crowded":          { label: "🎯 散户持仓拥挤", color: "#f87171", bg: "rgba(239,68,68,0.10)" },
+    };
+    const ALL_TAG_MAP = { ...TREND_TAG_MAP, ...WHALE_TAG_MAP };
+    const confluenceTags = (report.confluence_tags ?? []).map(
+      (tag) => ALL_TAG_MAP[tag] ?? null
+    ).filter(Boolean) as Array<{ label: string; color: string; bg: string }>;
+
     const dirLabel = displayDirection === "long" ? "做多" : displayDirection === "short" ? "做空" : "观望";
 
     return (
@@ -158,6 +176,20 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               <span style={S.label}>分析模式</span>
               <span style={S.value}>{modeLabel(report.mode)}</span>
             </div>
+            {/* ── 共振 & 风险标签 ── */}
+            {confluenceTags.length > 0 && (
+              <div style={{ paddingTop: 10, display: "flex", gap: 6, flexWrap: "wrap" as const }}>
+                {confluenceTags.map((tag, i) => (
+                  <span key={i} style={{
+                    fontSize: 11, fontWeight: 700,
+                    color: tag.color, background: tag.bg,
+                    borderRadius: 6, padding: "3px 10px",
+                    border: `1px solid ${tag.color}33`,
+                    letterSpacing: "0.01em",
+                  }}>{tag.label}</span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* ── Section 2: 策略摘要（含进场/止损/止盈点位） ── */}
