@@ -428,6 +428,42 @@
         "label": "高置信推送閾值",
         "help": "分析置信度超過此閾值時推送信號（0.5~0.9）"
       },
+      "consensus_min_confidence": {
+        "label": "最小置信度門限",
+        "help": "平均置信度不達此値完全輸出 neutral，過濾低質量信號（0.0~0.9）"
+      },
+      "consensus_flip_ratio": {
+        "label": "信號翻轉靈敏度",
+        "help": "翻轉閾値 = 信號閾値 × 此比例，越小越小容易翻轉（0.3~1.0，默誊 0.6）"
+      },
+      "leaderboard_min_strategies": {
+        "label": "上榜最低已結算條數",
+        "help": "策略至少幾條已結算才可參與排行，冷啟動設 1，成營後可調高（建議 3）"
+      },
+      "settle_timeout_scalping": {
+        "label": "實時短線結算超時",
+        "help": "實時短線模式策略超過此時間後以當前價格結算（小時為單位）"
+      },
+      "settle_timeout_intraday": {
+        "label": "日內博弈結算超時",
+        "help": "日內博弈模式策略超過此時間後以當前價格結算（小時為單位）"
+      },
+      "settle_timeout_trend": {
+        "label": "趨勢佈局結算超時",
+        "help": "趨勢佈局模式策略超過此時間後以當前價格結算（小時為單位）"
+      },
+      "publish_dedup_scalping_hours": {
+        "label": "實時發佈去重窗口",
+        "help": "同用戶同幣種實時短線策略最少間隔多少小時才能再次發佈到排行榜"
+      },
+      "publish_dedup_intraday_hours": {
+        "label": "日內發佈去重窗口",
+        "help": "同用戶同幣種日內博弈策略最少間隔多少小時才能再次發佈到排行榜"
+      },
+      "publish_dedup_trend_days": {
+        "label": "趨勢發佈去重窗口",
+        "help": "同用戶同幣種趨勢佈局策略最少間隔多少天才能再次發佈到排行榜"
+      },
       "risk_threshold_exchange_inflow_btc": {
         "label": "交易所流入預警",
         "help": "BTC 流入交易所超過此值觸發預警"

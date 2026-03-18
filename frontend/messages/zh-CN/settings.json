@@ -438,6 +438,42 @@
         "label": "高置信推送阈值",
         "help": "分析置信度超过此阈值时推送信号（0.5~0.9）"
       },
+      "consensus_min_confidence": {
+        "label": "最小置信度门限",
+        "help": "平均置信度不达此值完全输出 neutral，过滤低质量信号（0.0~0.9）"
+      },
+      "consensus_flip_ratio": {
+        "label": "信号翻转灵敏度",
+        "help": "翻转阈值 = 信号阈值 × 此比例，越小越小容易翻转（0.3~1.0，默认 0.6）"
+      },
+      "leaderboard_min_strategies": {
+        "label": "上榜最低已结算条数",
+        "help": "策略至少几条已结算才可参与排行，冷启动设 1，成熟后可调高（建议 3）"
+      },
+      "settle_timeout_scalping": {
+        "label": "实时短线结算超时",
+        "help": "实时短线模式策略超过此时间后以当前价格结算（小时为单位）"
+      },
+      "settle_timeout_intraday": {
+        "label": "日内博弈结算超时",
+        "help": "日内博弈模式策略超过此时间后以当前价格结算（小时为单位）"
+      },
+      "settle_timeout_trend": {
+        "label": "趋势布局结算超时",
+        "help": "趋势布局模式策略超过此时间后以当前价格结算（小时为单位）"
+      },
+      "publish_dedup_scalping_hours": {
+        "label": "实时发布去重窗口",
+        "help": "同用户同币种实时短线策略最少间隔多少小时才能再次发布到排行榜"
+      },
+      "publish_dedup_intraday_hours": {
+        "label": "日内发布去重窗口",
+        "help": "同用户同币种日内博弈策略最少间隔多少小时才能再次发布到排行榜"
+      },
+      "publish_dedup_trend_days": {
+        "label": "趋势发布去重窗口",
+        "help": "同用户同币种趋势布局策略最少间隔多少天才能再次发布到排行榜"
+      },
       "risk_threshold_exchange_inflow_btc": {
         "label": "交易所流入预警",
         "help": "BTC 流入交易所超过此值触发预警"

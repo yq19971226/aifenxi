@@ -88,7 +88,16 @@ const CONFIG_GROUPS: ConfigGroup[] = [
     items: [
       { key: "consensus_signal_threshold", isSecret: false, defaultValue: "0.35", category: "consensus" },
       { key: "consensus_min_agreement", isSecret: false, defaultValue: "2", category: "consensus" },
+      { key: "consensus_min_confidence", isSecret: false, defaultValue: "0.40", category: "consensus" },
+      { key: "consensus_flip_ratio", isSecret: false, defaultValue: "0.6", category: "consensus" },
       { key: "signal_push_threshold", isSecret: false, defaultValue: "0.7", category: "push" },
+      { key: "leaderboard_min_strategies", isSecret: false, defaultValue: "1", unit: "条", category: "leaderboard" },
+      { key: "settle_timeout_scalping", isSecret: false, defaultValue: "6", unit: "小时", category: "settlement" },
+      { key: "settle_timeout_intraday", isSecret: false, defaultValue: "24", unit: "小时", category: "settlement" },
+      { key: "settle_timeout_trend", isSecret: false, defaultValue: "72", unit: "小时", category: "settlement" },
+      { key: "publish_dedup_scalping_hours", isSecret: false, defaultValue: "4", unit: "小时", category: "publish" },
+      { key: "publish_dedup_intraday_hours", isSecret: false, defaultValue: "12", unit: "小时", category: "publish" },
+      { key: "publish_dedup_trend_days", isSecret: false, defaultValue: "3", unit: "天", category: "publish" },
     ],
   },
   {

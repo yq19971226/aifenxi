@@ -438,6 +438,42 @@
         "label": "High Confidence Push Threshold",
         "help": "Push signal when analysis confidence exceeds this threshold (0.5~0.9)"
       },
+      "consensus_min_confidence": {
+        "label": "Min Confidence Gate",
+        "help": "If average confidence is below this value, output neutral to filter low-quality signals (0.0~0.9)"
+      },
+      "consensus_flip_ratio": {
+        "label": "Signal Flip Sensitivity",
+        "help": "Flip threshold = signal threshold × this ratio. Lower = easier to flip direction (0.3~1.0, default 0.6)"
+      },
+      "leaderboard_min_strategies": {
+        "label": "Leaderboard Min Settled Strategies",
+        "help": "Minimum settled strategies required to appear on leaderboard. Set to 1 at launch, increase later (e.g. 3)"
+      },
+      "settle_timeout_scalping": {
+        "label": "Scalping Settlement Timeout",
+        "help": "Scalping strategies settle at current price after this many hours"
+      },
+      "settle_timeout_intraday": {
+        "label": "Intraday Settlement Timeout",
+        "help": "Intraday strategies settle at current price after this many hours"
+      },
+      "settle_timeout_trend": {
+        "label": "Trend Settlement Timeout",
+        "help": "Trend strategies settle at current price after this many hours"
+      },
+      "publish_dedup_scalping_hours": {
+        "label": "Scalping Publish Dedup Window",
+        "help": "Minimum hours between leaderboard publications per user per symbol (scalping)"
+      },
+      "publish_dedup_intraday_hours": {
+        "label": "Intraday Publish Dedup Window",
+        "help": "Minimum hours between leaderboard publications per user per symbol (intraday)"
+      },
+      "publish_dedup_trend_days": {
+        "label": "Trend Publish Dedup Window",
+        "help": "Minimum days between leaderboard publications per user per symbol (trend)"
+      },
       "risk_threshold_exchange_inflow_btc": {
         "label": "Exchange Inflow Alert",
         "help": "Trigger alert when BTC inflow to exchanges exceeds this value"
