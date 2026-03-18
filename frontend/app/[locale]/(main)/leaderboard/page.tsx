@@ -27,7 +27,7 @@ import { MaintenancePlaceholder } from "@/components/layout/MaintenancePlacehold
 const PAGE_SIZE = 20;
 
 const PERIOD_KEYS = ["7d", "30d", "90d"] as const;
-const MODE_KEYS = ["all", "scalping", "intraday", "trend"] as const;
+const MODE_KEYS = ["all", "intraday", "trend"] as const;
 type LeaderboardPeriod = (typeof PERIOD_KEYS)[number];
 type LeaderboardMode = (typeof MODE_KEYS)[number];
 

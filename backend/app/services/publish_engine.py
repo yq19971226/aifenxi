@@ -85,7 +85,8 @@ class PublishRuleEngine:
     def _passes_basic_rules(
         analysis_mode: str, direction: str, is_fallback: bool
     ) -> bool:
-        if analysis_mode not in ("scalping", "intraday", "trend"):
+        # scalping 不上排行榜（波动大、影响胜率美观度）
+        if analysis_mode not in ("intraday", "trend"):
             return False
         if is_fallback:
             return False

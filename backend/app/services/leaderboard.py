@@ -297,7 +297,7 @@ class LeaderboardService:
                 ROUND(CAST({_avg} AS NUMERIC), 4) AS avg_pnl
             FROM strategy_snapshots
             WHERE created_at > {period_cutoff}
-              AND analysis_mode IS NOT NULL
+              AND analysis_mode IN ('intraday', 'trend')
             GROUP BY analysis_mode
             ORDER BY analysis_mode
         """
