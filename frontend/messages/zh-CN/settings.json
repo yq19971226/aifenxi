@@ -136,7 +136,7 @@
       "checkout": "收银台设置",
       "billingCycle": "计费周期",
       "totalDue": "应付总计",
-      "avgMonthly": "折合  / 月"
+      "avgMonthly": "折合 ${amount} / 月"
     },
     "payment": {
       "network": "支付网络",

@@ -136,7 +136,7 @@
       "checkout": "Checkout",
       "billingCycle": "Billing Cycle",
       "totalDue": "Total Due",
-      "avgMonthly": "Avg  / MO"
+      "avgMonthly": "Avg ${amount} / MO"
     },
     "payment": {
       "network": "Payment Network",
