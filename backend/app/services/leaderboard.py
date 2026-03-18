@@ -179,10 +179,10 @@ class LeaderboardService:
                     COALESCE(ABS({_loss}), 0.0001) AS total_loss,
                     {_wins} AS wins,
                     {_losses} AS losses,
-                    ROUND({_avg}, 4) AS avg_pnl,
+                    ROUND(CAST({_avg} AS NUMERIC), 4) AS avg_pnl,
                     ROUND(
-                        CAST({_wins} AS FLOAT)
-                        / NULLIF({_settled}, 0),
+                        CAST(CAST({_wins} AS FLOAT)
+                        / NULLIF({_settled}, 0) AS NUMERIC),
                         4
                     ) AS win_rate
                 FROM strategy_snapshots
@@ -195,9 +195,9 @@ class LeaderboardService:
             ), ranked AS (
                 SELECT
                     user_id, settled, wins, losses, avg_pnl, win_rate, total_profit,
-                    {least_val('ROUND(total_profit / total_loss, 2)', '99.9')} AS profit_factor,
+                    {least_val('ROUND(CAST(total_profit / total_loss AS NUMERIC), 2)', '99.9')} AS profit_factor,
                     ROW_NUMBER() OVER (
-                        ORDER BY {least_val('ROUND(total_profit / total_loss, 2)', '99.9')} DESC, settled DESC
+                        ORDER BY {least_val('ROUND(CAST(total_profit / total_loss AS NUMERIC), 2)', '99.9')} DESC, settled DESC
                     ) AS rank
                 FROM user_stats
             )
@@ -223,11 +223,11 @@ class LeaderboardService:
                 {_settled} AS total_settled,
                 {_wins} AS total_wins,
                 ROUND(
-                    COALESCE(
+                    CAST(COALESCE(
                         CAST({_wins} AS FLOAT)
                         / NULLIF({_settled}, 0),
                         0
-                    ), 4
+                    ) AS NUMERIC), 4
                 ) AS win_rate,
                 COALESCE({_profit}, 0) AS total_profit,
                 COALESCE(ABS({_loss}), 0.0001) AS total_loss
@@ -284,13 +284,13 @@ class LeaderboardService:
                 {_wins} AS wins,
                 {_losses} AS losses,
                 ROUND(
-                    COALESCE(
+                    CAST(COALESCE(
                         CAST({_wins} AS FLOAT)
                         / NULLIF({_settled}, 0),
                         0
-                    ), 4
+                    ) AS NUMERIC), 4
                 ) AS win_rate,
-                ROUND({_avg}, 4) AS avg_pnl
+                ROUND(CAST({_avg} AS NUMERIC), 4) AS avg_pnl
             FROM strategy_snapshots
             WHERE created_at > {period_cutoff}
               AND analysis_mode IS NOT NULL
@@ -342,7 +342,7 @@ class LeaderboardService:
                 {_settled} AS settled,
                 {_wins} AS wins,
                 {_losses} AS losses,
-                ROUND({_avg}, 4) AS avg_pnl,
+                ROUND(CAST({_avg} AS NUMERIC), 4) AS avg_pnl,
                 COALESCE({_profit}, 0) AS total_profit,
                 COALESCE(ABS({_loss}), 0.0001) AS total_loss
             FROM strategy_snapshots
