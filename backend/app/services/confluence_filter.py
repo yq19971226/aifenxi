@@ -40,11 +40,15 @@ class ConfluenceResult:
 # 趋势共振层
 # ---------------------------------------------------------------------------
 
-# 不同模式的"上级参考模式"及其缓存超时
+# analysis:latest:{symbol} 只由 Trend 模式写入（_is_comprehensive_mode 只返回 trend）
+# 因此：
+#   scalping 参考 trend 缓存（跳过中间的 intraday 层）
+#   intraday 参考 trend 缓存
+# 如果用户近期没有跟趋势分析，则返回 stale，不作调节
 _TREND_REF: dict[str, tuple[str, int]] = {
-    "scalping": ("intraday", 5 * 60),   # 短线参考日内，5分钟超时
-    "intraday": ("trend",    15 * 60),  # 日内参考趋势，15分钟超时
-    "trend":    ("",         0),        # 趋势无上级，不做共振
+    "scalping": ("trend", 30 * 60),  # 短线参考趋势(30min超时)
+    "intraday": ("trend", 30 * 60),  # 日内参考趋势(30min超时)
+    "trend":    ("",       0),        # 趋势无上级，不做共振
 }
 
 _TREND_FACTOR_SAME    = 1.25   # 方向一致
@@ -235,8 +239,9 @@ async def apply_confluence_filter(
         _cfg_key = "confluence_filter:config_cache"
         _cached_cfg = await _redis.hgetall(_cfg_key)
         if _cached_cfg:
-            trend_enabled = (_cached_cfg.get(b"trend", b"false") == b"true")
-            whale_enabled = (_cached_cfg.get(b"whale", b"false") == b"true")
+            # decode_responses=True 时 hgetall 返回 str:str
+            trend_enabled = (_cached_cfg.get("trend", "false") == "true")
+            whale_enabled = (_cached_cfg.get("whale", "false") == "true")
         else:
             from app.core.database import AsyncSessionLocal
             from app.services.config_service import ConfigService
