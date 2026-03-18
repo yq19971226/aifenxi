@@ -464,6 +464,14 @@
         "label": "趨勢發佈去重窗口",
         "help": "同用戶同幣種趨勢佈局策略最少間隔多少天才能再次發佈到排行榜"
       },
+      "trend_confluence_enabled": {
+        "label": "跨周期共振開關",
+        "help": "開啟後，高周期趨勢信號將對低周期信號進行共振加權（true/false，預設 false）"
+      },
+      "whale_trap_enabled": {
+        "label": "巨鲸陷阱檢測開關",
+        "help": "開啟後，資金費率、爆倉、鏈上流入等異常將降低信號置信度（true/false，預設 false）"
+      },
       "risk_threshold_exchange_inflow_btc": {
         "label": "交易所流入預警",
         "help": "BTC 流入交易所超過此值觸發預警"

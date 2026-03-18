@@ -474,6 +474,14 @@
         "label": "趋势发布去重窗口",
         "help": "同用户同币种趋势布局策略最少间隔多少天才能再次发布到排行榜"
       },
+      "trend_confluence_enabled": {
+        "label": "跨周期共振开关",
+        "help": "开启后，高周期趋势信号将对低周期信号进行连共振加权（true/false，默认 false）"
+      },
+      "whale_trap_enabled": {
+        "label": "巨鲸陷阱检测开关",
+        "help": "开启后，资金费率、爆仓、链上流入等异常将降低信号置信度（true/false，默认 false）"
+      },
       "risk_threshold_exchange_inflow_btc": {
         "label": "交易所流入预警",
         "help": "BTC 流入交易所超过此值触发预警"

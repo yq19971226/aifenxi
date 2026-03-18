@@ -474,6 +474,14 @@
         "label": "Trend Publish Dedup Window",
         "help": "Minimum days between leaderboard publications per user per symbol (trend)"
       },
+      "trend_confluence_enabled": {
+        "label": "Cross-Timeframe Confluence",
+        "help": "When enabled, higher-timeframe trend signals weight lower-timeframe signals (true/false, default false)"
+      },
+      "whale_trap_enabled": {
+        "label": "Whale Trap Detector",
+        "help": "When enabled, extreme funding rates, liquidation surges, and on-chain inflows reduce signal confidence (true/false, default false)"
+      },
       "risk_threshold_exchange_inflow_btc": {
         "label": "Exchange Inflow Alert",
         "help": "Trigger alert when BTC inflow to exchanges exceeds this value"

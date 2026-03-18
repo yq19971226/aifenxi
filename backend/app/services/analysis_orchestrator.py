@@ -637,7 +637,29 @@ class AnalysisOrchestrator:
         except Exception as exc:
             logger.warning("completeness_degradation_failed: %s", exc)
 
+        # ── 9. 跨周期共振 + 巨鲸陷阱过滤（Phase 1/2/3）──────────
+        try:
+            from app.services.confluence_filter import apply_confluence_filter
+            cf = await apply_confluence_filter(
+                signal=report.signal,
+                confidence=report.confidence,
+                mode=mode.value,
+                symbol=symbol,
+                market_data=market_data,
+            )
+            if cf.final_confidence != report.confidence:
+                report = report.model_copy(update={
+                    "confidence": cf.final_confidence,
+                    "confluence_original_confidence": cf.original_confidence,
+                    "confluence_tags": cf.tags,
+                    "confluence_trend_tag": cf.trend_tag,
+                    "confluence_whale_risks": cf.whale_risks,
+                })
+        except Exception as exc:
+            logger.warning("confluence_filter_failed (skipping): %s", exc)
+
         return report
+
 
     # ===================================================================
     # 数据质量快照与状态评估（P1/P2）

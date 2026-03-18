@@ -226,6 +226,23 @@ class AnalysisReport(BaseModel):
     regime_suggestion: Optional[str] = Field(default=None, description="市场状态建议文案")
     regime_support: Optional[float] = Field(default=None, description="震荡区间支撑位")
     regime_resistance: Optional[float] = Field(default=None, description="震荡区间阻力位")
+    # ── 跨周期共振 + 巨鲸陷阱过滤字段（Phase 1/2/3）─────────
+    confluence_tags: list[str] = Field(
+        default_factory=list,
+        description="共振 + 风险标签列表，如 trend:resonant / whale:funding_rate_extreme",
+    )
+    confluence_original_confidence: Optional[float] = Field(
+        default=None,
+        description="共振调整前的原始 NSED 置信度（调整后此字段保留原始值，confidence 为调整后值）",
+    )
+    confluence_trend_tag: Optional[str] = Field(
+        default=None,
+        description="趋势共振标签: resonant/counter/neutral/stale/disabled",
+    )
+    confluence_whale_risks: list[str] = Field(
+        default_factory=list,
+        description="巨鲸陷阱风险标签列表",
+    )
 
 
 # ---------------------------------------------------------------------------
