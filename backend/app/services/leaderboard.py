@@ -19,14 +19,18 @@ from app.core.sql_compat import count_filter, sum_filter, avg_filter, now_minus_
 logger = logging.getLogger(__name__)
 
 _CACHE_TTL = 300  # 5 分钟
-# 冷启动阶段：门槛统一降至 1 条（等用户量增长后可调高）
-_MIN_STRATEGIES = 1  # 默认上榜最低策略数
-_MIN_BY_MODE: dict[str, int] = {
-    "all": 1,
-    "scalping": 1,
-    "intraday": 1,
-    "trend": 1,
-}
+# 默认上榜最低策略数（后台可配置：leaderboard_min_strategies）
+_MIN_STRATEGIES_DEFAULT = 1
+
+
+async def _get_min_strategies(mode: str = "all") -> int:
+    """动态读取上榜门槛，后台可修改。启用键：leaderboard_min_strategies（统一门槛）。"""
+    try:
+        from app.services.config_service import get_config_value
+        val = int(await get_config_value("leaderboard_min_strategies", str(_MIN_STRATEGIES_DEFAULT)))
+        return max(1, val)
+    except Exception:
+        return _MIN_STRATEGIES_DEFAULT
 
 
 def anonymous_id(user_id: UUID) -> str:
@@ -83,7 +87,7 @@ class LeaderboardService:
         mode_filter = "AND analysis_mode = :mode" if mode != "all" else ""
         ranked_cte = self._ranked_cte(period_cutoff, mode_filter)
 
-        params: dict = {"min_strategies": _MIN_BY_MODE.get(mode, _MIN_STRATEGIES)}
+        params: dict = {"min_strategies": await _get_min_strategies(mode)}
         if mode != "all":
             params["mode"] = mode
 
@@ -132,7 +136,7 @@ class LeaderboardService:
         mode_filter = "AND analysis_mode = :mode" if mode != "all" else ""
         ranked_cte = self._ranked_cte(period_cutoff, mode_filter)
 
-        params: dict = {"min_strategies": _MIN_BY_MODE.get(mode, _MIN_STRATEGIES), "uid": str(user_id)}
+        params: dict = {"min_strategies": await _get_min_strategies(mode), "uid": str(user_id)}
         if mode != "all":
             params["mode"] = mode
 

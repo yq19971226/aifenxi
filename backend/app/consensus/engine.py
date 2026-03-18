@@ -247,6 +247,7 @@ def _weighted_aggregate(
     signal_threshold: float = 0.35,
     min_agreement: int = 2,
     min_confidence: float = 0.40,
+    flip_ratio: float = 0.6,
     prev_signal: str | None = None,
 ) -> tuple[Literal["bullish", "bearish", "neutral"], float]:
     """加权聚合信号，返回 (consensus_signal, consensus_confidence)。
@@ -290,8 +291,8 @@ def _weighted_aggregate(
         return "neutral", round(max(0.0, min(0.95, weighted_confidence)), 4)
 
     # ── 迟滞逻辑 ──
-    # 翻转阈值：需要比标准阈值更强的反转信号才能翻转
-    flip_threshold = signal_threshold * 0.6  # 60% 标准阈值，约 0.27
+    # 翻转阈值：需要比标准阈值更强的反转信号才能翻转（后台可配置：consensus_flip_ratio）
+    flip_threshold = signal_threshold * flip_ratio
 
     if prev_signal == "bullish":
         # 已看多 → 维持只需 score > 0，翻空需 score < -flip_threshold
@@ -353,12 +354,14 @@ def _round3_aggregate(
     signal_threshold: float = 0.35,
     min_agreement: int = 2,
     min_confidence: float = 0.40,
+    flip_ratio: float = 0.6,
     prev_signal: str | None = None,
 ) -> ConsensusReport:
     """Round 3: 加权聚合 + 分歧度 + 少数派检测，生成最终报告。"""
     consensus_signal, consensus_confidence = _weighted_aggregate(
         votes, weights, signal_threshold, min_agreement,
         min_confidence=min_confidence,
+        flip_ratio=flip_ratio,
         prev_signal=prev_signal,
     )
     divergence = _calculate_divergence(votes)
@@ -441,8 +444,9 @@ async def run_nsed(market_data: MarketData) -> ConsensusReport:
         _sig_thr = float(await get_config_value("consensus_signal_threshold", "0.35"))
         _min_agr = int(await get_config_value("consensus_min_agreement", "2"))
         _min_conf = float(await get_config_value("consensus_min_confidence", "0.40"))
+        _flip_ratio = float(await get_config_value("consensus_flip_ratio", "0.6"))
     except Exception:
-        _sig_thr, _min_agr, _min_conf = 0.35, 2, 0.40
+        _sig_thr, _min_agr, _min_conf, _flip_ratio = 0.35, 2, 0.40, 0.6
 
     # ── 迟滞锚定：读取上一次共识信号 ──
     prev_signal: str | None = None
@@ -464,6 +468,7 @@ async def run_nsed(market_data: MarketData) -> ConsensusReport:
     report = _round3_aggregate(
         r2_votes, weights, market_data.symbol, _sig_thr, _min_agr,
         min_confidence=_min_conf,
+        flip_ratio=_flip_ratio,
         prev_signal=prev_signal,
     )
     logger.info(

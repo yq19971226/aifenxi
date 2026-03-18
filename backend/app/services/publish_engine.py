@@ -21,12 +21,30 @@ from app.core.sql_compat import now_minus_interval_literal
 
 logger = logging.getLogger(__name__)
 
-# dedup window: (value, unit) for now_minus_interval_literal
-DEDUP_WINDOWS: dict[str, tuple[int, str]] = {
+# 默认去重窗口（后台可配置：publish_dedup_scalping_hours / publish_dedup_intraday_hours / publish_dedup_trend_days）
+_DEDUP_DEFAULTS: dict[str, tuple[int, str]] = {
     "scalping": (4, "hours"),
     "intraday": (12, "hours"),
     "trend": (3, "days"),
 }
+
+
+async def _get_dedup_window(mode: str) -> tuple[int, str]:
+    """动态读取去重窗口配置，后台可通过 ConfigService 调整。"""
+    default = _DEDUP_DEFAULTS.get(mode)
+    if default is None:
+        return (0, "hours")
+    try:
+        from app.services.config_service import get_config_value
+        if mode == "trend":
+            val = int(await get_config_value("publish_dedup_trend_days", str(default[0])))
+            return (val, "days")
+        else:
+            key = f"publish_dedup_{mode}_hours"
+            val = int(await get_config_value(key, str(default[0])))
+            return (val, "hours")
+    except Exception:
+        return default
 
 
 class PublishRuleEngine:
@@ -78,8 +96,8 @@ class PublishRuleEngine:
     async def _is_duplicate(
         self, user_id: UUID, symbol: str, analysis_mode: str
     ) -> bool:
-        window = DEDUP_WINDOWS.get(analysis_mode)
-        if window is None:
+        window = await _get_dedup_window(analysis_mode)
+        if window[0] == 0:
             return False
 
         cutoff = now_minus_interval_literal(window[0], window[1])

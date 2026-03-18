@@ -110,10 +110,18 @@ class PerformanceTracker:
                 snapshot_id, snapshot, current_price, SettlementStatus.HIT_TARGET
             )
 
-        # 按 analysis_mode 动态超时
-        _SETTLE_TIMEOUT = {"scalping": 6, "intraday": 24, "trend": 72}
+        # 按 analysis_mode 动态超时（后台可配置：settle_timeout_scalping/intraday/trend）
         mode = snapshot.get("analysis_mode") or ""
-        timeout_hours = _SETTLE_TIMEOUT.get(mode, 72)
+        _DEFAULT_TIMEOUT = {"scalping": 6, "intraday": 24, "trend": 72}
+        try:
+            from app.services.config_service import get_config_value
+            _key = f"settle_timeout_{mode}" if mode else None
+            if _key:
+                timeout_hours = int(await get_config_value(_key, str(_DEFAULT_TIMEOUT.get(mode, 72))))
+            else:
+                timeout_hours = 72
+        except Exception:
+            timeout_hours = _DEFAULT_TIMEOUT.get(mode, 72)
         if elapsed_hours >= timeout_hours:
             return await self._settle(
                 snapshot_id, snapshot, current_price, SettlementStatus.TIMEOUT
