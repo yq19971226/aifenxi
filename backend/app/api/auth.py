@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.sql_compat import update_returning
 
-from app.core.auth_rate_limit import check_login_rate, check_register_rate, check_reset_rate, check_refresh_rate
+from app.core.auth_rate_limit import check_login_rate, check_register_rate, check_register_code_rate, check_reset_rate, check_refresh_rate
 from app.core.database import get_db
 from app.core.deps import UserInfo, get_current_user
 from app.core.i18n_errors import localized_http_exception
@@ -129,7 +129,7 @@ async def send_register_code(
     session: AsyncSession = Depends(get_db),
 ) -> dict[str, str]:
     """发送注册验证码到邮箱。"""
-    await check_register_rate(request)
+    await check_register_code_rate(request)
 
     email = _normalize_email(body.email)
     request_locale = get_locale_from_request(request)

@@ -155,7 +155,7 @@ class AnalysisQuotaService:
         """检查并递增计数。返回 (是否允许, 剩余次数)。
 
         配额检查优先级:
-        0. 等级门控 → 等级不足直接拒绝（bonus 不能绕过等级限制）
+        0. 等级门控 → 等级不足且无 bonus 时拒绝（有 bonus 可绕过）
         1. 先检查 bonus_credits → 有余额则扣减 bonus，放行
         2. bonus 用完 → 扣减日常配额 daily_limit
         3. 日常配额也用完 → 拒绝

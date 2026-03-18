@@ -67,7 +67,10 @@
         "2": "旗艦"
       },
       "expiresAt": "到期時間：{date}",
-      "daysLeft": "（還剩 {count} 天）"
+      "daysLeft": "（還剩 {count} 天）",
+      "active": "生效中",
+      "inactive": "未啟用",
+      "daysLeftRaw": "剩 {count} 天"
     },
     "freeTrial": {
       "title": "免費體驗",

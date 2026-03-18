@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 _LOGIN_LIMIT = 10          # 每窗口最大登录尝试
 _LOGIN_WINDOW = 300        # 5 分钟窗口
 
+_REGISTER_CODE_LIMIT = 5   # 每窗口最大注册验证码发送次数
+_REGISTER_CODE_WINDOW = 600  # 10 分钟窗口
+
 _REGISTER_LIMIT = 1        # 每窗口最大注册次数（同 IP 仅允许 1 次）
 _REGISTER_WINDOW = 86400   # 24 小时窗口（禁止多账号注册）
 
@@ -60,8 +63,14 @@ async def check_login_rate(request: Request) -> None:
     await _check_rate(f"rl:login:{ip}", _LOGIN_LIMIT, _LOGIN_WINDOW)
 
 
+async def check_register_code_rate(request: Request) -> None:
+    """注册验证码发送速率限制：5 次 / 10 分钟 / IP。"""
+    ip = _client_ip(request)
+    await _check_rate(f"rl:register_code:{ip}", _REGISTER_CODE_LIMIT, _REGISTER_CODE_WINDOW)
+
+
 async def check_register_rate(request: Request) -> None:
-    """注册速率限制：5 次 / 10 分钟 / IP。"""
+    """注册完成速率限制：1 次 / 24 小时 / IP（防多账号）。"""
     ip = _client_ip(request)
     await _check_rate(f"rl:register:{ip}", _REGISTER_LIMIT, _REGISTER_WINDOW)
 
