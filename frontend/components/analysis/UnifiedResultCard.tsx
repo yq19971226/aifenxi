@@ -165,6 +165,56 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
         </div>
       )}
 
+      {/* ── Confluence & Risk Tags ── */}
+      {(() => {
+        const TREND_TAG_MAP: Record<string, { label: string; color: string; bg: string }> = {
+          "trend:resonant": { label: "🟢 顺势共振",  color: "#34d399", bg: "bg-emerald-500/10" },
+          "trend:counter":  { label: "🔴 逆势信号",  color: "#f87171", bg: "bg-red-500/10" },
+          "trend:neutral":  { label: "⚪ 趋势中性",  color: "#a1a1aa", bg: "bg-zinc-500/10" },
+          "trend:stale":    { label: "⏱️ 趋势过时",  color: "#71717a", bg: "bg-white/[0.04]" },
+        };
+        const WHALE_TAG_MAP: Record<string, { label: string; color: string; bg: string }> = {
+          "whale:funding_rate_extreme": { label: "🚨 资金费率极端", color: "#fbbf24", bg: "bg-amber-500/10" },
+          "whale:liquidation_surge":    { label: "⚡ 清算潮警告",   color: "#f97316", bg: "bg-orange-500/10" },
+          "whale:netflow_dump_risk":    { label: "🐋 巨鲸出货风险", color: "#a78bfa", bg: "bg-violet-500/10" },
+          "whale:lsr_crowded":          { label: "🎯 散户持仓拥挤", color: "#f87171", bg: "bg-red-500/10" },
+        };
+        const ALL_TAG_MAP = { ...TREND_TAG_MAP, ...WHALE_TAG_MAP };
+        const confluenceTags = (report.confluence_tags ?? []).map(
+          (tag) => ALL_TAG_MAP[tag] ?? null
+        ).filter(Boolean) as Array<{ label: string; color: string; bg: string }>;
+
+        if (confluenceTags.length === 0 && !report.confluence_original_confidence) return null;
+
+        return (
+          <div className="mx-5 mt-4 flex flex-col gap-3 rounded-lg border border-indigo-500/20 bg-indigo-500/[0.02] px-4 py-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mr-1">
+                多维风险感知
+              </span>
+              {confluenceTags.map((tag, i) => (
+                <span key={i} className={cn("text-xs font-bold rounded-md px-2 py-1 border border-white/5", tag.color, tag.bg)}>
+                  {tag.label}
+                </span>
+              ))}
+            </div>
+            
+            {report.confluence_original_confidence != null && Math.round(report.confluence_original_confidence * 100) !== confidenceValue && (
+              <div className="text-xs text-zinc-400">
+                经过共振与巨鲸环境侦测，AI 置信度从 
+                <span className="font-mono text-zinc-300 mx-1 line-through opacity-60">
+                  {Math.round(report.confluence_original_confidence * 100)}%
+                </span>
+                被调准至
+                <span className="font-mono font-bold text-indigo-400 mx-1">
+                  {confidenceValue}%
+                </span>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       {/* ── Key Metrics Grid ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border border-b border-border bg-bg-surface/30">
         <MetricItem
