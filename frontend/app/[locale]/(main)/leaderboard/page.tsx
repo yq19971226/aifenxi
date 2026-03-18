@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
-import { Trophy, BarChart2, History, AlertCircle, TrendingUp, Zap, Clock, Target } from "lucide-react";
+import { Trophy, BarChart2, History, AlertCircle, TrendingUp, Clock, Target } from "lucide-react";
 import {
   fetchRankings,
   fetchSystemReport,
@@ -32,12 +32,10 @@ type LeaderboardPeriod = (typeof PERIOD_KEYS)[number];
 type LeaderboardMode = (typeof MODE_KEYS)[number];
 
 const MODE_ICON: Record<string, React.ReactNode> = {
-  scalping: <Zap size={18} className="text-amber-400" />,
   intraday: <Clock size={18} className="text-blue-400" />,
   trend: <TrendingUp size={18} className="text-emerald-400" />,
 };
 const MODE_COLOR: Record<string, string> = {
-  scalping: "text-amber-400",
   intraday: "text-blue-400",
   trend: "text-emerald-400",
 };

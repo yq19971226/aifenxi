@@ -13,7 +13,6 @@
   },
   "modes": {
     "all": "All",
-    "scalping": "Scalping",
     "intraday": "Intraday",
     "trend": "Trend"
   },
@@ -139,16 +138,15 @@
   },
   "modeLabels": {
     "intraday": "Intraday",
-    "trend": "Trend",
-    "scalping": "Scalping"
+    "trend": "Trend"
   },
   "rules": {
     "title": "Leaderboard Rules",
     "rule1": "Ranking metric is Profit Factor (total profit ÷ total loss), higher is better",
-    "rule2": "Scalping, Intraday, and Trend mode strategies all participate in rankings",
+    "rule2": "Intraday and Trend mode strategies participate in rankings; Scalping is excluded",
     "rule3": "Fallback strategies (auto-generated when data is insufficient) and neutral direction strategies are excluded",
-    "rule4": "De-duplication: Scalping 4h / Intraday 12h / Trend 3d window per user per symbol",
-    "rule5": "Min to rank: Scalping 5 / Intraday 2 / Trend 1 settled strategies",
+    "rule4": "De-duplication: Intraday 12h / Trend 3d window per user per symbol",
+    "rule5": "Min to rank: at least 1 settled strategy",
     "rule6": "Anonymous IDs are hashed from user IDs and cannot be reverse-engineered"
   }
 }
