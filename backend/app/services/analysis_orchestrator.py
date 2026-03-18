@@ -632,6 +632,8 @@ class AnalysisOrchestrator:
         })
 
         # ── 8. 旧路径兼容：信号完整度降级 ────────────────────────
+        # 先记录 NSED 真实置信度（completeness 降级会继续修改 confidence）
+        _nsed_confidence = report.confidence
         try:
             report = await self._apply_completeness_degradation(report)
         except Exception as exc:
@@ -650,7 +652,7 @@ class AnalysisOrchestrator:
             if cf.final_confidence != report.confidence:
                 report = report.model_copy(update={
                     "confidence": cf.final_confidence,
-                    "confluence_original_confidence": cf.original_confidence,
+                    "confluence_original_confidence": _nsed_confidence,  # NSED 原始值
                     "confluence_tags": cf.tags,
                     "confluence_trend_tag": cf.trend_tag,
                     "confluence_whale_risks": cf.whale_risks,

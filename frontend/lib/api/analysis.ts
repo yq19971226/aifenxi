@@ -77,6 +77,15 @@ export interface AnalysisReport {
   regime_resistance: number | null;
   /** 关键发现摘要（可选，后端可能返回） */
   key_findings?: string[];
+  // ── 跨周期共振 + 巨鲸陷阱字段 ─────────────────────────────
+  /** 共振与风险标签列表，如 trend:resonant / whale:funding_rate_extreme */
+  confluence_tags?: string[];
+  /** NSED 调整前的原始置信度（调整生效后才有值） */
+  confluence_original_confidence?: number | null;
+  /** 趋势共振标签: resonant / counter / neutral / stale / disabled */
+  confluence_trend_tag?: string | null;
+  /** 巨鲸陷阱风险标签列表 */
+  confluence_whale_risks?: string[];
 }
 
 export interface ProgressEvent {
