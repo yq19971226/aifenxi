@@ -79,3 +79,6 @@ tools/__pycache__/
 
 # Hypothesis
 .hypothesis/
+
+# AI Assistant private docs (local only, not pushed to remote)
+docs/AI助手开发规则与避坑手册.md
