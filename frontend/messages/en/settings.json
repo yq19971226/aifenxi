@@ -475,6 +475,14 @@
         "label": "Trend Publish Dedup Window",
         "help": "Minimum days between leaderboard publications per user per symbol (trend)"
       },
+      "analysis_maintenance_enabled": {
+        "label": "🔧 Analysis Maintenance Mode",
+        "help": "When enabled, all analysis requests will be blocked with a maintenance notice (no quota consumed). Default: Off",
+        "options": {
+          "false": "Running",
+          "true": "Maintenance"
+        }
+      },
       "trend_confluence_enabled": {
         "label": "Cross-Timeframe Confluence",
         "help": "When enabled, higher-timeframe trend signals weight lower-timeframe signals (default: Off)",

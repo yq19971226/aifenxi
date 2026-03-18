@@ -33,7 +33,29 @@ async def run_analysis(
     - 422: 参数校验失败（pydantic 自动处理）
     - 403: 会员等级不足（由编排器通过 SSE ErrorEvent 返回）
     - 429: 配额耗尽（由编排器通过 SSE ErrorEvent 返回）
+    - maintenance: 维护模式（直接返回 SSE error，不消耗配额）
     """
+    # ── 维护模式检查 ──────────────────────────────────────────
+    try:
+        from app.core.redis import get_redis_pool
+        _redis = get_redis_pool()
+        _maint = await _redis.get("analysis:maintenance_enabled")
+        if _maint is None:
+            # Redis 无缓存，从 DB 读取并缓存
+            from app.core.database import AsyncSessionLocal
+            from app.services.config_service import ConfigService
+            async with AsyncSessionLocal() as session:
+                svc = ConfigService(session)
+                _maint = await svc.get_config("analysis_maintenance_enabled", "false")
+            await _redis.setex("analysis:maintenance_enabled", 300, _maint)  # 5min 缓存
+        if _maint.lower() == "true":
+            import json
+            async def _maintenance_sse():
+                yield f"data: {json.dumps({'type': 'error', 'code': 'maintenance', 'message': '综合分析模块正在维护升级中，请稍后再试', 'reset_time': None})}\n\n"
+            return StreamingResponse(_maintenance_sse(), media_type="text/event-stream")
+    except Exception:
+        logger.debug("maintenance check failed, proceeding normally")
+
     orchestrator = AnalysisOrchestrator()
     return StreamingResponse(
         orchestrator.run_analysis(

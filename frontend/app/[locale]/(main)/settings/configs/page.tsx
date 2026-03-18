@@ -86,6 +86,8 @@ const CONFIG_GROUPS: ConfigGroup[] = [
   {
     id: "analysis",
     items: [
+      { key: "analysis_maintenance_enabled", isSecret: false, defaultValue: "false", category: "maintenance",
+        options: ["false", "true"] },
       { key: "consensus_signal_threshold", isSecret: false, defaultValue: "0.35", category: "consensus" },
       { key: "consensus_min_agreement", isSecret: false, defaultValue: "2", category: "consensus" },
       { key: "consensus_min_confidence", isSecret: false, defaultValue: "0.40", category: "consensus" },
