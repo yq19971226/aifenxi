@@ -19,11 +19,12 @@ from app.core.sql_compat import count_filter, sum_filter, avg_filter, now_minus_
 logger = logging.getLogger(__name__)
 
 _CACHE_TTL = 300  # 5 分钟
-_MIN_STRATEGIES = 3  # 默认上榜最低策略数
+# 冷启动阶段：门槛统一降至 1 条（等用户量增长后可调高）
+_MIN_STRATEGIES = 1  # 默认上榜最低策略数
 _MIN_BY_MODE: dict[str, int] = {
-    "all": 3,
-    "scalping": 5,
-    "intraday": 2,
+    "all": 1,
+    "scalping": 1,
+    "intraday": 1,
     "trend": 1,
 }
 
