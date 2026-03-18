@@ -326,7 +326,7 @@ async def register(
             {"id": str(uuid.uuid4()), "user_id": user_id},
         )
 
-        # 赠送新用户 bonus_credits（从动态配置读取，默认 5 次）
+        # 赠送新用户欢迎体验包（每模式独立配置，后台可调）
         bonus_msg = ""
         try:
             from app.services.config_service import get_config_value
@@ -334,21 +334,22 @@ async def register(
             from app.models.analysis import AnalysisMode
             from uuid import UUID as _UUID
 
-            bonus_enabled = (await get_config_value("new_user_bonus_enabled", "true")).lower() == "true"
-            if bonus_enabled:
-                bonus_amount = int(await get_config_value("new_user_bonus_credits", "5"))
-                if bonus_amount > 0:
-                    quota_svc = AnalysisQuotaService()
-                    uid = _UUID(user_id)
-                    from app.models.analysis import MODE_LEVEL_REQUIREMENTS
-                    for mode in AnalysisMode:
-                        # 仅给免费用户可用的模式赠送 bonus（等级门控）
-                        if MODE_LEVEL_REQUIREMENTS[mode] <= 0:
-                            await quota_svc.add_bonus_credits(uid, mode, bonus_amount)
-                    bonus_msg = f"，赠送 {bonus_amount} 次分析体验"
-                    logger.info("新用户 bonus_credits 赠送: user_id=%s, amount=%d", user_id, bonus_amount)
+            quota_svc = AnalysisQuotaService()
+            uid = _UUID(user_id)
+            granted = []
+
+            for mode in AnalysisMode:
+                key = f"welcome_bonus_{mode.value}"
+                amount = int(await get_config_value(key, "0"))
+                if amount > 0:
+                    await quota_svc.add_bonus_credits(uid, mode, amount)
+                    granted.append(f"{mode.value}×{amount}")
+
+            if granted:
+                bonus_msg = f"，赠送旗舰体验：{', '.join(granted)}"
+                logger.info("新用户欢迎包: user_id=%s, granted=%s", user_id, granted)
         except Exception as exc:
-            logger.warning("新用户 bonus_credits 赠送失败（非致命）: %s", exc)
+            logger.warning("新用户欢迎包赠送失败（非致命）: %s", exc)
 
         # 显式 flush 确保 DB 写入在当前事务中可见，
         # 然后手动 commit 避免 token-before-commit 竞态

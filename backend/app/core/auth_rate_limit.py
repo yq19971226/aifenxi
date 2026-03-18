@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 _LOGIN_LIMIT = 10          # 每窗口最大登录尝试
 _LOGIN_WINDOW = 300        # 5 分钟窗口
 
-_REGISTER_LIMIT = 5        # 每窗口最大注册次数
-_REGISTER_WINDOW = 600     # 10 分钟窗口
+_REGISTER_LIMIT = 1        # 每窗口最大注册次数（同 IP 仅允许 1 次）
+_REGISTER_WINDOW = 86400   # 24 小时窗口（禁止多账号注册）
 
 _RESET_LIMIT = 5           # 每窗口最大重置密码请求
 _RESET_WINDOW = 600        # 10 分钟窗口

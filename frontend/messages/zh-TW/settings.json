@@ -401,13 +401,17 @@
         "label": "免費績效天數",
         "help": "免費用戶可查看最近幾天的績效"
       },
-      "new_user_bonus_credits": {
-        "label": "新用戶贈送次數",
-        "help": "新註冊用戶贈送的分析體驗次數"
+      "welcome_bonus_scalping": {
+        "label": "歡迎包-超短線",
+        "help": "新註冊用戶贈送的超短線分析體驗次數（0=不贈送）"
       },
-      "new_user_bonus_enabled": {
-        "label": "贈送開關",
-        "help": "是否啟用新用戶贈送（true/false）"
+      "welcome_bonus_intraday": {
+        "label": "歡迎包-日內博弈",
+        "help": "新註冊用戶贈送的日內博弈分析體驗次數（推薦3次）"
+      },
+      "welcome_bonus_trend": {
+        "label": "歡迎包-趨勢佈局",
+        "help": "新註冊用戶贈送的趨勢佈局分析體驗次數（推薦1次）"
       },
       "playbook_sim_min_level": {
         "label": "劇本推演最低等級",

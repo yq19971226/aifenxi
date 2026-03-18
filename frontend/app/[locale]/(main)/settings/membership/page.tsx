@@ -166,10 +166,15 @@ function AccountHeroStrip({ user, t }: { user: UserInfo; t: MembershipTranslator
                    {t('currentStatus.active')}
                  </span>
                  {expiryInfo && (
-                   <span className={`text-[10px] font-mono whitespace-nowrap ${expiryInfo.daysLeft <= 7 ? "text-red-400 animate-pulse" : expiryInfo.daysLeft <= 30 ? "text-amber-400" : "text-zinc-500"}`}>
-                     {t('currentStatus.daysLeftRaw', { count: expiryInfo.daysLeft })}
-                   </span>
-                 )}
+                    <div className="flex flex-col gap-0.5">
+                      <span className={`text-[10px] font-mono whitespace-nowrap ${expiryInfo.daysLeft <= 7 ? "text-red-400 animate-pulse" : expiryInfo.daysLeft <= 30 ? "text-amber-400" : "text-zinc-500"}`}>
+                        {t('currentStatus.daysLeftRaw', { count: expiryInfo.daysLeft })}
+                      </span>
+                      <span className="text-[9px] font-mono text-zinc-600 whitespace-nowrap">
+                        {t('currentStatus.expiresAt', { date: expiryInfo.dateStr })}
+                      </span>
+                    </div>
+                  )}
               </div>
             ) : (
                <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-[4px] border border-zinc-500/30 text-zinc-500 bg-zinc-500/10 mb-1 w-max">

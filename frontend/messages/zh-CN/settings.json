@@ -411,13 +411,17 @@
         "label": "免费绩效天数",
         "help": "免费用户可查看最近几天的绩效"
       },
-      "new_user_bonus_credits": {
-        "label": "新用户赠送次数",
-        "help": "新注册用户赠送的分析体验次数"
+      "welcome_bonus_scalping": {
+        "label": "欢迎包-超短线",
+        "help": "新注册用户赠送的超短线分析体验次数（0=不赠送）"
       },
-      "new_user_bonus_enabled": {
-        "label": "赠送开关",
-        "help": "是否启用新用户赠送（true/false）"
+      "welcome_bonus_intraday": {
+        "label": "欢迎包-日内博弈",
+        "help": "新注册用户赠送的日内博弈分析体验次数（推荐3次）"
+      },
+      "welcome_bonus_trend": {
+        "label": "欢迎包-趋势布局",
+        "help": "新注册用户赠送的趋势布局分析体验次数（推荐1次）"
       },
       "playbook_sim_min_level": {
         "label": "剧本推演最低等级",

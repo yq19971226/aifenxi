@@ -411,13 +411,17 @@
         "label": "Free Performance Days",
         "help": "Number of recent days free users can view performance"
       },
-      "new_user_bonus_credits": {
-        "label": "New User Bonus Credits",
-        "help": "Analysis trial credits given to newly registered users"
+      "welcome_bonus_scalping": {
+        "label": "Welcome-Scalping",
+        "help": "Scalping analysis credits given to new users (0=disabled)"
       },
-      "new_user_bonus_enabled": {
-        "label": "Bonus Enabled",
-        "help": "Whether to enable new user bonus (true/false)"
+      "welcome_bonus_intraday": {
+        "label": "Welcome-Intraday",
+        "help": "Intraday analysis credits given to new users (recommended: 3)"
+      },
+      "welcome_bonus_trend": {
+        "label": "Welcome-Trend",
+        "help": "Trend analysis credits given to new users (recommended: 1)"
       },
       "playbook_sim_min_level": {
         "label": "Playbook Min Level",
