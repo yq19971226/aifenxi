@@ -608,6 +608,14 @@ function ConfigGroupCard({
         </button>
       </div>
 
+      {/* Group note callout（可选，仅特定分组显示）*/}
+      {(t.has(`groups.${group.id}.note` as Parameters<typeof t>[0]) as boolean) && (
+        <div className="mb-4 rounded-lg border border-sky-500/20 bg-sky-500/[0.06] px-4 py-3 text-xs text-sky-300 leading-relaxed">
+          <span className="mr-1 font-bold">💡</span>
+          {t(`groups.${group.id}.note` as Parameters<typeof t>[0])}
+        </div>
+      )}
+
       {/* Items */}
       <div className="divide-y divide-white/[0.04]">
         {group.items.map((item) => (

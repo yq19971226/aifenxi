@@ -196,7 +196,8 @@
       },
       "analysis": {
         "icon": "📊",
-        "title": "Analysis & Signals"
+        "title": "Analysis & Signals",
+        "note": "[Cross-Timeframe Confluence] When enabled, higher-timeframe trend signals boost (x1.25) or penalize (x0.65) lower-timeframe signals based on alignment. [Whale Trap Detector] When enabled, extreme funding rates, liquidation spikes, or large on-chain inflows will automatically reduce signal confidence (minimum 0.40x). Recommended: enable Whale Trap first, monitor for a few days, then enable Confluence."
       },
       "risk": {
         "icon": "⚠️",
