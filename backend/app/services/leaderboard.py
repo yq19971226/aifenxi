@@ -106,12 +106,18 @@ class LeaderboardService:
         rankings = []
         for row in page_rows:
             uid = UUID(str(row["user_id"]))
+            _wins = int(row["wins"] or 0)
+            _settled = int(row["settled"] or 0)
+            _win_rate = float(row.get("win_rate") or 0) if row.get("win_rate") is not None else (
+                round(_wins / _settled, 4) if _settled > 0 else 0.0
+            )
             rankings.append({
                 "rank": row["rank"],
                 "anonymous_id": anonymous_id(uid),
-                "settled": row["settled"],
-                "wins": row["wins"],
-                "losses": row["losses"],
+                "settled": _settled,
+                "wins": _wins,
+                "losses": int(row["losses"] or 0),
+                "win_rate": _win_rate,
                 "profit_factor": float(row["profit_factor"]),
                 "avg_pnl": float(row["avg_pnl"] or 0),
             })
@@ -135,12 +141,18 @@ class LeaderboardService:
             my_res = await self._session.execute(text(my_sql), params)
             my_row = my_res.mappings().first()
             if my_row:
+                _wins = int(my_row["wins"] or 0)
+                _settled = int(my_row["settled"] or 0)
+                _win_rate = float(my_row.get("win_rate") or 0) if my_row.get("win_rate") is not None else (
+                    round(_wins / _settled, 4) if _settled > 0 else 0.0
+                )
                 return my_row["rank"], {
                     "rank": my_row["rank"],
                     "anonymous_id": anonymous_id(user_id),
-                    "settled": my_row["settled"],
-                    "wins": my_row["wins"],
-                    "losses": my_row["losses"],
+                    "settled": _settled,
+                    "wins": _wins,
+                    "losses": int(my_row["losses"] or 0),
+                    "win_rate": _win_rate,
                     "profit_factor": float(my_row["profit_factor"]),
                     "avg_pnl": float(my_row["avg_pnl"] or 0),
                 }
@@ -154,7 +166,8 @@ class LeaderboardService:
         _profit = sum_filter("pnl_pct", "pnl_pct > 0")
         _loss = sum_filter("pnl_pct", "pnl_pct < 0")
         _wins = count_filter("pnl_pct > 0")
-        _losses = count_filter("pnl_pct <= 0 AND status != 'pending'")
+        # 修复：平盈（pnl_pct=0）不算亏损，只有负盈亏才是亏损
+        _losses = count_filter("pnl_pct < 0 AND status != 'pending'")
         _avg = avg_filter("pnl_pct", "status != 'pending'")
         _having = count_filter("status != 'pending'")
         return f"""
@@ -166,7 +179,12 @@ class LeaderboardService:
                     COALESCE(ABS({_loss}), 0.0001) AS total_loss,
                     {_wins} AS wins,
                     {_losses} AS losses,
-                    ROUND({_avg}, 4) AS avg_pnl
+                    ROUND({_avg}, 4) AS avg_pnl,
+                    ROUND(
+                        CAST({_wins} AS FLOAT)
+                        / NULLIF({_settled}, 0),
+                        4
+                    ) AS win_rate
                 FROM strategy_snapshots
                 WHERE published = TRUE
                   AND user_id IS NOT NULL
@@ -176,7 +194,7 @@ class LeaderboardService:
                 HAVING {_having} >= :min_strategies
             ), ranked AS (
                 SELECT
-                    user_id, settled, wins, losses, avg_pnl, total_profit,
+                    user_id, settled, wins, losses, avg_pnl, win_rate, total_profit,
                     {least_val('ROUND(total_profit / total_loss, 2)', '99.9')} AS profit_factor,
                     ROW_NUMBER() OVER (
                         ORDER BY {least_val('ROUND(total_profit / total_loss, 2)', '99.9')} DESC, settled DESC

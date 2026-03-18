@@ -244,8 +244,9 @@ async def _get_dynamic_weights() -> dict[str, float]:
 def _weighted_aggregate(
     votes: list[ModelVote],
     weights: dict[str, float],
-    signal_threshold: float = 0.35,
-    min_agreement: int = 2,
+    signal_threshold: float = 0.45,
+    min_agreement: int = 3,
+    min_confidence: float = 0.40,
     prev_signal: str | None = None,
 ) -> tuple[Literal["bullish", "bearish", "neutral"], float]:
     """加权聚合信号，返回 (consensus_signal, consensus_confidence)。
@@ -256,8 +257,11 @@ def _weighted_aggregate(
     否则 → neutral
 
     迟滞机制（Hysteresis）：
-    当 prev_signal 存在时，翻转到相反方向需要更低的阈值（flip_threshold=0.20），
+    当 prev_signal 存在时，翻转到相反方向需要更低的阈值（flip_threshold），
     防止信号在阈值边界来回跳动。从 prev_signal 保持原方向使用标准阈值。
+
+    置信度门限（min_confidence）：
+    即使方向满足阈值，平均置信度不足时也输出 neutral，过滤低质量信号。
     """
     weighted_score = 0.0
     total_weight = 0.0
@@ -277,9 +281,17 @@ def _weighted_aggregate(
     bullish_count = sum(1 for v in votes if v.signal == "bullish")
     bearish_count = sum(1 for v in votes if v.signal == "bearish")
 
+    # ── 置信度门限：平均置信度过低直接输出 neutral ──
+    if weighted_confidence < min_confidence:
+        logger.info(
+            "Signal suppressed by confidence gate (%.3f < %.3f)",
+            weighted_confidence, min_confidence,
+        )
+        return "neutral", round(max(0.0, min(0.95, weighted_confidence)), 4)
+
     # ── 迟滞逻辑 ──
-    # 翻转阈值比标准阈值更低 — 需要更强的反转信号才能翻转
-    flip_threshold = 0.20
+    # 翻转阈值：需要比标准阈值更强的反转信号才能翻转
+    flip_threshold = signal_threshold * 0.6  # 60% 标准阈值，约 0.27
 
     if prev_signal == "bullish":
         # 已看多 → 维持只需 score > 0，翻空需 score < -flip_threshold
@@ -338,13 +350,15 @@ def _round3_aggregate(
     votes: list[ModelVote],
     weights: dict[str, float],
     symbol: str,
-    signal_threshold: float = 0.35,
-    min_agreement: int = 2,
+    signal_threshold: float = 0.45,
+    min_agreement: int = 3,
+    min_confidence: float = 0.40,
     prev_signal: str | None = None,
 ) -> ConsensusReport:
     """Round 3: 加权聚合 + 分歧度 + 少数派检测，生成最终报告。"""
     consensus_signal, consensus_confidence = _weighted_aggregate(
         votes, weights, signal_threshold, min_agreement,
+        min_confidence=min_confidence,
         prev_signal=prev_signal,
     )
     divergence = _calculate_divergence(votes)
@@ -424,10 +438,11 @@ async def run_nsed(market_data: MarketData) -> ConsensusReport:
     weights = await _get_dynamic_weights()
     try:
         from app.services.config_service import get_config_value
-        _sig_thr = float(await get_config_value("consensus_signal_threshold", "0.35"))
-        _min_agr = int(await get_config_value("consensus_min_agreement", "2"))
+        _sig_thr = float(await get_config_value("consensus_signal_threshold", "0.45"))
+        _min_agr = int(await get_config_value("consensus_min_agreement", "3"))
+        _min_conf = float(await get_config_value("consensus_min_confidence", "0.40"))
     except Exception:
-        _sig_thr, _min_agr = 0.35, 2
+        _sig_thr, _min_agr, _min_conf = 0.45, 3, 0.40
 
     # ── 迟滞锚定：读取上一次共识信号 ──
     prev_signal: str | None = None
@@ -448,6 +463,7 @@ async def run_nsed(market_data: MarketData) -> ConsensusReport:
 
     report = _round3_aggregate(
         r2_votes, weights, market_data.symbol, _sig_thr, _min_agr,
+        min_confidence=_min_conf,
         prev_signal=prev_signal,
     )
     logger.info(
@@ -461,10 +477,10 @@ async def run_nsed(market_data: MarketData) -> ConsensusReport:
         },
     )
 
-    # 缓存到 Redis（TTL 使用合同定义）
+    # 缓存到 Redis（TTL 30分钟，过长会导致用户总看到旧信号）
     try:
         cache_key = f"consensus:latest:{market_data.symbol}"
-        await set_with_ttl(cache_key, report.model_dump(mode="json"), ttl_seconds=14400)
+        await set_with_ttl(cache_key, report.model_dump(mode="json"), ttl_seconds=1800)
     except Exception as exc:
         logger.error("Failed to cache consensus report", extra={"error": str(exc)})
 

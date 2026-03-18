@@ -9,6 +9,7 @@ export interface RankingEntry {
   settled: number;
   wins: number;
   losses: number;
+  win_rate: number;      // 服务器端直接计算好的胜率（0~1）
   profit_factor: number;
   avg_pnl: number;
 }

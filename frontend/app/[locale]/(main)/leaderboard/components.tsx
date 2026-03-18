@@ -29,7 +29,11 @@ export function formatPnl(pnl: number | null | undefined): string {
   return `${sign}${pnl.toFixed(2)}%`;
 }
 
-export function winRatePct(wins: number, losses: number): string {
+export function winRatePct(wins: number, losses: number, win_rate?: number): string {
+  // 优先使用服务端直接计算的 win_rate（避免客户端 wins/losses 计数异常导致 NaN）
+  if (win_rate != null && !Number.isNaN(win_rate)) {
+    return `${(win_rate * 100).toFixed(1)}%`;
+  }
   const total = wins + losses;
   if (total === 0) return "—";
   return `${((wins / total) * 100).toFixed(1)}%`;
@@ -213,7 +217,7 @@ export function RankingTable({
                 </td>
                 <td className="px-4 py-3 text-right text-xs md:text-sm font-mono text-zinc-300">
                   {entry.wins}/{entry.losses}
-                  <span className="ml-1 text-zinc-500">({winRatePct(entry.wins, entry.losses)})</span>
+                  <span className="ml-1 text-zinc-500">({winRatePct(entry.wins, entry.losses, entry.win_rate)})</span>
                 </td>
                 <td className="px-4 py-3 text-right text-xs md:text-sm font-mono hidden sm:table-cell">
                   <span
