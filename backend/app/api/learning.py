@@ -29,6 +29,7 @@ class CalibrationParamsUpdate(BaseModel):
     """校准参数更新请求。"""
     signal_threshold: float | None = Field(None, ge=0.1, le=0.8)
     min_agreement: int | None = Field(None, ge=1, le=4)
+    min_confidence: float | None = Field(None, ge=0.0, le=0.9)
 
 
 class CleanupRequest(BaseModel):
@@ -145,7 +146,7 @@ async def update_calibration_params(
     session: AsyncSession = Depends(get_db),
 ) -> dict:
     """更新共识引擎校准参数。"""
-    if body.signal_threshold is None and body.min_agreement is None:
+    if body.signal_threshold is None and body.min_agreement is None and body.min_confidence is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="至少提供一个参数",
@@ -155,6 +156,7 @@ async def update_calibration_params(
         return await svc.update_calibration_params(
             signal_threshold=body.signal_threshold,
             min_agreement=body.min_agreement,
+            min_confidence=body.min_confidence,
             changed_by=user.email,
         )
     except Exception as exc:

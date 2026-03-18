@@ -540,22 +540,26 @@ function CalibrationTab() {
 
   const [threshold, setThreshold] = useState<number | null>(null);
   const [minAgree, setMinAgree] = useState<number | null>(null);
+  const [minConf, setMinConf] = useState<number | null>(null);
 
   const currentThreshold = threshold ?? data?.signal_threshold ?? 0.35;
   const currentMinAgree = minAgree ?? data?.min_agreement ?? 2;
+  const currentMinConf = minConf ?? data?.min_confidence ?? 0.40;
 
   const handleSave = useCallback(async () => {
     setSaving(true);
     setMsg(null);
     try {
-      const params: { signal_threshold?: number; min_agreement?: number } = {};
+      const params: { signal_threshold?: number; min_agreement?: number; min_confidence?: number } = {};
       if (threshold !== null) params.signal_threshold = threshold;
       if (minAgree !== null) params.min_agreement = minAgree;
+      if (minConf !== null) params.min_confidence = minConf;
       await updateCalibrationParams(params);
       setMsg("参数已更新");
       queryClient.invalidateQueries({ queryKey: ["calibrationParams"] });
       setThreshold(null);
       setMinAgree(null);
+      setMinConf(null);
     } catch (err: unknown) {
       setMsg(err instanceof Error ? err.message : "更新失败");
     } finally {
@@ -567,12 +571,12 @@ function CalibrationTab() {
   if (error) return <ErrorMsg msg={error instanceof Error ? error.message : "加载失败"} />;
 
   const rec = data?.recommended;
-  const hasChanges = threshold !== null || minAgree !== null;
+  const hasChanges = threshold !== null || minAgree !== null || minConf !== null;
 
   return (
     <div className="space-y-4">
       <Card title="共识引擎校准参数">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <label className="text-xs uppercase tracking-widest text-zinc-500">
               信号阈值 <span className="text-zinc-500">({rec?.signal_threshold.min}~{rec?.signal_threshold.max})</span>
@@ -607,6 +611,23 @@ function CalibrationTab() {
               className="mt-2 w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-accent/40"
             />
           </div>
+          <div>
+            <label className="text-xs uppercase tracking-widest text-zinc-500">
+              最低置信度门槛 <span className="text-zinc-500">({rec?.min_confidence.min ?? 0}~{rec?.min_confidence.max ?? 0.9})</span>
+            </label>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              模型平均置信度不足此值时强制输出 neutral，过滤低质量信号
+            </p>
+            <input
+              type="number"
+              step="0.05"
+              min={rec?.min_confidence.min ?? 0}
+              max={rec?.min_confidence.max ?? 0.9}
+              value={currentMinConf}
+              onChange={(e) => setMinConf(parseFloat(e.target.value))}
+              className="mt-2 w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-accent/40"
+            />
+          </div>
         </div>
 
         {msg && (
@@ -618,6 +639,7 @@ function CalibrationTab() {
             onClick={() => {
               setThreshold(rec?.signal_threshold.default ?? 0.35);
               setMinAgree(rec?.min_agreement.default ?? 2);
+              setMinConf(rec?.min_confidence.default ?? 0.40);
             }}
             className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
           >

@@ -244,8 +244,8 @@ async def _get_dynamic_weights() -> dict[str, float]:
 def _weighted_aggregate(
     votes: list[ModelVote],
     weights: dict[str, float],
-    signal_threshold: float = 0.45,
-    min_agreement: int = 3,
+    signal_threshold: float = 0.35,
+    min_agreement: int = 2,
     min_confidence: float = 0.40,
     prev_signal: str | None = None,
 ) -> tuple[Literal["bullish", "bearish", "neutral"], float]:
@@ -350,8 +350,8 @@ def _round3_aggregate(
     votes: list[ModelVote],
     weights: dict[str, float],
     symbol: str,
-    signal_threshold: float = 0.45,
-    min_agreement: int = 3,
+    signal_threshold: float = 0.35,
+    min_agreement: int = 2,
     min_confidence: float = 0.40,
     prev_signal: str | None = None,
 ) -> ConsensusReport:
@@ -434,15 +434,15 @@ async def run_nsed(market_data: MarketData) -> ConsensusReport:
         extra={"votes": [(v.model_key, v.signal) for v in r2_votes]},
     )
 
-    # Round 3 — 加权聚合（从动态配置读取校准参数）
+    # Round 3 — 加权聚合（从动态配置读取校准参数，后台信号校准頁可调整）
     weights = await _get_dynamic_weights()
     try:
         from app.services.config_service import get_config_value
-        _sig_thr = float(await get_config_value("consensus_signal_threshold", "0.45"))
-        _min_agr = int(await get_config_value("consensus_min_agreement", "3"))
+        _sig_thr = float(await get_config_value("consensus_signal_threshold", "0.35"))
+        _min_agr = int(await get_config_value("consensus_min_agreement", "2"))
         _min_conf = float(await get_config_value("consensus_min_confidence", "0.40"))
     except Exception:
-        _sig_thr, _min_agr, _min_conf = 0.45, 3, 0.40
+        _sig_thr, _min_agr, _min_conf = 0.35, 2, 0.40
 
     # ── 迟滞锚定：读取上一次共识信号 ──
     prev_signal: str | None = None

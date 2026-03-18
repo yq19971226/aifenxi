@@ -85,9 +85,11 @@ export interface WeightsPreview {
 export interface CalibrationParams {
   signal_threshold: number;
   min_agreement: number;
+  min_confidence: number;
   recommended: {
     signal_threshold: { min: number; max: number; default: number };
     min_agreement: { min: number; max: number; default: number };
+    min_confidence: { min: number; max: number; default: number };
   };
 }
 
@@ -159,6 +161,7 @@ export async function fetchCalibrationParams(): Promise<CalibrationParams> {
 export async function updateCalibrationParams(params: {
   signal_threshold?: number;
   min_agreement?: number;
+  min_confidence?: number;
 }): Promise<{ status: string; params: Record<string, string> }> {
   const res = await authFetch(
     `${API_BASE}/api/admin/learning/calibration-params`,

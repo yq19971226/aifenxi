@@ -306,13 +306,16 @@ class LearningService:
 
         threshold = float(await get_config_value("consensus_signal_threshold", "0.35"))
         min_agreement = int(await get_config_value("consensus_min_agreement", "2"))
+        min_confidence = float(await get_config_value("consensus_min_confidence", "0.40"))
 
         return {
             "signal_threshold": threshold,
             "min_agreement": min_agreement,
+            "min_confidence": min_confidence,
             "recommended": {
                 "signal_threshold": {"min": 0.1, "max": 0.8, "default": 0.35},
                 "min_agreement": {"min": 1, "max": 4, "default": 2},
+                "min_confidence": {"min": 0.0, "max": 0.9, "default": 0.40},
             },
         }
 
@@ -320,6 +323,7 @@ class LearningService:
         self,
         signal_threshold: float | None = None,
         min_agreement: int | None = None,
+        min_confidence: float | None = None,
         changed_by: str = "admin",
     ) -> dict:
         """更新校准参数到 config_service，并写入 changelog。"""
@@ -351,6 +355,19 @@ class LearningService:
             updated["min_agreement"] = new_val
             await self._write_changelog(
                 "calibration", "consensus_min_agreement",
+                old_val, new_val, changed_by,
+            )
+
+        if min_confidence is not None:
+            old_val = await svc.get_config("consensus_min_confidence", "0.40")
+            new_val = str(round(min_confidence, 4))
+            await self._upsert_config(
+                svc, "consensus_min_confidence", new_val,
+                category="consensus", changed_by=changed_by,
+            )
+            updated["min_confidence"] = new_val
+            await self._write_changelog(
+                "calibration", "consensus_min_confidence",
                 old_val, new_val, changed_by,
             )
 
