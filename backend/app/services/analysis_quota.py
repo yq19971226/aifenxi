@@ -160,13 +160,11 @@ class AnalysisQuotaService:
         2. bonus 用完 → 扣减日常配额 daily_limit
         3. 日常配额也用完 → 拒绝
         """
-        # 等级门控（P0 安全修复）：bonus 不能绕过模式等级要求
-        # 例外：免费体验通道 — 免费用户的 intraday bonus 来自 free_trial 功能，
-        # 这是运营主动赠送的受控功能，允许通过。
-        # trend 模式无免费体验，始终严格门控。
+        # 等级门控：bonus 可以绕过等级限制（运营主动赠送的受控功能）
+        # 欢迎包/手动充值赋予的 bonus 允许任何等级用户使用
         required_level = MODE_LEVEL_REQUIREMENTS[mode]
         if level < required_level:
-            # 检查是否有 bonus（免费体验）可以通行
+            # 检查是否有 bonus（免费体验/欢迎包/手动充值）可以通行
             has_bonus = await self.get_bonus_remaining(user_id, mode) > 0
             if not has_bonus:
                 logger.warning(
@@ -174,16 +172,9 @@ class AnalysisQuotaService:
                     user_id, level, mode.value, required_level,
                 )
                 return False, 0
-            # 有 bonus 但差距超过 1 级 → 仍然拒绝（防止 level=0 用 trend=2）
-            if required_level - level > 1:
-                logger.warning(
-                    "等级门控拒绝(跨级): 用户 %s (等级=%d) 尝试使用模式=%s (需等级=%d)",
-                    user_id, level, mode.value, required_level,
-                )
-                return False, 0
-            # 差距 = 1 且有 bonus → 允许（如 level=0 用 intraday=1 的免费体验）
+            # 有 bonus → 允许（运营赠送的 bonus 不受跨级限制）
             logger.info(
-                "免费体验通行: 用户 %s (等级=%d) 使用 bonus 访问模式=%s",
+                "Bonus 通行: 用户 %s (等级=%d) 使用 bonus 访问模式=%s",
                 user_id, level, mode.value,
             )
 
@@ -269,11 +260,9 @@ class AnalysisQuotaService:
             remaining = 0
 
             if locked:
-                # 检查免费体验通道：有 bonus 且等级差距 ≤ 1 → 显示为可用
+                # 有 bonus → 显示为可用（运营赠送的 bonus 不受跨级限制）
                 bonus = await self.get_bonus_remaining(user_id, mode)
-                gap = MODE_LEVEL_REQUIREMENTS[mode] - level
-                if bonus > 0 and gap <= 1:
-                    # 免费体验可用 — 显示 bonus 次数，不标记锁定
+                if bonus > 0:
                     result[mode.value] = QuotaInfo(
                         mode=mode,
                         remaining=bonus,
@@ -281,7 +270,7 @@ class AnalysisQuotaService:
                         locked=False,
                     )
                 else:
-                    # 严格锁定
+                    # 无 bonus → 严格锁定
                     result[mode.value] = QuotaInfo(
                         mode=mode,
                         remaining=0,
