@@ -193,7 +193,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
                 多维风险感知
               </span>
               {confluenceTags.map((tag, i) => (
-                <span key={i} className={cn("text-xs font-bold rounded-md px-2 py-1 border border-white/5", tag.color, tag.bg)}>
+                <span key={i} className={cn("text-xs font-bold rounded-md px-2 py-1 border border-white/5", tag.bg)} style={{ color: tag.color }}>
                   {tag.label}
                 </span>
               ))}

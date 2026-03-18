@@ -2,13 +2,13 @@
 
 设计原则：
 - 只降权或维持，趋势共振可正向 boost（上限 1.25），巨鲸陷阱只降权（上限 1.00）
-- Redis 数据超时（scalping: 5min / intraday: 15min）则不作调整，返回因子 1.0
+- Redis 数据超时（scalping/intraday: 30min）则不作调整，返回因子 1.0
 - 所有异常均 fail-safe（静默跳过，置信度不调整）
 - 通过 ConfigService 读取开关：trend_confluence_enabled / whale_trap_enabled
 
 置信度公式：
     final_confidence = nsed_confidence × trend_factor × whale_factor
-    → clamp [0.10, 0.95]
+    → clamp [0.05, 0.95]
 """
 
 from __future__ import annotations
