@@ -163,17 +163,17 @@ function AccountHeroStrip({ user, t }: { user: UserInfo; t: MembershipTranslator
             {isPremium ? (
               <div className="flex flex-col gap-1 pb-1">
                  <span className={`text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-[4px] border border-current/30 ${color} bg-current/10 w-max`}>
-                   Active
+                   {t('currentStatus.active')}
                  </span>
                  {expiryInfo && (
                    <span className={`text-[10px] font-mono whitespace-nowrap ${expiryInfo.daysLeft <= 7 ? "text-red-400 animate-pulse" : expiryInfo.daysLeft <= 30 ? "text-amber-400" : "text-zinc-500"}`}>
-                     {expiryInfo.daysLeft} DAYS LEFT
+                     {t('currentStatus.daysLeftRaw', { count: expiryInfo.daysLeft })}
                    </span>
                  )}
               </div>
             ) : (
                <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-[4px] border border-zinc-500/30 text-zinc-500 bg-zinc-500/10 mb-1 w-max">
-                 Inactive
+                 {t('currentStatus.inactive')}
                </span>
             )}
           </div>
@@ -407,7 +407,7 @@ function LiveCheckoutSidebar({
                 <span className="font-mono text-4xl font-black text-white">{currentPayment.pay_amount}</span>
                 <span className="text-sm font-bold text-zinc-400">{currentPayment.pay_currency?.toUpperCase()}</span>
               </div>
-              <p className="text-[10px] font-mono text-zinc-500 tracking-wide mt-1">Network: <span className="text-white ml-1">{currentPayment.network}</span></p>
+              <p className="text-[10px] font-mono text-zinc-500 tracking-wide mt-1">{t('payment.info.networkLabel')} <span className="text-white ml-1">{currentPayment.network}</span></p>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -435,7 +435,7 @@ function LiveCheckoutSidebar({
                    <span className="h-1.5 w-1.5 rounded-full bg-current opacity-70" />
                    {statusMsg}
                </span>
-               <p className="mt-2 text-[9px] text-zinc-500 font-mono italic">Please transfer the exact amount within the time limit. The system will auto-confirm upon blockchain confirmation.</p>
+               <p className="mt-2 text-[9px] text-zinc-500 font-mono italic">{t('payment.info.hint')}</p>
             </div>
          </motion.div>
        ) : (
@@ -445,7 +445,7 @@ function LiveCheckoutSidebar({
             animate={{ opacity: 1 }}
             className="relative bg-[#0f0f0f] rounded-xl p-5 lg:p-7 flex flex-col gap-6"
           >
-            <h3 className="text-xs font-black text-white font-mono tracking-widest uppercase border-b border-white/5 pb-4">{t('planSelection.title')} Checkout</h3>
+            <h3 className="text-xs font-black text-white font-mono tracking-widest uppercase border-b border-white/5 pb-4">{t('planSelection.title')} {t('planSelection.checkout')}</h3>
 
             {/* Plan Toggle */}
             <div className="flex p-1 bg-black rounded-lg border border-white/10 relative">
@@ -470,7 +470,7 @@ function LiveCheckoutSidebar({
 
             {/* Billing Cycle */}
             <div className="flex flex-col gap-3">
-              <span className="text-[9px] font-black text-zinc-500 tracking-widest uppercase font-mono">Billing Cycle</span>
+              <span className="text-[9px] font-black text-zinc-500 tracking-widest uppercase font-mono">{t('planSelection.billingCycle')}</span>
               <div className="grid grid-cols-3 gap-2">
                 {DURATION_OPTS.map(opt => (
                   <button 
@@ -509,7 +509,7 @@ function LiveCheckoutSidebar({
             <div className="mt-4 pt-6 border-t border-white/5 flex flex-col gap-4">
                <div className="flex items-end justify-between">
                  <div className="flex flex-col">
-                   <span className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase mb-1">Total Due</span>
+                   <span className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase mb-1">{t('planSelection.totalDue')}</span>
                    <span className="text-zinc-400 text-xs font-mono">{planName} · {DURATION_OPTS.find(x => x.m === selectedDuration)?.label}</span>
                  </div>
                  <div className="text-right">
@@ -519,7 +519,7 @@ function LiveCheckoutSidebar({
                    </div>
                    {selectedDuration > 1 && (
                      <span className="text-[10px] text-emerald-400 font-mono tracking-tight bg-emerald-500/10 px-1.5 py-[1px] rounded inline-block mt-1">
-                       Avg ${(selectedTotal/selectedDuration).toFixed(2)} / MO
+                       {t('planSelection.avgMonthly', { amount: (selectedTotal/selectedDuration).toFixed(2) })}
                      </span>
                    )}
                  </div>
@@ -532,9 +532,9 @@ function LiveCheckoutSidebar({
                >
                  <span className="relative z-10 flex items-center justify-center gap-2">
                    {creating ? (
-                     <><span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" /> PROCCESSING...</>
+                     <><span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" /> {t('payment.creating').toUpperCase()}</>
                    ) : (
-                     <>PAY {selectedTotal} USDT <svg className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${isFlagship ? 'text-black/50' : 'text-white/50'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></>
+                     <><span className="whitespace-nowrap">{t('payment.createButton', { amount: selectedTotal }).toUpperCase()} USDT</span> <svg className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${isFlagship ? 'text-black/50' : 'text-white/50'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></>
                    )}
                  </span>
                </button>
@@ -647,7 +647,7 @@ export default function MembershipPage() {
         <h1 className="text-3xl lg:text-4xl font-black font-mono tracking-widest uppercase mb-3">
            {t('title')}
         </h1>
-        <p className="text-[11px] font-bold font-mono text-zinc-500 uppercase tracking-[0.3em]">Billing & Subscriptions</p>
+        <p className="text-[11px] font-bold font-mono text-zinc-500 uppercase tracking-[0.3em]">{t('subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">

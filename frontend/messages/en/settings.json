@@ -67,7 +67,10 @@
         "2": "Flagship"
       },
       "expiresAt": "Expires: {date}",
-      "daysLeft": "({count} days left)"
+      "daysLeft": "({count} days left)",
+      "active": "Active",
+      "inactive": "Inactive",
+      "daysLeftRaw": "{count} DAYS LEFT"
     },
     "freeTrial": {
       "title": "Free Trial",
@@ -129,7 +132,11 @@
       "save": "Save {percent}%",
       "perMonth": "/mo",
       "perQuarter": "/qtr",
-      "perYear": "/yr"
+      "perYear": "/yr",
+      "checkout": "Checkout",
+      "billingCycle": "Billing Cycle",
+      "totalDue": "Total Due",
+      "avgMonthly": "Avg  / MO"
     },
     "payment": {
       "network": "Payment Network",
@@ -142,7 +149,9 @@
         "copy": "Copy",
         "copied": "Copied",
         "timeRemaining": "Time Remaining",
-        "expired": "Expired"
+        "expired": "Expired",
+        "hint": "Please transfer the exact amount within the time limit. The system will auto-confirm upon blockchain confirmation.",
+        "networkLabel": "Network:"
       },
       "status": {
         "pending": "Pending",
@@ -161,7 +170,8 @@
         "network": "Network",
         "status": "Status"
       }
-    }
+    },
+    "subtitle": "Billing & Subscriptions"
   },
   "configs": {
     "title": "System Configuration",
