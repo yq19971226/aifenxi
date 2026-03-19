@@ -210,12 +210,13 @@ function KpiCard({
 function TierBar({ free, pro, flagship }: { free: number; pro: number; flagship: number }) {
   const total = free + pro + flagship || 1;
   const pct = (n: number) => ((n / total) * 100).toFixed(1);
+  const t = useTranslations("admin");
 
   return (
     <div className="bg-bg-surface border border-border rounded-xl shadow-inner p-5 space-y-4">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">会员分布</span>
-        <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{total} 人</span>
+        <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{t("dashboard.tierBar.title")}</span>
+        <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{t("dashboard.tierBar.count", { count: total })}</span>
       </div>
       <div className="mb-2 flex h-2.5 overflow-hidden rounded-full bg-bg-elevated border border-border shadow-inner mt-2">
         <div className="bg-zinc-500 transition-all opacity-80" style={{ width: `${pct(free)}%` }} />
@@ -225,15 +226,15 @@ function TierBar({ free, pro, flagship }: { free: number; pro: number; flagship:
       <div className="flex items-center gap-4 text-[10px] font-bold font-mono uppercase tracking-widest text-zinc-500 flex-wrap">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-zinc-500 opacity-80" />
-          免费 <span className="text-zinc-300">{free}</span>
+          {t("dashboard.tierBar.free")} <span className="text-zinc-300">{free}</span>
         </span>
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
-          专业 <span className="text-zinc-300">{pro}</span>
+          {t("dashboard.tierBar.pro")} <span className="text-zinc-300">{pro}</span>
         </span>
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
-          旗舰 <span className="text-zinc-300">{flagship}</span>
+          {t("dashboard.tierBar.flagship")} <span className="text-zinc-300">{flagship}</span>
         </span>
       </div>
     </div>
@@ -243,6 +244,7 @@ function TierBar({ free, pro, flagship }: { free: number; pro: number; flagship:
 /* ── LLM 成本面板（紧凑版） ──────────────────────────────── */
 
 function LLMCostCompact({ cost }: { cost: LLMCostSummary }) {
+  const t = useTranslations("admin");
   const modelLabels: Record<string, string> = {
     "deepseek-r1": "DeepSeek R1",
     "deepseek-v3.2-thinking": "DeepSeek V3.2",
@@ -284,20 +286,20 @@ function LLMCostCompact({ cost }: { cost: LLMCostSummary }) {
   return (
     <div className="bg-bg-surface border border-border rounded-xl shadow-inner p-5 space-y-4">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">今日 AI 成本</span>
+        <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{t("dashboard.llmCost.title")}</span>
         <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{cost.date}</span>
       </div>
       <div className="grid grid-cols-3 gap-3 pt-1">
         <div>
-          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">总成本</p>
+          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">{t("dashboard.llmCost.totalCost")}</p>
           <p className="text-base sm:text-lg font-black font-mono text-zinc-200 tracking-tight">${cost.total_cost_usd.toFixed(4)}</p>
         </div>
         <div>
-          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Tokens</p>
+          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">{t("dashboard.llmCost.tokens")}</p>
           <p className="text-base sm:text-lg font-black font-mono text-zinc-200 tracking-tight">{cost.total_tokens.toLocaleString()}</p>
         </div>
         <div>
-          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">调用</p>
+          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">{t("dashboard.llmCost.calls")}</p>
           <p className="text-base sm:text-lg font-black font-mono text-zinc-200 tracking-tight">{cost.total_calls}</p>
         </div>
       </div>
@@ -325,19 +327,20 @@ function LLMCostCompact({ cost }: { cost: LLMCostSummary }) {
 /* ── AI 爬虫访问统计 ────────────────────────────────────── */
 
 function CrawlerStatsCard({ stats }: { stats: CrawlerStats }) {
+  const t = useTranslations("admin");
   const bots = stats.bots.slice(0, 5); // 只看前5个
   
   return (
     <div className="bg-bg-surface border border-border rounded-xl shadow-inner p-5 space-y-4">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">AI 引擎收录检测</span>
-        <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest">累计 {stats.total_hits} 次</span>
+        <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{t("dashboard.crawler.title")}</span>
+        <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{t("dashboard.crawler.totalHits", { count: stats.total_hits })}</span>
       </div>
       
       {bots.length === 0 ? (
         <div className="py-8 flex flex-col items-center justify-center gap-3 text-zinc-600 bg-bg-primary/50 rounded-xl border border-dashed border-border/50">
           <Wifi size={24} className="animate-pulse opacity-50" />
-          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">等待 AI 引擎首访同步...</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">{t("dashboard.crawler.waiting")}</p>
         </div>
       ) : (
         <div className="space-y-4 pt-1">
@@ -377,23 +380,24 @@ function CrawlerStatsCard({ stats }: { stats: CrawlerStats }) {
 
 /* ── 快捷操作 ──────────────────────────────────────────────── */
 
-const QUICK_ACTIONS: { label: string; href: string; icon: LucideIcon; desc: string }[] = [
-  { label: "用户管理", href: "/admin/users", icon: Users, desc: "搜索/封禁/调整等级" },
-  { label: "API 密钥", href: "/admin/api-keys", icon: Key, desc: "管理第三方密钥" },
-  { label: "数据源", href: "/admin/datasources", icon: Database, desc: "开关数据源" },
-  { label: "系统监控", href: "/admin/monitor", icon: Monitor, desc: "智能体/编排器" },
-  { label: "模型分工", href: "/admin/models", icon: Brain, desc: "切换模型映射" },
-  { label: "参数设置", href: "/settings/configs", icon: Settings, desc: "运行时参数" },
+const QUICK_ACTION_KEYS = [
+  { key: "userMgmt", href: "/admin/users", icon: Users },
+  { key: "apiKeys", href: "/admin/api-keys", icon: Key },
+  { key: "datasources", href: "/admin/datasources", icon: Database },
+  { key: "monitor", href: "/admin/monitor", icon: Monitor },
+  { key: "models", href: "/admin/models", icon: Brain },
+  { key: "configs", href: "/settings/configs", icon: Settings },
 ];
 
 function QuickActions() {
+  const t = useTranslations("admin");
   return (
     <div className="bg-bg-surface border border-border rounded-xl shadow-inner overflow-hidden">
       <div className="px-5 py-4 border-b border-border bg-bg-primary/30">
-        <span className="text-sm font-bold text-zinc-300 tracking-wide">快捷操作</span>
+        <span className="text-sm font-bold text-zinc-300 tracking-wide">{t("dashboard.quickActions.title")}</span>
       </div>
       <div className="grid grid-cols-2 gap-px bg-border sm:grid-cols-3">
-        {QUICK_ACTIONS.map((act) => {
+        {QUICK_ACTION_KEYS.map((act) => {
           const Icon = act.icon;
           return (
             <Link
@@ -406,9 +410,9 @@ function QuickActions() {
               </div>
               <div>
                 <p className="text-sm font-bold text-zinc-300 group-hover:text-white transition-colors">
-                  {act.label}
+                  {t(`dashboard.quickActions.${act.key}.label`)}
                 </p>
-                <p className="text-[10px] font-bold font-mono text-zinc-500 mt-0.5 uppercase tracking-widest">{act.desc}</p>
+                <p className="text-[10px] font-bold font-mono text-zinc-500 mt-0.5 uppercase tracking-widest">{t(`dashboard.quickActions.${act.key}.desc`)}</p>
               </div>
             </Link>
           );
@@ -421,6 +425,7 @@ function QuickActions() {
 /* ── 页面主体 ──────────────────────────────────────────────── */
 
 export default function AdminDashboardPage() {
+  const t = useTranslations("admin");
   const { user } = useAuth();
   const [error, setError] = useState("");
 
@@ -486,9 +491,9 @@ export default function AdminDashboardPage() {
         {/* ── Header ── */}
         <div className="flex items-end justify-between">
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-white font-mono">运营概览 / DASHBOARD</h1>
+            <h1 className="text-2xl font-black tracking-tight text-white font-mono">{t("dashboard.title")} / DASHBOARD</h1>
             <p className="text-[10px] mt-2 font-bold font-mono text-zinc-500 uppercase tracking-widest">
-              ADMIN CONTROL PANEL • {new Date().toLocaleDateString("zh-CN")}
+              ADMIN CONTROL PANEL • {new Date().toLocaleDateString()}
             </p>
           </div>
           <div className="h-px w-24 bg-gradient-to-r from-indigo-500/30 to-transparent hidden md:block" />
@@ -500,49 +505,49 @@ export default function AdminDashboardPage() {
         {/* ── KPI row (6 columns) ── */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 xl:grid-cols-7">
           <KpiCard
-            label="总用户"
+            label={t("dashboard.kpi.totalUsers")}
             value={stats.total_users}
-            sub={`今日 +${stats.new_users_today}`}
+            sub={t("dashboard.kpi.todayNew", { count: stats.new_users_today })}
             icon={Users}
             color="bg-indigo-500/10 text-indigo-400"
           />
           <KpiCard
-            label="7日新增"
+            label={t("dashboard.kpi.newUsers7d")}
             value={stats.new_users_7d}
             icon={UserPlus}
             color="bg-emerald-500/10 text-emerald-400"
           />
           <KpiCard
-            label="累计收入"
+            label={t("dashboard.kpi.totalRevenue")}
             value={fmtUsd(stats.total_revenue_usd)}
-            sub={`30d ${fmtUsd(stats.revenue_30d_usd)}`}
+            sub={t("dashboard.kpi.revenue30d", { amount: fmtUsd(stats.revenue_30d_usd) })}
             icon={DollarSign}
             color="bg-amber-500/10 text-amber-400"
           />
           <KpiCard
-            label="待处理支付"
+            label={t("dashboard.kpi.pendingPayments")}
             value={stats.pending_payments}
             icon={Clock}
             color={stats.pending_payments > 0 ? "bg-red-500/10 text-red-400 border-red-500/30" : "bg-bg-elevated border-border text-zinc-500"}
           />
           <KpiCard
-            label="策略 24h"
+            label={t("dashboard.kpi.strategies24h")}
             value={`+${stats.strategies_24h}`}
-            sub={`累计 ${stats.total_strategies}`}
+            sub={t("dashboard.kpi.totalStrategies", { count: stats.total_strategies })}
             icon={TrendingUp}
             color="bg-indigo-500/10 text-indigo-400"
           />
           <KpiCard
-            label="共识 24h"
+            label={t("dashboard.kpi.consensus24h")}
             value={`+${stats.consensus_24h}`}
-            sub={`累计 ${stats.total_consensus}`}
+            sub={t("dashboard.kpi.totalConsensus", { count: stats.total_consensus })}
             icon={Brain}
             color="bg-purple-500/10 text-purple-400"
           />
           <KpiCard
-            label="登录在线"
+            label={t("dashboard.kpi.onlineUsers")}
             value={onlineStats?.logged_in_online ?? 0}
-            sub={`WS 价格${onlineStats?.price ?? 0} / 预警${onlineStats?.alerts ?? 0}`}
+            sub={t("dashboard.kpi.onlineBreakdown", { price: onlineStats?.price ?? 0, alerts: onlineStats?.alerts ?? 0 })}
             icon={Wifi}
             color={(onlineStats?.logged_in_online ?? 0) > 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-blue-500/10 text-blue-400"}
           />
@@ -555,28 +560,28 @@ export default function AdminDashboardPage() {
             <CrawlerStatsCard stats={crawlerStats} />
           ) : (
             <div className="bg-bg-surface border border-border rounded-xl shadow-inner p-5 flex items-center justify-center">
-              <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest animate-pulse">爬虫数据加载中…</span>
+              <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest animate-pulse">{t("dashboard.crawler.loading")}</span>
             </div>
           )}
           {llmCost ? (
             <LLMCostCompact cost={llmCost} />
           ) : (
             <div className="bg-bg-surface border border-border rounded-xl shadow-inner p-5 flex items-center justify-center">
-              <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest animate-pulse">AI 成本数据加载中…</span>
+              <span className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest animate-pulse">{t("dashboard.llmCost.loading")}</span>
             </div>
           )}
           <div className="bg-bg-surface border border-border rounded-xl shadow-inner p-5 space-y-4">
-            <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest block">系统活跃度</span>
+            <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest block">{t("dashboard.activity.title")}</span>
             <div className="grid grid-cols-2 gap-4 pt-1">
               <div>
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">智能体报告</p>
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">{t("dashboard.activity.agentReports")}</p>
                 <p className="text-2xl font-black font-mono text-zinc-200 tracking-tight">{stats.total_agent_reports}</p>
-                <p className="text-[10px] font-bold font-mono text-indigo-400 uppercase tracking-widest mt-2 bg-indigo-500/10 inline-block px-1.5 py-0.5 rounded">24h +{stats.agent_reports_24h}</p>
+                <p className="text-[10px] font-bold font-mono text-indigo-400 uppercase tracking-widest mt-2 bg-indigo-500/10 inline-block px-1.5 py-0.5 rounded">{t("dashboard.activity.agentReports24h", { count: stats.agent_reports_24h })}</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">预警规则</p>
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">{t("dashboard.activity.alertRules")}</p>
                 <p className="text-2xl font-black font-mono text-zinc-200 tracking-tight">{stats.total_alert_rules}</p>
-                <p className="text-[10px] font-bold font-mono text-emerald-400 uppercase tracking-widest mt-2 bg-emerald-500/10 inline-block px-1.5 py-0.5 rounded">活跃 {stats.active_alert_rules}</p>
+                <p className="text-[10px] font-bold font-mono text-emerald-400 uppercase tracking-widest mt-2 bg-emerald-500/10 inline-block px-1.5 py-0.5 rounded">{t("dashboard.activity.activeRules", { count: stats.active_alert_rules })}</p>
               </div>
             </div>
           </div>

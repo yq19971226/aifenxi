@@ -447,6 +447,9 @@
     "defenseLevel": "Defense Level",
     "collusionDetected": "Collusion detected",
     "onlineUsers": "Online Users",
+    "loggedInOnline": "Logged In",
+    "datasourceHealth": "Data Source Health",
+    "datasourceHealthDesc": "Real-time connection status and success rate",
     "websocketSubtitle": "WebSocket real-time (30s refresh)",
     "live": "Live",
     "totalConnections": "Total Connections",
@@ -681,6 +684,27 @@
       "agentReports24h": "24h +{count}",
       "alertRules": "Alert Rules",
       "activeRules": "Active {count}"
+    },
+    "crawler": {
+      "title": "AI Engine Indexing",
+      "totalHits": "{count} total hits",
+      "waiting": "Waiting for AI engine initial visit…",
+      "loading": "Loading crawler data…"
     }
+  },
+  "logs": {
+    "title": "System Logs",
+    "subtitle": "Real-time system execution logs and error reports",
+    "filterPlaceholder": "Filter logs...",
+    "lines": "Lines",
+    "last": "Last {count}",
+    "autoRefresh": "Auto Refresh",
+    "consoleOutput": "Console Output",
+    "linesLoaded": "{count} lines loaded",
+    "connecting": "Establishing connection to log server...",
+    "noData": "No log data received or filters produced no results.",
+    "systemStatus": "System Status: Optimal",
+    "node": "Node: production-core-01",
+    "uptime": "Uptime: 14d 2h 45m"
   }
 }

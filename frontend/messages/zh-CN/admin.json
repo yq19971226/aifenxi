@@ -387,6 +387,9 @@
     "defenseLevel": "防御等级",
     "collusionDetected": "合谋检测异常",
     "onlineUsers": "在线用户",
+    "loggedInOnline": "登录在线",
+    "datasourceHealth": "数据源健康度",
+    "datasourceHealthDesc": "实时连接状态与成功率",
     "websocketSubtitle": "WebSocket 实时连接（30s 刷新）",
     "live": "实时",
     "totalConnections": "总连接",
@@ -623,6 +626,27 @@
       "agentReports24h": "24h +{count}",
       "alertRules": "预警规则",
       "activeRules": "活跃 {count}"
+    },
+    "crawler": {
+      "title": "AI 引擎收录检测",
+      "totalHits": "累计 {count} 次",
+      "waiting": "等待 AI 引擎首访同步...",
+      "loading": "爬虫数据加载中…"
     }
+  },
+  "logs": {
+    "title": "系统日志",
+    "subtitle": "实时系统执行日志与错误报告",
+    "filterPlaceholder": "过滤日志...",
+    "lines": "行数",
+    "last": "最近 {count}",
+    "autoRefresh": "自动刷新",
+    "consoleOutput": "控制台输出",
+    "linesLoaded": "{count} 行已加载",
+    "connecting": "正在连接日志服务器...",
+    "noData": "未收到日志数据或过滤无结果。",
+    "systemStatus": "系统状态: 正常",
+    "node": "节点: production-core-01",
+    "uptime": "运行时间: 14d 2h 45m"
   }
 }

@@ -386,6 +386,9 @@
     "defenseLevel": "防禦等級",
     "collusionDetected": "合謀檢測異常",
     "onlineUsers": "線上用戶",
+    "loggedInOnline": "登入線上",
+    "datasourceHealth": "數據源健康度",
+    "datasourceHealthDesc": "即時連線狀態與成功率",
     "websocketSubtitle": "WebSocket 即時連線（30s 刷新）",
     "live": "即時",
     "totalConnections": "總連線",
@@ -622,6 +625,27 @@
       "agentReports24h": "24h +{count}",
       "alertRules": "預警規則",
       "activeRules": "活躍 {count}"
+    },
+    "crawler": {
+      "title": "AI 引擎收錄偵測",
+      "totalHits": "累計 {count} 次",
+      "waiting": "等待 AI 引擎首訪同步...",
+      "loading": "爬蟲數據載入中…"
     }
+  },
+  "logs": {
+    "title": "系統日誌",
+    "subtitle": "即時系統執行日誌與錯誤報告",
+    "filterPlaceholder": "過濾日誌...",
+    "lines": "行數",
+    "last": "最近 {count}",
+    "autoRefresh": "自動刷新",
+    "consoleOutput": "控制台輸出",
+    "linesLoaded": "{count} 行已載入",
+    "connecting": "正在連接日誌伺服器...",
+    "noData": "未收到日誌數據或過濾無結果。",
+    "systemStatus": "系統狀態: 正常",
+    "node": "節點: production-core-01",
+    "uptime": "運行時間: 14d 2h 45m"
   }
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { authHeaders } from "@/lib/api/auth";
 import { fetchModelAssignments } from "@/lib/api/admin-models";
 import {
@@ -30,27 +31,17 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
 // ── 智能体注册表 ──────────────────────────────────────────
 
-interface AgentMeta {
-  id: string;
-  name: string;
-  desc: string;
-  model: string;
-  icon: React.ReactNode;
-  phase: string;
-  modes: string[];
-}
-
-const AGENTS: AgentMeta[] = [
-  { id: "technical", name: "技术分析", desc: "K线形态、指标信号、支撑压力位", model: "claude-sonnet", icon: <TrendingUp size={16} />, phase: "核心层", modes: ["超短线", "日内", "趋势"] },
-  { id: "onchain", name: "链上数据", desc: "资金动向、交易所流入流出、矿工储备", model: "deepseek-v3.2-thinking", icon: <Database size={16} />, phase: "核心层", modes: ["日内", "趋势"] },
-  { id: "sentiment", name: "舆情分析", desc: "恐贪指数、社交热度、流量动向", model: "grok-fast", icon: <Activity size={16} />, phase: "核心层", modes: ["趋势"] },
-  { id: "orderbook", name: "订单簿", desc: "买卖盘深度、大单挂单、挂单价", model: "qwen3-max", icon: <BarChart3 size={16} />, phase: "核心层", modes: ["日内", "趋势"] },
-  { id: "risk", name: "风险评估", desc: "仓位风险、止损建议、盈亏比", model: "claude-haiku", icon: <Shield size={16} />, phase: "核心层", modes: ["日内", "趋势"] },
-  { id: "news_analyst", name: "新闻分析", desc: "全球加密新闻解读、监管政策影响", model: "grok-fast", icon: <Newspaper size={16} />, phase: "增强层", modes: ["日内", "趋势"] },
-  { id: "calendar", name: "日历事件", desc: "代币解锁、上线、减半等事件影响评估", model: "grok-fast", icon: <Clock size={16} />, phase: "增强层", modes: ["日内", "趋势"] },
-  { id: "reflection", name: "反思复盘", desc: "回顾历史判断准确率，持续自我改进", model: "deepseek-r1", icon: <Lightbulb size={16} />, phase: "增强层", modes: ["离线"] },
-  { id: "adversarial", name: "对抗推演", desc: "站在庄家视角反推下一步操盘策略", model: "deepseek-r1", icon: <Swords size={16} />, phase: "对抗层", modes: ["趋势"] },
-  { id: "collusion_detector", name: "合谋检测", desc: "检测对倒交易、协作拉盘、恶意操纵", model: "claude-sonnet", icon: <Users size={16} />, phase: "对抗层", modes: ["趋势"] },
+const AGENTS_CONFIG = [
+  { id: "technical", modelDefault: "claude-sonnet", icon: <TrendingUp size={16} />, phase: "core", modeKeys: ["intraday", "trend"] },
+  { id: "onchain", modelDefault: "deepseek-v3.2-thinking", icon: <Database size={16} />, phase: "core", modeKeys: ["intraday", "trend"] },
+  { id: "sentiment", modelDefault: "grok-fast", icon: <Activity size={16} />, phase: "core", modeKeys: ["trend"] },
+  { id: "orderbook", modelDefault: "qwen3-max", icon: <BarChart3 size={16} />, phase: "core", modeKeys: ["intraday", "trend"] },
+  { id: "risk", modelDefault: "claude-haiku", icon: <Shield size={16} />, phase: "core", modeKeys: ["intraday", "trend"] },
+  { id: "news_analyst", modelDefault: "grok-fast", icon: <Newspaper size={16} />, phase: "enhance", modeKeys: ["intraday", "trend"] },
+  { id: "calendar", modelDefault: "grok-fast", icon: <Clock size={16} />, phase: "enhance", modeKeys: ["intraday", "trend"] },
+  { id: "reflection", modelDefault: "deepseek-r1", icon: <Lightbulb size={16} />, phase: "enhance", modeKeys: ["offline"] },
+  { id: "adversarial", modelDefault: "deepseek-r1", icon: <Swords size={16} />, phase: "adversarial", modeKeys: ["trend"] },
+  { id: "collusion_detector", modelDefault: "claude-sonnet", icon: <Users size={16} />, phase: "adversarial", modeKeys: ["trend"] },
 ];
 
 const MODEL_LABELS: Record<string, string> = {
@@ -92,9 +83,9 @@ const MODEL_COLORS: Record<string, string> = {
 };
 
 const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
-  "核心层": { bg: "bg-blue-500/10", text: "text-blue-400" },
-  "增强层": { bg: "bg-zinc-500/10", text: "text-zinc-400" },
-  "对抗层": { bg: "bg-red-500/10", text: "text-red-400" },
+  "core": { bg: "bg-blue-500/10", text: "text-blue-400" },
+  "enhance": { bg: "bg-zinc-500/10", text: "text-zinc-400" },
+  "adversarial": { bg: "bg-red-500/10", text: "text-red-400" },
 };
 
 // ── 系统健康数据 ──────────────────────────────────────────
@@ -167,38 +158,39 @@ async function fetchDefenseStatus(symbol: string): Promise<DefenseStatus> {
 
 function OnlineUsersCard() {
   const { data } = useAdminOnlineStats();
+  const t = useTranslations("admin");
 
   return (
     <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="mb-1 text-sm font-semibold text-white">在线用户</h2>
-          <p className="text-xs text-zinc-500">登录在线（心跳） / WebSocket 连接，约 15s 刷新</p>
+          <h2 className="mb-1 text-sm font-semibold text-white">{t("monitor.onlineUsers")}</h2>
+          <p className="text-xs text-zinc-500">{t("monitor.websocketSubtitle")}</p>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
           </span>
-          <span className="text-xs text-zinc-500">实时</span>
+          <span className="text-xs text-zinc-500">{t("monitor.live")}</span>
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="text-center">
           <p className="text-2xl font-bold text-accent">{data?.logged_in_online ?? 0}</p>
-          <p className="mt-1 text-xs text-zinc-500">登录在线</p>
+          <p className="mt-1 text-xs text-zinc-500">{t("monitor.onlineUsers")}</p>
         </div>
         <div className="text-center">
           <p className="text-2xl font-bold text-zinc-300">{data?.total ?? 0}</p>
-          <p className="mt-1 text-xs text-zinc-500">WS 总连接</p>
+          <p className="mt-1 text-xs text-zinc-500">{t("monitor.totalConnections")}</p>
         </div>
         <div className="text-center">
           <p className="text-2xl font-bold text-blue-400">{data?.price ?? 0}</p>
-          <p className="mt-1 text-xs text-zinc-500">价格频道</p>
+          <p className="mt-1 text-xs text-zinc-500">{t("monitor.priceChannel")}</p>
         </div>
         <div className="text-center">
           <p className="text-2xl font-bold text-emerald-400">{data?.alerts ?? 0}</p>
-          <p className="mt-1 text-xs text-zinc-500">预警频道</p>
+          <p className="mt-1 text-xs text-zinc-500">{t("monitor.alertChannel")}</p>
         </div>
       </div>
     </div>
@@ -208,6 +200,7 @@ function OnlineUsersCard() {
 // ── 数据源健康卡片 ──
 function DataSourceHealthCard() {
   const { data } = useDataSourceHealth();
+  const t = useTranslations("admin");
   const sources = data?.sources || {};
 
   return (
@@ -218,8 +211,8 @@ function DataSourceHealthCard() {
             <Database className="text-emerald-500" size={20} />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-white">数据源健康度</h2>
-            <p className="text-xs text-zinc-500">实时连接状态与成功率</p>
+            <h2 className="text-sm font-semibold text-white">{t("monitor.datasourceHealth")}</h2>
+            <p className="text-xs text-zinc-500">{t("monitor.datasourceHealthDesc")}</p>
           </div>
         </div>
         <div className="text-right">
@@ -258,6 +251,7 @@ function DataSourceHealthCard() {
 
 export default function AdminMonitorPage() {
   const { user } = useAuth();
+  const t = useTranslations("admin");
   const [monitorSymbol, setMonitorSymbol] = useState("BTCUSDT");
 
   const { data: health } = useSystemHealth();
@@ -307,14 +301,14 @@ export default function AdminMonitorPage() {
             <Cpu className="text-zinc-400" size={22} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white">系统监控</h1>
+            <h1 className="text-xl font-bold text-white">{t("monitor.title")}</h1>
             <p className="text-xs text-zinc-500">
-              {AGENTS.length} 个 AI 智能体 · 多维度市场分析
+              {t("monitor.subtitle", { count: AGENTS_CONFIG.length })}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-zinc-500">监控币种</span>
+          <span className="text-xs text-zinc-500">{t("monitor.monitorSymbol")}</span>
           <select
             value={monitorSymbol}
             onChange={(e) => setMonitorSymbol(e.target.value)}
@@ -333,7 +327,7 @@ export default function AdminMonitorPage() {
         <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-4">
           <div className="flex items-center gap-2 text-zinc-500">
             <Wifi size={14} />
-            <span className="text-xs">后端服务</span>
+            <span className="text-xs">{t("monitor.backendService")}</span>
           </div>
           <div className="mt-2 flex items-center gap-2">
             {isHealthy ? (
@@ -342,15 +336,15 @@ export default function AdminMonitorPage() {
               <AlertTriangle size={18} className="text-red-400" />
             )}
             <span className={`text-lg font-bold ${isHealthy ? "text-green-400" : "text-red-400"}`}>
-              {isHealthy ? "正常" : "异常"}
+              {isHealthy ? t("monitor.statusOk") : t("monitor.statusError")}
             </span>
           </div>
           <p className="mt-1 text-xs text-zinc-500">
-            环境: {health?.status === "ok" && health?.env && String(health.env).toLowerCase() !== "unknown"
+            {t("monitor.env")}: {health?.status === "ok" && health?.env && String(health.env).toLowerCase() !== "unknown"
               ? health.env
               : "—"}
             {health?.status !== "ok" && (
-              <span className="ml-1 text-zinc-600">(无法连接)</span>
+              <span className="ml-1 text-zinc-600">({t("monitor.statusError")})</span>
             )}
           </p>
         </div>
@@ -359,28 +353,28 @@ export default function AdminMonitorPage() {
         <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-4">
           <div className="flex items-center gap-2 text-zinc-500">
             <Brain size={14} />
-            <span className="text-xs">智能体</span>
+            <span className="text-xs">{t("monitor.agentsLabel")}</span>
           </div>
-          <p className="mt-2 text-2xl font-bold text-accent">{AGENTS.length}</p>
-          <p className="mt-1 text-xs text-zinc-500">核心5 + 增强3 + 对抗2</p>
+          <p className="mt-2 text-2xl font-bold text-accent">{AGENTS_CONFIG.length}</p>
+          <p className="mt-1 text-xs text-zinc-500">{t("monitor.agentsCount")}</p>
         </div>
 
         {/* 反思状态 */}
         <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-4">
           <div className="flex items-center gap-2 text-zinc-500">
             <Lightbulb size={14} />
-            <span className="text-xs">反思注入</span>
+            <span className="text-xs">{t("monitor.reflection")}</span>
           </div>
           <div className="mt-2 flex items-center gap-2">
             {reflectionStatus?.has_data ? (
               <>
                 <CheckCircle size={18} className="text-green-400" />
-                <span className="text-lg font-bold text-green-400">活跃</span>
+                <span className="text-lg font-bold text-green-400">{t("monitor.reflectionActive")}</span>
               </>
             ) : (
               <>
                 <Clock size={18} className="text-zinc-500" />
-                <span className="text-lg font-bold text-zinc-500">待触发</span>
+                <span className="text-lg font-bold text-zinc-500">{t("monitor.reflectionPending")}</span>
               </>
             )}
           </div>
@@ -390,7 +384,7 @@ export default function AdminMonitorPage() {
         <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-4">
           <div className="flex items-center gap-2 text-zinc-500">
             <Shield size={14} />
-            <span className="text-xs">防御等级</span>
+            <span className="text-xs">{t("monitor.defenseLevel")}</span>
           </div>
           <p className={`mt-2 text-lg font-bold ${
             defenseStatus?.alert_level === "high" || defenseStatus?.alert_level === "critical"
@@ -402,7 +396,7 @@ export default function AdminMonitorPage() {
             {(defenseStatus?.alert_level || "none").toUpperCase()}
           </p>
           {defenseStatus?.collusion_detected && (
-            <p className="mt-1 text-xs text-red-400">合谋检测异常</p>
+            <p className="mt-1 text-xs text-red-400">{t("monitor.collusionDetected")}</p>
           )}
         </div>
       </div>
@@ -417,9 +411,9 @@ export default function AdminMonitorPage() {
       <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="mb-1 text-sm font-semibold text-white">K 线数据采集</h2>
+            <h2 className="mb-1 text-sm font-semibold text-white">{t("monitor.klineScheduler")}</h2>
             <p className="text-xs text-zinc-500">
-              自动从 Binance 拉取 K 线数据并缓存，每 {klineScheduler?.cycle_seconds ?? 300} 秒一轮
+              {t("monitor.klineSchedulerDesc", { seconds: klineScheduler?.cycle_seconds ?? 300 })}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -431,7 +425,7 @@ export default function AdminMonitorPage() {
               <span className={`h-1.5 w-1.5 rounded-full ${
                 klineScheduler?.running ? "bg-green-400" : "bg-red-400"
               }`} />
-              {klineScheduler?.running ? "运行中" : "已停止"}
+              {klineScheduler?.running ? t("monitor.running") : t("monitor.stopped")}
             </span>
           </div>
         </div>
@@ -440,7 +434,7 @@ export default function AdminMonitorPage() {
           <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-3">
             <div className="flex items-center gap-1.5 text-zinc-500">
               <RefreshCw size={12} />
-              <span className="text-xs">已完成轮次</span>
+              <span className="text-xs">{t("monitor.completedRounds")}</span>
             </div>
             <p className="mt-1 text-lg font-bold text-white">
               {klineScheduler?.rounds_completed ?? 0}
@@ -449,13 +443,13 @@ export default function AdminMonitorPage() {
           <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-3">
             <div className="flex items-center gap-1.5 text-zinc-500">
               <Database size={12} />
-              <span className="text-xs">采集任务</span>
+              <span className="text-xs">{t("monitor.collectTasks")}</span>
             </div>
             <p className="mt-1 text-lg font-bold text-white">
               {klineScheduler?.last_total ?? 0}
               {(klineScheduler?.last_failed ?? 0) > 0 && (
                 <span className="ml-1 text-sm text-red-400">
-                  ({klineScheduler?.last_failed} 失败)
+                  ({klineScheduler?.last_failed} {t("monitor.failed")})
                 </span>
               )}
             </p>
@@ -463,7 +457,7 @@ export default function AdminMonitorPage() {
           <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-3">
             <div className="flex items-center gap-1.5 text-zinc-500">
               <Timer size={12} />
-              <span className="text-xs">上轮耗时</span>
+              <span className="text-xs">{t("monitor.lastRoundTime")}</span>
             </div>
             <p className="mt-1 text-lg font-bold text-white">
               {klineScheduler?.last_elapsed_s ?? 0}s
@@ -472,7 +466,7 @@ export default function AdminMonitorPage() {
           <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-3">
             <div className="flex items-center gap-1.5 text-zinc-500">
               <Clock size={12} />
-              <span className="text-xs">上次采集</span>
+              <span className="text-xs">{t("monitor.lastCollect")}</span>
             </div>
             <p className="mt-1 text-sm font-medium text-white">
               {klineScheduler?.last_collect_at
@@ -484,7 +478,7 @@ export default function AdminMonitorPage() {
 
         {klineScheduler?.symbols && (
           <div className="mt-4">
-            <p className="mb-2 text-xs text-zinc-500">采集币种</p>
+            <p className="mb-2 text-xs text-zinc-500">{t("monitor.collectSymbols")}</p>
             <div className="flex flex-wrap gap-1.5">
               {klineScheduler.symbols.map((s) => (
                 <span
@@ -495,7 +489,7 @@ export default function AdminMonitorPage() {
                 </span>
               ))}
             </div>
-            <p className="mt-2 mb-1 text-xs text-zinc-500">采集周期</p>
+            <p className="mt-2 mb-1 text-xs text-zinc-500">{t("monitor.collectIntervals")}</p>
             <div className="flex flex-wrap gap-1.5">
               {klineScheduler.intervals.map((i) => (
                 <span
@@ -512,23 +506,23 @@ export default function AdminMonitorPage() {
 
       {/* 智能体列表 */}
       <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5">
-        <h2 className="mb-1 text-sm font-semibold text-white">AI 智能体一览</h2>
-        <p className="mb-4 text-xs text-zinc-500">系统内置 {AGENTS.length} 个 AI 智能体，从不同维度分析市场并给出综合建议</p>
+        <h2 className="mb-1 text-sm font-semibold text-white">{t("monitor.agentsList")}</h2>
+        <p className="mb-4 text-xs text-zinc-500">{t("monitor.agentsListDesc", { count: AGENTS_CONFIG.length })}</p>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-white/[0.06] text-xs text-zinc-500">
-                <th className="pb-3 pr-4">智能体</th>
-                <th className="pb-3 pr-4">层级</th>
-                <th className="pb-3 pr-4">AI 模型</th>
-                <th className="pb-3">分析频率</th>
+                <th className="pb-3 pr-4">{t("monitor.agentHeader")}</th>
+                <th className="pb-3 pr-4">{t("monitor.layer")}</th>
+                <th className="pb-3 pr-4">{t("monitor.aiModel")}</th>
+                <th className="pb-3">{t("monitor.analysisFrequency")}</th>
               </tr>
             </thead>
             <tbody>
-              {AGENTS.map((agent) => {
-                const phaseColor = PHASE_COLORS[agent.phase] || PHASE_COLORS["核心层"];
-                const actualModel = assignmentMap[agent.id] || agent.model;
-                const isCustom = assignmentMap[agent.id] && assignmentMap[agent.id] !== agent.model;
+              {AGENTS_CONFIG.map((agent) => {
+                const phaseColor = PHASE_COLORS[agent.phase] || PHASE_COLORS["core"];
+                const actualModel = assignmentMap[agent.id] || agent.modelDefault;
+                const isCustom = assignmentMap[agent.id] && assignmentMap[agent.id] !== agent.modelDefault;
                 const modelColor = MODEL_COLORS[actualModel] || "text-zinc-400";
                 return (
                   <tr
@@ -539,14 +533,14 @@ export default function AdminMonitorPage() {
                       <div className="flex items-center gap-2">
                         <span className="text-zinc-400">{agent.icon}</span>
                         <div>
-                          <span className="font-medium text-white">{agent.name}</span>
-                          <p className="text-xs text-zinc-500 mt-0.5">{agent.desc}</p>
+                          <span className="font-medium text-white">{t(`monitor.agents.${agent.id}.name`)}</span>
+                          <p className="text-xs text-zinc-500 mt-0.5">{t(`monitor.agents.${agent.id}.desc`)}</p>
                         </div>
                       </div>
                     </td>
                     <td className="py-3 pr-4">
                       <span className={`rounded-full px-2 py-0.5 text-xs ${phaseColor.bg} ${phaseColor.text}`}>
-                        {agent.phase}
+                        {t(`monitor.phases.${agent.phase}`)}
                       </span>
                     </td>
                     <td className="py-3 pr-4">
@@ -556,19 +550,19 @@ export default function AdminMonitorPage() {
                         </span>
                         {isCustom && (
                           <span className="rounded bg-amber-500/20 px-1 py-0.5 text-xs text-amber-400">
-                            自定义
+                            {t("monitor.custom")}
                           </span>
                         )}
                       </div>
                     </td>
                     <td className="py-3">
                       <div className="flex gap-1">
-                        {agent.modes.map((m) => (
+                        {agent.modeKeys.map((m) => (
                           <span
                             key={m}
                             className="rounded bg-white/[0.06] px-1.5 py-0.5 text-xs text-zinc-400"
                           >
-                            {m}
+                            {t(`monitor.modes.${m}`)}
                           </span>
                         ))}
                       </div>
@@ -583,31 +577,24 @@ export default function AdminMonitorPage() {
 
       {/* 分析模式说明 */}
       <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5">
-        <h2 className="mb-1 text-sm font-semibold text-white">分析模式</h2>
-        <p className="mb-4 text-xs text-zinc-500">系统会根据市场情况自动选择合适的分析模式，调度不同数量的智能体</p>
+        <h2 className="mb-1 text-sm font-semibold text-white">{t("monitor.analysisModes")}</h2>
+        <p className="mb-4 text-xs text-zinc-500">{t("monitor.analysisModesDesc")}</p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <ModeCard
-            mode="超短线"
-            label="秒级判断，适合短线交易"
-            count={1}
-            agents={["技术分析"]}
-            color="text-blue-400"
-          />
-          <ModeCard
-            mode="日内"
-            label="分钟级分析，适合日内波段"
+            mode={t("monitor.modes.intraday")}
+            label={t("monitor.modeLabels.intraday")}
             count={6}
-            agents={["技术分析", "链上数据", "风险评估", "订单簿", "新闻分析", "日历事件", "+反思注入"]}
+            agents={[t("monitor.agents.technical.name"), t("monitor.agents.onchain.name"), t("monitor.agents.risk.name"), t("monitor.agents.orderbook.name"), t("monitor.agents.news_analyst.name"), t("monitor.agents.calendar.name"), "+" + t("monitor.agents.reflection.name")]}
             color="text-zinc-400"
           />
           <ModeCard
-            mode="趋势"
-            label="全维度深度分析，适合中长线布局"
+            mode={t("monitor.modes.trend")}
+            label={t("monitor.modeLabels.trend")}
             count={10}
             agents={[
-              "技术分析", "链上数据", "风险评估", "订单簿",
-              "舆情分析", "新闻分析", "日历事件", "对抗推演", "合谋检测",
-              "+反思注入",
+              t("monitor.agents.technical.name"), t("monitor.agents.onchain.name"), t("monitor.agents.risk.name"), t("monitor.agents.orderbook.name"),
+              t("monitor.agents.sentiment.name"), t("monitor.agents.news_analyst.name"), t("monitor.agents.calendar.name"), t("monitor.agents.adversarial.name"), t("monitor.agents.collusion_detector.name"),
+              "+" + t("monitor.agents.reflection.name"),
             ]}
             color="text-orange-400"
           />
@@ -630,12 +617,13 @@ function ModeCard({
   agents: string[];
   color: string;
 }) {
+  const t = useTranslations("admin");
   return (
     <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-4">
       <div className="flex items-center justify-between">
         <span className={`text-sm font-semibold ${color}`}>{mode}</span>
         <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-xs text-zinc-400">
-          {count} 智能体
+          {t("monitor.agentsCountLabel", { count })}
         </span>
       </div>
       <p className="mb-2 text-xs text-zinc-500">{label}</p>
