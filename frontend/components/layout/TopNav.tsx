@@ -78,13 +78,7 @@ const MOBILE_MENU_GROUPS: MobileMenuGroup[] = [
   },
 ];
 
-// 分组标签 i18n 映射
-const GROUP_LABELS: Record<string, string> = {
-  analysis: "核心分析",
-  tools: "工具",
-  account: "账户",
-  management: "管理",
-};
+// Group labels are resolved via t() at render time
 
 export function TopNav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -175,7 +169,7 @@ export function TopNav() {
                 return (
                   <div key={group.labelKey} className="space-y-3">
                     <div className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest px-2">
-                      {GROUP_LABELS[group.labelKey] ?? group.labelKey}
+                      {t(`common.${group.labelKey}` as Parameters<typeof t>[0])}
                     </div>
                     <div className="space-y-1">
                       {visibleItems.map((item) => {
@@ -236,7 +230,7 @@ export function TopNav() {
                     <div className="min-w-0">
                       <div className="text-sm font-bold truncate text-zinc-200">{user.email?.split("@")[0] ?? "User"}</div>
                       <div className="text-xs text-zinc-500 font-bold font-mono uppercase tracking-widest mt-0.5">
-                      {user.membership_level >= 2 ? "旗舰会员" : user.membership_level >= 1 ? "专业会员" : "普通用户"}
+                      {user.membership_level >= 2 ? t('common.roleAdmin') : user.membership_level >= 1 ? t('common.roleOperator') : t('common.roleUser')}
                       </div>
                     </div>
                   </div>

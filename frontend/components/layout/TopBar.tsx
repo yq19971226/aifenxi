@@ -4,32 +4,36 @@ import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { Bell, Wifi, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { useTranslations } from "next-intl";
 
-const pageTitles: Record<string, string> = {
-  "/dashboard": "看板",
-  "/consensus": "综合分析",
-  "/adversarial": "AI 对抗推演",
-  "/performance": "策略绩效",
-  "/alerts": "预警管理",
-  "/backtest": "策略回测",
-  "/tasks": "任务中心",
-  "/partner": "合伙人",
-  "/settings/membership": "会员中心",
-  "/settings/push": "推送设置",
-  "/settings": "设置",
+const PAGE_KEYS: Record<string, string> = {
+  "/dashboard": "dashboard",
+  "/consensus": "consensus",
+  "/adversarial": "adversarial",
+  "/performance": "performance",
+  "/alerts": "alerts",
+  "/backtest": "backtest",
+  "/tasks": "tasks",
+  "/partner": "partner",
+  "/settings/membership": "membership",
+  "/settings/push": "push",
+  "/settings": "settings",
 };
 
 export function TopBar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const t = useTranslations("nav.topbar");
+  const tCommon = useTranslations("nav.common");
   const [time, setTime] = useState("");
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const title =
-    Object.entries(pageTitles).find(([path]) =>
+  const pageKey =
+    Object.entries(PAGE_KEYS).find(([path]) =>
       pathname.startsWith(path)
-    )?.[1] ?? "AXIOM洞察";
+    )?.[1];
+  const title = pageKey ? t(`pages.${pageKey}`) : t("defaultTitle");
 
   const initial = user?.email?.charAt(0).toUpperCase() ?? "U";
 
@@ -66,7 +70,7 @@ export function TopBar() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-bull)] opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--color-bull)]" />
           </span>
-          <span className="text-xs text-zinc-400">系统正常</span>
+          <span className="text-xs text-zinc-400">{t("systemOnline")}</span>
         </div>
 
         {/* Time */}
@@ -107,7 +111,7 @@ export function TopBar() {
                 className="flex w-full items-center gap-2 px-3 py-2 text-sm text-zinc-300 transition-colors hover:bg-white/[0.04] hover:text-white"
               >
                 <LogOut size={14} />
-                退出登录
+                {tCommon("logout")}
               </button>
             </div>
           )}

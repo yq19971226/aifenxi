@@ -25,12 +25,13 @@ export function DirectionBadge({
         ? "text-amber-400"
         : null;
 
+  const tb = useTranslations("dashboard.badges");
   const badge = (() => {
     if (direction === "long") {
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-sm font-medium text-emerald-400">
           <TrendingUp size={14} />
-          {"看涨"}
+          {tb("long")}
         </span>
       );
     }
@@ -38,14 +39,14 @@ export function DirectionBadge({
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-1 text-sm font-medium text-red-400">
           <TrendingDown size={14} />
-          {"看跌"}
+          {tb("short")}
         </span>
       );
     }
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-zinc-500/10 px-2.5 py-1 text-sm font-medium text-zinc-400">
         <Minus size={14} />
-        {"中性"}
+        {tb("neutral")}
       </span>
     );
   })();
@@ -56,7 +57,7 @@ export function DirectionBadge({
       {worthIcon && (
         <span
           className={`h-1.5 w-1.5 rounded-full ${(worthIcon ?? "").replace("text-", "bg-")}`}
-          title={isWorthTaking ? "值得交易" : "谨慎观望"}
+          title={isWorthTaking ? tb("worthTaking") : tb("notWorth")}
         />
       )}
     </span>
@@ -64,18 +65,19 @@ export function DirectionBadge({
 }
 
 export function AlertBadge({ level }: { level: string }) {
-  const config: Record<string, { color: string; label: string }> = {
-    none: { color: "text-zinc-500", label: "正常" },
-    low: { color: "text-emerald-400", label: "安全" },
-    medium: { color: "text-yellow-400", label: "警惕" },
-    high: { color: "text-orange-400", label: "危险" },
-    critical: { color: "text-red-400", label: "极危" },
+  const t = useTranslations("dashboard.risk");
+  const ALERT_COLORS: Record<string, string> = {
+    none: "text-zinc-500",
+    low: "text-emerald-400",
+    medium: "text-yellow-400",
+    high: "text-orange-400",
+    critical: "text-red-400",
   };
-  const { color, label } = config[level] || config.none;
+  const color = ALERT_COLORS[level] || ALERT_COLORS.none;
   return (
     <span className={`inline-flex items-center gap-1 text-sm font-medium ${color}`}>
       <span className={`h-2 w-2 rounded-full ${(color ?? "").replace("text-", "bg-")}`} />
-      {label}
+      {t(`levels.${level || "none"}`)}
     </span>
   );
 }

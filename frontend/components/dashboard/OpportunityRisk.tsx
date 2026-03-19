@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import {
   Crosshair,
@@ -12,16 +12,17 @@ import {
 import { formatPrice } from "@/lib/utils/format";
 import type { SymbolOverview } from "@/lib/api/dashboard";
 
-const ALERT_CONFIG: Record<string, { label: string; color: string; dot: string }> = {
-  none: { label: "正常", color: "text-zinc-400", dot: "bg-zinc-500" },
-  low: { label: "安全", color: "text-emerald-400", dot: "bg-emerald-400" },
-  medium: { label: "警惕", color: "text-yellow-400", dot: "bg-yellow-400" },
-  high: { label: "危险", color: "text-orange-400", dot: "bg-orange-400" },
-  critical: { label: "极危", color: "text-red-400", dot: "bg-red-400" },
+const ALERT_STYLES: Record<string, { color: string; dot: string }> = {
+  none: { color: "text-zinc-400", dot: "bg-zinc-500" },
+  low: { color: "text-emerald-400", dot: "bg-emerald-400" },
+  medium: { color: "text-yellow-400", dot: "bg-yellow-400" },
+  high: { color: "text-orange-400", dot: "bg-orange-400" },
+  critical: { color: "text-red-400", dot: "bg-red-400" },
 };
 
 export function OpportunityRank({ symbols }: { symbols: SymbolOverview[] }) {
   const locale = useLocale();
+  const t = useTranslations("dashboard.opportunity");
   const opportunities = symbols
     .filter((s) => s.is_worth_taking && s.direction !== "neutral")
     .sort((a, b) => b.risk_reward_ratio - a.risk_reward_ratio);
@@ -30,14 +31,14 @@ export function OpportunityRank({ symbols }: { symbols: SymbolOverview[] }) {
     <div className="card p-5 h-full">
       <div className="flex items-center gap-2 mb-4">
         <Crosshair size={14} className="text-accent" />
-        <h3 className="text-sm font-semibold text-white">机会排行</h3>
+        <h3 className="text-sm font-semibold text-white">{t("title")}</h3>
         <span className="text-xs text-zinc-500 bg-white/[0.04] px-1.5 py-0.5 rounded-full font-mono">
-          {opportunities.length} 个可操作
+          {t("count", { count: opportunities.length })}
         </span>
       </div>
 
       {opportunities.length === 0 ? (
-        <p className="text-xs text-zinc-500 py-4">暂无可操作机会</p>
+        <p className="text-xs text-zinc-500 py-4">{t("empty")}</p>
       ) : (
         <div className="space-y-2">
           {opportunities.map((item, idx) => (
@@ -65,7 +66,7 @@ export function OpportunityRank({ symbols }: { symbols: SymbolOverview[] }) {
                     )}
                     {item.entry_low != null && item.entry_high != null && (
                       <span>
-                        入场 {formatPrice(item.entry_low)}–{formatPrice(item.entry_high)}
+                        {t("entry", { low: formatPrice(item.entry_low), high: formatPrice(item.entry_high) })}
                       </span>
                     )}
                     {item.stop_loss != null && (
@@ -96,19 +97,20 @@ export function OpportunityRank({ symbols }: { symbols: SymbolOverview[] }) {
 
 export function RiskRadar({ symbols }: { symbols: SymbolOverview[] }) {
   const locale = useLocale();
+  const t = useTranslations("dashboard.risk");
   return (
     <div className="card p-5 h-full">
       <div className="flex items-center gap-2 mb-4">
         <Shield size={14} className="text-blue-400" />
-        <h3 className="text-sm font-semibold text-white">风险雷达</h3>
+        <h3 className="text-sm font-semibold text-white">{t("title")}</h3>
       </div>
 
       {symbols.length === 0 ? (
-        <p className="text-xs text-zinc-500 py-4">暂无数据</p>
+        <p className="text-xs text-zinc-500 py-4">{t("empty")}</p>
       ) : (
         <div className="space-y-1">
           {symbols.map((item, idx) => {
-            const cfg = ALERT_CONFIG[item.alert_level] || ALERT_CONFIG.none;
+            const cfg = ALERT_STYLES[item.alert_level] || ALERT_STYLES.none;
             return (
               <motion.div
                 key={item.symbol}
@@ -127,7 +129,7 @@ export function RiskRadar({ symbols }: { symbols: SymbolOverview[] }) {
                     </span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-sm ${cfg.color}`}>{cfg.label}</span>
+                    <span className={`text-sm ${cfg.color}`}>{t(`levels.${item.alert_level || "none"}`)}</span>
                     <ChevronRight size={14} className="text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </Link>

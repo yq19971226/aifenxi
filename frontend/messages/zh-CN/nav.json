@@ -48,6 +48,9 @@
     "menu": "菜单",
     "login": "登录",
     "account": "账户",
+    "analysis": "核心分析",
+    "tools": "工具",
+    "management": "管理",
     "system": "系统",
     "more": "更多",
     "maintenance": "维护中",
@@ -69,5 +72,22 @@
     "alerts": "预警规则",
     "settings": "设置",
     "admin": "管理"
+  },
+  "topbar": {
+    "systemOnline": "系统正常",
+    "defaultTitle": "AXIOM洞察",
+    "pages": {
+      "dashboard": "看板",
+      "consensus": "综合分析",
+      "adversarial": "AI 对抗推演",
+      "performance": "策略绩效",
+      "alerts": "预警管理",
+      "backtest": "策略回测",
+      "tasks": "任务中心",
+      "partner": "合伙人",
+      "membership": "会员中心",
+      "push": "推送设置",
+      "settings": "设置"
+    }
   }
 }

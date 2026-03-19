@@ -57,5 +57,47 @@
   "error": {
     "loadFailed": "載入失敗",
     "fetchFailed": "取得資料失敗，30s 後自動重試"
+  },
+  "expanded": {
+    "strategySummary": "策略摘要",
+    "entryZone": "入場區間",
+    "stopLoss": "止損",
+    "targetPrice": "目標價",
+    "riskReward": "風險回報比",
+    "strategyUpdated": "策略更新",
+    "noStrategy": "暫無策略數據",
+    "defenseStatus": "防禦狀態",
+    "dealerIntent": "莊家意圖",
+    "notDetected": "未檢測",
+    "collusionDetection": "合謀檢測",
+    "collusionAbnormal": "異常",
+    "collusionNormal": "正常",
+    "quickActions": "快捷操作",
+    "deepAnalysis": "綜合分析",
+    "adversarial": "對抗推演"
+  },
+  "opportunity": {
+    "title": "機會排行",
+    "count": "{count} 個可操作",
+    "empty": "暫無可操作機會",
+    "entry": "入場 {low}–{high}"
+  },
+  "risk": {
+    "title": "風險雷達",
+    "empty": "暫無數據",
+    "levels": {
+      "none": "正常",
+      "low": "安全",
+      "medium": "警惕",
+      "high": "危險",
+      "critical": "極危"
+    }
+  },
+  "badges": {
+    "long": "多",
+    "short": "空",
+    "neutral": "觀",
+    "worthTaking": "值得進場",
+    "notWorth": "觀望"
   }
 }

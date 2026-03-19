@@ -48,6 +48,9 @@
     "menu": "選單",
     "login": "登入",
     "account": "帳戶",
+    "analysis": "核心分析",
+    "tools": "工具",
+    "management": "管理",
     "system": "系統",
     "more": "更多",
     "maintenance": "維護中",
@@ -69,5 +72,22 @@
     "alerts": "預警規則",
     "settings": "設定",
     "admin": "管理"
+  },
+  "topbar": {
+    "systemOnline": "系統正常",
+    "defaultTitle": "AXIOM洞察",
+    "pages": {
+      "dashboard": "看板",
+      "consensus": "綜合分析",
+      "adversarial": "AI 對抗推演",
+      "performance": "策略績效",
+      "alerts": "預警管理",
+      "backtest": "策略回測",
+      "tasks": "任務中心",
+      "partner": "合夥人",
+      "membership": "會員中心",
+      "push": "推送設定",
+      "settings": "設定"
+    }
   }
 }

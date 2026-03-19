@@ -57,5 +57,47 @@
   "error": {
     "loadFailed": "加载失败",
     "fetchFailed": "获取数据失败，30s 后自动重试"
+  },
+  "expanded": {
+    "strategySummary": "策略摘要",
+    "entryZone": "入场区间",
+    "stopLoss": "止损",
+    "targetPrice": "目标价",
+    "riskReward": "风险回报比",
+    "strategyUpdated": "策略更新",
+    "noStrategy": "暂无策略数据",
+    "defenseStatus": "防御状态",
+    "dealerIntent": "庄家意图",
+    "notDetected": "未检测",
+    "collusionDetection": "合谋检测",
+    "collusionAbnormal": "异常",
+    "collusionNormal": "正常",
+    "quickActions": "快捷操作",
+    "deepAnalysis": "综合分析",
+    "adversarial": "对抗推演"
+  },
+  "opportunity": {
+    "title": "机会排行",
+    "count": "{count} 个可操作",
+    "empty": "暂无可操作机会",
+    "entry": "入场 {low}–{high}"
+  },
+  "risk": {
+    "title": "风险雷达",
+    "empty": "暂无数据",
+    "levels": {
+      "none": "正常",
+      "low": "安全",
+      "medium": "警惕",
+      "high": "危险",
+      "critical": "极危"
+    }
+  },
+  "badges": {
+    "long": "多",
+    "short": "空",
+    "neutral": "观",
+    "worthTaking": "值得进场",
+    "notWorth": "观望"
   }
 }

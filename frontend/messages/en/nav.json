@@ -48,6 +48,9 @@
     "menu": "Menu",
     "login": "Login",
     "account": "Account",
+    "analysis": "Analysis",
+    "tools": "Tools",
+    "management": "Management",
     "system": "System",
     "more": "More",
     "maintenance": "Maintenance",
@@ -69,5 +72,22 @@
     "alerts": "Alerts",
     "settings": "Settings",
     "admin": "Admin"
+  },
+  "topbar": {
+    "systemOnline": "System online",
+    "defaultTitle": "AXIOM Insights",
+    "pages": {
+      "dashboard": "Dashboard",
+      "consensus": "Analysis",
+      "adversarial": "AI Battle",
+      "performance": "Performance",
+      "alerts": "Alerts",
+      "backtest": "Backtest",
+      "tasks": "Tasks",
+      "partner": "Partner",
+      "membership": "Membership",
+      "push": "Push Settings",
+      "settings": "Settings"
+    }
   }
 }

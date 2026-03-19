@@ -57,5 +57,47 @@
   "error": {
     "loadFailed": "Load failed",
     "fetchFailed": "Failed to fetch data, will retry in 30s"
+  },
+  "expanded": {
+    "strategySummary": "Strategy Summary",
+    "entryZone": "Entry Zone",
+    "stopLoss": "Stop Loss",
+    "targetPrice": "Target",
+    "riskReward": "Risk/Reward",
+    "strategyUpdated": "Updated",
+    "noStrategy": "No strategy data",
+    "defenseStatus": "Defense Status",
+    "dealerIntent": "Dealer Intent",
+    "notDetected": "Not detected",
+    "collusionDetection": "Collusion Check",
+    "collusionAbnormal": "Alert",
+    "collusionNormal": "Normal",
+    "quickActions": "Quick Actions",
+    "deepAnalysis": "Deep Analysis",
+    "adversarial": "AI Duel"
+  },
+  "opportunity": {
+    "title": "Opportunities",
+    "count": "{count} actionable",
+    "empty": "No actionable opportunities",
+    "entry": "Entry {low}–{high}"
+  },
+  "risk": {
+    "title": "Risk Radar",
+    "empty": "No data",
+    "levels": {
+      "none": "Normal",
+      "low": "Safe",
+      "medium": "Caution",
+      "high": "Danger",
+      "critical": "Critical"
+    }
+  },
+  "badges": {
+    "long": "L",
+    "short": "S",
+    "neutral": "N",
+    "worthTaking": "Worth entry",
+    "notWorth": "Wait"
   }
 }
