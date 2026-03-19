@@ -5,6 +5,7 @@ import { X, Download, Loader2, Check } from "lucide-react";
 
 import type { AnalysisReport } from "@/lib/api/analysis";
 import { ShareCard, type ShareCardConfig } from "./ShareCard";
+import { useTranslations } from "next-intl";
 
 interface ShareModalProps {
   report: AnalysisReport;
@@ -16,6 +17,7 @@ export function ShareModal({ report, config, onClose }: ShareModalProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const t = useTranslations("consensus.shareModal");
 
   const handleSave = useCallback(async () => {
     if (!cardRef.current || saving) return;
@@ -55,7 +57,7 @@ export function ShareModal({ report, config, onClose }: ShareModalProps) {
       <div className="relative z-10 flex max-h-[90vh] w-full max-w-[92vw] sm:max-w-[420px] flex-col items-center gap-4 rounded-xl bg-zinc-900 border border-white/10 p-4 sm:p-6 shadow-2xl mx-3 sm:mx-0">
         {/* Header */}
         <div className="flex w-full items-center justify-between">
-          <h3 className="text-sm font-semibold text-white">预览分享卡片</h3>
+          <h3 className="text-sm font-semibold text-white">{t("title")}</h3>
           <button
             type="button"
             onClick={onClose}
@@ -86,7 +88,7 @@ export function ShareModal({ report, config, onClose }: ShareModalProps) {
           ) : (
             <Download size={16} />
           )}
-          {saving ? "生成中…" : saved ? "已保存" : "保存图片"}
+          {saving ? t("saving") : saved ? t("saved") : t("save")}
         </button>
 
         <p className="text-xs text-zinc-500">
@@ -95,8 +97,8 @@ export function ShareModal({ report, config, onClose }: ShareModalProps) {
             report.strategy.entry_high != null ||
             report.strategy.stop_loss != null ||
             (report.strategy.targets && report.strategy.targets.length > 0))
-            ? "含进场/止损/止盈点位，分享时请注意隐私"
-            : "不含具体点位，可安全分享"}
+            ? t("privacyWarning")
+            : t("safeToShare")}
         </p>
       </div>
     </div>

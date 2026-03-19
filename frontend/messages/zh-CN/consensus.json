@@ -156,6 +156,14 @@
     "levelsLabel": "价位：{levels}",
     "sourceLine": "来源：Axiom 蜂群分析 · Alpha 信号"
   },
+  "shareModal": {
+    "title": "预览分享卡片",
+    "saving": "生成中…",
+    "saved": "已保存",
+    "save": "保存图片",
+    "privacyWarning": "含进场/止损/止盈点位，分享时请注意隐私",
+    "safeToShare": "不含具体点位，可安全分享"
+  },
   "disclaimer": "本分析报告由 AI 智能体生成，仅供参考研究使用，不构成任何投资建议或推荐。加密货币市场具有高度波动性，投资存在重大风险，可能导致本金损失。请在作出任何投资决策前独立评估风险，并咨询专业财务顾问。",
   "flow": {
     "coreAnalysis": "核心AI分析",

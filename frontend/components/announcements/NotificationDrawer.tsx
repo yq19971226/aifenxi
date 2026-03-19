@@ -15,10 +15,12 @@ import {
 } from "lucide-react";
 import { fetchAnnouncementHistory, type AnnouncementHistoryItem } from "@/lib/api/announcements";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export function NotificationDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const t = useTranslations("announcements.drawer");
 
   useEffect(() => {
     const handler = () => setIsOpen((prev) => !prev);
@@ -82,13 +84,13 @@ export function NotificationDrawer() {
                 <Bell size={16} />
               </div>
               <h2 className="text-base font-bold tracking-wider">
-                消息中心 {items.length > 0 && <span className="ml-1 text-xs text-zinc-500">({items.length})</span>}
+                {t("title")} {items.length > 0 && <span className="ml-1 text-xs text-zinc-500">({items.length})</span>}
               </h2>
             </div>
             <button
               onClick={() => setIsOpen(false)}
               className="flex items-center justify-center p-2 rounded-lg text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-              aria-label="关闭"
+              aria-label={t("close")}
             >
               <X size={20} />
             </button>
@@ -99,18 +101,18 @@ export function NotificationDrawer() {
             {isLoading ? (
               <div className="flex flex-col items-center justify-center h-full text-zinc-500 gap-3">
                 <div className="w-6 h-6 rounded-full border-2 border-indigo-500/30 border-t-indigo-500 animate-spin" />
-                <p className="text-sm font-medium tracking-wide">加载消息中...</p>
+                <p className="text-sm font-medium tracking-wide">{t("loading")}</p>
               </div>
             ) : error ? (
               <div className="flex flex-col items-center justify-center h-full text-red-500/80 gap-2">
-                <p className="text-sm">加载失败，请稍后重试。</p>
+                <p className="text-sm">{t("loadError")}</p>
               </div>
             ) : items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-zinc-500 gap-4">
                 <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white/[0.03] border border-white/[0.05]">
                   <History size={24} className="opacity-40" />
                 </div>
-                <p className="text-sm font-medium tracking-wide">暂无任何历史消息</p>
+                <p className="text-sm font-medium tracking-wide">{t("empty")}</p>
               </div>
             ) : (
               items.map((item: AnnouncementHistoryItem) => {
@@ -142,9 +144,9 @@ export function NotificationDrawer() {
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-bold">
                           {isArchived ? (
-                            <span className="text-zinc-500 flex items-center gap-1"><Archive size={10} /> 归档</span>
+                            <span className="text-zinc-500 flex items-center gap-1"><Archive size={10} /> {t("archived")}</span>
                           ) : (
-                            <span className="text-indigo-400 flex items-center gap-1"><Megaphone size={10} /> 公告</span>
+                            <span className="text-indigo-400 flex items-center gap-1"><Megaphone size={10} /> {t("announcement")}</span>
                           )}
                           <span className="text-zinc-600 px-1">•</span>
                           <span className="text-zinc-500 font-mono flex items-center gap-1">
@@ -155,7 +157,7 @@ export function NotificationDrawer() {
                         <div className="flex items-center gap-2 shrink-0">
                           {item.last_event === "confirmed" && (
                             <div className="flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest gap-1">
-                              <CheckCircle size={10} /> 已阅
+                              <CheckCircle size={10} /> {t("confirmed")}
                             </div>
                           )}
                           <ChevronDown 
@@ -206,7 +208,7 @@ export function NotificationDrawer() {
                                 {item.content_md}
                               </div>
                             ) : (
-                              <p className="text-xs text-zinc-500 italic">暂无详细内容</p>
+                              <p className="text-xs text-zinc-500 italic">{t("noContent")}</p>
                             )}
                           </div>
                         </motion.div>
@@ -220,7 +222,7 @@ export function NotificationDrawer() {
 
           {/* Footer */}
           <div className="flex h-14 items-center justify-center border-t border-white/[0.06] bg-black/20 text-[11px] font-mono text-zinc-500">
-            AXIOM · 消息中心
+            {t("footer")}
           </div>
         </motion.div>
       )}

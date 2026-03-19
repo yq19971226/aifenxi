@@ -169,6 +169,14 @@
     "levelsLabel": "價位：{levels}",
     "sourceLine": "來源：Axiom 蜂群分析 · Alpha 信號"
   },
+  "shareModal": {
+    "title": "預覽分享卡片",
+    "saving": "生成中…",
+    "saved": "已儲存",
+    "save": "儲存圖片",
+    "privacyWarning": "含入場/止損/止盈點位，分享時請注意隱私",
+    "safeToShare": "不含具體點位，可安全分享"
+  },
   "disclaimer": "本分析報告由 AI 智能體生成，僅供參考研究使用，不構成任何投資建議或推薦。加密貨幣市場具有高度波動性，投資存在重大風險，可能導致本金損失。請在作出任何投資決策前獨立評估風險，並諮詢專業財務顧問。",
   "renderers": {
     "adversarial": {

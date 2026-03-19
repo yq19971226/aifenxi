@@ -66,5 +66,17 @@
     "viewDetail": "查看详情",
     "acknowledged": "我已知晓",
     "dismiss": "关闭提醒"
+  },
+  "drawer": {
+    "title": "消息中心",
+    "close": "关闭",
+    "loading": "加载消息中...",
+    "loadError": "加载失败，请稍后重试。",
+    "empty": "暂无任何历史消息",
+    "archived": "归档",
+    "announcement": "公告",
+    "confirmed": "已阅",
+    "noContent": "暂无详细内容",
+    "footer": "AXIOM · 消息中心"
   }
 }

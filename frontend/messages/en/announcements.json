@@ -66,5 +66,17 @@
     "viewDetail": "View Details",
     "acknowledged": "I Acknowledge",
     "dismiss": "Dismiss"
+  },
+  "drawer": {
+    "title": "Notifications",
+    "close": "Close",
+    "loading": "Loading messages...",
+    "loadError": "Load failed, please retry later.",
+    "empty": "No notification history",
+    "archived": "Archived",
+    "announcement": "Announcement",
+    "confirmed": "Read",
+    "noContent": "No detail content",
+    "footer": "AXIOM · Notifications"
   }
 }
