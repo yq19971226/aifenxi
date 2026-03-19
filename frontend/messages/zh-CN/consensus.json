@@ -119,7 +119,17 @@
     "weakSignal": "信号偏弱",
     "signalInsufficient": "信号不足",
     "signalInsufficientTitle": "当前多空分歧较大，信号置信度未达阈值",
-    "signalInsufficientDesc": "多维分析置信度未达到系统阈值（{threshold}%），当前信号方向不够确定，建议观望，不建议此时入场。"
+    "signalInsufficientDesc": "多维分析置信度未达到系统阈值（{threshold}%），当前信号方向不够确定，建议观望，不建议此时入场。",
+    "confluenceLabel": "多维风险感知",
+    "confluenceAdj": "经过共振与巨鲸环境侦测，AI 置信度从 {from}% 被调准至 {to}%",
+    "tag_trend_resonant": "🟢 顺势共振",
+    "tag_trend_counter": "🔴 逆势信号",
+    "tag_trend_neutral": "⚪ 趋势中性",
+    "tag_trend_stale": "⏱️ 趋势过时",
+    "tag_whale_funding": "🚨 资金费率极端",
+    "tag_whale_liquidation": "⚡ 清算潮警告",
+    "tag_whale_netflow": "🐋 巨鲸出货风险",
+    "tag_whale_crowded": "🎯 散户持仓拥挤"
   },
   "strategy": {
     "priceMap": "价位分布图",
@@ -262,5 +272,24 @@
         "conservative": "保守"
       }
     }
+  },
+  "ui": {
+    "long": "多",
+    "short": "空",
+    "confidence": "置信度",
+    "trend": "趋势: {dir}",
+    "collapse": "收起",
+    "expandAll": "展开全部 ({count})",
+    "notDetected": "未检测到",
+    "entryPrice": "(在价格)",
+    "entryZone": "入场区间",
+    "stopLoss": "止损位",
+    "targets": "目标位",
+    "riskReward": "盈亏比",
+    "agentCount": "{count} AI 智能体",
+    "bullishCount": "{count}多",
+    "bearishCount": "{count}空",
+    "neutralCount": "{count}中性",
+    "collapseSection": "收起 {title}"
   }
 }

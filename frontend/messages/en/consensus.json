@@ -132,7 +132,17 @@
     "weakSignal": "Weak Signal",
     "signalInsufficient": "Signal Insufficient",
     "signalInsufficientTitle": "High bull-bear divergence — confidence below threshold",
-    "signalInsufficientDesc": "Analysis confidence is below the system threshold ({threshold}%). Signal direction is uncertain — observation recommended, entry not advised."
+    "signalInsufficientDesc": "Analysis confidence is below the system threshold ({threshold}%). Signal direction is uncertain — observation recommended, entry not advised.",
+    "confluenceLabel": "MULTI-DIM RISK",
+    "confluenceAdj": "After confluence & whale detection, AI confidence adjusted from {from}% to {to}%",
+    "tag_trend_resonant": "🟢 Trend Resonance",
+    "tag_trend_counter": "🔴 Counter-Trend",
+    "tag_trend_neutral": "⚪ Trend Neutral",
+    "tag_trend_stale": "⏱️ Trend Stale",
+    "tag_whale_funding": "🚨 Extreme Funding",
+    "tag_whale_liquidation": "⚡ Liquidation Surge",
+    "tag_whale_netflow": "🐋 Whale Dump Risk",
+    "tag_whale_crowded": "🎯 Retail Crowded"
   },
   "strategy": {
     "priceMap": "Price Map",
@@ -262,5 +272,24 @@
     "analysisFlow": "AI Analysis Flow",
     "makerPerspective": "Maker AI Perspective",
     "makerCompleted": "Maker AI has completed counter-simulation"
+  },
+  "ui": {
+    "long": "Long",
+    "short": "Short",
+    "confidence": "Confidence",
+    "trend": "Trend: {dir}",
+    "collapse": "Collapse",
+    "expandAll": "Expand all ({count})",
+    "notDetected": "Not detected",
+    "entryPrice": "(at price)",
+    "entryZone": "Entry Zone",
+    "stopLoss": "Stop Loss",
+    "targets": "Targets",
+    "riskReward": "R/R",
+    "agentCount": "{count} AI Agents",
+    "bullishCount": "{count} Bull",
+    "bearishCount": "{count} Bear",
+    "neutralCount": "{count} Neutral",
+    "collapseSection": "Collapse {title}"
   }
 }

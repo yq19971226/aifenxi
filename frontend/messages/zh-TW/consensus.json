@@ -132,7 +132,17 @@
     "weakSignal": "信號偏弱",
     "signalInsufficient": "信號不足",
     "signalInsufficientTitle": "當前多空分歧較大，信號置信度未達閾值",
-    "signalInsufficientDesc": "多維分析置信度未達到系統閾值（{threshold}%），當前信號方向不夠確定，建議觀望，不建議此時入場。"
+    "signalInsufficientDesc": "多維分析置信度未達到系統閾值（{threshold}%），當前信號方向不夠確定，建議觀望，不建議此時入場。",
+    "confluenceLabel": "多維風險感知",
+    "confluenceAdj": "經過共振與巨鯨環境偵測，AI 置信度從 {from}% 被調準至 {to}%",
+    "tag_trend_resonant": "🟢 順勢共振",
+    "tag_trend_counter": "🔴 逆勢信號",
+    "tag_trend_neutral": "⚪ 趨勢中性",
+    "tag_trend_stale": "⏱️ 趨勢過時",
+    "tag_whale_funding": "🚨 資金費率極端",
+    "tag_whale_liquidation": "⚡ 清算潮警告",
+    "tag_whale_netflow": "🐋 巨鯨出貨風險",
+    "tag_whale_crowded": "🎯 散戶持倉擁擠"
   },
   "strategy": {
     "priceMap": "價位分佈圖",
@@ -261,5 +271,24 @@
     "analysisFlow": "AI 分析流程",
     "makerPerspective": "莊家 AI 視角",
     "makerCompleted": "莊家AI已完成反向推演"
+  },
+  "ui": {
+    "long": "多",
+    "short": "空",
+    "confidence": "置信度",
+    "trend": "趨勢: {dir}",
+    "collapse": "收起",
+    "expandAll": "展開全部 ({count})",
+    "notDetected": "未檢測到",
+    "entryPrice": "(在價格)",
+    "entryZone": "入場區間",
+    "stopLoss": "止損位",
+    "targets": "目標位",
+    "riskReward": "盈虧比",
+    "agentCount": "{count} AI 智能體",
+    "bullishCount": "{count}多",
+    "bearishCount": "{count}空",
+    "neutralCount": "{count}中性",
+    "collapseSection": "收起 {title}"
   }
 }

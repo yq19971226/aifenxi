@@ -12,17 +12,19 @@ import {
 
 import type { SignalDirection } from "@/lib/api/analysis";
 import { fieldLabel, formatDirection, formatPrice, formatValue, getSignalStyle, localizeText } from "./helpers";
+import { useTranslations } from "next-intl";
 
 // ── Direction badge ──────────────────────────────────────────
 
 export function DirectionBadge({ direction }: { direction: string }) {
+  const t = useTranslations("consensus.ui");
   const style =
     direction === "bullish" || direction === "long"
       ? "bg-emerald-500/15 text-emerald-400"
       : direction === "bearish" || direction === "short"
         ? "bg-red-500/15 text-red-400"
         : "bg-zinc-500/15 text-zinc-400";
-  const label = direction === "bullish" || direction === "long" ? "多" : direction === "bearish" || direction === "short" ? "空" : formatDirection(direction);
+  const label = direction === "bullish" || direction === "long" ? t("long") : direction === "bearish" || direction === "short" ? t("short") : formatDirection(direction);
   return (
     <span className={`inline-block rounded px-1.5 py-0.5 text-xs font-bold ${style}`}>
       {label}
@@ -33,6 +35,7 @@ export function DirectionBadge({ direction }: { direction: string }) {
 // ── Signal row (signal + confidence + trend in one row) ──────
 
 export function SignalRow({ data }: { data: Record<string, unknown> }) {
+  const t = useTranslations("consensus.ui");
   const signal = String(data.signal || "");
   const confidence = typeof data.confidence === "number" ? data.confidence : null;
   const trend = String(data.trend || "");
@@ -51,12 +54,12 @@ export function SignalRow({ data }: { data: Record<string, unknown> }) {
       )}
       {confidence !== null && (
         <span className="inline-flex items-center gap-1 rounded-md bg-white/[0.06] px-2 py-1 text-sm font-mono text-zinc-300">
-          置信度 <span className="font-bold">{(confidence * 100).toFixed(0)}%</span>
+          {t("confidence")} <span className="font-bold">{(confidence * 100).toFixed(0)}%</span>
         </span>
       )}
       {trend && (
         <span className="inline-flex items-center gap-1 rounded-md bg-white/[0.04] px-2 py-1 text-sm text-zinc-400">
-          趋势: {formatDirection(trend)}
+          {t("trend", { dir: formatDirection(trend) })}
         </span>
       )}
     </div>
@@ -84,6 +87,7 @@ export function PriceLevels({ levels, type }: { levels: number[]; type: "support
 // ── Reasoning block ──────────────────────────────────────────
 
 export function ReasoningBlock({ text }: { text: string }) {
+  const t = useTranslations("consensus.ui");
   const [expanded, setExpanded] = useState(false);
   const localized = localizeText(text);
   const isLong = localized.length > 200;
@@ -98,7 +102,7 @@ export function ReasoningBlock({ text }: { text: string }) {
           onClick={() => setExpanded((v) => !v)}
           className="mt-1 text-xs text-accent hover:underline"
         >
-          {expanded ? "收起" : "展开全文"}
+          {expanded ? t("collapse") : t("expandAll", { count: localized.length })}
         </button>
       )}
     </div>
@@ -110,8 +114,9 @@ export function ReasoningBlock({ text }: { text: string }) {
 const _INITIAL_SHOW = 5;
 
 export function ObjectArrayTable({ items }: { items: Record<string, unknown>[] }) {
+  const t = useTranslations("consensus.ui");
   const [showAll, setShowAll] = useState(false);
-  if (items.length === 0) return <span className="text-sm text-zinc-500">未检测到</span>;
+  if (items.length === 0) return <span className="text-sm text-zinc-500">{t("notDetected")}</span>;
 
   const isPattern = items[0] && "pattern_name" in items[0];
 
@@ -150,7 +155,7 @@ export function ObjectArrayTable({ items }: { items: Record<string, unknown>[] }
             onClick={() => setShowAll((v) => !v)}
             className="text-xs text-accent hover:underline"
           >
-            {showAll ? "收起" : `展开全部 (${unique.length})`}
+            {showAll ? t("collapse") : t("expandAll", { count: unique.length })}
           </button>
         )}
       </div>
@@ -179,7 +184,7 @@ export function ObjectArrayTable({ items }: { items: Record<string, unknown>[] }
           onClick={() => setShowAll((v) => !v)}
           className="text-xs text-accent hover:underline"
         >
-          {showAll ? "收起" : `展开全部 (${items.length})`}
+          {showAll ? t("collapse") : t("expandAll", { count: items.length })}
         </button>
       )}
     </div>
@@ -195,6 +200,7 @@ export function PreviewList({
   renderItem: (item: string, index: number) => React.ReactNode;
   initialCount?: number;
 }) {
+  const t = useTranslations("consensus.ui");
   const [showAll, setShowAll] = useState(false);
   const displayed = showAll ? items : items.slice(0, initialCount);
 
@@ -209,7 +215,7 @@ export function PreviewList({
           onClick={() => setShowAll((v) => !v)}
           className="text-xs text-accent hover:underline"
         >
-          {showAll ? "收起" : `展开全部 (${items.length})`}
+          {showAll ? t("collapse") : t("expandAll", { count: items.length })}
         </button>
       )}
     </div>
