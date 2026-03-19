@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import {
   Brain,
   TrendingUp,
@@ -62,8 +63,15 @@ const AGENT_ICONS: Record<string, React.ReactNode> = {
 const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
   "核心" : { bg: "bg-blue-500/10", text: "text-blue-400" },
   "增强" : { bg: "bg-zinc-500/10", text: "text-zinc-400" },
+  "增強" : { bg: "bg-zinc-500/10", text: "text-zinc-400" },
   "对抗" : { bg: "bg-red-500/10", text: "text-red-400" },
+  "對抗" : { bg: "bg-red-500/10", text: "text-red-400" },
   "共识引擎": { bg: "bg-amber-500/10", text: "text-amber-400" },
+  "共識引擎": { bg: "bg-amber-500/10", text: "text-amber-400" },
+  "Core": { bg: "bg-blue-500/10", text: "text-blue-400" },
+  "Enhanced": { bg: "bg-zinc-500/10", text: "text-zinc-400" },
+  "Adversarial": { bg: "bg-red-500/10", text: "text-red-400" },
+  "Consensus Engine": { bg: "bg-amber-500/10", text: "text-amber-400" },
 };
 
 const MODEL_COLORS: Record<string, string> = {
@@ -98,6 +106,7 @@ function ModelSelect({
   models: AvailableModel[];
   onChange: (key: string) => void;
 }) {
+  const t = useTranslations("admin");
   const [open, setOpen] = useState(false);
   const current = models.find((m) => m.model_key === value);
   const isCustom = value !== defaultValue;
@@ -117,7 +126,7 @@ function ModelSelect({
         </span>
         {isCustom && (
           <span className="rounded bg-amber-500/20 px-1 py-0.5 text-xs text-amber-400">
-            自定义
+            {t("models.custom")}
           </span>
         )}
         <ChevronDown size={12} className="ml-auto text-zinc-500" />
@@ -152,13 +161,13 @@ function ModelSelect({
                     </span>
                     {m.model_key === defaultValue && (
                       <span className="rounded bg-blue-500/20 px-1 py-0.5 text-xs text-blue-400">
-                        默认
+                        {t("models.default")}
                       </span>
                     )}
                   </div>
                   <p className="mt-0.5 text-xs text-zinc-500 leading-relaxed">{m.description}</p>
                   <p className="mt-1 text-xs text-zinc-500">
-                    费用: ${m.pricing.input}/千输入 · ${m.pricing.output}/千输出
+                    {t("models.cost")}: ${m.pricing.input}/K in · ${m.pricing.output}/K out
                   </p>
                 </div>
               </button>
@@ -173,6 +182,7 @@ function ModelSelect({
 /* ── 页面主体 ─────────────────────────────────────────────── */
 
 export default function AdminModelsPage() {
+  const t = useTranslations("admin");
   const { user } = useAuth();
   const [models, setModels] = useState<AvailableModel[]>([]);
   const [assignments, setAssignments] = useState<ModelAssignment[]>([]);
@@ -194,7 +204,7 @@ export default function AdminModelsPage() {
       setPendingChanges({});
       setError("");
     } catch (e: any) {
-      setError(e.message || "加载失败");
+      setError(e.message || t("models.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -224,24 +234,24 @@ export default function AdminModelsPage() {
       for (const [agentId, modelKey] of Object.entries(pendingChanges)) {
         await updateModelAssignment(agentId, modelKey);
       }
-      setSuccessMsg(`已保存 ${Object.keys(pendingChanges).length} 项模型变更`);
+      setSuccessMsg(t("models.savedChanges", { count: Object.keys(pendingChanges).length }));
       await loadData();
     } catch (e: any) {
-      setError(e.message || "保存失败");
+      setError(e.message || t("models.saveFailed"));
     } finally {
       setSaving(false);
     }
   };
 
   const handleResetAll = async () => {
-    if (!confirm("确定恢复所有智能体的默认模型分配？")) return;
+    if (!confirm(t("models.confirmReset"))) return;
     setSaving(true);
     try {
       await resetAllAssignments();
-      setSuccessMsg("已恢复所有默认模型分配");
+      setSuccessMsg(t("models.resetSuccess"));
       await loadData();
     } catch (e: any) {
-      setError(e.message || "重置失败");
+      setError(e.message || t("models.resetFailed"));
     } finally {
       setSaving(false);
     }
@@ -265,7 +275,7 @@ export default function AdminModelsPage() {
       const result = force ? await refreshDmxapiSync() : await fetchDmxapiSync();
       setDmxapiSync(result);
     } catch (e: any) {
-      setSyncError(e.message || "DMXAPI 同步失败");
+      setSyncError(e.message || t("models.syncFailed"));
     } finally {
       setSyncLoading(false);
     }
@@ -302,9 +312,9 @@ export default function AdminModelsPage() {
             <Cpu className="text-zinc-400" size={22} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white">AI 模型分工</h1>
+            <h1 className="text-xl font-bold text-white">{t("models.title")}</h1>
             <p className="text-xs text-zinc-500">
-              自定义每个智能体使用的 AI 模型，模型出问题时可快速切换
+              {t("models.subtitle")}
             </p>
           </div>
         </div>
@@ -316,7 +326,7 @@ export default function AdminModelsPage() {
               className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] px-3 py-2 text-xs text-zinc-400 transition-colors hover:bg-white/[0.04] disabled:opacity-50"
             >
               <RotateCcw size={12} />
-              恢复默认
+              {t("models.resetDefault")}
             </button>
           )}
           <button
@@ -325,7 +335,7 @@ export default function AdminModelsPage() {
             className="flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-400 transition-colors hover:bg-emerald-500/10 disabled:opacity-50"
           >
             <RefreshCw size={12} className={syncLoading ? "animate-spin" : ""} />
-            {syncLoading ? "同步中..." : "同步 DMXAPI"}
+            {syncLoading ? t("models.syncing") : t("models.syncDmxapi")}
           </button>
           <button
             onClick={handleSave}
@@ -337,7 +347,7 @@ export default function AdminModelsPage() {
             }`}
           >
             <Save size={12} />
-            {saving ? "保存中..." : changeCount > 0 ? `保存 (${changeCount})` : "保存"}
+            {saving ? t("models.saving") : changeCount > 0 ? t("models.saveCount", { count: changeCount }) : t("models.save")}
           </button>
         </div>
       </div>
@@ -356,12 +366,12 @@ export default function AdminModelsPage() {
       {changeCount > 0 && (
         <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-400 flex items-center gap-2">
           <AlertTriangle size={14} />
-          有 {changeCount} 项未保存的模型变更，点击「保存」生效
+          {t("models.unsavedChanges", { count: changeCount })}
         </div>
       )}
       {syncError && (
         <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-xs text-red-400">
-          DMXAPI 同步失败: {syncError}
+          {t("models.syncFailed")}: {syncError}
         </div>
       )}
 
@@ -371,9 +381,9 @@ export default function AdminModelsPage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Wifi size={14} className="text-emerald-400" />
-              <span className="text-sm font-medium text-white">DMXAPI 模型可用性</span>
+              <span className="text-sm font-medium text-white">{t("models.dmxapiAvailability")}</span>
               <span className="text-xs text-zinc-500">
-                DMXAPI 共 {dmxapiSync.dmxapi_total_models} 个模型
+                {t("models.dmxapiTotal", { count: dmxapiSync.dmxapi_total_models })}
               </span>
             </div>
             <button
@@ -386,11 +396,11 @@ export default function AdminModelsPage() {
           </div>
           <div className="flex gap-4 text-xs">
             <span className="text-emerald-400">
-              ✅ {dmxapiSync.system_available} 个可用
+              {t("models.availableCount", { count: dmxapiSync.system_available })}
             </span>
             {dmxapiSync.system_unavailable > 0 && (
               <span className="text-red-400 font-medium">
-                ❌ {dmxapiSync.system_unavailable} 个已下架
+                {t("models.unavailableCount", { count: dmxapiSync.system_unavailable })}
               </span>
             )}
           </div>
@@ -412,7 +422,7 @@ export default function AdminModelsPage() {
                     </div>
                     {r.suggestions.length > 0 && (
                       <div className="mt-1">
-                        <span className="text-xs text-zinc-500">可能的替代: </span>
+                        <span className="text-xs text-zinc-500">{t("models.alternatives")}: </span>
                         <span className="text-xs text-zinc-400">
                           {r.suggestions.slice(0, 5).join(", ")}
                         </span>
@@ -427,14 +437,14 @@ export default function AdminModelsPage() {
 
       {/* 分组展示 */}
       {Object.entries(grouped).map(([phase, items]) => {
-        const phaseColor = PHASE_COLORS[phase] || PHASE_COLORS["核心"];
+        const phaseColor = PHASE_COLORS[phase] || PHASE_COLORS["核心"] || PHASE_COLORS["Core"];
         return (
           <div key={phase} className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5">
             <div className="mb-4 flex items-center gap-2">
               <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${phaseColor.bg} ${phaseColor.text}`}>
                 {phase}
               </span>
-              <span className="text-xs text-zinc-500">{items.length} 个智能体</span>
+              <span className="text-xs text-zinc-500">{t("models.agentCount", { count: items.length })}</span>
             </div>
             <div className="space-y-2">
               {items.map((item) => {
@@ -461,12 +471,12 @@ export default function AdminModelsPage() {
                           </span>
                           {item.is_custom && !hasPending && (
                             <span className="rounded bg-amber-500/20 px-1 py-0.5 text-xs text-amber-400">
-                              已自定义
+                              {t("models.customized")}
                             </span>
                           )}
                           {hasPending && (
                             <span className="rounded bg-amber-500/30 px-1 py-0.5 text-xs text-amber-300 animate-pulse">
-                              待保存
+                              {t("models.pendingSave")}
                             </span>
                           )}
                         </div>
@@ -491,7 +501,7 @@ export default function AdminModelsPage() {
 
       {/* 模型说明卡片 */}
       <div className="rounded-lg border border-white/[0.06] bg-[#0F1422] p-5">
-        <h2 className="mb-4 text-sm font-semibold text-white">可用模型一览</h2>
+        <h2 className="mb-4 text-sm font-semibold text-white">{t("models.availableModels")}</h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {models.map((m) => (
             <div
@@ -509,7 +519,7 @@ export default function AdminModelsPage() {
                         ? "bg-emerald-500/20 text-emerald-400"
                         : "bg-red-500/20 text-red-400"
                     }`}>
-                      {dmxapiStatusMap[m.model_key].available ? "在线" : "已下架"}
+                      {dmxapiStatusMap[m.model_key].available ? t("models.available") : t("models.unavailable")}
                     </span>
                   )}
                   <span className="text-xs text-zinc-500 font-mono">{m.model_name}</span>
