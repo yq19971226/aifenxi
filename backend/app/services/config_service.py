@@ -477,11 +477,19 @@ class ConfigService:
                 error=str(exc),
             )
 
+    # 配置 key → 独立 Redis 缓存 key 的映射（这些独立缓存由各 API 端点自行管理）
+    _EXTRA_CACHE_KEYS: dict[str, list[str]] = {
+        "analysis_maintenance_enabled": ["analysis:maintenance_enabled"],
+    }
+
     async def _clear_cache(self, key: str) -> None:
-        """清除指定配置的 Redis 缓存。"""
+        """清除指定配置的 Redis 缓存。包括独立端点缓存。"""
         try:
             redis = get_redis_pool()
-            await redis.delete(f"{self.CACHE_PREFIX}{key}")
+            keys_to_delete = [f"{self.CACHE_PREFIX}{key}"]
+            # 同步清除独立缓存 key（如 analysis:maintenance_enabled）
+            keys_to_delete.extend(self._EXTRA_CACHE_KEYS.get(key, []))
+            await redis.delete(*keys_to_delete)
         except RuntimeError:
             logger.warning("redis_unavailable", action="clear_cache", key=key)
         except Exception as exc:
