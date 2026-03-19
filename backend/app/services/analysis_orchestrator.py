@@ -660,6 +660,25 @@ class AnalysisOrchestrator:
         except Exception as exc:
             logger.warning("confluence_filter_failed (skipping): %s", exc)
 
+        # ── 10. 信号不足标识：置信度未达阈值且被降级为 neutral ──
+        try:
+            from app.services.config_service import get_config_value
+            _conf_threshold = float(await get_config_value("consensus_min_confidence", "0.50"))
+        except Exception:
+            _conf_threshold = 0.50
+
+        # signal_insufficient: confidence > 0 但被门限压为 neutral（有倾向但不够自信）
+        is_insufficient = (
+            report.signal == "neutral"
+            and report.confidence > 0
+            and report.confidence < _conf_threshold
+            and report.blocked_reason is None
+        )
+        report = report.model_copy(update={
+            "signal_insufficient": is_insufficient,
+            "confidence_threshold": _conf_threshold,
+        })
+
         return report
 
 

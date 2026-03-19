@@ -129,7 +129,10 @@
     "blockedReasoning_timeout": "Analysis timed out before completing. Please retry later.",
     "lowConfTitle": "Low confidence signal — for reference only",
     "lowConfDesc": "Analysis results show some disagreement or incomplete data coverage. Consider using your own judgment or wait for a clearer signal before taking action.",
-    "weakSignal": "Weak Signal"
+    "weakSignal": "Weak Signal",
+    "signalInsufficient": "Signal Insufficient",
+    "signalInsufficientTitle": "High bull-bear divergence — confidence below threshold",
+    "signalInsufficientDesc": "Analysis confidence is below the system threshold ({threshold}%). Signal direction is uncertain — observation recommended, entry not advised."
   },
   "snippet": {
     "title": "AI Citation Snippet",

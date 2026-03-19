@@ -306,7 +306,7 @@ class LearningService:
 
         threshold = float(await get_config_value("consensus_signal_threshold", "0.35"))
         min_agreement = int(await get_config_value("consensus_min_agreement", "2"))
-        min_confidence = float(await get_config_value("consensus_min_confidence", "0.40"))
+        min_confidence = float(await get_config_value("consensus_min_confidence", "0.50"))
 
         return {
             "signal_threshold": threshold,
@@ -359,7 +359,7 @@ class LearningService:
             )
 
         if min_confidence is not None:
-            old_val = await svc.get_config("consensus_min_confidence", "0.40")
+            old_val = await svc.get_config("consensus_min_confidence", "0.50")
             new_val = str(round(min_confidence, 4))
             await self._upsert_config(
                 svc, "consensus_min_confidence", new_val,

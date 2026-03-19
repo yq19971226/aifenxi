@@ -86,6 +86,11 @@ export interface AnalysisReport {
   confluence_trend_tag?: string | null;
   /** 巨鲸陷阱风险标签列表 */
   confluence_whale_risks?: string[];
+  // ── 低置信度信号不足标识 ───────────────────────────────────
+  /** True = 有方向倾向但置信度未达阈值，方向被降级为 neutral */
+  signal_insufficient?: boolean;
+  /** 当前生效的置信度阈值（后台动态配置 consensus_min_confidence） */
+  confidence_threshold?: number | null;
 }
 
 export interface ProgressEvent {

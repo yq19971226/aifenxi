@@ -91,7 +91,7 @@ const CONFIG_GROUPS: ConfigGroup[] = [
         options: ["false", "true"] },
       { key: "consensus_signal_threshold", isSecret: false, defaultValue: "0.35", category: "consensus" },
       { key: "consensus_min_agreement", isSecret: false, defaultValue: "2", category: "consensus" },
-      { key: "consensus_min_confidence", isSecret: false, defaultValue: "0.40", category: "consensus" },
+      { key: "consensus_min_confidence", isSecret: false, defaultValue: "0.50", category: "consensus" },
       { key: "consensus_flip_ratio", isSecret: false, defaultValue: "0.6", category: "consensus" },
       { key: "signal_push_threshold", isSecret: false, defaultValue: "0.7", category: "push" },
       { key: "leaderboard_min_strategies", isSecret: false, defaultValue: "1", unit: "条", category: "leaderboard" },

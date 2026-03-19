@@ -246,7 +246,7 @@ def _weighted_aggregate(
     weights: dict[str, float],
     signal_threshold: float = 0.35,
     min_agreement: int = 2,
-    min_confidence: float = 0.40,
+    min_confidence: float = 0.50,
     flip_ratio: float = 0.6,
     prev_signal: str | None = None,
 ) -> tuple[Literal["bullish", "bearish", "neutral"], float]:
@@ -353,7 +353,7 @@ def _round3_aggregate(
     symbol: str,
     signal_threshold: float = 0.35,
     min_agreement: int = 2,
-    min_confidence: float = 0.40,
+    min_confidence: float = 0.50,
     flip_ratio: float = 0.6,
     prev_signal: str | None = None,
 ) -> ConsensusReport:
@@ -443,10 +443,10 @@ async def run_nsed(market_data: MarketData) -> ConsensusReport:
         from app.services.config_service import get_config_value
         _sig_thr = float(await get_config_value("consensus_signal_threshold", "0.35"))
         _min_agr = int(await get_config_value("consensus_min_agreement", "2"))
-        _min_conf = float(await get_config_value("consensus_min_confidence", "0.40"))
+        _min_conf = float(await get_config_value("consensus_min_confidence", "0.50"))
         _flip_ratio = float(await get_config_value("consensus_flip_ratio", "0.6"))
     except Exception:
-        _sig_thr, _min_agr, _min_conf, _flip_ratio = 0.35, 2, 0.40, 0.6
+        _sig_thr, _min_agr, _min_conf, _flip_ratio = 0.35, 2, 0.50, 0.6
 
     # ── 迟滞锚定：读取上一次共识信号 ──
     prev_signal: str | None = None

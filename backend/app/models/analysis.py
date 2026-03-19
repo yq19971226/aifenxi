@@ -244,6 +244,15 @@ class AnalysisReport(BaseModel):
         default_factory=list,
         description="巨鲸陷阱风险标签列表",
     )
+    # ── 低置信度信号不足标识 ──────────────────────────────────
+    signal_insufficient: bool = Field(
+        default=False,
+        description="True 表示有方向倾向但置信度未达阈值，方向被降级为 neutral",
+    )
+    confidence_threshold: Optional[float] = Field(
+        default=None,
+        description="当前生效的置信度阈值（后台动态配置 consensus_min_confidence）",
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -68,9 +68,10 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
   const confidence = confidenceValue.toString();
   const { avgConf } = useConsensusData(report.sections);
 
-  // Confidence level classification
-  const isLowConf = !isBlocked && confidenceValue > 0 && confidenceValue < 40;
-  const confBarColor = confidenceValue >= 60 ? "bg-bull" : confidenceValue >= 40 ? "bg-amber-400" : "bg-red-400";
+  // Confidence level classification — 使用后台动态阈值
+  const confThresholdPct = Math.round((report.confidence_threshold ?? 0.50) * 100);
+  const isLowConf = !isBlocked && (report.signal_insufficient === true || (confidenceValue > 0 && confidenceValue < confThresholdPct));
+  const confBarColor = confidenceValue >= 60 ? "bg-bull" : confidenceValue >= confThresholdPct ? "bg-amber-400" : "bg-red-400";
   const glowClass = isBlocked || isLowConf ? "" : rawSignal === "bullish" ? "glow-green" : rawSignal === "bearish" ? "glow-red" : "";
 
   return (
@@ -150,16 +151,16 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
         </div>
       )}
 
-      {/* ── Low Confidence Banner ── */}
+      {/* ── Signal Insufficient / Low Confidence Banner ── */}
       {isLowConf && (
         <div className="mx-5 mt-4 flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3">
           <AlertTriangle className="h-5 w-5 text-amber-400 mt-0.5 shrink-0" />
           <div>
             <p className="text-sm font-semibold text-amber-300">
-              {t("card.lowConfTitle")}
+              {t("card.signalInsufficientTitle")}
             </p>
             <p className="text-xs text-zinc-400 mt-1">
-              {t("card.lowConfDesc")}
+              {t("card.signalInsufficientDesc", { threshold: confThresholdPct })}
             </p>
           </div>
         </div>
@@ -315,7 +316,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
               <div className="flex justify-between items-end">
                 <div>
                   <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-1.5">{t("card.assessment")}</p>
-                  <p className={cn("text-xs font-mono uppercase tracking-widest font-bold", isLowConf ? "text-amber-400" : "text-emerald-400")}>{isLowConf ? t("card.weakSignal") : t("card.activeTracking")}</p>
+                  <p className={cn("text-xs font-mono uppercase tracking-widest font-bold", isLowConf ? "text-amber-400" : "text-emerald-400")}>{isLowConf ? t("card.signalInsufficient") : t("card.activeTracking")}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-1.5">{t("card.confidence")}</p>

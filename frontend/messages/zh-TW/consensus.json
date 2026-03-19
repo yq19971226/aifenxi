@@ -129,7 +129,10 @@
     "blockedReasoning_timeout": "分析過程超時，未能獲取完整結果。請稍後重試。",
     "lowConfTitle": "當前信號置信度偏低，僅供參考",
     "lowConfDesc": "多維分析結果存在一定分歧或部分數據域覆蓋不足，建議結合自身判斷謹慎操作，或等待更明確的信號出現後再做決策。",
-    "weakSignal": "信號偏弱"
+    "weakSignal": "信號偏弱",
+    "signalInsufficient": "信號不足",
+    "signalInsufficientTitle": "當前多空分歧較大，信號置信度未達閾值",
+    "signalInsufficientDesc": "多維分析置信度未達到系統閾值（{threshold}%），當前信號方向不夠確定，建議觀望，不建議此時入場。"
   },
   "snippet": {
     "title": "共識引用片段",
