@@ -13,6 +13,7 @@ import {
   RefreshCw,
   RotateCcw,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import {
   fetchSystemStatus,
@@ -25,6 +26,7 @@ import { ConfirmDeployDialog } from "./ConfirmDeployDialog";
 import { ContainerList } from "./ContainerList";
 
 export default function AdminSystemPage() {
+  const t = useTranslations("admin");
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -140,7 +142,7 @@ export default function AdminSystemPage() {
         },
       );
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "未知错误";
+      const msg = err instanceof Error ? err.message : t("systemMgmt.unknownError");
       if (msg.includes("network") || msg.includes("fetch") || msg.includes("Failed")) {
         await pollFinalResult();
       } else {
@@ -154,7 +156,7 @@ export default function AdminSystemPage() {
   if (!isAdmin) {
     return (
       <div className="flex items-center justify-center py-20 text-zinc-500">
-        无权访问此页面
+        {t("systemMgmt.noAccess")}
       </div>
     );
   }
@@ -168,8 +170,8 @@ export default function AdminSystemPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-100">系统管理</h1>
-          <p className="mt-1 text-sm text-zinc-500">代码更新、服务状态、一键部署</p>
+          <h1 className="text-xl font-semibold text-zinc-100">{t("systemMgmt.title")}</h1>
+          <p className="mt-1 text-sm text-zinc-500">{t("systemMgmt.subtitle")}</p>
         </div>
         <button
           type="button"
@@ -178,7 +180,7 @@ export default function AdminSystemPage() {
           className="flex items-center gap-1.5 rounded-md bg-white/[0.06] px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:bg-white/[0.1] hover:text-zinc-200"
         >
           <RefreshCw size={13} className={isLoading ? "animate-spin" : ""} />
-          刷新
+          {t("systemMgmt.refresh")}
         </button>
       </div>
 
@@ -188,7 +190,7 @@ export default function AdminSystemPage() {
           <div className="flex items-center gap-2">
             <AlertTriangle size={15} className="text-amber-400" />
             <p className="text-sm text-amber-400">
-              无法连接部署代理 — {status.error || "请确认服务器上 axiom-deploy-agent 服务已启动"}
+              {t("systemMgmt.agentWarning")} — {status.error || t("systemMgmt.agentHint")}
             </p>
           </div>
         </div>
@@ -200,7 +202,7 @@ export default function AdminSystemPage() {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <GitBranch size={16} className="text-zinc-400" />
-              <span className="text-sm font-medium text-zinc-200">代码版本</span>
+              <span className="text-sm font-medium text-zinc-200">{t("systemMgmt.codeVersion")}</span>
             </div>
             {isLoading ? (
               <div className="h-12 w-48 skeleton rounded-lg" />
@@ -216,17 +218,17 @@ export default function AdminSystemPage() {
                 {git.has_update ? (
                   <div className="flex items-center gap-1.5 text-xs text-amber-400">
                     <ArrowDownCircle size={13} />
-                    <span>有 {git.behind} 个新提交可更新</span>
+                    <span>{t("systemMgmt.newCommits", { count: git.behind })}</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-1.5 text-xs text-emerald-400">
                     <CheckCircle2 size={13} />
-                    <span>已是最新版本</span>
+                    <span>{t("systemMgmt.upToDate")}</span>
                   </div>
                 )}
               </div>
             ) : (
-              <p className="text-sm text-zinc-500">{git?.error || "无法获取版本信息"}</p>
+              <p className="text-sm text-zinc-500">{git?.error || t("systemMgmt.cannotGetVersion")}</p>
             )}
           </div>
 
@@ -241,7 +243,7 @@ export default function AdminSystemPage() {
               className="flex items-center gap-2 rounded-md bg-white/[0.06] px-4 py-2.5 text-sm text-zinc-300 transition-colors hover:bg-white/[0.1] disabled:opacity-40"
             >
               <RotateCcw size={15} />
-              一键回退
+              {t("systemMgmt.rollback")}
             </button>
             <button
               type="button"
@@ -253,9 +255,9 @@ export default function AdminSystemPage() {
               className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm disabled:opacity-40"
             >
               {deploying ? (
-                <><Loader2 size={15} className="animate-spin" /> 处理中...</>
+                <><Loader2 size={15} className="animate-spin" /> {t("systemMgmt.deploying")}</>
               ) : (
-                <><Server size={15} /> 一键更新</>
+                <><Server size={15} /> {t("systemMgmt.deploy")}</>
               )}
             </button>
           </div>
@@ -270,10 +272,10 @@ export default function AdminSystemPage() {
                 ) : (
                   <XCircle size={12} className="text-red-400" />
                 )}
-                上次部署: {lastDeploy.success ? "成功" : "失败"}
+                {t("systemMgmt.lastDeploy")}: {lastDeploy.success ? t("systemMgmt.success") : t("systemMgmt.failed")}
               </span>
-              <span>耗时 {lastDeploy.elapsed_s}s</span>
-              <span>版本 {lastDeploy.commit}</span>
+              <span>{t("systemMgmt.elapsed", { seconds: lastDeploy.elapsed_s })}</span>
+              <span>{t("systemMgmt.version", { commit: lastDeploy.commit })}</span>
               <span>{new Date(lastDeploy.finished_at).toLocaleString("zh-CN")}</span>
             </div>
           </div>
@@ -284,23 +286,23 @@ export default function AdminSystemPage() {
       {logs.length > 0 && (
         <div className="card p-6">
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm font-medium text-zinc-200">部署日志</span>
+            <span className="text-sm font-medium text-zinc-200">{t("systemMgmt.deployLog")}</span>
             {deployResult === "success" && (
               <span className="flex items-center gap-1 text-xs text-emerald-400">
-                <CheckCircle2 size={13} /> 部署成功
+                <CheckCircle2 size={13} /> {t("systemMgmt.deploySuccess")}
                 {refreshCountdown !== null && refreshCountdown > 0 && (
-                  <span className="ml-2 text-zinc-500">{refreshCountdown}s 后自动刷新</span>
+                  <span className="ml-2 text-zinc-500">{t("systemMgmt.autoRefresh", { count: refreshCountdown })}</span>
                 )}
               </span>
             )}
             {deployResult === "error" && (
               <span className="flex items-center gap-1 text-xs text-red-400">
-                <XCircle size={13} /> 部署失败
+                <XCircle size={13} /> {t("systemMgmt.deployFailed")}
               </span>
             )}
             {deploying && (
               <span className="flex items-center gap-1 text-xs text-zinc-400">
-                <Loader2 size={13} className="animate-spin" /> 进行中...
+                <Loader2 size={13} className="animate-spin" /> {t("systemMgmt.inProgress")}
               </span>
             )}
           </div>

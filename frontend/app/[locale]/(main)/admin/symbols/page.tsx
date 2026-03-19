@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -23,6 +24,7 @@ interface AddSymbolDialogProps {
 }
 
 function AddSymbolDialog({ onClose, onDone }: AddSymbolDialogProps) {
+  const t = useTranslations("admin");
   const [symbol, setSymbol] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [hasOnchain, setHasOnchain] = useState(true);
@@ -32,7 +34,7 @@ function AddSymbolDialog({ onClose, onDone }: AddSymbolDialogProps) {
 
   const handleSubmit = useCallback(async () => {
     if (!symbol.trim() || !displayName.trim()) {
-      setError("请填写交易对和显示名称");
+      setError(t("symbols.fillRequired"));
       return;
     }
     setSubmitting(true);
@@ -47,7 +49,7 @@ function AddSymbolDialog({ onClose, onDone }: AddSymbolDialogProps) {
       await addSymbol(data);
       onDone();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "添加失败");
+      setError(err instanceof Error ? err.message : t("symbols.addFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -68,11 +70,11 @@ function AddSymbolDialog({ onClose, onDone }: AddSymbolDialogProps) {
         className="w-full max-w-md backdrop-blur-md bg-bg-primary border border-white/[0.08] rounded-lg p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-sm font-semibold text-zinc-200">添加交易对</h3>
+        <h3 className="text-sm font-semibold text-zinc-200">{t("symbols.addTitle")}</h3>
 
         <div className="mt-4 space-y-3">
           <div>
-            <label className="text-xs uppercase tracking-widest text-zinc-500">交易对</label>
+            <label className="text-xs uppercase tracking-widest text-zinc-500">{t("symbols.symbolLabel")}</label>
             <input
               type="text"
               value={symbol}
@@ -82,7 +84,7 @@ function AddSymbolDialog({ onClose, onDone }: AddSymbolDialogProps) {
             />
           </div>
           <div>
-            <label className="text-xs uppercase tracking-widest text-zinc-500">显示名称</label>
+            <label className="text-xs uppercase tracking-widest text-zinc-500">{t("symbols.displayName")}</label>
             <input
               type="text"
               value={displayName}
@@ -94,11 +96,11 @@ function AddSymbolDialog({ onClose, onDone }: AddSymbolDialogProps) {
           <div className="flex gap-4">
             <label className="flex items-center gap-2 text-xs text-zinc-400">
               <input type="checkbox" checked={hasOnchain} onChange={(e) => setHasOnchain(e.target.checked)} className="rounded" />
-              链上数据
+              {t("symbols.onchainData")}
             </label>
             <label className="flex items-center gap-2 text-xs text-zinc-400">
               <input type="checkbox" checked={hasDerivatives} onChange={(e) => setHasDerivatives(e.target.checked)} className="rounded" />
-              合约数据
+              {t("symbols.derivativesData")}
             </label>
           </div>
         </div>
@@ -111,7 +113,7 @@ function AddSymbolDialog({ onClose, onDone }: AddSymbolDialogProps) {
             onClick={onClose}
             className="rounded-lg border border-white/[0.08] px-4 py-2 text-xs text-zinc-400 transition-colors hover:bg-white/[0.04]"
           >
-            取消
+            {t("symbols.cancel")}
           </button>
           <button
             type="button"
@@ -119,7 +121,7 @@ function AddSymbolDialog({ onClose, onDone }: AddSymbolDialogProps) {
             disabled={submitting}
             className="rounded-lg bg-[var(--color-accent)]/20 px-4 py-2 text-xs font-semibold text-accent transition-all hover:bg-[var(--color-accent)]/30 disabled:opacity-50"
           >
-            {submitting ? "添加中…" : "添加"}
+            {submitting ? t("symbols.adding") : t("symbols.add")}
           </button>
         </div>
       </motion.div>
@@ -154,16 +156,17 @@ function formatExpiredReasons(reasons: string[]): string {
   if (!reasons.length) return "-";
 
   const labels: Record<string, string> = {
-    missing_kline: "缺K线",
-    missing_indicator: "缺指标",
-    stale_kline: "K线过旧",
-    stale_indicator: "指标过旧",
+    missing_kline: "Missing K",
+    missing_indicator: "Missing I",
+    stale_kline: "Stale K",
+    stale_indicator: "Stale I",
   };
 
   return reasons.map((reason) => labels[reason] ?? reason).join("/");
 }
 
 function SymbolRow({ config, onToggle, onDelete, toggling }: SymbolRowProps) {
+  const t = useTranslations("admin");
   const isToggling = toggling === config.symbol;
 
   return (
@@ -178,23 +181,23 @@ function SymbolRow({ config, onToggle, onDelete, toggling }: SymbolRowProps) {
               : "text-zinc-500 bg-zinc-500/20"
           }`}
         >
-          {config.enabled ? "启用" : "禁用"}
+          {config.enabled ? t("symbols.enabled") : t("symbols.disabled")}
         </span>
       </td>
       <td className="py-3 text-xs text-zinc-500">{config.collect_interval_sec}s</td>
       <td className="py-3">
         <div className="flex gap-1">
           {config.has_onchain && (
-            <span className="rounded bg-[var(--color-accent)]/10 px-1.5 py-0.5 text-xs text-accent">链上</span>
+            <span className="rounded bg-[var(--color-accent)]/10 px-1.5 py-0.5 text-xs text-accent">{t("symbols.onchain")}</span>
           )}
           {config.has_derivatives && (
-            <span className="rounded bg-[#F5A623]/10 px-1.5 py-0.5 text-xs text-[#F5A623]">合约</span>
+            <span className="rounded bg-[#F5A623]/10 px-1.5 py-0.5 text-xs text-[#F5A623]">{t("symbols.derivatives")}</span>
           )}
         </div>
       </td>
       <td className="py-3 text-xs text-zinc-500">
         {config.error_count > 0 && (
-          <span className="text-bear">{config.error_count} 次</span>
+          <span className="text-bear">{config.error_count} {t("symbols.errors")}</span>
         )}
       </td>
       <td className="py-3">
@@ -205,7 +208,7 @@ function SymbolRow({ config, onToggle, onDelete, toggling }: SymbolRowProps) {
             disabled={isToggling}
             className="rounded px-2 py-1 text-xs font-medium text-zinc-400 bg-white/[0.04] border border-white/[0.08] transition-colors hover:bg-white/[0.08] disabled:opacity-50"
           >
-            {isToggling ? "…" : config.enabled ? "禁用" : "启用"}
+            {isToggling ? "…" : config.enabled ? t("symbols.disable") : t("symbols.enable")}
           </button>
           {config.enabled && (
             <button
@@ -213,7 +216,7 @@ function SymbolRow({ config, onToggle, onDelete, toggling }: SymbolRowProps) {
               onClick={() => onDelete(config.symbol)}
               className="rounded px-2 py-1 text-xs font-medium text-bear bg-[var(--color-bear)]/10 transition-colors hover:bg-[var(--color-bear)]/20"
             >
-              删除
+              {t("symbols.delete")}
             </button>
           )}
         </div>
@@ -225,6 +228,7 @@ function SymbolRow({ config, onToggle, onDelete, toggling }: SymbolRowProps) {
 // ── Main Page ────────────────────────────────────────────────
 
 export default function AdminSymbolsPage() {
+  const t = useTranslations("admin");
   const { user } = useAuth();
   
   const queryClient = useQueryClient();
@@ -277,7 +281,7 @@ export default function AdminSymbolsPage() {
 
   const handleDelete = useCallback(
     async (symbol: string) => {
-      if (!confirm(`确认禁用交易对 ${symbol}？`)) return;
+      if (!confirm(t("symbols.confirmDisable", { symbol }))) return;
       try {
         await deleteSymbol(symbol);
         refresh();
@@ -317,9 +321,9 @@ export default function AdminSymbolsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-200">币种管理</h1>
+          <h1 className="text-xl font-semibold text-zinc-200">{t("symbols.title")}</h1>
           <p className="text-xs text-zinc-500 mt-1">
-            管理系统支持的交易对，启用 {enabledCount} 个，禁用 {disabledCount} 个
+            {t("symbols.subtitle", { enabled: enabledCount, disabled: disabledCount })}
           </p>
         </div>
         <button
@@ -327,7 +331,7 @@ export default function AdminSymbolsPage() {
           onClick={() => setShowAdd(true)}
           className="rounded-lg bg-[var(--color-accent)]/20 px-4 py-2 text-xs font-semibold text-accent transition-all hover:bg-[var(--color-accent)]/30"
         >
-          + 添加交易对
+          {t("symbols.addSymbol")}
         </button>
       </div>
 
@@ -339,20 +343,20 @@ export default function AdminSymbolsPage() {
           </div>
         ) : error ? (
           <p className="text-sm text-bear text-center py-4">
-            {error instanceof Error ? error.message : "加载失败"}
+            {error instanceof Error ? error.message : t("symbols.loadFailed")}
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/[0.08]">
-                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">交易对</th>
-                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">名称</th>
-                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">状态</th>
-                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">采集间隔</th>
-                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">数据源</th>
-                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">错误</th>
-                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">操作</th>
+                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">{t("symbols.table.symbol")}</th>
+                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">{t("symbols.table.name")}</th>
+                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">{t("symbols.table.status")}</th>
+                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">{t("symbols.table.interval")}</th>
+                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">{t("symbols.table.sources")}</th>
+                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">{t("symbols.table.errors")}</th>
+                  <th className="pb-3 text-left text-xs font-medium text-zinc-500">{t("symbols.table.actions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -373,7 +377,7 @@ export default function AdminSymbolsPage() {
 
       <div className="card-surface rounded-lg p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-zinc-200">K线采集联动进度</h2>
+          <h2 className="text-sm font-semibold text-zinc-200">{t("symbols.klineProgress.title")}</h2>
           <label className="flex cursor-pointer items-center gap-2 text-xs text-zinc-500">
             <input
               type="checkbox"
@@ -381,31 +385,31 @@ export default function AdminSymbolsPage() {
               onChange={(e) => setIssuesOnly(e.target.checked)}
               className="rounded"
             />
-            仅显示异常
+            {t("symbols.klineProgress.issuesOnly")}
           </label>
         </div>
         {enabledSymbols.length === 0 ? (
-          <p className="mt-3 text-sm text-zinc-500">暂无启用币种。</p>
+          <p className="mt-3 text-sm text-zinc-500">{t("symbols.klineProgress.noEnabledSymbols")}</p>
         ) : klineLoading ? (
-          <p className="mt-3 text-sm text-zinc-500">加载中...</p>
+          <p className="mt-3 text-sm text-zinc-500">{t("symbols.klineProgress.loading")}</p>
         ) : klineError ? (
-          <p className="mt-3 text-sm text-bear">{klineError instanceof Error ? klineError.message : "加载失败"}</p>
+          <p className="mt-3 text-sm text-bear">{klineError instanceof Error ? klineError.message : t("symbols.loadFailed")}</p>
         ) : klineProgress ? (
           <div className="mt-3 space-y-3">
             <div className="rounded border border-white/[0.06] bg-white/[0.02] p-3 text-xs text-zinc-500">
               <div className="flex flex-wrap items-center gap-3">
                 <span>
-                  调度器: {klineProgress.running ? <span className="text-bull">运行中</span> : <span className="text-bear">未运行</span>}
+                  {t("symbols.klineProgress.scheduler")}: {klineProgress.running ? <span className="text-bull">{t("symbols.klineProgress.running")}</span> : <span className="text-bear">{t("symbols.klineProgress.notRunning")}</span>}
                 </span>
-                <span>轮次: {klineProgress.scheduler.rounds_completed}</span>
-                <span>失败: {klineProgress.scheduler.last_failed}</span>
-                <span>耗时: {klineProgress.scheduler.last_elapsed_s}s</span>
-                <span>最近采集: {klineProgress.scheduler.last_collect_at || "-"}</span>
+                <span>{t("symbols.klineProgress.rounds")}: {klineProgress.scheduler.rounds_completed}</span>
+                <span>{t("symbols.klineProgress.failed")}: {klineProgress.scheduler.last_failed}</span>
+                <span>{t("symbols.klineProgress.elapsed")}: {klineProgress.scheduler.last_elapsed_s}s</span>
+                <span>{t("symbols.klineProgress.lastCollect")}: {klineProgress.scheduler.last_collect_at || "-"}</span>
               </div>
               <p className="mt-2">
-                总体: {klineProgress.progress_pct.toFixed(1)}% ({klineProgress.ready_slots}/{klineProgress.total_slots})
+                {t("symbols.klineProgress.overall")}: {klineProgress.progress_pct.toFixed(1)}% ({klineProgress.ready_slots}/{klineProgress.total_slots})
               </p>
-              <p className="mt-1 text-xs text-zinc-500">异常槽位: {issueSlots}</p>
+              <p className="mt-1 text-xs text-zinc-500">{t("symbols.klineProgress.issueSlots")}: {issueSlots}</p>
               <div className="mt-2 h-1.5 w-full overflow-hidden rounded bg-white/[0.08]">
                 <div
                   className="h-full bg-[var(--color-accent)] transition-all"
@@ -415,7 +419,7 @@ export default function AdminSymbolsPage() {
             </div>
 
             {progressSymbols.length === 0 ? (
-              <p className="text-xs text-zinc-500">当前筛选下无异常项。</p>
+              <p className="text-xs text-zinc-500">{t("symbols.klineProgress.noIssues")}</p>
             ) : progressSymbols.map((s) => (
               <details key={s.symbol} className="rounded border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs" open>
                 <summary className="flex cursor-pointer list-none items-center justify-between text-zinc-300">
