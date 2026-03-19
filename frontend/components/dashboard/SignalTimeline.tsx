@@ -11,6 +11,7 @@ import {
   Crosshair,
   BarChart3,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { SignalEvent } from "@/lib/api/dashboard";
 
 const SIGNAL_CONFIG: Record<string, { icon: typeof Zap; color: string; bg: string }> = {
@@ -21,34 +22,35 @@ const SIGNAL_CONFIG: Record<string, { icon: typeof Zap; color: string; bg: strin
   risk_alert: { icon: AlertTriangle, color: "text-red-400", bg: "bg-red-500/10" },
 };
 
-function formatRelativeTime(isoStr: string): string {
-  const now = Date.now();
-  const then = new Date(isoStr).getTime();
-  const diffMs = now - then;
-  const diffMin = Math.round(diffMs / 60_000);
-
-  if (diffMin < 1) return "刚刚";
-  if (diffMin < 60) return `${diffMin}分钟前`;
-  const diffHr = Math.round(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}小时前`;
-  return `${Math.round(diffHr / 24)}天前`;
-}
-
 const DEFAULT_VISIBLE = 5;
 
 export function SignalTimeline({ signals }: { signals: SignalEvent[] }) {
+  const t = useTranslations("analysis.timeline");
   const [showAll, setShowAll] = useState(false);
   const visible = showAll ? signals : signals.slice(0, DEFAULT_VISIBLE);
+
+  const formatRelativeTime = (isoStr: string): string => {
+    const now = Date.now();
+    const then = new Date(isoStr).getTime();
+    const diffMs = now - then;
+    const diffMin = Math.round(diffMs / 60_000);
+
+    if (diffMin < 1) return t("justNow");
+    if (diffMin < 60) return t("minutesAgo", { min: diffMin });
+    const diffHr = Math.round(diffMin / 60);
+    if (diffHr < 24) return t("hoursAgo", { h: diffHr });
+    return t("daysAgo", { d: Math.round(diffHr / 24) });
+  };
 
   if (signals.length === 0) {
     return (
       <div className="card p-5">
         <div className="flex items-center gap-2 mb-3">
           <Zap size={14} className="text-accent" />
-          <h3 className="text-sm font-semibold text-white">综合信号</h3>
+          <h3 className="text-sm font-semibold text-white">{t("title")}</h3>
           <span className="text-xs text-zinc-500 bg-white/[0.04] px-1.5 py-0.5 rounded-full">0</span>
         </div>
-        <p className="text-xs text-zinc-500">暂无信号</p>
+        <p className="text-xs text-zinc-500">{t("empty")}</p>
       </div>
     );
   }
@@ -58,7 +60,7 @@ export function SignalTimeline({ signals }: { signals: SignalEvent[] }) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Zap size={14} className="text-accent" />
-          <h3 className="text-sm font-semibold text-white">综合信号</h3>
+          <h3 className="text-sm font-semibold text-white">{t("title")}</h3>
           <span className="text-xs text-zinc-500 bg-white/[0.04] px-1.5 py-0.5 rounded-full font-mono">
             {signals.length}
           </span>
@@ -68,7 +70,7 @@ export function SignalTimeline({ signals }: { signals: SignalEvent[] }) {
             onClick={() => setShowAll((v) => !v)}
             className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
           >
-            {showAll ? "收起" : `查看全部 ${signals.length} 条`} ›
+            {showAll ? t("collapse") : t("showAll", { count: signals.length })} ›
           </button>
         )}
       </div>

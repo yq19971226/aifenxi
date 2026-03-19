@@ -52,5 +52,36 @@
       "collapse": "Collapse",
       "expandAll": "Expand All ({count})"
     }
+  },
+  "stability": {
+    "title": "Signal Stability",
+    "grade": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "no_data": "No Data"
+    },
+    "streak": "Streak",
+    "streakTimes": "{count}×",
+    "signal": {
+      "bullish": "Bullish",
+      "bearish": "Bearish",
+      "neutral": "Neutral"
+    },
+    "consistency": "Consistency",
+    "duration": "Duration",
+    "durationMin": "{min}m",
+    "durationHourMin": "{h}h {min}m",
+    "durationHour": "{h}h"
+  },
+  "timeline": {
+    "title": "Signals",
+    "empty": "No signals",
+    "collapse": "Collapse",
+    "showAll": "Show all {count}",
+    "justNow": "Just now",
+    "minutesAgo": "{min}m ago",
+    "hoursAgo": "{h}h ago",
+    "daysAgo": "{d}d ago"
   }
 }

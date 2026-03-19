@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Activity, TrendingUp, TrendingDown, Minus, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { authFetch } from "@/lib/api/auth";
+import { useTranslations } from "next-intl";
 
 interface SignalStabilityData {
   recent_signals: Array<{
@@ -34,18 +35,11 @@ const SIGNAL_ICONS: Record<string, React.ElementType> = {
 };
 
 const GRADE_STYLES: Record<string, { bg: string; text: string; border: string }> = {
-  "高": { bg: "bg-emerald-500/10", text: "text-emerald-400", border: "border-emerald-500/20" },
-  "中": { bg: "bg-amber-500/10", text: "text-amber-400", border: "border-amber-500/20" },
-  "低": { bg: "bg-red-500/10", text: "text-red-400", border: "border-red-500/20" },
-  "无数据": { bg: "bg-zinc-500/10", text: "text-zinc-500", border: "border-zinc-500/20" },
+  high: { bg: "bg-emerald-500/10", text: "text-emerald-400", border: "border-emerald-500/20" },
+  medium: { bg: "bg-amber-500/10", text: "text-amber-400", border: "border-amber-500/20" },
+  low: { bg: "bg-red-500/10", text: "text-red-400", border: "border-red-500/20" },
+  no_data: { bg: "bg-zinc-500/10", text: "text-zinc-500", border: "border-zinc-500/20" },
 };
-
-function formatDuration(minutes: number): string {
-  if (minutes < 60) return `${minutes}分钟`;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m > 0 ? `${h}小时${m}分` : `${h}小时`;
-}
 
 export function SignalStabilityBar({
   symbol,
@@ -54,13 +48,13 @@ export function SignalStabilityBar({
   symbol: string;
   mode: string;
 }) {
+  const t = useTranslations("analysis.stability");
   const [data, setData] = useState<SignalStabilityData | null>(null);
 
   useEffect(() => {
     if (!symbol || !mode) return;
 
     const fetchStability = async () => {
-      // 延迟 800ms 等待后端 record_signal 写入 Redis 完成
       await new Promise(r => setTimeout(r, 800));
       try {
         const res = await authFetch(`/api/analysis/signal-stability/${symbol}/${mode}`);
@@ -68,7 +62,7 @@ export function SignalStabilityBar({
           setData(await res.json());
         }
       } catch {
-        // 静默失败
+        // silent
       }
     };
 
@@ -77,8 +71,18 @@ export function SignalStabilityBar({
 
   if (!data || data.total_count < 2) return null;
 
-  const grade = GRADE_STYLES[data.stability_grade] || GRADE_STYLES["无数据"];
+  const grade = GRADE_STYLES[data.stability_grade] || GRADE_STYLES["no_data"];
+  const gradeLabel = t(`grade.${data.stability_grade}` as "grade.high" | "grade.medium" | "grade.low" | "grade.no_data");
   const consistencyPct = Math.round(data.consistency * 100);
+
+  const formatDuration = (minutes: number): string => {
+    if (minutes < 60) return t("durationMin", { min: minutes });
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return m > 0 ? t("durationHourMin", { h, min: m }) : t("durationHour", { h });
+  };
+
+  const signalLabel = t(`signal.${data.dominant_signal}` as "signal.bullish" | "signal.bearish" | "signal.neutral");
 
   return (
     <motion.div
@@ -98,7 +102,7 @@ export function SignalStabilityBar({
             )}
           >
             <Activity size={12} />
-            信号稳定度: {data.stability_grade}
+            {t("title")}: {gradeLabel}
           </div>
 
           {/* Signal dot trail (recent 5 signals as colored dots) */}
@@ -129,11 +133,11 @@ export function SignalStabilityBar({
               } />;
             })()}
             <span>
-              连续<span className="text-white font-bold mx-0.5">{data.current_streak}</span>次
+              {t("streak")}<span className="text-white font-bold mx-0.5">{data.current_streak}</span>{t("streakTimes", { count: "" })}
               <span className={
                 data.dominant_signal === "bullish" ? "text-emerald-400" :
                 data.dominant_signal === "bearish" ? "text-red-400" : "text-zinc-400"
-              }>{data.dominant_signal === "bullish" ? "看多" : data.dominant_signal === "bearish" ? "看空" : "中性"}</span>
+              }>{signalLabel}</span>
             </span>
           </div>
 
@@ -149,14 +153,14 @@ export function SignalStabilityBar({
                 style={{ width: `${consistencyPct}%` }}
               />
             </div>
-            <span>一致性 <span className="text-white font-bold">{consistencyPct}%</span></span>
+            <span>{t("consistency")} <span className="text-white font-bold">{consistencyPct}%</span></span>
           </div>
 
           {/* Duration */}
           {data.duration_minutes > 0 && (
             <div className="flex items-center gap-1">
               <Timer size={11} className="text-zinc-500" />
-              <span>持续 <span className="text-white font-bold">{formatDuration(data.duration_minutes)}</span></span>
+              <span>{t("duration")} <span className="text-white font-bold">{formatDuration(data.duration_minutes)}</span></span>
             </div>
           )}
         </div>

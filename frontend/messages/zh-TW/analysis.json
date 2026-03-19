@@ -52,5 +52,36 @@
       "collapse": "收起",
       "expandAll": "展開全部 ({count})"
     }
+  },
+  "stability": {
+    "title": "訊號穩定度",
+    "grade": {
+      "high": "高",
+      "medium": "中",
+      "low": "低",
+      "no_data": "無資料"
+    },
+    "streak": "連續",
+    "streakTimes": "{count}次",
+    "signal": {
+      "bullish": "看多",
+      "bearish": "看空",
+      "neutral": "中性"
+    },
+    "consistency": "一致性",
+    "duration": "持續",
+    "durationMin": "{min}分鐘",
+    "durationHourMin": "{h}小時{min}分",
+    "durationHour": "{h}小時"
+  },
+  "timeline": {
+    "title": "綜合訊號",
+    "empty": "暫無訊號",
+    "collapse": "收起",
+    "showAll": "查看全部 {count} 條",
+    "justNow": "剛剛",
+    "minutesAgo": "{min}分鐘前",
+    "hoursAgo": "{h}小時前",
+    "daysAgo": "{d}天前"
   }
 }

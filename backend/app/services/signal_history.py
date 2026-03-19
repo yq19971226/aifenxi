@@ -121,11 +121,11 @@ async def get_signal_stability(
 
         # 5. 稳定度等级
         if streak >= 4 and consistency >= 0.8:
-            grade = "高"
+            grade = "high"
         elif streak >= 2 and consistency >= 0.6:
-            grade = "中"
+            grade = "medium"
         else:
-            grade = "低"
+            grade = "low"
 
         # 前端展示用的简化列表（最近 5 条）
         recent = [
@@ -161,5 +161,5 @@ def _empty_stability() -> dict:
         "dominant_signal": "neutral",
         "duration_minutes": 0,
         "total_count": 0,
-        "stability_grade": "无数据",
+        "stability_grade": "no_data",
     }
