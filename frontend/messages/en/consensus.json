@@ -134,6 +134,19 @@
     "signalInsufficientTitle": "High bull-bear divergence — confidence below threshold",
     "signalInsufficientDesc": "Analysis confidence is below the system threshold ({threshold}%). Signal direction is uncertain — observation recommended, entry not advised."
   },
+  "strategy": {
+    "priceMap": "Price Map",
+    "spread": "Spread",
+    "stopLossLabel": "STOP LOSS",
+    "entryZone": "ENTRY ZONE",
+    "stopLossPos": "Stop Loss",
+    "rrLabel": "Risk/Reward",
+    "tpTargets": "TP Targets",
+    "direction": "Direction: {dir}",
+    "validUntil": "Valid until {time}",
+    "degradedTitle": "Strategy Degraded",
+    "degradedDesc": "Agent returned a degraded response. Strategy data unavailable. Please retry."
+  },
   "snippet": {
     "title": "AI Citation Snippet",
     "copy": "Copy for AI",

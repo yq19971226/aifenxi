@@ -107,5 +107,12 @@
     "networkLatency": "Link Latency",
     "latencyMs": "12ms",
     "marketPulse": "Market Pulse"
+  },
+  "analysisPanel": {
+    "title": "Analysis Hub",
+    "subtitle": "Multi-dimensional AI-powered analysis engine",
+    "maintenanceTitle": "Analysis module under maintenance",
+    "maintenanceDesc": "System upgrade in progress. Analysis is temporarily unavailable. Background data continues to run — service will auto-restore once complete.",
+    "modeLocked": "This mode requires {tier} membership. Please upgrade."
   }
 }

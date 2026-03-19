@@ -203,7 +203,7 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
   const handleModeSelect = useCallback((m: AnalysisMode) => {
     if (isModeLocked(m)) {
       const opt = MODE_OPTIONS.find((o) => o.value === m);
-      setUpgradeHint(`该模式需要${opt?.tierLabel ?? "高级版"}会员，请升级后使用`);
+      setUpgradeHint(t("analysisPanel.modeLocked", { tier: opt?.tierLabel ?? "Premium" }));
       return;
     }
     setUpgradeHint(null);
@@ -224,9 +224,9 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
       <div>
         <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
           <span className="w-2 h-6 rounded-full bg-indigo-500" />
-          综合分析
+          {t("analysisPanel.title")}
         </h2>
-        <p className="text-sm text-zinc-400 mt-1">基于多维度数据的智能分析引擎</p>
+        <p className="text-sm text-zinc-400 mt-1">{t("analysisPanel.subtitle")}</p>
       </div>
 
       {/* Mode selector */}
@@ -272,9 +272,9 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
           className="rounded-xl border border-sky-500/20 bg-sky-500/[0.06] px-5 py-5 text-center space-y-3"
         >
           <div className="text-3xl">🔧</div>
-          <p className="text-sm font-bold text-sky-300">综合分析模块维护中</p>
+          <p className="text-sm font-bold text-sky-300">{t("analysisPanel.maintenanceTitle")}</p>
           <p className="text-xs text-zinc-400 leading-relaxed max-w-sm mx-auto">
-            系统正在进行升级维护，分析功能暂时不可用。后台数据正常运行，维护完成后将自动恢复。
+            {t("analysisPanel.maintenanceDesc")}
           </p>
         </motion.div>
       )}
@@ -289,7 +289,7 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
             className="flex items-center gap-1.5 rounded-md bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
           >
             <RefreshCw size={12} />
-            重试
+            {tCommon("buttons.refresh")}
           </button>
         </div>
       )}
@@ -310,7 +310,7 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
               className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm font-medium text-zinc-500 transition-colors hover:bg-white/[0.06] hover:text-zinc-300"
             >
               <RefreshCw size={12} />
-              重新分析
+              {tCommon("buttons.refresh")}
             </button>
           )}
           <AnalysisReport

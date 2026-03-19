@@ -134,6 +134,19 @@
     "signalInsufficientTitle": "當前多空分歧較大，信號置信度未達閾值",
     "signalInsufficientDesc": "多維分析置信度未達到系統閾值（{threshold}%），當前信號方向不夠確定，建議觀望，不建議此時入場。"
   },
+  "strategy": {
+    "priceMap": "價位分佈圖",
+    "spread": "差幅",
+    "stopLossLabel": "止損",
+    "entryZone": "進場區間",
+    "stopLossPos": "止損位",
+    "rrLabel": "盈虧比",
+    "tpTargets": "止盈目標",
+    "direction": "操作方向：{dir}",
+    "validUntil": "有效至 {time}",
+    "degradedTitle": "策略生成降級",
+    "degradedDesc": "智能體返回了降級響應，策略數據不可用。請重試分析。"
+  },
   "snippet": {
     "title": "共識引用片段",
     "copy": "複製給 AI",

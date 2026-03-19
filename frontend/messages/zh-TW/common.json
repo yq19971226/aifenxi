@@ -107,5 +107,12 @@
     "networkLatency": "鏈路延遲",
     "latencyMs": "12ms",
     "marketPulse": "市場脈衝"
+  },
+  "analysisPanel": {
+    "title": "綜合分析",
+    "subtitle": "基於多維度數據的智能分析引擎",
+    "maintenanceTitle": "綜合分析模組維護中",
+    "maintenanceDesc": "系統正在進行升級維護，分析功能暫時不可用。後台數據正常運行，維護完成後將自動恢復。",
+    "modeLocked": "該模式需要{tier}會員，請升級後使用"
   }
 }
