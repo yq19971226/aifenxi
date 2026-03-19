@@ -761,7 +761,13 @@
     "failed": "失败",
     "elapsed": "耗时 {seconds}s",
     "version": "版本 {commit}",
-    "unknownError": "未知错误"
+    "unknownError": "未知错误",
+    "pollSseDisconnected": "[log] SSE 连接中断（后端正在重启），轮询最终结果...",
+    "pollDeploySuccess": "[done] 部署成功 (版本 {commit})",
+    "pollDeployFailed": "[error] 部署失败，请检查服务器日志",
+    "pollStillDeploying": "[log] 部署仍在进行中... ({seconds}s)",
+    "pollServiceUnavailable": "[log] 服务暂不可用，继续等待... ({seconds}s)",
+    "pollTimeout": "[error] 轮询超时（120s），请手动检查服务器状态"
   },
   "withdrawals": {
     "title": "提现审核",

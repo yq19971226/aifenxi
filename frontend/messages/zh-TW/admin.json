@@ -760,7 +760,13 @@
     "failed": "失敗",
     "elapsed": "耗時 {seconds}s",
     "version": "版本 {commit}",
-    "unknownError": "未知錯誤"
+    "unknownError": "未知錯誤",
+    "pollSseDisconnected": "[log] SSE 連線中斷（後端正在重啟），輪詢最終結果...",
+    "pollDeploySuccess": "[done] 部署成功 (版本 {commit})",
+    "pollDeployFailed": "[error] 部署失敗，請檢查伺服器日誌",
+    "pollStillDeploying": "[log] 部署仍在進行中... ({seconds}s)",
+    "pollServiceUnavailable": "[log] 服務暫不可用，繼續等待... ({seconds}s)",
+    "pollTimeout": "[error] 輪詢逾時（120s），請手動檢查伺服器狀態"
   },
   "withdrawals": {
     "title": "提現審核",

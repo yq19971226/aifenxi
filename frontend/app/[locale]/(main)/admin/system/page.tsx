@@ -69,7 +69,7 @@ export default function AdminSystemPage() {
   }, [refreshCountdown]);
 
   const pollFinalResult = useCallback(async () => {
-    setLogs((prev) => [...prev, "[log] SSE 连接中断（后端正在重启），轮询最终结果..."]);
+    setLogs((prev) => [...prev, t("systemMgmt.pollSseDisconnected")]);
     for (let i = 0; i < 24; i++) {
       await new Promise((r) => setTimeout(r, 5000));
       try {
@@ -80,23 +80,23 @@ export default function AdminSystemPage() {
           setLogs((prev) => [
             ...prev,
             ok
-              ? `[done] 部署成功 (版本 ${st.last_deploy?.commit})`
-              : "[error] 部署失败，请检查服务器日志",
+              ? t("systemMgmt.pollDeploySuccess", { commit: st.last_deploy?.commit ?? "?" })
+              : t("systemMgmt.pollDeployFailed"),
           ]);
           setDeploying(false);
           queryClient.invalidateQueries({ queryKey: ["admin-system-status"] });
           if (ok) setRefreshCountdown(8);
           return;
         }
-        setLogs((prev) => [...prev, `[log] 部署仍在进行中... (${(i + 1) * 5}s)`]);
+        setLogs((prev) => [...prev, t("systemMgmt.pollStillDeploying", { seconds: (i + 1) * 5 })]);
       } catch {
-        setLogs((prev) => [...prev, `[log] 服务暂不可用，继续等待... (${(i + 1) * 5}s)`]);
+        setLogs((prev) => [...prev, t("systemMgmt.pollServiceUnavailable", { seconds: (i + 1) * 5 })]);
       }
     }
-    setLogs((prev) => [...prev, "[error] 轮询超时（120s），请手动检查服务器状态"]);
+    setLogs((prev) => [...prev, t("systemMgmt.pollTimeout")]);
     setDeployResult("error");
     setDeploying(false);
-  }, [queryClient]);
+  }, [queryClient, t]);
 
   const handleAction = useCallback(async (targetCommit?: string) => {
     if (deploying) return;

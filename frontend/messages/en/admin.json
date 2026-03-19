@@ -819,7 +819,13 @@
     "failed": "Failed",
     "elapsed": "Elapsed {seconds}s",
     "version": "Version {commit}",
-    "unknownError": "Unknown error"
+    "unknownError": "Unknown error",
+    "pollSseDisconnected": "[log] SSE disconnected (backend restarting), polling final result...",
+    "pollDeploySuccess": "[done] Deploy successful (version {commit})",
+    "pollDeployFailed": "[error] Deploy failed, please check server logs",
+    "pollStillDeploying": "[log] Deploy still in progress... ({seconds}s)",
+    "pollServiceUnavailable": "[log] Service unavailable, continue waiting... ({seconds}s)",
+    "pollTimeout": "[error] Poll timeout (120s), please manually check server status"
   },
   "withdrawals": {
     "title": "Withdrawal Review",
