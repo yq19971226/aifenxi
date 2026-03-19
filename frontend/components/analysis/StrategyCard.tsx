@@ -80,11 +80,11 @@ export function StrategyRangeBar({
           style={{ left: `${pct(entryHigh)}%` }}
         />
         {/* Target markers */}
-        {targets.map((t, i) => (
+        {targets.map((tp, i) => (
           <div
             key={i}
             className="absolute top-0 h-full w-[2px] bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"
-            style={{ left: `${pct(t)}%` }}
+            style={{ left: `${pct(tp)}%` }}
           >
             <span className="absolute bottom-1 left-2 text-[11px] font-mono font-bold text-emerald-400 whitespace-nowrap bg-black/60 px-1 rounded">
               T{i + 1}
