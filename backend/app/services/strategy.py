@@ -96,6 +96,9 @@ class StrategyService:
                 stop_loss = price * 0.95
             if entry_low > price:
                 entry_low = price * 0.98
+            # 关键：止损必须在入场区间下方（不能在区间内部）
+            if stop_loss >= entry_low:
+                stop_loss = entry_low * 0.97
             targets = sorted([t for t in targets if t > price])
             fallback = [price * 1.03, price * 1.06, price * 1.10]
             while len(targets) < 3:
@@ -105,6 +108,9 @@ class StrategyService:
                 stop_loss = price * 1.05
             if entry_high < price:
                 entry_high = price * 1.02
+            # 关键：止损必须在入场区间上方（不能在区间内部）
+            if stop_loss <= entry_high:
+                stop_loss = entry_high * 1.03
             targets = sorted([t for t in targets if t < price], reverse=True)
             fallback = [price * 0.97, price * 0.94, price * 0.90]
             while len(targets) < 3:
