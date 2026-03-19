@@ -223,7 +223,7 @@ export default function TasksPage() {
                     <div className="bg-black/40 border border-white/[0.05] p-6 lg:p-8">
                       {!step2Done ? (
                         <div className="flex flex-col items-center justify-center py-8">
-                          <p className="text-sm font-sans text-zinc-400 mb-8 text-center max-w-sm leading-relaxed">任务模板已选定。Axiom V5 引擎将为您单独生成带有追踪码的高级分析海报与文案用于社交分享。</p>
+                          <p className="text-sm font-sans text-zinc-400 mb-8 text-center max-w-sm leading-relaxed">{t('today.step2Desc')}</p>
                           <button onClick={() => genPromo()} disabled={promoLoading} className="relative overflow-hidden group flex items-center gap-3 border border-indigo-500/50 bg-indigo-500/10 px-8 py-4 text-[11px] font-black font-mono text-indigo-400 uppercase tracking-[0.2em] hover:bg-indigo-500 hover:text-white hover:border-indigo-400 disabled:opacity-40 transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)]">
                             <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-indigo-500/20 to-indigo-500/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
                             <Sparkles size={16} className="group-hover:scale-110 transition-transform" />
@@ -263,7 +263,7 @@ export default function TasksPage() {
                   {/* STEP 3: Submit PoW */}
                   <StepContainer step={3} title={t('today.step3')} isActive={step2Done} isDone={false} isLast={true}>
                     <div className="bg-black/40 border border-white/[0.05] p-6 lg:p-8">
-                       <p className="text-xs text-zinc-400 font-sans mb-8">请将您的公开推文链接以及包含浏览量的页面截图链接填入下方。审核将由分布式引擎在一定延迟后验证。</p>
+                       <p className="text-xs text-zinc-400 font-sans mb-8">{t('today.step3Desc')}</p>
                        <div className="space-y-6">
                         <div>
                           <label className="mb-2 flex items-center gap-2 text-[10px] font-bold font-mono text-zinc-400 uppercase tracking-[0.2em]"><ExternalLink size={12} className="text-zinc-500" />{t('today.postUrl')}</label>

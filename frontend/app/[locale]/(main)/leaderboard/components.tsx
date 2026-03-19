@@ -269,7 +269,7 @@ export function RankingTable({
                     <span className="text-[10px] font-black font-mono text-zinc-500 w-6 text-center">{entry.rank}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-white font-mono truncate tracking-wider">{entry.anonymous_id}</p>
-                      {isMe && <span className="text-[8px] font-black font-mono text-indigo-400 uppercase tracking-widest leading-none mt-1 inline-block">YOU / 当前</span>}
+                      {isMe && <span className="text-[8px] font-black font-mono text-indigo-400 uppercase tracking-widest leading-none mt-1 inline-block">{t("comp.me")}</span>}
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-2 border-t border-white/5 pt-3">

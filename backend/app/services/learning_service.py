@@ -315,7 +315,7 @@ class LearningService:
             "recommended": {
                 "signal_threshold": {"min": 0.1, "max": 0.8, "default": 0.35},
                 "min_agreement": {"min": 1, "max": 4, "default": 2},
-                "min_confidence": {"min": 0.0, "max": 0.9, "default": 0.40},
+                "min_confidence": {"min": 0.0, "max": 0.9, "default": 0.50},
             },
         }
 
