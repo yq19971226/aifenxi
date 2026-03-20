@@ -7,8 +7,9 @@ import {
   getStatusReasonLabel,
 } from "@/lib/payment-status";
 import { OrderSyncButton } from "@/components/admin/orders/OrderSyncButton";
+import { useTranslations } from "next-intl";
 
-const PLAN_LABEL: Record<number, string> = { 1: "专业", 2: "旗舰" };
+// PLAN_LABEL is now handled via i18n inside the component
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString("zh-CN", {
@@ -39,20 +40,25 @@ export function AdminOrdersTable({
   onError,
   onSynced,
 }: AdminOrdersTableProps) {
+  const t = useTranslations("admin.orders.table");
+  const PLAN_LABEL: Record<number, string> = {
+    1: t("planPro"),
+    2: t("planFlagship"),
+  };
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-white/[0.08] text-left text-xs text-zinc-500">
-            <th className="px-5 py-3 font-medium">订单ID</th>
-            <th className="px-5 py-3 font-medium">用户邮箱</th>
-            <th className="px-5 py-3 font-medium">套餐</th>
-            <th className="px-5 py-3 font-medium">金额</th>
-            <th className="px-5 py-3 font-medium">支付网络</th>
-            <th className="px-5 py-3 font-medium">状态</th>
-            <th className="px-5 py-3 font-medium">Provider 诊断</th>
-            <th className="px-5 py-3 font-medium">创建时间</th>
-            {isAdmin && <th className="px-5 py-3 font-medium">操作</th>}
+            <th className="px-5 py-3 font-medium">{t("orderId")}</th>
+            <th className="px-5 py-3 font-medium">{t("userEmail")}</th>
+            <th className="px-5 py-3 font-medium">{t("plan")}</th>
+            <th className="px-5 py-3 font-medium">{t("amount")}</th>
+            <th className="px-5 py-3 font-medium">{t("paymentNetwork")}</th>
+            <th className="px-5 py-3 font-medium">{t("status")}</th>
+            <th className="px-5 py-3 font-medium">{t("providerDiag")}</th>
+            <th className="px-5 py-3 font-medium">{t("createdAt")}</th>
+            {isAdmin && <th className="px-5 py-3 font-medium">{t("action")}</th>}
           </tr>
         </thead>
         <tbody>

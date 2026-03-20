@@ -57,5 +57,24 @@
   "error": {
     "loadFailed": "加載性能數據失敗",
     "exportFailed": "導出失敗"
+  },
+  "summary": {
+    "title": "策略績效",
+    "winRate": "勝率",
+    "totalStrategies": "總策略數",
+    "settled": "已結算",
+    "profitLossRatio": "盈虧比",
+    "avgProfit": "平均盈利",
+    "avgLoss": "平均虧損",
+    "upgradeToUnlock": "升級解鎖"
+  },
+  "agentAccuracy": {
+    "title": "智慧體準確率排行",
+    "agents": {
+      "technical": "技術分析",
+      "onchain": "鏈上解讀",
+      "adversarial": "對抗推演",
+      "risk": "風險預警"
+    }
   }
 }

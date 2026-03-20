@@ -99,5 +99,13 @@
     "neutral": "觀",
     "worthTaking": "值得進場",
     "notWorth": "觀望"
+  },
+  "summary": {
+    "watchedSymbols": "監控幣種",
+    "bullish": "看漲",
+    "bearish": "看跌",
+    "avgConfidence": "平均置信度",
+    "actionable": "可操作",
+    "riskAlert": "風險預警"
   }
 }

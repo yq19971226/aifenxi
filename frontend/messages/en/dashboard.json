@@ -99,5 +99,13 @@
     "neutral": "N",
     "worthTaking": "Worth entry",
     "notWorth": "Wait"
+  },
+  "summary": {
+    "watchedSymbols": "Watched",
+    "bullish": "Bullish",
+    "bearish": "Bearish",
+    "avgConfidence": "Avg Confidence",
+    "actionable": "Actionable",
+    "riskAlert": "Risk Alert"
   }
 }

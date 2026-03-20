@@ -165,7 +165,20 @@
     "prevPage": "上一頁",
     "nextPage": "下一頁",
     "errorFetchFailed": "查詢訂單失敗",
-    "emptyTitle": "暫無訂單資料"
+    "emptyTitle": "暫無訂單資料",
+    "table": {
+      "orderId": "訂單ID",
+      "userEmail": "用戶郵箱",
+      "plan": "套餐",
+      "amount": "金額",
+      "paymentNetwork": "支付網路",
+      "status": "狀態",
+      "providerDiag": "Provider 診斷",
+      "createdAt": "建立時間",
+      "action": "操作",
+      "planPro": "專業",
+      "planFlagship": "旗艦"
+    }
   },
   "announcements": {
     "noAccess": "無權限存取公告管理",

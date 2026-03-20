@@ -18,7 +18,6 @@
       "operators": "Operators",
       "orders": "Orders",
       "notifications": "Notifications",
-
       "announcements": "Announcements",
       "playbookReview": "Playbook Review",
       "taskReview": "Task Review",
@@ -167,7 +166,20 @@
     "prevPage": "Previous",
     "nextPage": "Next",
     "errorFetchFailed": "Failed to fetch orders",
-    "emptyTitle": "No orders yet"
+    "emptyTitle": "No orders yet",
+    "table": {
+      "orderId": "Order ID",
+      "userEmail": "User Email",
+      "plan": "Plan",
+      "amount": "Amount",
+      "paymentNetwork": "Network",
+      "status": "Status",
+      "providerDiag": "Provider Diag",
+      "createdAt": "Created At",
+      "action": "Action",
+      "planPro": "Pro",
+      "planFlagship": "Flagship"
+    }
   },
   "announcements": {
     "noAccess": "No permission to manage announcements",
@@ -477,16 +489,46 @@
     "analysisModesDesc": "System auto-selects analysis mode based on market conditions and dispatches agents accordingly",
     "agentsCountLabel": "{count} agents",
     "agents": {
-      "technical": { "name": "Technical Analysis", "desc": "Candlestick patterns, indicators, support/resistance" },
-      "onchain": { "name": "On-chain Data", "desc": "Fund flows, exchange inflows/outflows, miner reserves" },
-      "sentiment": { "name": "Sentiment Analysis", "desc": "Fear-greed index, social heat, traffic trends" },
-      "orderbook": { "name": "Order Book", "desc": "Bid/ask depth, large orders, limit prices" },
-      "risk": { "name": "Risk Assessment", "desc": "Position risk, stop-loss advice, risk-reward ratio" },
-      "news_analyst": { "name": "News Analysis", "desc": "Global crypto news, regulatory impact" },
-      "calendar": { "name": "Calendar Events", "desc": "Token unlocks, listings, halving impact" },
-      "reflection": { "name": "Reflection", "desc": "Historical accuracy review, continuous improvement" },
-      "adversarial": { "name": "Adversarial Simulation", "desc": "Market maker perspective, counter-strategy" },
-      "collusion_detector": { "name": "Collusion Detection", "desc": "Wash trading, pump coordination, manipulation" }
+      "technical": {
+        "name": "Technical Analysis",
+        "desc": "Candlestick patterns, indicators, support/resistance"
+      },
+      "onchain": {
+        "name": "On-chain Data",
+        "desc": "Fund flows, exchange inflows/outflows, miner reserves"
+      },
+      "sentiment": {
+        "name": "Sentiment Analysis",
+        "desc": "Fear-greed index, social heat, traffic trends"
+      },
+      "orderbook": {
+        "name": "Order Book",
+        "desc": "Bid/ask depth, large orders, limit prices"
+      },
+      "risk": {
+        "name": "Risk Assessment",
+        "desc": "Position risk, stop-loss advice, risk-reward ratio"
+      },
+      "news_analyst": {
+        "name": "News Analysis",
+        "desc": "Global crypto news, regulatory impact"
+      },
+      "calendar": {
+        "name": "Calendar Events",
+        "desc": "Token unlocks, listings, halving impact"
+      },
+      "reflection": {
+        "name": "Reflection",
+        "desc": "Historical accuracy review, continuous improvement"
+      },
+      "adversarial": {
+        "name": "Adversarial Simulation",
+        "desc": "Market maker perspective, counter-strategy"
+      },
+      "collusion_detector": {
+        "name": "Collusion Detection",
+        "desc": "Wash trading, pump coordination, manipulation"
+      }
     },
     "phases": {
       "core": "Core",
@@ -671,12 +713,30 @@
     },
     "quickActions": {
       "title": "Quick Actions",
-      "userMgmt": { "label": "User Management", "desc": "Search / Ban / Adjust tier" },
-      "apiKeys": { "label": "API Keys", "desc": "Manage third-party keys" },
-      "datasources": { "label": "Data Sources", "desc": "Toggle data sources" },
-      "monitor": { "label": "System Monitor", "desc": "Agents / Orchestrator" },
-      "models": { "label": "Model Assignment", "desc": "Switch model mapping" },
-      "configs": { "label": "Parameters", "desc": "Runtime parameters" }
+      "userMgmt": {
+        "label": "User Management",
+        "desc": "Search / Ban / Adjust tier"
+      },
+      "apiKeys": {
+        "label": "API Keys",
+        "desc": "Manage third-party keys"
+      },
+      "datasources": {
+        "label": "Data Sources",
+        "desc": "Toggle data sources"
+      },
+      "monitor": {
+        "label": "System Monitor",
+        "desc": "Agents / Orchestrator"
+      },
+      "models": {
+        "label": "Model Assignment",
+        "desc": "Switch model mapping"
+      },
+      "configs": {
+        "label": "Parameters",
+        "desc": "Runtime parameters"
+      }
     },
     "activity": {
       "title": "System Activity",
@@ -910,12 +970,30 @@
       "down": "Down"
     },
     "services": {
-      "api":   { "label": "API Service",   "detail": "Response < 200ms" },
-      "db":    { "label": "Database",      "detail": "PostgreSQL Pool 12/50" },
-      "redis": { "label": "Redis Cache",   "detail": "Memory 128MB / 512MB" },
-      "ws":    { "label": "WebSocket",     "detail": "Active Connections 24" },
-      "cpu":   { "label": "CPU Usage",     "detail": "4 Cores / 8GB" },
-      "llm":   { "label": "LLM Gateway",  "detail": "DMXAPI Reachable" }
+      "api": {
+        "label": "API Service",
+        "detail": "Response < 200ms"
+      },
+      "db": {
+        "label": "Database",
+        "detail": "PostgreSQL Pool 12/50"
+      },
+      "redis": {
+        "label": "Redis Cache",
+        "detail": "Memory 128MB / 512MB"
+      },
+      "ws": {
+        "label": "WebSocket",
+        "detail": "Active Connections 24"
+      },
+      "cpu": {
+        "label": "CPU Usage",
+        "detail": "4 Cores / 8GB"
+      },
+      "llm": {
+        "label": "LLM Gateway",
+        "detail": "DMXAPI Reachable"
+      }
     },
     "metrics": {
       "ok": "OK",

@@ -57,5 +57,24 @@
   "error": {
     "loadFailed": "绩效数据加载失败",
     "exportFailed": "导出失败"
+  },
+  "summary": {
+    "title": "策略绩效",
+    "winRate": "胜率",
+    "totalStrategies": "总策略数",
+    "settled": "已结算",
+    "profitLossRatio": "盈亏比",
+    "avgProfit": "平均盈利",
+    "avgLoss": "平均亏损",
+    "upgradeToUnlock": "升级解锁"
+  },
+  "agentAccuracy": {
+    "title": "智能体准确率排行",
+    "agents": {
+      "technical": "技术分析",
+      "onchain": "链上解读",
+      "adversarial": "对抗推演",
+      "risk": "风险预警"
+    }
   }
 }

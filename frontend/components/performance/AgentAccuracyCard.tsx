@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { EmptyPerformance } from "@/components/ui/EmptyState";
 
 // ── Props ────────────────────────────────────────────────────
@@ -12,21 +13,12 @@ export interface AgentAccuracyCardProps {
 
 // ── Constants ────────────────────────────────────────────────
 
-const AGENT_LABELS: Record<string, string> = {
-  technical: "技术分析",
-  onchain: "链上解读",
-  adversarial: "对抗推演",
-  risk: "风险预警",
-};
+// AGENT_LABELS is now sourced from i18n inside the component
 
 const BAR_COLOR = "rgb(99,102,241)";
 const BAR_BG = "rgba(255,255,255,0.06)";
 
 // ── Helpers ──────────────────────────────────────────────────
-
-function agentLabel(agentId: string): string {
-  return AGENT_LABELS[agentId] ?? agentId;
-}
 
 function accuracyColor(accuracy: number): string {
   if (accuracy >= 70) return "text-emerald-400";
@@ -42,6 +34,12 @@ interface RankedAgent {
 // ── Component ────────────────────────────────────────────────
 
 export function AgentAccuracyCard({ byAgent }: AgentAccuracyCardProps) {
+  const t = useTranslations("performance.agentAccuracy");
+
+  function agentLabel(agentId: string): string {
+    const agents = t.raw("agents") as Record<string, string>;
+    return agents[agentId] ?? agentId;
+  }
   const ranked: RankedAgent[] = useMemo(() => {
     return Object.entries(byAgent)
       .map(([id, accuracy]) => ({ id, accuracy }))
@@ -61,7 +59,7 @@ export function AgentAccuracyCard({ byAgent }: AgentAccuracyCardProps) {
       transition={{ duration: 0.4, delay: 0.15 }}
     >
       <p className="mb-4 text-xs font-medium uppercase tracking-widest text-zinc-500">
-        智能体准确率排行
+        {t("title")}
       </p>
 
       {ranked.length === 0 ? (

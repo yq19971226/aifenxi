@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { useNumberFormatter } from "@/lib/i18n/formatters";
 import {
   TrendingUp,
@@ -31,6 +32,7 @@ export function SummaryCardsSkeleton() {
 
 export function SummaryCards({ symbols }: { symbols: SymbolOverview[] }) {
   const { formatNumber, formatPercent } = useNumberFormatter();
+  const t = useTranslations("dashboard.summary");
   
   const stats = useMemo(() => {
     const bullish = symbols.filter((s) => s.direction === "long").length;
@@ -48,42 +50,42 @@ export function SummaryCards({ symbols }: { symbols: SymbolOverview[] }) {
 
   const cards = [
     {
-      label: "监控币种",
+      label: t("watchedSymbols"),
       value: formatNumber(symbols.length, 0),
       icon: Eye,
       color: "text-blue-400",
       bg: "bg-blue-500/[0.08]",
     },
     {
-      label: "看涨",
+      label: t("bullish"),
       value: formatNumber(stats.bullish, 0),
       icon: TrendingUp,
       color: "text-emerald-400",
       bg: "bg-emerald-500/[0.08]",
     },
     {
-      label: "看跌",
+      label: t("bearish"),
       value: formatNumber(stats.bearish, 0),
       icon: TrendingDown,
       color: "text-red-400",
       bg: "bg-red-500/[0.08]",
     },
     {
-      label: "平均置信度",
+      label: t("avgConfidence"),
       value: formatPercent(stats.avgConf, 0),
       icon: BarChart3,
       color: "text-yellow-400",
       bg: "bg-yellow-500/[0.08]",
     },
     {
-      label: "可操作",
+      label: t("actionable"),
       value: formatNumber(stats.actionable, 0),
       icon: Crosshair,
       color: stats.actionable > 0 ? "text-accent" : "text-zinc-500",
       bg: stats.actionable > 0 ? "bg-accent/[0.08]" : "bg-white/[0.04]",
     },
     {
-      label: "风险预警",
+      label: t("riskAlert"),
       value: formatNumber(stats.alerts, 0),
       icon: AlertTriangle,
       color: stats.alerts > 0 ? "text-red-400" : "text-zinc-500",

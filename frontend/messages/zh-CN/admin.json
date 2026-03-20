@@ -165,7 +165,20 @@
     "prevPage": "上一页",
     "nextPage": "下一页",
     "errorFetchFailed": "查询订单失败",
-    "emptyTitle": "暂无订单数据"
+    "emptyTitle": "暂无订单数据",
+    "table": {
+      "orderId": "订单ID",
+      "userEmail": "用户邮箱",
+      "plan": "套餐",
+      "amount": "金额",
+      "paymentNetwork": "支付网络",
+      "status": "状态",
+      "providerDiag": "Provider 诊断",
+      "createdAt": "创建时间",
+      "action": "操作",
+      "planPro": "专业",
+      "planFlagship": "旗舰"
+    }
   },
   "announcements": {
     "noAccess": "无权限访问公告管理",

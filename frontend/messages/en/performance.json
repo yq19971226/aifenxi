@@ -57,5 +57,24 @@
   "error": {
     "loadFailed": "Failed to load performance data",
     "exportFailed": "Export failed"
+  },
+  "summary": {
+    "title": "Strategy Performance",
+    "winRate": "Win Rate",
+    "totalStrategies": "Strategies",
+    "settled": "Settled",
+    "profitLossRatio": "Risk/Reward",
+    "avgProfit": "Avg Profit",
+    "avgLoss": "Avg Loss",
+    "upgradeToUnlock": "Upgrade to unlock"
+  },
+  "agentAccuracy": {
+    "title": "Agent Accuracy Ranking",
+    "agents": {
+      "technical": "Technical",
+      "onchain": "Onchain",
+      "adversarial": "Adversarial",
+      "risk": "Risk Alert"
+    }
   }
 }
