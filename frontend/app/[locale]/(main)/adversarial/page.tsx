@@ -58,33 +58,6 @@ export default function AdversarialPage() {
   const { user } = useAuth();
   const userLevel = effectiveLevel(user);
 
-  // ── 旗舰专属功能，等级不足时显示升级引导 ───────────────
-  if (userLevel < 2) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-        <div className="max-w-md w-full text-center">
-          <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-[#F5A623]/10 border border-[#F5A623]/20 mx-auto mb-6">
-            <Swords size={28} className="text-[#F5A623]" />
-          </div>
-          <h2 className="text-xl font-black font-mono uppercase tracking-widest text-white mb-3">
-            AI 对抗推演
-          </h2>
-          <p className="text-sm text-zinc-400 leading-relaxed mb-2">
-            基于 DeepSeek R1 + Claude Sonnet 双模型对抗推演，识别主力操盘、合谋、逆空逼多信号。
-          </p>
-          <p className="text-xs text-zinc-600 font-mono mb-8">旗舰专属 · Flagship Only</p>
-          <Link
-            href={`/${locale}/settings/membership`}
-            className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-[#F5A623] hover:bg-[#f0a010] text-black font-black font-mono uppercase tracking-widest text-sm py-3.5 transition-all shadow-[0_0_20px_rgba(245,166,35,0.25)] hover:shadow-[0_0_30px_rgba(245,166,35,0.4)]"
-          >
-            升级旗舰解锁
-          </Link>
-          <p className="mt-4 text-[10px] text-zinc-700 font-mono">当前等级：{['免费','专业','旗舰'][userLevel] ?? '免费'}</p>
-        </div>
-      </div>
-    );
-  }
-
   const searchParams = useSearchParams();
   const initialSymbol = searchParams.get("symbol") || "BTCUSDT";
   const [symbol, setSymbol] = useState(initialSymbol);
@@ -119,6 +92,33 @@ export default function AdversarialPage() {
     const interval = setInterval(() => fetchData(symbol), 60_000);
     return () => clearInterval(interval);
   }, [symbol, fetchData]);
+
+  // ── 旗舰专属功能，等级不足时显示升级引导 ───────────────
+  if (userLevel < 2) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+        <div className="max-w-md w-full text-center">
+          <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-[#F5A623]/10 border border-[#F5A623]/20 mx-auto mb-6">
+            <Swords size={28} className="text-[#F5A623]" />
+          </div>
+          <h2 className="text-xl font-black font-mono uppercase tracking-widest text-white mb-3">
+            AI 对抗推演
+          </h2>
+          <p className="text-sm text-zinc-400 leading-relaxed mb-2">
+            基于 DeepSeek R1 + Claude Sonnet 双模型对抗推演，识别主力操盘、合谋、逆空逼多信号。
+          </p>
+          <p className="text-xs text-zinc-600 font-mono mb-8">旗舰专属 · Flagship Only</p>
+          <Link
+            href={`/${locale}/settings/membership`}
+            className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-[#F5A623] hover:bg-[#f0a010] text-black font-black font-mono uppercase tracking-widest text-sm py-3.5 transition-all shadow-[0_0_20px_rgba(245,166,35,0.25)] hover:shadow-[0_0_30px_rgba(245,166,35,0.4)]"
+          >
+            升级旗舰解锁
+          </Link>
+          <p className="mt-4 text-[10px] text-zinc-700 font-mono">当前等级：{['免费','专业','旗舰'][userLevel] ?? '免费'}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (featureState !== "active") {
     return <MaintenancePlaceholder featureName="AI 对抗推演" />;
