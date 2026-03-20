@@ -1,56 +1,56 @@
 {
   "site": {
-    "title": "AXIOM Insight - Market Maker AI Analysis Platform",
-    "description": "Multi-agent collaborative analysis of market maker behavior, cutting through noise with technicals, on-chain data, derivatives, and sentiment",
-    "og_title": "AXIOM Insight - Market Maker AI Analysis Platform",
-    "og_description": "AI-powered multi-agent analysis of market maker behavior — multi-dimensional insights to support your trading decisions"
+    "title": "AXIOM Insight - Crypto AI Analysis | Market Maker Behavior Detection",
+    "description": "AXIOM Insight uses multi-agent AI to detect market maker and whale behavior in crypto. Real-time on-chain data, derivatives flow, sentiment analysis for BTC, ETH, SOL and more.",
+    "og_title": "AXIOM Insight — AI-Powered Crypto Market Maker Analysis",
+    "og_description": "Multi-agent AI detects market maker manipulation, whale accumulation, and smart money flows. Make informed crypto trading decisions with AXIOM Insight."
   },
   "dashboard": {
-    "title": "Dashboard - AXIOM Insight",
-    "description": "Multi-asset AI analysis overview, real-time market signal monitoring"
+    "title": "Dashboard — Real-Time AI Crypto Analysis | AXIOM Insight",
+    "description": "Monitor BTC, ETH, SOL and top crypto assets with real-time AI signals, on-chain flows, and market regime detection on a single dashboard."
   },
   "consensus": {
-    "title": "Consensus Analysis - AXIOM Insight",
-    "description": "Multi-agent consensus analysis with AI multi-dimensional research"
+    "title": "AI Consensus Analysis — Multi-Agent Crypto Signal | AXIOM Insight",
+    "description": "Get consensus signals from multiple specialized AI agents analyzing technicals, on-chain data, derivatives, and market sentiment simultaneously."
   },
   "alerts": {
-    "title": "Alert Rules - AXIOM Insight",
-    "description": "Custom price alerts and risk monitoring rules"
+    "title": "Price Alerts & Risk Monitoring — AXIOM Insight",
+    "description": "Set custom price alerts and AI-powered risk monitoring rules for crypto assets. Get notified before major market moves."
   },
   "performance": {
-    "title": "Strategy Performance - AXIOM Insight",
-    "description": "AI strategy historical performance and win rate statistics"
+    "title": "AI Strategy Performance & Win Rate — AXIOM Insight",
+    "description": "Track historical performance, win rates, and signal accuracy of AI-generated crypto trading strategies on AXIOM Insight."
   },
   "playbook": {
-    "title": "Playbook Simulation - AXIOM Insight",
-    "description": "Market maker playbook simulation and counter-strategy reasoning"
+    "title": "Market Maker Playbook Simulation — AXIOM Insight",
+    "description": "Simulate market maker manipulation playbooks and generate counter-strategies using AI. Understand how whales orchestrate price movements."
   },
   "backtest": {
-    "title": "Backtest - AXIOM Insight",
-    "description": "Strategy historical backtesting and validation"
+    "title": "Strategy Backtesting — Crypto AI Signal Validation | AXIOM Insight",
+    "description": "Backtest AI-generated crypto trading strategies against historical data. Validate signals before risking real capital."
   },
   "leaderboard": {
-    "title": "Leaderboard - AXIOM Insight",
-    "description": "Strategy performance rankings and community signals"
+    "title": "Crypto Strategy Leaderboard — AXIOM Insight",
+    "description": "Explore top-performing AI strategy signals, ranked by accuracy and profit factor across different market conditions."
   },
   "settings": {
-    "title": "Settings - AXIOM Insight",
-    "description": "Account settings and preference management"
+    "title": "Account Settings — AXIOM Insight",
+    "description": "Manage your AXIOM Insight account settings, notification preferences, and API access."
   },
   "partner": {
-    "title": "Partner - AXIOM Insight",
-    "description": "Partner program and referral rewards"
+    "title": "Partner Program — Earn with AXIOM Insight",
+    "description": "Join the AXIOM Insight partner program and earn commission by referring traders to our AI-powered crypto analysis platform."
   },
   "tasks": {
-    "title": "Task Center - AXIOM Insight",
-    "description": "Daily tasks and rewards"
+    "title": "Daily Tasks & Rewards — AXIOM Insight",
+    "description": "Complete daily tasks and earn rewards on AXIOM Insight's AI crypto analysis platform."
   },
   "login": {
-    "title": "Login - AXIOM Insight",
-    "description": "Login to AXIOM Insight market maker AI analysis platform"
+    "title": "Login — AXIOM Insight | AI Crypto Market Maker Analysis",
+    "description": "Sign in to AXIOM Insight to access real-time AI-powered market maker behavior analysis, on-chain signals, and smart money tracking."
   },
   "guide": {
-    "title": "User Guide - AXIOM Insight",
-    "description": "Step-by-step guide to using AXIOM Insight for market maker behavior analysis"
+    "title": "User Guide — How to Use AXIOM Insight for Crypto Analysis",
+    "description": "Step-by-step guide to using AXIOM Insight: from reading AI signals and on-chain data to understanding market maker behavior and executing smarter trades."
   }
 }

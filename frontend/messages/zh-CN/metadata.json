@@ -1,56 +1,56 @@
 {
   "site": {
-    "title": "AXIOM洞察 - 庄家行为 AI 多维分析平台",
-    "description": "多智能体协同分析庄家行为，穿透市场噪音，从技术面、链上数据、合约市场、市场情绪等维度提供综合判断参考",
-    "og_title": "AXIOM洞察 - 庄家行为 AI 多维分析平台",
-    "og_description": "多 AI 智能体协同分析庄家行为，穿透市场噪音，洞察主力动向，为你的交易决策提供多维参考"
+    "title": "AXIOM洞察 - 加密货币庄家行为 AI 分析平台 | 链上数据实时监控",
+    "description": "AXIOM洞察多智能体 AI 协同侦测加密市场庄家行为、巨鲸动向，融合技术面、链上数据、合约市场、市场情绪，为比特币、以太坊等主流币种提供实时交易参考。",
+    "og_title": "AXIOM洞察 — AI 多维分析庄家行为，洞察加密市场主力动向",
+    "og_description": "多 AI 智能体协同分析庄家操盘、巨鲸流向与聪明钱动态，链上数据实时追踪 BTC、ETH、SOL，助你在加密交易中做出更明智的决策。"
   },
   "dashboard": {
-    "title": "概览 - AXIOM洞察",
-    "description": "多币种 AI 分析概览，实时监控市场信号"
+    "title": "概览 — 实时 AI 加密分析信号 | AXIOM洞察",
+    "description": "一屏掌握 BTC、ETH、SOL 等主流币种的 AI 信号、链上资金流向与市场状态，实时监控庄家行为动态。"
   },
   "consensus": {
-    "title": "综合分析 - AXIOM洞察",
-    "description": "多智能体共识分析，AI 多维度精准研判"
+    "title": "多智能体共识分析 — AI 协同研判加密市场 | AXIOM洞察",
+    "description": "技术面、链上数据、衍生品、市场情绪四维同步分析，多 AI 智能体给出统一研判方向，减少主观偏差。"
   },
   "alerts": {
-    "title": "预警规则 - AXIOM洞察",
-    "description": "自定义价格预警和风险监控规则"
+    "title": "价格预警与风险监控 — AXIOM洞察",
+    "description": "自定义加密资产价格预警规则，AI 实时监控异常链上动向和合约市场风险，提前收到关键信号提示。"
   },
   "performance": {
-    "title": "策略绩效 - AXIOM洞察",
-    "description": "AI 策略历史表现和胜率统计"
+    "title": "AI 策略绩效与胜率统计 — AXIOM洞察",
+    "description": "追踪 AXIOM洞察 AI 策略信号的历史表现、胜率和盈亏比，验证信号质量，评估策略可靠性。"
   },
   "playbook": {
-    "title": "剧本推演 - AXIOM洞察",
-    "description": "庄家操盘剧本推演与反制策略模拟"
+    "title": "庄家剧本推演与反制策略 — AXIOM洞察",
+    "description": "模拟庄家洗盘、拉升、砸盘等常见操盘剧本，AI 自动生成应对策略，识破主力布局套路。"
   },
   "backtest": {
-    "title": "回测 - AXIOM洞察",
-    "description": "策略历史回测和验证"
+    "title": "策略历史回测验证 — 加密 AI 信号回测 | AXIOM洞察",
+    "description": "用历史数据回测 AI 生成的加密交易策略，验证信号有效性，降低实盘风险。"
   },
   "leaderboard": {
-    "title": "排行榜 - AXIOM洞察",
-    "description": "策略绩效排行和社区信号"
+    "title": "加密策略绩效排行榜 — AXIOM洞察",
+    "description": "探索 AI 策略信号排行，按准确率、盈利因子排序，发现在不同市场环境下表现最优的分析策略。"
   },
   "settings": {
-    "title": "设置 - AXIOM洞察",
-    "description": "账户设置和偏好管理"
+    "title": "账户设置 — AXIOM洞察",
+    "description": "管理 AXIOM洞察账户设置、通知偏好和 API 访问权限。"
   },
   "partner": {
-    "title": "合伙人 - AXIOM洞察",
-    "description": "合伙人计划和推荐奖励"
+    "title": "合伙人计划 — 推广 AXIOM洞察赚取佣金",
+    "description": "加入 AXIOM洞察合伙人计划，邀请交易者使用 AI 加密分析平台，赚取推荐奖励。"
   },
   "tasks": {
-    "title": "任务中心 - AXIOM洞察",
-    "description": "每日任务和奖励"
+    "title": "每日任务与奖励 — AXIOM洞察",
+    "description": "完成每日任务获取奖励，提升在 AXIOM洞察 AI 加密分析平台上的使用权益。"
   },
   "login": {
-    "title": "登录 - AXIOM洞察",
-    "description": "登录 AXIOM洞察 庄家行为 AI 多维分析平台"
+    "title": "登录 — AXIOM洞察 | 加密货币庄家行为 AI 分析",
+    "description": "登录 AXIOM洞察，获取实时 AI 庄家行为分析、链上信号追踪与聪明钱动向监控。"
   },
   "guide": {
-    "title": "使用指南 - AXIOM洞察",
-    "description": "从注册到实战，手把手教你用 AXIOM洞察 分析庄家行为"
+    "title": "使用指南 — 如何用 AXIOM洞察 分析加密市场",
+    "description": "从注册到实战，手把手教你读懂 AI 信号、链上数据和庄家操盘逻辑，用 AXIOM洞察 做出更聪明的加密交易决策。"
   }
 }
