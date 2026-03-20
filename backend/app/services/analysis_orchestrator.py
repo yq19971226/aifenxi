@@ -1513,6 +1513,13 @@ class AnalysisOrchestrator:
         )
         confidence = confidence * trial_penalty
 
+        # ── 操盘阶段 → 信号置信度修正 ──────────────────────
+        # 阶段与信号方向一致时适当提升，相悖时降权，真正让 Phase 参与决策
+        _phase_val = current_phase.value if current_phase else None
+        if _phase_val:
+            from app.services.level_calibrator import apply_phase_confidence_modifier
+            signal, confidence = apply_phase_confidence_modifier(signal, confidence, _phase_val)
+
         # 宏观事件：高紧急度事件降低整体置信度
         if macro_result and macro_result.confidence_modifier < 1.0:
             confidence = confidence * macro_result.confidence_modifier
@@ -1604,6 +1611,32 @@ class AnalysisOrchestrator:
                 )
                 try:
                     strategy = await self._point_snapper.snap(strategy, symbol)
+                    # ── 结构点位精准校准：FVG / OB / VP ──────────────────
+                    # 让计算出来的 FVG/OB/VP 数据真正影响进场止损目标，而非仅展示
+                    try:
+                        from app.services.level_calibrator import calibrate_strategy_levels
+                        (
+                            strategy.entry_low,
+                            strategy.entry_high,
+                            strategy.stop_loss,
+                            strategy.targets,
+                            _struct_fields,
+                        ) = calibrate_strategy_levels(
+                            direction=strategy.direction,
+                            entry_low=strategy.entry_low,
+                            entry_high=strategy.entry_high,
+                            stop_loss=strategy.stop_loss,
+                            targets=strategy.targets,
+                            current_price=market_data.current_price,
+                            fvg_list=fvg_results,
+                            ob_list=ob_results,
+                            vp_data=vp_data,
+                            atr=_atr,
+                        )
+                        # 记录校准字段（追加到 snapped_fields）
+                        strategy.snapped_fields = (strategy.snapped_fields or []) + _struct_fields
+                    except Exception as _cal_exc:
+                        logger.warning("结构点位校准失败，使用原始点位: %s", _cal_exc)
                     await set_with_ttl(
                         f"strategy:latest:{symbol.upper()}",
                         strategy.model_dump(mode="json"),
@@ -2142,6 +2175,12 @@ class AnalysisOrchestrator:
         if macro_result and macro_result.confidence_modifier < 1.0:
             confidence = confidence * macro_result.confidence_modifier
 
+        # ── 操盘阶段 → 信号置信度修正 ──────────────────────
+        _phase_val_t = current_phase.value if current_phase else None
+        if _phase_val_t and signal != "neutral":
+            from app.services.level_calibrator import apply_phase_confidence_modifier
+            signal, confidence = apply_phase_confidence_modifier(signal, confidence, _phase_val_t)
+
         # AI 加速操盘
         if accel_warning and accel_warning.is_accelerated:
             confidence = confidence * 0.8
@@ -2233,6 +2272,29 @@ class AnalysisOrchestrator:
                 )
                 try:
                     strategy = await self._point_snapper.snap(strategy, symbol)
+                    try:
+                        from app.services.level_calibrator import calibrate_strategy_levels
+                        (
+                            strategy.entry_low,
+                            strategy.entry_high,
+                            strategy.stop_loss,
+                            strategy.targets,
+                            _struct_fields,
+                        ) = calibrate_strategy_levels(
+                            direction=strategy.direction,
+                            entry_low=strategy.entry_low,
+                            entry_high=strategy.entry_high,
+                            stop_loss=strategy.stop_loss,
+                            targets=strategy.targets,
+                            current_price=market_data.current_price,
+                            fvg_list=fvg_results,
+                            ob_list=ob_results,
+                            vp_data=vp_data,
+                            atr=_atr,
+                        )
+                        strategy.snapped_fields = (strategy.snapped_fields or []) + _struct_fields
+                    except Exception as _ce:
+                        logger.warning("趋势策略结构点位校准失败: %s", _ce)
                     await set_with_ttl(
                         f"strategy:latest:{symbol.upper()}",
                         strategy.model_dump(mode="json"),
@@ -2250,6 +2312,25 @@ class AnalysisOrchestrator:
                     strategy = self._strategy_svc.generate_from_report(primary_report, current_price=market_data.current_price)
                     try:
                         strategy = await self._point_snapper.snap(strategy, symbol)
+                        try:
+                            from app.services.level_calibrator import calibrate_strategy_levels
+                            (
+                                strategy.entry_low, strategy.entry_high,
+                                strategy.stop_loss, strategy.targets, _sf,
+                            ) = calibrate_strategy_levels(
+                                direction=strategy.direction,
+                                entry_low=strategy.entry_low,
+                                entry_high=strategy.entry_high,
+                                stop_loss=strategy.stop_loss,
+                                targets=strategy.targets,
+                                current_price=market_data.current_price,
+                                fvg_list=fvg_results,
+                                ob_list=ob_results,
+                                vp_data=vp_data,
+                            )
+                            strategy.snapped_fields = (strategy.snapped_fields or []) + _sf
+                        except Exception as _ce:
+                            logger.warning("趋势回退策略结构点位校准失败: %s", _ce)
                         await set_with_ttl(
                             f"strategy:latest:{symbol.upper()}",
                             strategy.model_dump(mode="json"),
