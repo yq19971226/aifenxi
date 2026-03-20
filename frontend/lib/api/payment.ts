@@ -27,7 +27,7 @@ export interface PaymentInfo {
 export type DurationMonths = 1 | 3 | 12;
 
 interface CreatePaymentRequest {
-  plan: 1 | 2;
+  plan: 1 | 2 | 3 | 4 | 5;  // 1=专业订阅, 2=旗舰订阅, 3=积分包S, 4=积分包M, 5=积分包L
   network: PaymentNetwork;
   duration_months?: DurationMonths;
 }

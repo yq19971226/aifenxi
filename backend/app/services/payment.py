@@ -73,6 +73,58 @@ _DURATION_DISCOUNT_CONFIG_KEYS: dict[int, str] = {
 
 DURATION_DAYS: dict[int, int] = {1: 30, 3: 90, 12: 365}
 
+# ── 积分包配置 ─────────────────────────────────────────────────
+# plan 3 = S档, plan 4 = M档, plan 5 = L档
+# 价格/次数全部走 config，硬编码为兜底默认值
+
+CREDITS_PACK_CONFIG: dict[int, dict] = {
+    3: {
+        "price_key": "credits_pack_s_price",
+        "credits_key": "credits_pack_s_credits",
+        "mode_key": "credits_pack_s_mode",
+        "default_price": 10.0,
+        "default_credits": 130,
+        "default_mode": "scalping",
+        "label": "积分包 S",
+    },
+    4: {
+        "price_key": "credits_pack_m_price",
+        "credits_key": "credits_pack_m_credits",
+        "mode_key": "credits_pack_m_mode",
+        "default_price": 30.0,
+        "default_credits": 420,
+        "default_mode": "scalping",
+        "label": "积分包 M",
+    },
+    5: {
+        "price_key": "credits_pack_l_price",
+        "credits_key": "credits_pack_l_credits",
+        "mode_key": "credits_pack_l_mode",
+        "default_price": 100.0,
+        "default_credits": 1500,
+        "default_mode": "scalping",
+        "label": "积分包 L",
+    },
+}
+
+
+async def _get_credits_pack_info(plan: int) -> dict | None:
+    """从动态配置读取积分包价格/次数/模式，失败时回退默认值。plan in {3,4,5}。"""
+    cfg = CREDITS_PACK_CONFIG.get(plan)
+    if cfg is None:
+        return None
+    try:
+        from app.services.config_service import get_config_value
+        price = float(await get_config_value(cfg["price_key"], str(cfg["default_price"])))
+        credits = int(await get_config_value(cfg["credits_key"], str(cfg["default_credits"])))
+        mode = await get_config_value(cfg["mode_key"], cfg["default_mode"])
+    except Exception:
+        logger.warning("读取积分包配置失败，使用默认值: plan=%d", plan)
+        price = cfg["default_price"]
+        credits = cfg["default_credits"]
+        mode = cfg["default_mode"]
+    return {"price": price, "credits": credits, "mode": mode, "label": cfg["label"]}
+
 
 async def _get_plan_price(plan: int) -> float | None:
     """从动态配置读取套餐月价，失败时回退到硬编码默认值。"""
@@ -142,14 +194,17 @@ def _build_external_order_id(user_id: str) -> str:
 # ── Pydantic 模型 ─────────────────────────────────────────────
 
 class CreatePaymentRequest(BaseModel):
-    """创建支付请求。"""
+    """创建支付请求。plan 1-2 为订阅，plan 3-5 为积分包。"""
 
-    plan: int = Field(..., ge=1, le=2, description="套餐: 1=专业, 2=旗舰")
+    plan: int = Field(
+        ..., ge=1, le=5,
+        description="套餐: 1=专业订阅, 2=旗舰订阅, 3=积分包S, 4=积分包M, 5=积分包L"
+    )
     network: Literal["TRC-20", "ERC-20", "BEP-20"] = Field(
         ..., description="支付网络"
     )
     duration_months: Literal[1, 3, 12] = Field(
-        default=1, description="订阅时长: 1=月付, 3=季付, 12=年付"
+        default=1, description="订阅时长(仅订阅套餐有效): 1=月付, 3=季付, 12=年付"
     )
 
 
@@ -409,16 +464,23 @@ async def create_payment(
 ) -> PaymentInfo:
     """创建 Oxapay 支付订单并写入数据库。
 
-    1. 调用 Oxapay Merchant API 创建发票
-    2. 将支付记录插入 payments 表
-    3. 返回包含支付地址的 PaymentInfo
+    plan 1-2: 订阅套餐（按月/季/年定价）
+    plan 3-5: 积分包（固定价格，无时长概念）
     """
-    monthly_price = await _get_plan_price(request.plan)
-    if monthly_price is None:
-        raise ValueError(f"无效的套餐: {request.plan}")
+    is_credits_pack = request.plan in CREDITS_PACK_CONFIG
 
-    discount = await _get_duration_discount(request.duration_months)
-    amount = round(monthly_price * request.duration_months * discount, 2)
+    if is_credits_pack:
+        pack_info = await _get_credits_pack_info(request.plan)
+        if pack_info is None:
+            raise ValueError(f"无效的积分包套餐: {request.plan}")
+        amount = pack_info["price"]
+    else:
+        monthly_price = await _get_plan_price(request.plan)
+        if monthly_price is None:
+            raise ValueError(f"无效的套餐: {request.plan}")
+        discount = await _get_duration_discount(request.duration_months)
+        amount = round(monthly_price * request.duration_months * discount, 2)
+
     oxapay_network = NETWORK_MAP.get(request.network)
     if oxapay_network is None:
         raise ValueError(f"不支持的网络: {request.network}")
@@ -448,7 +510,6 @@ async def create_payment(
         logger.error("Oxapay API error: %s", exc)
         raise RuntimeError("支付服务异常，请稍后重试")
 
-    # Oxapay V1 返回 { "data": { "track_id": "...", "payment_url": "..." }, "status": 200 }
     resp_data = ox_response.get("data", {})
     payment_id = str(resp_data.get("track_id", ""))
     if not payment_id:
@@ -456,9 +517,8 @@ async def create_payment(
         raise RuntimeError("支付服务返回异常")
 
     payment_url = resp_data.get("payment_url", "")
-    # Invoice 创建时还没有具体 pay_address，需要用户在支付页面选择后才有
     pay_address = ""
-    pay_amount = amount  # 创建时金额就是请求金额
+    pay_amount = amount
 
     create_payload = WebhookPayload(
         track_id=payment_id,
@@ -473,7 +533,8 @@ async def create_payment(
         source="create",
     )
 
-    # 写入数据库
+    # 写入数据库（积分包 duration_months 记为 0 加以区分）
+    duration_months_db = 0 if is_credits_pack else request.duration_months
     try:
         result = await insert_returning(
             session,
@@ -496,7 +557,7 @@ async def create_payment(
                 "plan": request.plan,
                 "amount_usd": amount,
                 "network": request.network,
-                "duration_months": request.duration_months,
+                "duration_months": duration_months_db,
                 **create_audit,
             },
             table="payments",
@@ -616,7 +677,7 @@ async def handle_webhook(
         return
 
     if local_status == "completed":
-        # 支付成功 → 更新状态 + 升级会员（事务内）
+        # 支付成功 → 更新状态，然后按 plan 类型分发
         try:
             await session.execute(
                 text(
@@ -637,29 +698,52 @@ async def handle_webhook(
             user_id = str(existing["user_id"])
             plan = existing["plan"]
 
-            # duration 计算：优先从订单落库值读取，严禁兜底错误默认值
-            duration = None
-            try:
-                result_dur = await session.execute(
-                    text("SELECT duration_months FROM payments WHERE payment_id = :pid"),
-                    {"pid": payment_id},
-                )
-                dur_row = result_dur.mappings().first()
-                if dur_row and dur_row["duration_months"]:
-                    dm = int(dur_row["duration_months"])
-                    duration = DURATION_DAYS.get(dm)
-            except Exception:
-                pass
-            if duration is None:
-                duration = DURATION_DAYS.get(plan, 30)
-                logger.warning(
-                    "duration_months missing or unmapped, falling back to plan-based: "
-                    "payment_id=%s, plan=%s, duration=%d",
-                    payment_id, plan, duration,
-                )
-            await upgrade_membership(session, user_id, plan, duration_days=duration)
+            if plan in CREDITS_PACK_CONFIG:
+                # ── 积分包：发放 bonus credits ─────────────────────
+                pack_info = await _get_credits_pack_info(plan)
+                if pack_info:
+                    from app.models.analysis import AnalysisMode
+                    from app.services.analysis_quota import AnalysisQuotaService
+                    from uuid import UUID
+                    quota_svc = AnalysisQuotaService()
+                    mode = AnalysisMode(pack_info["mode"])
+                    await quota_svc.add_bonus_credits(
+                        UUID(user_id), mode, pack_info["credits"]
+                    )
+                    logger.info(
+                        "Credits granted: payment_id=%s, user_id=%s, plan=%d, "
+                        "mode=%s, credits=%d",
+                        payment_id, user_id, plan, pack_info["mode"], pack_info["credits"],
+                    )
+                else:
+                    logger.error(
+                        "Credits pack config missing at webhook time: payment_id=%s, plan=%d",
+                        payment_id, plan,
+                    )
+            else:
+                # ── 订阅套餐：升级会员 ─────────────────────────────
+                duration = None
+                try:
+                    result_dur = await session.execute(
+                        text("SELECT duration_months FROM payments WHERE payment_id = :pid"),
+                        {"pid": payment_id},
+                    )
+                    dur_row = result_dur.mappings().first()
+                    if dur_row and dur_row["duration_months"]:
+                        dm = int(dur_row["duration_months"])
+                        duration = DURATION_DAYS.get(dm)
+                except Exception:
+                    pass
+                if duration is None:
+                    duration = DURATION_DAYS.get(plan, 30)
+                    logger.warning(
+                        "duration_months missing or unmapped, falling back to plan-based: "
+                        "payment_id=%s, plan=%s, duration=%d",
+                        payment_id, plan, duration,
+                    )
+                await upgrade_membership(session, user_id, plan, duration_days=duration)
 
-            # 合伙人佣金发放（DB 事务内写记录，事务提交后同步 Redis）
+            # 合伙人佣金发放（订阅和积分包都参与分佣）
             commission_result = None
             try:
                 amount_usd = payload.get_amount() or 0
@@ -698,10 +782,7 @@ async def handle_webhook(
                             await asyncio.sleep(0.5 * (_attempt + 1))
             logger.info(
                 "Payment completed: payment_id=%s, user_id=%s, plan=%d, provider_status=%s",
-                payment_id,
-                user_id,
-                plan,
-                provider_status,
+                payment_id, user_id, plan, provider_status,
             )
         except Exception as exc:
             logger.error("handle_webhook update error: %s", exc)

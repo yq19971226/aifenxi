@@ -209,10 +209,9 @@ function FeatureTable({ plansData }: { plansData: PlansResponse | undefined }) {
     "链上数据": "数据权限",
     "多智能体共识": "AI 能力",
     "策略推送": "通知",
-    "剧本推演": "高级功能",
-    "对抗防御": "高级功能",
+    "AI 对抗推演": "高级功能",
     "策略回测": "高级功能",
-    "API 访问": "开发者",
+    "积分包充值": "充值",
   };
 
   const sections: Record<string, typeof features> = {};
@@ -297,7 +296,10 @@ function FeatureTable({ plansData }: { plansData: PlansResponse | undefined }) {
 
 function PaymentHistory({ payments }: { payments: PaymentInfo[] }) {
   if (!payments.length) return null;
-  const planNames: Record<number, string> = { 0: "免费", 1: "专业", 2: "旗舰" };
+  const planNames: Record<number, string> = {
+    0: "免费", 1: "专业", 2: "旗舰",
+    3: "积分包 S", 4: "积分包 M", 5: "积分包 L",
+  };
   return (
     <div className="rounded-2xl bg-[#0a0a0a] border border-white/5 overflow-hidden">
       <div className="px-6 py-5 border-b border-white/[0.05] flex items-center gap-2">
@@ -339,6 +341,14 @@ function PaymentHistory({ payments }: { payments: PaymentInfo[] }) {
   );
 }
 
+// ── Credits Pack Options ─────────────────────────────────────
+
+const CREDITS_PACKS = [
+  { plan: 3 as const, label: "S 档", credits: "130次", price: 10, desc: "轻量补充" },
+  { plan: 4 as const, label: "M 档", credits: "420次", price: 30, desc: "日常使用" },
+  { plan: 5 as const, label: "L 档", credits: "1500次", price: 100, desc: "高频交易" },
+];
+
 // ── Checkout Sidebar ──────────────────────────────────────────
 
 function CheckoutSidebar({
@@ -350,6 +360,9 @@ function CheckoutSidebar({
   creating, error, handleCreatePayment,
   currentPayment, paymentExpiresAt,
 }: any) {
+  const [tab, setTab] = useState<"sub" | "credits">("sub");
+  const [selectedCredits, setSelectedCredits] = useState<3 | 4 | 5>(3);
+
   const isFlagship = selectedPlan === 2;
   const selectedTotal = isFlagship ? flagshipTotal : proTotal;
   const planLabel = isFlagship ? "旗舰" : "专业";
@@ -374,10 +387,28 @@ function CheckoutSidebar({
   const accentGlow = isFlagship
     ? "shadow-[0_0_25px_rgba(245,166,35,0.15)]"
     : "shadow-[0_0_25px_rgba(99,102,241,0.15)]";
-  const accentBorder = isFlagship ? "border-[#F5A623]/20" : "border-indigo-500/20";
+  const accentBorder = tab === "credits" ? "border-emerald-500/20" : isFlagship ? "border-[#F5A623]/20" : "border-indigo-500/20";
+
+  const selectedPack = CREDITS_PACKS.find(p => p.plan === selectedCredits)!;
 
   return (
-    <div className={`sticky top-24 rounded-2xl bg-[#0a0a0a] border ${accentBorder} overflow-hidden ${accentGlow}`}>
+    <div className={`sticky top-24 rounded-2xl bg-[#0a0a0a] border ${accentBorder} overflow-hidden ${tab === "credits" ? "shadow-[0_0_25px_rgba(52,211,153,0.12)]" : accentGlow}`}>
+      {/* Tab Switch */}
+      <div className="flex border-b border-white/[0.05]">
+        {(["sub", "credits"] as const).map((t) => (
+          <button key={t} onClick={() => setTab(t)}
+            className={`flex-1 py-3.5 text-[9px] font-black font-mono uppercase tracking-[0.2em] transition-all ${
+              tab === t
+                ? t === "credits"
+                  ? "text-emerald-400 border-b-2 border-emerald-500 bg-emerald-500/5"
+                  : "text-white border-b-2 border-indigo-500 bg-indigo-500/5"
+                : "text-zinc-600 hover:text-zinc-400"
+            }`}>
+            {t === "sub" ? "订阅套餐" : "积分充值"}
+          </button>
+        ))}
+      </div>
+
       <AnimatePresence mode="wait">
         {currentPayment ? (
           // ── Active Payment ──────────────────────────
@@ -387,7 +418,9 @@ function CheckoutSidebar({
                 <p className="text-[9px] font-black font-mono uppercase tracking-[0.2em] text-zinc-600 mb-1">支付信息</p>
                 <div className="flex items-center gap-2">
                   <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="text-xs font-bold font-mono text-white uppercase">{["免费","专业","旗舰"][currentPayment.plan] ?? `套餐${currentPayment.plan}`}</span>
+                  <span className="text-xs font-bold font-mono text-white uppercase">
+                    {["免费","专业","旗舰","积分包S","积分包M","积分包L"][currentPayment.plan] ?? `套餐${currentPayment.plan}`}
+                  </span>
                 </div>
               </div>
               {currentPayment.status === "pending" && !isExpired ? (
@@ -428,12 +461,14 @@ function CheckoutSidebar({
               <span className={`text-[9px] font-mono font-bold uppercase tracking-widest flex items-center gap-2 ${currentPayment.status === "pending" && isExpired ? "text-zinc-600" : st?.text}`}>
                 <span className="h-1.5 w-1.5 rounded-full bg-current opacity-60" />{statusMsg}
               </span>
-              <p className="mt-1.5 text-[8px] text-zinc-700 font-mono italic">链上到账后自动升级，通常 1-3 个确认块（约 1 分钟）</p>
+              <p className="mt-1.5 text-[8px] text-zinc-700 font-mono italic">
+                {currentPayment.plan >= 3 ? "链上到账后自动发放积分，通常 1-3 个确认块" : "链上到账后自动升级，通常 1-3 个确认块（约 1 分钟）"}
+              </p>
             </div>
           </motion.div>
-        ) : (
-          // ── Checkout Form ───────────────────────────
-          <motion.div key="checkout" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 flex flex-col gap-5">
+        ) : tab === "sub" ? (
+          // ── Subscription Checkout ───────────────────
+          <motion.div key="checkout-sub" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 flex flex-col gap-5">
             <h3 className="text-[9px] font-black font-mono uppercase tracking-[0.25em] text-zinc-500 border-b border-white/[0.05] pb-4">
               选择套餐 · 数字货币结算
             </h3>
@@ -504,7 +539,7 @@ function CheckoutSidebar({
                 </div>
               </div>
 
-              <button onClick={handleCreatePayment} disabled={creating}
+              <button onClick={() => handleCreatePayment("sub")} disabled={creating}
                 className={`group relative w-full rounded-lg h-13 py-3.5 flex items-center justify-center gap-2 font-mono text-[11px] font-black uppercase tracking-[0.15em] transition-all disabled:opacity-50 disabled:cursor-not-allowed ${isFlagship
                   ? "bg-[#F5A623] hover:bg-[#f0a010] text-black shadow-[0_0_20px_rgba(245,166,35,0.2)] hover:shadow-[0_0_30px_rgba(245,166,35,0.4)]"
                   : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)]"}`}>
@@ -524,9 +559,104 @@ function CheckoutSidebar({
                   <p className="text-[9px] font-mono font-bold text-red-400 text-center">{error}</p>
                 </div>
               )}
-
               <p className="mt-3 text-[8px] font-mono text-zinc-700 text-center leading-relaxed">
                 到账后自动升级 · 链上不可退款 · 到期后恢复免费等级
+              </p>
+            </div>
+          </motion.div>
+        ) : (
+          // ── Credits Pack Checkout ────────────────────
+          <motion.div key="checkout-credits" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 flex flex-col gap-5">
+            <h3 className="text-[9px] font-black font-mono uppercase tracking-[0.25em] text-zinc-500 border-b border-white/[0.05] pb-4">
+              积分充值 · 超短线分析次数
+            </h3>
+
+            {/* Pack Selection */}
+            <div className="flex flex-col gap-2">
+              {CREDITS_PACKS.map(pack => (
+                <button key={pack.plan} onClick={() => setSelectedCredits(pack.plan)}
+                  className={`relative flex items-center justify-between rounded-xl border p-4 text-left transition-all ${
+                    selectedCredits === pack.plan
+                      ? "border-emerald-500/40 bg-emerald-500/[0.06] shadow-[inset_0_0_20px_rgba(52,211,153,0.05)]"
+                      : "border-white/[0.06] bg-black/30 hover:border-white/[0.12]"
+                  }`}>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`text-[10px] font-black font-mono uppercase tracking-widest ${
+                        selectedCredits === pack.plan ? "text-emerald-400" : "text-zinc-400"
+                      }`}>{pack.label}</span>
+                      <span className="text-[8px] font-mono text-zinc-700 bg-white/[0.03] border border-white/[0.05] px-1.5 py-[1px] rounded">{pack.desc}</span>
+                    </div>
+                    <span className={`text-[11px] font-bold font-mono ${
+                      selectedCredits === pack.plan ? "text-emerald-300" : "text-zinc-500"
+                    }`}>{pack.credits} 次</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-end gap-0.5">
+                      <span className={`text-sm font-bold font-mono ${
+                        selectedCredits === pack.plan ? "text-emerald-400" : "text-zinc-500"
+                      }`}>$</span>
+                      <span className={`text-2xl font-black font-mono leading-none ${
+                        selectedCredits === pack.plan ? "text-white" : "text-zinc-400"
+                      }`}>{pack.price}</span>
+                    </div>
+                    <span className="text-[8px] font-mono text-zinc-700">
+                      ≈ ${(pack.price / parseInt(pack.credits)).toFixed(2)}/次
+                    </span>
+                  </div>
+                  {selectedCredits === pack.plan && (
+                    <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Network */}
+            <div>
+              <p className="text-[8px] font-black font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2.5">支付网络 · USDT Only</p>
+              <div className="grid grid-cols-3 gap-2">
+                {NETWORKS.map(net => (
+                  <button key={net} onClick={() => setSelectedNetwork(net)}
+                    className={`rounded-md border py-2 text-[9px] font-bold font-mono tracking-wider transition-all ${selectedNetwork === net ? "bg-emerald-500/8 border-emerald-500/35 text-emerald-400" : "bg-black/50 border-white/[0.06] text-zinc-600 hover:text-zinc-400 hover:border-white/10"}`}>
+                    {net}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Total */}
+            <div className="pt-4 border-t border-white/[0.05]">
+              <div className="flex items-end justify-between mb-4">
+                <div>
+                  <p className="text-[8px] text-zinc-600 font-mono uppercase tracking-[0.2em] mb-1">应付总计</p>
+                  <p className="text-[9px] text-emerald-500/70 font-mono">{selectedPack.credits} · 一次性 · 永不过期</p>
+                </div>
+                <div className="flex items-end gap-1">
+                  <span className="text-lg font-bold font-mono text-white">$</span>
+                  <span className="text-4xl font-black font-mono leading-none tracking-tighter text-white">{selectedPack.price}</span>
+                </div>
+              </div>
+
+              <button onClick={() => handleCreatePayment("credits", selectedCredits)} disabled={creating}
+                className="group relative w-full rounded-lg py-3.5 flex items-center justify-center gap-2 font-mono text-[11px] font-black uppercase tracking-[0.15em] transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(52,211,153,0.15)] hover:shadow-[0_0_30px_rgba(52,211,153,0.3)]">
+                {creating ? (
+                  <><span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" /> 创建中</>
+                ) : (
+                  <>充值 {selectedPack.credits}
+                    <svg className="w-4 h-4 transition-transform group-hover:translate-x-1 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </>
+                )}
+              </button>
+
+              {error && (
+                <div className="mt-3 bg-red-500/8 border border-red-500/20 p-3 rounded-lg">
+                  <p className="text-[9px] font-mono font-bold text-red-400 text-center">{error}</p>
+                </div>
+              )}
+              <p className="mt-3 text-[8px] font-mono text-zinc-700 text-center leading-relaxed">
+                到账后自动到账 · 永久有效 · 用完即止 · 链上不可退款
               </p>
             </div>
           </motion.div>
@@ -576,10 +706,14 @@ export default function MembershipPage() {
     return dur === 3 ? plan.price_quarterly : dur === 12 ? plan.price_yearly : plan.price_monthly;
   };
 
-  const handleCreatePayment = useCallback(async () => {
+  const handleCreatePayment = useCallback(async (
+    type: "sub" | "credits" = "sub",
+    creditsPlan?: 3 | 4 | 5,
+  ) => {
     setCreating(true); setError(null);
     try {
-      const payment = await createPayment({ plan: selectedPlan, network: selectedNetwork, duration_months: selectedDuration });
+      const plan = type === "credits" ? (creditsPlan ?? 3) : selectedPlan;
+      const payment = await createPayment({ plan, network: selectedNetwork, duration_months: selectedDuration });
       setCurrentPayment(payment);
       setPaymentExpiresAt(Date.now() + PAYMENT_TIMEOUT_MS);
       queryClient.invalidateQueries({ queryKey: ["paymentHistory"] });
