@@ -18,9 +18,7 @@
       "operators": "營運員管理",
       "orders": "平台訂單",
       "notifications": "通知管理",
-
       "announcements": "公告管理",
-
       "taskReview": "任務審核",
       "taskTemplates": "任務模板",
       "withdrawals": "提現審核",
@@ -416,16 +414,46 @@
     "analysisModesDesc": "系統會根據市場情況自動選擇合適的分析模式，調度不同數量的智能體",
     "agentsCountLabel": "{count} 智能體",
     "agents": {
-      "technical": { "name": "技術分析", "desc": "K線形態、指標信號、支撐壓力位" },
-      "onchain": { "name": "鏈上數據", "desc": "資金動向、交易所流入流出、礦工儲備" },
-      "sentiment": { "name": "輿情分析", "desc": "恐貪指數、社交熱度、流量動向" },
-      "orderbook": { "name": "訂單簿", "desc": "買賣盤深度、大單掛單、掛單價" },
-      "risk": { "name": "風險評估", "desc": "倉位風險、止損建議、盈虧比" },
-      "news_analyst": { "name": "新聞分析", "desc": "全球加密新聞解讀、監管政策影響" },
-      "calendar": { "name": "日曆事件", "desc": "代幣解鎖、上線、減半等事件影響評估" },
-      "reflection": { "name": "反思覆盤", "desc": "回顧歷史判斷準確率，持續自我改進" },
-      "adversarial": { "name": "對抗推演", "desc": "站在莊家視角反推下一步操盤策略" },
-      "collusion_detector": { "name": "合謀檢測", "desc": "檢測對倒交易、協作拉盤、惡意操縱" }
+      "technical": {
+        "name": "技術分析",
+        "desc": "K線形態、指標信號、支撐壓力位"
+      },
+      "onchain": {
+        "name": "鏈上數據",
+        "desc": "資金動向、交易所流入流出、礦工儲備"
+      },
+      "sentiment": {
+        "name": "輿情分析",
+        "desc": "恐貪指數、社交熱度、流量動向"
+      },
+      "orderbook": {
+        "name": "訂單簿",
+        "desc": "買賣盤深度、大單掛單、掛單價"
+      },
+      "risk": {
+        "name": "風險評估",
+        "desc": "倉位風險、止損建議、盈虧比"
+      },
+      "news_analyst": {
+        "name": "新聞分析",
+        "desc": "全球加密新聞解讀、監管政策影響"
+      },
+      "calendar": {
+        "name": "日曆事件",
+        "desc": "代幣解鎖、上線、減半等事件影響評估"
+      },
+      "reflection": {
+        "name": "反思覆盤",
+        "desc": "回顧歷史判斷準確率，持續自我改進"
+      },
+      "adversarial": {
+        "name": "對抗推演",
+        "desc": "站在莊家視角反推下一步操盤策略"
+      },
+      "collusion_detector": {
+        "name": "合謀檢測",
+        "desc": "檢測對倒交易、協作拉盤、惡意操縱"
+      }
     },
     "phases": {
       "core": "核心層",
@@ -612,12 +640,30 @@
     },
     "quickActions": {
       "title": "快捷操作",
-      "userMgmt": { "label": "用戶管理", "desc": "搜尋/封禁/調整等級" },
-      "apiKeys": { "label": "API 密鑰", "desc": "管理第三方密鑰" },
-      "datasources": { "label": "數據源", "desc": "開關數據源" },
-      "monitor": { "label": "系統監控", "desc": "智能體/編排器" },
-      "models": { "label": "模型分工", "desc": "切換模型映射" },
-      "configs": { "label": "參數設置", "desc": "運行時參數" }
+      "userMgmt": {
+        "label": "用戶管理",
+        "desc": "搜尋/封禁/調整等級"
+      },
+      "apiKeys": {
+        "label": "API 密鑰",
+        "desc": "管理第三方密鑰"
+      },
+      "datasources": {
+        "label": "數據源",
+        "desc": "開關數據源"
+      },
+      "monitor": {
+        "label": "系統監控",
+        "desc": "智能體/編排器"
+      },
+      "models": {
+        "label": "模型分工",
+        "desc": "切換模型映射"
+      },
+      "configs": {
+        "label": "參數設置",
+        "desc": "運行時參數"
+      }
     },
     "activity": {
       "title": "系統活躍度",
@@ -842,6 +888,61 @@
       "scalping": "超短線 (日歸)",
       "intraday": "日內 (週歸)",
       "trend": "趨勢 (月歸)"
+    }
+  },
+  "health": {
+    "status": {
+      "healthy": "正常",
+      "degraded": "降級",
+      "down": "宕機"
+    },
+    "services": {
+      "api": {
+        "label": "API 服務",
+        "detail": "回應 < 200ms"
+      },
+      "db": {
+        "label": "資料庫",
+        "detail": "PostgreSQL 連線池 12/50"
+      },
+      "redis": {
+        "label": "Redis 快取",
+        "detail": "記憶體 128MB / 512MB"
+      },
+      "ws": {
+        "label": "WebSocket",
+        "detail": "活躍連線 24"
+      },
+      "cpu": {
+        "label": "CPU 使用率",
+        "detail": "4 核 / 8GB"
+      },
+      "llm": {
+        "label": "LLM 閘道",
+        "detail": "DMXAPI 可達"
+      }
+    },
+    "metrics": {
+      "ok": "正常",
+      "online": "線上"
+    }
+  },
+  "wizard": {
+    "enterKey": "輸入 {label}",
+    "selectModel": "選擇模型...",
+    "encryptionNote": "所有金鑰均透過 AES-256 加密存儲。",
+    "welcomeReady": "準備就緒。我們將帶您逐步完成核心設定，以解鎖 Axiom 的全部能力。",
+    "agents": {
+      "technical": "技術分析",
+      "onchain": "鏈上分析",
+      "sentiment": "輿情分析",
+      "adversarial": "對抗推演"
+    },
+    "featureLabels": {
+      "adversarial": "AI對抗推演 (Adversarial)",
+      "leaderboard": "收益榜單 (Leaderboard)",
+      "task": "任務回核 (Task Review)",
+      "partner": "合夥人系統 (Partner)"
     }
   }
 }

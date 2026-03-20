@@ -11,6 +11,7 @@ import {
   Star,
   User,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   getUsers,
   toggleUserActive,
@@ -19,9 +20,7 @@ import {
   type AdminUserListResponse,
 } from "@/lib/api/admin-users";
 
-/* ── Constants ── */
-
-const LEVEL_LABEL: Record<number, string> = { 0: "免费", 1: "专业", 2: "旗舰" };
+// LEVEL_LABEL is now handled via i18n inside the component
 
 const LEVEL_ICON: Record<number, React.ReactNode> = {
   0: <User size={10} />,
@@ -44,6 +43,12 @@ export interface AdminUserTableProps {
 /* ── Component ── */
 
 export function AdminUserTable({ className = "" }: AdminUserTableProps) {
+  const t = useTranslations("admin.users");
+  const LEVEL_LABEL: Record<number, string> = {
+    0: t("levels.free"),
+    1: t("levels.pro"),
+    2: t("levels.flagship"),
+  };
   const [data, setData] = useState<AdminUserListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -92,12 +97,12 @@ export function AdminUserTable({ className = "" }: AdminUserTableProps) {
     <div className={`card ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-        <h3 className="text-sm font-medium text-zinc-200">用户管理</h3>
+        <h3 className="text-sm font-medium text-zinc-200">{t('title')}</h3>
         <div className="relative">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
-            placeholder="搜索邮箱..."
+            placeholder={t('searchPlaceholder')}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -113,11 +118,11 @@ export function AdminUserTable({ className = "" }: AdminUserTableProps) {
         <table className="w-full">
           <thead>
             <tr className="border-b border-white/[0.06]">
-              <th className="px-5 py-2.5 text-left text-sm font-medium text-zinc-500">邮箱</th>
-              <th className="px-5 py-2.5 text-left text-sm font-medium text-zinc-500">会员等级</th>
-              <th className="px-5 py-2.5 text-left text-sm font-medium text-zinc-500">状态</th>
-              <th className="px-5 py-2.5 text-left text-sm font-medium text-zinc-500">注册时间</th>
-              <th className="px-5 py-2.5 text-right text-sm font-medium text-zinc-500">操作</th>
+              <th className="px-5 py-2.5 text-left text-sm font-medium text-zinc-500">{t('table.email')}</th>
+              <th className="px-5 py-2.5 text-left text-sm font-medium text-zinc-500">{t('table.membershipLevel')}</th>
+              <th className="px-5 py-2.5 text-left text-sm font-medium text-zinc-500">{t('table.status')}</th>
+              <th className="px-5 py-2.5 text-left text-sm font-medium text-zinc-500">{t('table.createdAt')}</th>
+              <th className="px-5 py-2.5 text-right text-sm font-medium text-zinc-500">{t('table.action')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.04]">
@@ -135,7 +140,7 @@ export function AdminUserTable({ className = "" }: AdminUserTableProps) {
               ? (
                 <tr>
                   <td colSpan={5} className="py-12 text-center text-sm text-zinc-500">
-                    暂无用户
+                    {t('emptyTitle')}
                   </td>
                 </tr>
               )
@@ -178,7 +183,7 @@ export function AdminUserTable({ className = "" }: AdminUserTableProps) {
                             u.is_active ? "bg-emerald-500" : "bg-red-500"
                           }`}
                         />
-                        {u.is_active ? "正常" : "封禁"}
+                        {u.is_active ? t('status.enabled') : t('status.disabled')}
                       </span>
                     </td>
 
@@ -199,11 +204,11 @@ export function AdminUserTable({ className = "" }: AdminUserTableProps) {
                       >
                         {u.is_active ? (
                           <>
-                            <Ban size={11} /> 封禁
+                            <Ban size={11} /> {t('actions.disable')}
                           </>
                         ) : (
                           <>
-                            <CheckCircle2 size={11} /> 解封
+                            <CheckCircle2 size={11} /> {t('actions.enable')}
                           </>
                         )}
                       </button>

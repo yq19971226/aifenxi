@@ -33,6 +33,7 @@ interface WizardStepProps {
 
 function StepApiKeys({ onNext, onPrev, data, setData }: WizardStepProps) {
   const t = useTranslations("admin.wizard");
+  const tSetup = useTranslations("admin.setup.wizard");
   const [verifying, setVerifying] = useState<string | null>(null);
   const [verifyStatus, setVerifyStatus] = useState<Record<string, 'success' | 'failed' | null>>({});
 
@@ -63,7 +64,7 @@ function StepApiKeys({ onNext, onPrev, data, setData }: WizardStepProps) {
                 value={data[item.key] || ""}
                 onChange={(e) => setData({ ...data, [item.key]: e.target.value })}
                 className="w-full bg-zinc-900/50 border border-zinc-800 focus:border-emerald-500/50 rounded-lg px-4 py-2.5 outline-none transition-all pr-12"
-                placeholder={`输入 ${item.label}`}
+                placeholder={t('enterKey', { label: item.label })}
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                 {verifyStatus[item.key] === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
@@ -86,7 +87,7 @@ function StepApiKeys({ onNext, onPrev, data, setData }: WizardStepProps) {
       <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl flex gap-3">
         <Info className="w-5 h-5 text-emerald-500 shrink-0" />
         <p className="text-xs text-zinc-400 leading-relaxed">
-          {t('step1Desc')} 所有密钥均通过 AES-256 加密存储。
+          {tSetup('step1Desc')} {t('encryptionNote')}
         </p>
       </div>
     </div>
@@ -106,11 +107,12 @@ function StepModels({ onNext, onPrev, data, setData }: WizardStepProps) {
     }
   });
 
+  const tW = useTranslations("admin.wizard");
   const CORE_AGENTS = [
-    { id: "technical", label: "技术分析 (Technical Analyst)" },
-    { id: "onchain", label: "链上分析 (Onchain Analyst)" },
-    { id: "sentiment", label: "舆情分析 (Sentiment Analyst)" },
-    { id: "adversarial", label: "对抗推演 (Adversarial)" },
+    { id: "technical" as const },
+    { id: "onchain" as const },
+    { id: "sentiment" as const },
+    { id: "adversarial" as const },
   ];
 
   const models = availableModelsData?.models || [];
@@ -120,13 +122,13 @@ function StepModels({ onNext, onPrev, data, setData }: WizardStepProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {CORE_AGENTS.map((agent) => (
           <div key={agent.id} className="space-y-2">
-            <label className="text-sm font-medium text-zinc-400">{agent.label}</label>
+            <label className="text-sm font-medium text-zinc-400">{tW(`agents.${agent.id}`)}</label>
             <select
               value={data[`model_route:${agent.id}`] || ""}
               onChange={(e) => setData({ ...data, [`model_route:${agent.id}`]: e.target.value })}
               className="w-full bg-zinc-900/50 border border-zinc-800 focus:border-emerald-500/50 rounded-lg px-4 py-2.5 outline-none transition-all appearance-none"
             >
-              <option value="">选择模型...</option>
+              <option value="">{tW('selectModel')}</option>
               {models.map((m: any) => (
                 <option key={m.model_key} value={m.model_key}>
                   {m.display_name} ({m.model_name})
@@ -146,10 +148,10 @@ function StepFeatures({ onNext, onPrev, data, setData }: WizardStepProps) {
   const t = useTranslations("admin.wizard");
   
   const FEATURES = [
-    { key: "adversarial", configKey: "adversarial_feature_enabled", label: "AI对抗推演 (Adversarial)" },
-    { key: "leaderboard", configKey: "leaderboard_feature_enabled", label: "收益榜单 (Leaderboard)" },
-    { key: "task", configKey: "task_feature_enabled", label: "任务回核 (Task Review)" },
-    { key: "partner", configKey: "partner_feature_enabled", label: "合伙人系统 (Partner)" },
+    { key: "adversarial" as const, configKey: "adversarial_feature_enabled" },
+    { key: "leaderboard" as const, configKey: "leaderboard_feature_enabled" },
+    { key: "task" as const, configKey: "task_feature_enabled" },
+    { key: "partner" as const, configKey: "partner_feature_enabled" },
   ];
 
   return (
@@ -167,7 +169,7 @@ function StepFeatures({ onNext, onPrev, data, setData }: WizardStepProps) {
           <div className="flex items-center gap-3">
             <ToggleRight className={`w-5 h-5 ${data[f.configKey] === "active" ? "text-emerald-500" : "text-zinc-500"}`} />
             <span className={`font-medium ${data[f.configKey] === "active" ? "text-emerald-400" : "text-zinc-400"}`}>
-              {f.label}
+              {t(`featureLabels.${f.key}`)}
             </span>
           </div>
           <div className={`w-2 h-2 rounded-full ${data[f.configKey] === "active" ? "bg-emerald-500" : "bg-zinc-700"}`} />
@@ -285,7 +287,7 @@ export default function SetupWizard({ onFinish }: { onFinish?: () => void }) {
                   </div>
                   <div className="space-y-2 max-w-sm">
                     <p className="text-zinc-300 leading-relaxed font-medium">
-                      准备就绪。我们将带您逐步完成核心配置，以解锁 Axiom 的全部能力。
+                      {t('welcomeReady')}
                     </p>
                   </div>
                 </div>

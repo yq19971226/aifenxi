@@ -8,6 +8,7 @@ import {
   Wifi,
   type LucideIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 /* ── Types ── */
 
@@ -15,7 +16,7 @@ type HealthStatus = "healthy" | "degraded" | "down";
 
 interface ServiceHealth {
   id: string;
-  label: string;
+  label?: string;
   icon: LucideIcon;
   status: HealthStatus;
   metric?: string;
@@ -27,17 +28,6 @@ export interface SystemHealthGridProps {
   className?: string;
 }
 
-/* ── Defaults ── */
-
-const DEFAULT_SERVICES: ServiceHealth[] = [
-  { id: "api", label: "API 服务", icon: Activity, status: "healthy", metric: "99.9%", detail: "响应 < 200ms" },
-  { id: "db", label: "数据库", icon: Database, status: "healthy", metric: "正常", detail: "PostgreSQL 连接池 12/50" },
-  { id: "redis", label: "Redis 缓存", icon: HardDrive, status: "healthy", metric: "正常", detail: "内存 128MB / 512MB" },
-  { id: "ws", label: "WebSocket", icon: Wifi, status: "healthy", metric: "在线", detail: "活跃连接 24" },
-  { id: "cpu", label: "CPU 使用率", icon: Cpu, status: "healthy", metric: "23%", detail: "4 核 / 8GB" },
-  { id: "llm", label: "LLM 网关", icon: Activity, status: "healthy", metric: "正常", detail: "DMXAPI 可达" },
-];
-
 /* ── Status styles ── */
 
 const STATUS_DOT: Record<HealthStatus, string> = {
@@ -46,10 +36,10 @@ const STATUS_DOT: Record<HealthStatus, string> = {
   down: "bg-red-500",
 };
 
-const STATUS_LABEL: Record<HealthStatus, string> = {
-  healthy: "正常",
-  degraded: "降级",
-  down: "宕机",
+const STATUS_LABEL_KEYS: Record<HealthStatus, string> = {
+  healthy: "healthy",
+  degraded: "degraded",
+  down: "down",
 };
 
 const STATUS_TEXT: Record<HealthStatus, string> = {
@@ -61,13 +51,26 @@ const STATUS_TEXT: Record<HealthStatus, string> = {
 /* ── Component ── */
 
 export function SystemHealthGrid({
-  services = DEFAULT_SERVICES,
+  services,
   className = "",
 }: SystemHealthGridProps) {
+  const t = useTranslations("admin.health");
+  const resolvedServices = services ?? [
+    { id: "api",   icon: Activity,   status: "healthy" as const, metric: "99.9%" },
+    { id: "db",    icon: Database,   status: "healthy" as const, metric: t("metrics.ok") },
+    { id: "redis", icon: HardDrive,  status: "healthy" as const, metric: t("metrics.ok") },
+    { id: "ws",    icon: Wifi,       status: "healthy" as const, metric: t("metrics.online") },
+    { id: "cpu",   icon: Cpu,        status: "healthy" as const, metric: "23%" },
+    { id: "llm",   icon: Activity,   status: "healthy" as const, metric: t("metrics.ok") },
+  ];
+
+  const svcLabels = t.raw("services") as Record<string, { label: string; detail: string }>;
+
   return (
     <div className={`grid grid-cols-2 gap-3 lg:grid-cols-3 ${className}`}>
-      {services.map((svc) => {
+      {resolvedServices.map((svc) => {
         const Icon = svc.icon;
+        const info = svcLabels[svc.id] ?? { label: svc.id, detail: "" };
         return (
           <div
             key={svc.id}
@@ -77,12 +80,12 @@ export function SystemHealthGrid({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Icon size={14} className="text-zinc-500" />
-                <span className="text-xs font-medium text-zinc-300">{svc.label}</span>
+                <span className="text-xs font-medium text-zinc-300">{info.label}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[svc.status]}`} />
                 <span className={`text-xs ${STATUS_TEXT[svc.status]}`}>
-                  {STATUS_LABEL[svc.status]}
+                  {t(`status.${STATUS_LABEL_KEYS[svc.status]}`)}
                 </span>
               </div>
             </div>
@@ -93,8 +96,8 @@ export function SystemHealthGrid({
             )}
 
             {/* Detail */}
-            {svc.detail && (
-              <span className="text-xs text-zinc-500">{svc.detail}</span>
+            {info.detail && (
+              <span className="text-xs text-zinc-500">{info.detail}</span>
             )}
           </div>
         );
@@ -102,3 +105,4 @@ export function SystemHealthGrid({
     </div>
   );
 }
+

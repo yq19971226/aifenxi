@@ -902,5 +902,42 @@
       "intraday": "Intraday (Weekly)",
       "trend": "Trend (Monthly)"
     }
+  },
+  "health": {
+    "status": {
+      "healthy": "OK",
+      "degraded": "Degraded",
+      "down": "Down"
+    },
+    "services": {
+      "api":   { "label": "API Service",   "detail": "Response < 200ms" },
+      "db":    { "label": "Database",      "detail": "PostgreSQL Pool 12/50" },
+      "redis": { "label": "Redis Cache",   "detail": "Memory 128MB / 512MB" },
+      "ws":    { "label": "WebSocket",     "detail": "Active Connections 24" },
+      "cpu":   { "label": "CPU Usage",     "detail": "4 Cores / 8GB" },
+      "llm":   { "label": "LLM Gateway",  "detail": "DMXAPI Reachable" }
+    },
+    "metrics": {
+      "ok": "OK",
+      "online": "Online"
+    }
+  },
+  "wizard": {
+    "enterKey": "Enter {label}",
+    "selectModel": "Select model...",
+    "encryptionNote": "All keys are encrypted via AES-256.",
+    "welcomeReady": "Ready. We'll walk you through the core setup to unlock Axiom's full potential.",
+    "agents": {
+      "technical": "Technical Analyst",
+      "onchain": "Onchain Analyst",
+      "sentiment": "Sentiment Analyst",
+      "adversarial": "Adversarial"
+    },
+    "featureLabels": {
+      "adversarial": "AI Adversarial (Adversarial)",
+      "leaderboard": "Leaderboard (Leaderboard)",
+      "task": "Task Review (Task Review)",
+      "partner": "Partner System (Partner)"
+    }
   }
 }

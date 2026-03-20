@@ -10,7 +10,6 @@
       "dashboard": "后台总览",
       "monitor": "系统监控",
       "setup": "功能开关",
-
       "apiKeys": "API 密钥",
       "datasources": "数据源管理",
       "models": "模型分工",
@@ -19,9 +18,7 @@
       "operators": "运营员管理",
       "orders": "平台订单",
       "notifications": "通知管理",
-
       "announcements": "公告管理",
-
       "taskReview": "任务审核",
       "taskTemplates": "任务模板",
       "withdrawals": "提现审核",
@@ -417,16 +414,46 @@
     "analysisModesDesc": "系统会根据市场情况自动选择合适的分析模式，调度不同数量的智能体",
     "agentsCountLabel": "{count} 智能体",
     "agents": {
-      "technical": { "name": "技术分析", "desc": "K线形态、指标信号、支撑压力位" },
-      "onchain": { "name": "链上数据", "desc": "资金动向、交易所流入流出、矿工储备" },
-      "sentiment": { "name": "舆情分析", "desc": "恐贪指数、社交热度、流量动向" },
-      "orderbook": { "name": "订单簿", "desc": "买卖盘深度、大单挂单、挂单价" },
-      "risk": { "name": "风险评估", "desc": "仓位风险、止损建议、盈亏比" },
-      "news_analyst": { "name": "新闻分析", "desc": "全球加密新闻解读、监管政策影响" },
-      "calendar": { "name": "日历事件", "desc": "代币解锁、上线、减半等事件影响评估" },
-      "reflection": { "name": "反思复盘", "desc": "回顾历史判断准确率，持续自我改进" },
-      "adversarial": { "name": "对抗推演", "desc": "站在庄家视角反推下一步操盘策略" },
-      "collusion_detector": { "name": "合谋检测", "desc": "检测对倒交易、协作拉盘、恶意操纵" }
+      "technical": {
+        "name": "技术分析",
+        "desc": "K线形态、指标信号、支撑压力位"
+      },
+      "onchain": {
+        "name": "链上数据",
+        "desc": "资金动向、交易所流入流出、矿工储备"
+      },
+      "sentiment": {
+        "name": "舆情分析",
+        "desc": "恐贪指数、社交热度、流量动向"
+      },
+      "orderbook": {
+        "name": "订单簿",
+        "desc": "买卖盘深度、大单挂单、挂单价"
+      },
+      "risk": {
+        "name": "风险评估",
+        "desc": "仓位风险、止损建议、盈亏比"
+      },
+      "news_analyst": {
+        "name": "新闻分析",
+        "desc": "全球加密新闻解读、监管政策影响"
+      },
+      "calendar": {
+        "name": "日历事件",
+        "desc": "代币解锁、上线、减半等事件影响评估"
+      },
+      "reflection": {
+        "name": "反思复盘",
+        "desc": "回顾历史判断准确率，持续自我改进"
+      },
+      "adversarial": {
+        "name": "对抗推演",
+        "desc": "站在庄家视角反推下一步操盘策略"
+      },
+      "collusion_detector": {
+        "name": "合谋检测",
+        "desc": "检测对倒交易、协作拉盘、恶意操纵"
+      }
     },
     "phases": {
       "core": "核心层",
@@ -613,12 +640,30 @@
     },
     "quickActions": {
       "title": "快捷操作",
-      "userMgmt": { "label": "用户管理", "desc": "搜索/封禁/调整等级" },
-      "apiKeys": { "label": "API 密钥", "desc": "管理第三方密钥" },
-      "datasources": { "label": "数据源", "desc": "开关数据源" },
-      "monitor": { "label": "系统监控", "desc": "智能体/编排器" },
-      "models": { "label": "模型分工", "desc": "切换模型映射" },
-      "configs": { "label": "参数设置", "desc": "运行时参数" }
+      "userMgmt": {
+        "label": "用户管理",
+        "desc": "搜索/封禁/调整等级"
+      },
+      "apiKeys": {
+        "label": "API 密钥",
+        "desc": "管理第三方密钥"
+      },
+      "datasources": {
+        "label": "数据源",
+        "desc": "开关数据源"
+      },
+      "monitor": {
+        "label": "系统监控",
+        "desc": "智能体/编排器"
+      },
+      "models": {
+        "label": "模型分工",
+        "desc": "切换模型映射"
+      },
+      "configs": {
+        "label": "参数设置",
+        "desc": "运行时参数"
+      }
     },
     "activity": {
       "title": "系统活跃度",
@@ -843,6 +888,61 @@
       "scalping": "超短线 (日归)",
       "intraday": "日内 (周归)",
       "trend": "趋势 (月归)"
+    }
+  },
+  "health": {
+    "status": {
+      "healthy": "正常",
+      "degraded": "降级",
+      "down": "宕机"
+    },
+    "services": {
+      "api": {
+        "label": "API 服务",
+        "detail": "响应 < 200ms"
+      },
+      "db": {
+        "label": "数据库",
+        "detail": "PostgreSQL 连接池 12/50"
+      },
+      "redis": {
+        "label": "Redis 缓存",
+        "detail": "内存 128MB / 512MB"
+      },
+      "ws": {
+        "label": "WebSocket",
+        "detail": "活跃连接 24"
+      },
+      "cpu": {
+        "label": "CPU 使用率",
+        "detail": "4 核 / 8GB"
+      },
+      "llm": {
+        "label": "LLM 网关",
+        "detail": "DMXAPI 可达"
+      }
+    },
+    "metrics": {
+      "ok": "正常",
+      "online": "在线"
+    }
+  },
+  "wizard": {
+    "enterKey": "输入 {label}",
+    "selectModel": "选择模型...",
+    "encryptionNote": "所有密钥均通过 AES-256 加密存储。",
+    "welcomeReady": "准备就绪。我们将带您逐步完成核心配置，以解锁 Axiom 的全部能力。",
+    "agents": {
+      "technical": "技术分析",
+      "onchain": "链上分析",
+      "sentiment": "舆情分析",
+      "adversarial": "对抗推演"
+    },
+    "featureLabels": {
+      "adversarial": "AI对抗推演 (Adversarial)",
+      "leaderboard": "收益榜单 (Leaderboard)",
+      "task": "任务回核 (Task Review)",
+      "partner": "合伙人系统 (Partner)"
     }
   }
 }
