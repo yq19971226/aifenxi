@@ -105,7 +105,7 @@ export default function AdversarialPage() {
             AI 对抗推演
           </h2>
           <p className="text-sm text-zinc-400 leading-relaxed mb-2">
-            基于 DeepSeek R1 + Claude Sonnet 双模型对抗推演，识别主力操盘、合谋、逆空逼多信号。
+            基于多模架构智能体对抗推演，识别主力操盘、合谋、逆空逼多信号。
           </p>
           <p className="text-xs text-zinc-600 font-mono mb-8">旗舰专属 · Flagship Only</p>
           <Link
