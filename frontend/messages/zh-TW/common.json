@@ -179,5 +179,8 @@
   },
   "dataTable": {
     "emptyText": "無數據"
+  },
+  "rateHistoryChart": {
+    "noData": "暫無速率數據"
   }
 }

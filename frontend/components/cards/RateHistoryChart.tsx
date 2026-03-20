@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import type { RateHistoryPoint } from "@/lib/api/datasources";
 
 interface RateHistoryChartProps {
@@ -9,6 +10,7 @@ interface RateHistoryChartProps {
 }
 
 export function RateHistoryChart({ data, height = 120 }: RateHistoryChartProps) {
+  const t = useTranslations("common.rateHistoryChart");
   const width = 480;
   const padX = 40;
   const padY = 20;
@@ -53,7 +55,7 @@ export function RateHistoryChart({ data, height = 120 }: RateHistoryChartProps) 
         className="flex items-center justify-center rounded-lg bg-zinc-800/30 text-xs text-zinc-500"
         style={{ height }}
       >
-        暂无速率数据
+        {t("noData")}
       </div>
     );
   }

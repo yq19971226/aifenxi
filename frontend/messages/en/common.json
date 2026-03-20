@@ -179,5 +179,8 @@
   },
   "dataTable": {
     "emptyText": "No data"
+  },
+  "rateHistoryChart": {
+    "noData": "No rate data available"
   }
 }
