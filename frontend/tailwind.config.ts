@@ -12,6 +12,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // --- PREMIUM MILLION DOLLAR UI OVERRIDES ---
+        // Force any hardcoded `bg-black` to use our Obsidian Abyss base to cure the "dead black" effect.
+        black: "#02040A",
+        // Soften the deepest zincs
+        zinc: {
+          950: "#02040A",
+          900: "#090D14",
+          800: "#111622",
+        },
+        // -------------------------------------------
         "bg-primary": "var(--bg-primary)",
         "bg-secondary": "var(--bg-secondary)",
         "bg-elevated": "var(--bg-elevated)",
