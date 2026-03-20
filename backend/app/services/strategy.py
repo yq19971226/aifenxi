@@ -48,13 +48,13 @@ def _atr_multipliers(
 
     if vol_ratio < 0.01:
         # 低波动：放宽倍数，避免噪音触发止损
-        return {"entry": 2.0, "stop": 2.5, "targets": [2.0, 4.0, 7.0]}
+        return {"entry": 2.0, "stop": 3.0, "targets": [2.0, 4.0, 7.0]}
     elif vol_ratio > 0.03:
         # 高波动：收窄倍数，控制单笔风险
         return {"entry": 1.0, "stop": 1.5, "targets": [1.0, 2.0, 3.5]}
     else:
-        # 正常：维持现有倍数
-        return {"entry": 1.5, "stop": 2.0, "targets": [1.5, 3.0, 5.0]}
+        # 正常：止损拓宽至 2.5x ATR，减少噪音触发
+        return {"entry": 1.5, "stop": 2.5, "targets": [1.5, 3.0, 5.0]}
 
 
 class StrategyResult(BaseModel):

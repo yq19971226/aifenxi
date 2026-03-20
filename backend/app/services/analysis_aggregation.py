@@ -258,13 +258,16 @@ def _intraday_aggregate(
     avg_confidence = weighted_confidence / total_effective_weight
 
     # ── 市场状态前置过滤 ──
-    # 震荡市：提高方向信号阈值 + 置信度 penalty，防止频繁翻转
+    # 震荡市：强制抑制方向信号，除非得分明显超过高阈值
     # 高波动：仅置信度 penalty
     regime_confidence_penalty = 1.0
     if regime == "ranging":
         regime_confidence_penalty = 0.70  # 置信度衰减 30%
-        # 震荡市需要更强的信号才给方向
-        # （通过提高标准阈值实现，下方迟滞逻辑会用到）
+        # 震荡市直接抑制方向信号： avg_score 未超过 0.50 就返回 neutral
+        # 避免停损过紧 + 频繁翻转导致胜率下滑
+        if abs(avg_score) < 0.50:
+            avg_confidence *= regime_confidence_penalty
+            return "neutral", round(min(avg_confidence, 1.0), 4)
     elif regime == "volatile":
         regime_confidence_penalty = 0.80  # 置信度衰减 20%
 
@@ -272,8 +275,8 @@ def _intraday_aggregate(
 
     # ── 迟滞逻辑 ──
     # 震荡市使用更高阈值（更难给方向信号，倾向 neutral/观望）
-    standard_threshold = 0.45 if regime == "ranging" else 0.30
-    flip_threshold = 0.25 if regime == "ranging" else 0.15
+    standard_threshold = 0.50 if regime == "ranging" else 0.30
+    flip_threshold = 0.35 if regime == "ranging" else 0.15
 
     if prev_signal == "bullish":
         if avg_score < -flip_threshold:
