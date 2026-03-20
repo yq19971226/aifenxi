@@ -89,5 +89,14 @@
       "push": "Push Settings",
       "settings": "Settings"
     }
+  },
+  "membership": {
+    "flagship": "Flagship Member",
+    "pro": "Pro Member",
+    "free": "Free User"
+  },
+  "sidebar": {
+    "expand": "Expand sidebar",
+    "collapse": "Collapse sidebar"
   }
 }

@@ -965,5 +965,10 @@
     "errorRate": "错误率",
     "calls": "次调用",
     "errors": "次错误"
+  },
+  "orderSync": {
+    "syncFailed": "同步订单状态失败",
+    "syncing": "重查中…",
+    "sync": "重查状态"
   }
 }

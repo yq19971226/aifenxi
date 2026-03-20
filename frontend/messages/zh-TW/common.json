@@ -169,5 +169,15 @@
     "auditLog": {
       "title": "暫無審計日誌"
     }
+  },
+  "offline": {
+    "message": "網路連線已中斷，部分功能可能無法使用",
+    "dismiss": "關閉"
+  },
+  "moduleError": {
+    "loadFailed": "載入失敗"
+  },
+  "dataTable": {
+    "emptyText": "無數據"
   }
 }

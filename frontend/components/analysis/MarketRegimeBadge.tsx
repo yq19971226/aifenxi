@@ -5,8 +5,10 @@ import { AlertTriangle, ArrowRightLeft, TrendingUp } from "lucide-react";
 
 import type { MarketRegime } from "@/lib/api/analysis";
 import { formatPrice, localizeText } from "./helpers";
+import { useTranslations } from "next-intl";
 
 export function MarketRegimeBadge({ regime }: { regime: MarketRegime }) {
+  const t = useTranslations("analysis.marketRegime");
   return (
     <motion.div
       initial={{ opacity: 0, y: -4 }}
@@ -34,7 +36,7 @@ export function MarketRegimeBadge({ regime }: { regime: MarketRegime }) {
             regime.regime === "ranging" ? "text-amber-400"
               : regime.regime === "volatile" ? "text-red-400" : "text-emerald-400"
           }`}>
-            {regime.regime === "ranging" ? "— 震荡区间" : regime.regime === "volatile" ? "⚠ 高波动" : "↑ 趋势行情"}
+            {regime.regime === "ranging" ? t("ranging") : regime.regime === "volatile" ? t("volatile") : t("trending")}
           </span>
           {regime.adx !== null && (
             <span className="text-xs font-mono text-zinc-500">ADX {regime.adx.toFixed(1)}</span>
@@ -48,7 +50,7 @@ export function MarketRegimeBadge({ regime }: { regime: MarketRegime }) {
         <p className="text-sm text-zinc-400 leading-relaxed">{localizeText(regime.suggestion)}</p>
         {regime.support !== null && regime.resistance !== null && regime.regime === "ranging" && (
           <p className="text-xs font-mono text-zinc-500 mt-1">
-            支撑 {formatPrice(regime.support)} ~ 阻力 {formatPrice(regime.resistance)}
+            {t("support")} {formatPrice(regime.support)} ~ {t("resistance")} {formatPrice(regime.resistance)}
           </p>
         )}
       </div>

@@ -95,5 +95,21 @@
     "excellent": "Excellent",
     "reference": "Reference",
     "caution": "Caution"
+  },
+  "marketRegime": {
+    "ranging": "— Ranging",
+    "volatile": "⚠ High Volatility",
+    "trending": "↑ Trending",
+    "support": "Support",
+    "resistance": "Resistance"
+  },
+  "quotaDisplay": {
+    "exhausted": "Daily quota exhausted, resets at UTC 00:00 tomorrow",
+    "remaining": "Daily quota"
+  },
+  "symbolInput": {
+    "label": "Trading Pair Symbol",
+    "analyzing": "Analyzing...",
+    "start": "Start Analysis"
   }
 }

@@ -78,5 +78,6 @@
     "confirmed": "Read",
     "noContent": "No detail content",
     "footer": "AXIOM · Notifications"
-  }
+  },
+  "broadcastLabel": "BROADCAST"
 }

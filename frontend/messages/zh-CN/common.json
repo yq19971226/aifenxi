@@ -169,5 +169,15 @@
     "auditLog": {
       "title": "暂无审计日志"
     }
+  },
+  "offline": {
+    "message": "网络连接已断开，部分功能可能不可用",
+    "dismiss": "关闭"
+  },
+  "moduleError": {
+    "loadFailed": "加载失败"
+  },
+  "dataTable": {
+    "emptyText": "无数据"
   }
 }

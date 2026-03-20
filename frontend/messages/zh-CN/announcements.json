@@ -78,5 +78,6 @@
     "confirmed": "已阅",
     "noContent": "暂无详细内容",
     "footer": "AXIOM · 消息中心"
-  }
+  },
+  "broadcastLabel": "广播"
 }

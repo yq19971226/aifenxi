@@ -78,5 +78,6 @@
     "confirmed": "已閱",
     "noContent": "暫無詳細內容",
     "footer": "AXIOM · 訊息中心"
-  }
+  },
+  "broadcastLabel": "廣播"
 }

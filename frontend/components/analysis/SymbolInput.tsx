@@ -1,6 +1,7 @@
 "use client";
 
 import { RefreshCw } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 // ── Component ────────────────────────────────────────────────
 
@@ -21,13 +22,14 @@ export function SymbolInput({
   canStart,
   onStart,
 }: SymbolInputProps) {
+  const t = useTranslations("analysis.symbolInput");
   const displaySymbols = quickSymbols.slice(0, 5);
 
   return (
     <div className="flex flex-col lg:flex-row items-end gap-4 bg-white/[0.01] border border-white/[0.03] p-5 rounded-lg">
       <div className="w-full flex-1 space-y-2">
         <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
-          交易对 Symbol
+          {t("label")}
         </label>
         <div className="relative">
           <input
@@ -72,10 +74,10 @@ export function SymbolInput({
         {running ? (
           <>
             <RefreshCw size={14} className="animate-spin" />
-            分析中...
+            {t("analyzing")}
           </>
         ) : (
-          "开始分析"
+          t("start")
         )}
       </button>
     </div>

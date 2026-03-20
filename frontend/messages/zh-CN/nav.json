@@ -89,5 +89,14 @@
       "push": "推送设置",
       "settings": "设置"
     }
+  },
+  "membership": {
+    "flagship": "旗舰会员",
+    "pro": "专业会员",
+    "free": "普通用户"
+  },
+  "sidebar": {
+    "expand": "展开侧边栏",
+    "collapse": "收起侧边栏"
   }
 }

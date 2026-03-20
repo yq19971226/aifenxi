@@ -95,5 +95,21 @@
     "excellent": "优质",
     "reference": "可参考",
     "caution": "谨慎"
+  },
+  "marketRegime": {
+    "ranging": "— 震荡区间",
+    "volatile": "⚠ 高波动",
+    "trending": "↑ 趋势行情",
+    "support": "支撑",
+    "resistance": "阻力"
+  },
+  "quotaDisplay": {
+    "exhausted": "今日配额已用完，明日 UTC 00:00 重置",
+    "remaining": "今日分析配额"
+  },
+  "symbolInput": {
+    "label": "交易对 Symbol",
+    "analyzing": "分析中...",
+    "start": "开始分析"
   }
 }

@@ -260,7 +260,7 @@ export function Sidebar() {
                 >
                   <div className="text-sm font-bold truncate text-zinc-200 leading-tight mb-0.5">{user.email?.split("@")[0] ?? "User"}</div>
                   <div className="text-xs font-bold font-mono tracking-widest text-zinc-500 truncate uppercase">
-                    {user.membership_level >= 2 ? "旗舰会员" : user.membership_level >= 1 ? "专业会员" : "普通用户"}
+                    {user.membership_level >= 2 ? t("membership.flagship") : user.membership_level >= 1 ? t("membership.pro") : t("membership.free")}
                   </div>
                 </motion.div>
               )}

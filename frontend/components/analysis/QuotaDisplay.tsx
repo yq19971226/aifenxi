@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-
+import { useTranslations } from "next-intl";
 import type { QuotaInfo } from "@/lib/api/analysis";
 
 // ── Component ────────────────────────────────────────────────
@@ -14,6 +14,7 @@ interface QuotaDisplayProps {
 }
 
 export function QuotaDisplay({ quota, isLocked, isExhausted, upgradeHint }: QuotaDisplayProps) {
+  const t = useTranslations("analysis.quotaDisplay");
   return (
     <div className="flex flex-col gap-2">
       {upgradeHint && (
@@ -29,7 +30,7 @@ export function QuotaDisplay({ quota, isLocked, isExhausted, upgradeHint }: Quot
       {isExhausted && !isLocked && (
         <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3">
           <p className="text-sm text-red-400 font-medium">
-            今日配额已用完，明日 UTC 00:00 重置
+            {t("exhausted")}
           </p>
         </div>
       )}
@@ -38,7 +39,7 @@ export function QuotaDisplay({ quota, isLocked, isExhausted, upgradeHint }: Quot
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-            <span className="text-xs text-zinc-500">今日分析配额</span>
+            <span className="text-xs text-zinc-500">{t("remaining")}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex gap-1">

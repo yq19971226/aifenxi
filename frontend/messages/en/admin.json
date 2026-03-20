@@ -1025,5 +1025,10 @@
     "errorRate": "Error Rate",
     "calls": "calls",
     "errors": "errors"
+  },
+  "orderSync": {
+    "syncFailed": "Failed to sync order status",
+    "syncing": "Re-checking…",
+    "sync": "Re-check Status"
   }
 }

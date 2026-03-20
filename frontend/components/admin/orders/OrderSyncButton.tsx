@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { syncAdminOrderStatus } from "@/lib/api/admin-orders";
+import { useTranslations } from "next-intl";
 
 interface OrderSyncButtonProps {
   disabled?: boolean;
@@ -16,6 +17,7 @@ export function OrderSyncButton({
   onError,
   onSuccess,
 }: OrderSyncButtonProps) {
+  const t = useTranslations("admin.orderSync");
   const [syncing, setSyncing] = useState(false);
 
   const handleClick = useCallback(async () => {
@@ -25,7 +27,7 @@ export function OrderSyncButton({
       await syncAdminOrderStatus(paymentId);
       onSuccess();
     } catch (error: unknown) {
-      onError(error instanceof Error ? error.message : "同步订单状态失败");
+      onError(error instanceof Error ? error.message : t("syncFailed"));
     } finally {
       setSyncing(false);
     }
@@ -38,7 +40,7 @@ export function OrderSyncButton({
       disabled={disabled || syncing}
       className="rounded-md border border-white/[0.1] bg-white/[0.06] px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-50"
     >
-      {syncing ? "重查中…" : "重查状态"}
+      {syncing ? t("syncing") : t("sync")}
     </button>
   );
 }

@@ -5,8 +5,10 @@ import { usePathname } from "next/navigation";
 import { Megaphone } from "lucide-react";
 import { fetchActiveAnnouncements } from "@/lib/api/announcements";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export function MarqueeBanner() {
+  const t = useTranslations("announcements");
   const pathname = usePathname() || "/";
 
   const { data } = useQuery({
@@ -32,7 +34,7 @@ export function MarqueeBanner() {
       <div className="flex items-center gap-2 pl-4 pr-3 shrink-0 bg-bg-primary h-full z-10 shadow-[10px_0_15px_-5px_rgba(0,0,0,0.5)] border-r border-white/[0.02]">
         <Megaphone size={14} className="text-indigo-400 animate-pulse" />
         <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-500">
-          广播
+          {t("broadcastLabel")}
         </span>
       </div>
       

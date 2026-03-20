@@ -26,6 +26,7 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ userRole }: AdminSidebarProps) {
   const pathname = usePathname();
+  const t = useTranslations("nav.sidebar");
   const [collapsed, setCollapsed] = useState(false);
   const filteredGroups = useFilteredGroups(userRole);
 
@@ -42,7 +43,7 @@ export function AdminSidebar({ userRole }: AdminSidebarProps) {
           type="button"
           onClick={() => setCollapsed((v) => !v)}
           className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-500 hover:text-white hover:bg-white/[0.06] transition-all hover:shadow-[0_0_15px_rgba(255,255,255,0.05)]"
-          aria-label={collapsed ? "展开侧边栏" : "收起侧边栏"}
+          aria-label={collapsed ? t("expand") : t("collapse")}
         >
           {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
         </button>

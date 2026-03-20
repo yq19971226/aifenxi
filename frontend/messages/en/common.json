@@ -169,5 +169,15 @@
     "auditLog": {
       "title": "No audit log"
     }
+  },
+  "offline": {
+    "message": "Network disconnected, some features may be unavailable",
+    "dismiss": "Dismiss"
+  },
+  "moduleError": {
+    "loadFailed": "Load Failed"
+  },
+  "dataTable": {
+    "emptyText": "No data"
   }
 }
