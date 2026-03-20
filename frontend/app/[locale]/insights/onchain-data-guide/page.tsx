@@ -88,13 +88,20 @@ export default function OnchainGuidePage({ params: { locale } }: { params: { loc
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: isZh ? "链上数据完全指南：读懂聪明钱的流向" : "Complete Guide to On-Chain Data: Tracking Smart Money",
-    author: { "@type": "Organization", name: "AXIOM洞察" },
-    publisher: { "@type": "Organization", name: "AXIOM洞察", url: BASE_URL },
+    headline: isZh ? "链上数据完全指南：读懂聪明錢的流向" : "Complete Guide to On-Chain Data: Tracking Smart Money",
+    author: { "@type": "Organization", name: "AXIOM洞察", url: BASE_URL },
+    publisher: { "@type": "Organization", name: "AXIOM洞察", url: BASE_URL,
+      logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.svg` }
+    },
     url: `${BASE_URL}/${locale}/insights/onchain-data-guide`,
+    image: `${BASE_URL}/og-image.png`,
     inLanguage: locale,
     datePublished: "2026-03-05",
-    dateModified: "2026-03-15",
+    dateModified: "2026-03-20",
+    keywords: isZh
+      ? "链上数据,聪明錢,交易所流入流出,巨鲸追踪,MVRV,资金费率,UTXO"
+      : "on-chain data,smart money,exchange inflow outflow,whale tracking,MVRV,funding rate,UTXO,Glassnode",
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE_URL}/${locale}/insights/onchain-data-guide` },
   };
 
   return (

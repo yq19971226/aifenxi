@@ -116,14 +116,21 @@ export default function ManipulationPatternsPage({ params: { locale } }: { param
     "@context": "https://schema.org",
     "@type": "Article",
     headline: isZh
-      ? "BTC 常见主力操盘套路解析：拉盘、砸盘、洗盘全图解"
+      ? "BTC 常见主力操盘套路解析：拉盘、第盘、洗盘全图解"
       : "BTC Market Manipulation Patterns: Pump, Dump & Wash Trading Explained",
-    author: { "@type": "Organization", name: "AXIOM洞察" },
-    publisher: { "@type": "Organization", name: "AXIOM洞察", url: BASE_URL },
+    author: { "@type": "Organization", name: "AXIOM洞察", url: BASE_URL },
+    publisher: { "@type": "Organization", name: "AXIOM洞察", url: BASE_URL,
+      logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.svg` }
+    },
     url: `${BASE_URL}/${locale}/insights/btc-manipulation-patterns`,
+    image: `${BASE_URL}/og-image.png`,
     inLanguage: locale,
     datePublished: "2026-03-10",
-    dateModified: "2026-03-15",
+    dateModified: "2026-03-20",
+    keywords: isZh
+      ? "BTC操盘套路,拉盘第盘,洗盘信号,主力出货,加密货币操控,跟庄技巧"
+      : "BTC manipulation,pump dump,wash trading,stop hunt,market maker patterns,crypto manipulation signals",
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE_URL}/${locale}/insights/btc-manipulation-patterns` },
   };
 
   return (

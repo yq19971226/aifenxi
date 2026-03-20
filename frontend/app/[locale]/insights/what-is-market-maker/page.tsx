@@ -36,13 +36,19 @@ export default function ArticlePage({ params: { locale } }: { params: { locale: 
     description: isZh
       ? "在加密市场中，庄家掌控大量筹码，其行为模式在价格、链上数据和合约市场中留下可识别的痕迹。"
       : "Market makers control large positions. Their behaviors leave identifiable traces in price, on-chain data, and derivatives markets.",
-    author: { "@type": "Organization", name: "AXIOM洞察" },
-    publisher: { "@type": "Organization", name: "AXIOM洞察", url: BASE_URL },
+    author: { "@type": "Organization", name: "AXIOM洞察", url: BASE_URL },
+    publisher: { "@type": "Organization", name: "AXIOM洞察", url: BASE_URL,
+      logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.svg` }
+    },
     url: `${BASE_URL}/${locale}/insights/what-is-market-maker`,
+    image: `${BASE_URL}/og-image.png`,
     inLanguage: locale,
     datePublished: "2026-03-01",
-    dateModified: "2026-03-15",
+    dateModified: "2026-03-20",
     mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE_URL}/${locale}/insights/what-is-market-maker` },
+    keywords: isZh
+      ? "庄家行为,主力控盘,加密货币分析,链上数据,巨鲸追踪,审延策略"
+      : "market maker,crypto manipulation,whale tracking,on-chain analysis,BTC analysis,smart money",
   };
 
   return (
