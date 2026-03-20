@@ -83,5 +83,17 @@
     "minutesAgo": "{min}分鐘前",
     "hoursAgo": "{h}小時前",
     "daysAgo": "{d}天前"
+  },
+  "statusBanner": {
+    "actionable": "可執行",
+    "degraded": "降級",
+    "blocked": "阻斷",
+    "dataCompleteness": "數據完整度"
+  },
+  "strategyQuality": {
+    "prefix": "策略品質：",
+    "excellent": "優質",
+    "reference": "可參考",
+    "caution": "謹慎"
   }
 }

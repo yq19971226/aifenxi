@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { BarChart3, TrendingUp, AlertTriangle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 /* ── Types ── */
 
@@ -32,6 +33,7 @@ function generateMockData(): HourlyData[] {
 /* ── Component ── */
 
 export function ApiCallChart({ data, className = "" }: ApiCallChartProps) {
+  const t = useTranslations("admin.apiCallChart");
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const chartData = data ?? generateMockData();
 
@@ -58,20 +60,20 @@ export function ApiCallChart({ data, className = "" }: ApiCallChartProps) {
       <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
         <div className="flex items-center gap-2">
           <BarChart3 size={14} className="text-zinc-500" />
-          <h3 className="text-sm font-medium text-zinc-200">API 调用量</h3>
-          <span className="text-sm text-zinc-500">过去 24 小时</span>
+          <h3 className="text-sm font-medium text-zinc-200">{t('title')}</h3>
+          <span className="text-sm text-zinc-500">{t('last24h')}</span>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <TrendingUp size={12} className="text-emerald-400" />
             <span className="text-sm text-zinc-400">
-              总计 <span className="font-mono text-zinc-200">{totalCalls.toLocaleString()}</span>
+              {t('total')} <span className="font-mono text-zinc-200">{totalCalls.toLocaleString()}</span>
             </span>
           </div>
           <div className="flex items-center gap-1.5">
             <AlertTriangle size={12} className={Number(errorRate) > 1 ? "text-red-400" : "text-zinc-500"} />
             <span className="text-sm text-zinc-400">
-              错误率 <span className={`font-mono ${Number(errorRate) > 1 ? "text-red-400" : "text-zinc-200"}`}>{errorRate}%</span>
+              {t('errorRate')} <span className={`font-mono ${Number(errorRate) > 1 ? "text-red-400" : "text-zinc-200"}`}>{errorRate}%</span>
             </span>
           </div>
         </div>
@@ -105,9 +107,9 @@ export function ApiCallChart({ data, className = "" }: ApiCallChartProps) {
                 {isHovered && (
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-10 rounded-lg border border-white/[0.08] bg-[#1a1a1f] px-3 py-2 text-xs whitespace-nowrap shadow-xl">
                     <p className="text-zinc-400">{d.hour}</p>
-                    <p className="text-zinc-200 font-mono">{d.calls} 次调用</p>
+                    <p className="text-zinc-200 font-mono">{d.calls} {t('calls')}</p>
                     {d.errors > 0 && (
-                      <p className="text-red-400 font-mono">{d.errors} 次错误</p>
+                      <p className="text-red-400 font-mono">{d.errors} {t('errors')}</p>
                     )}
                   </div>
                 )}

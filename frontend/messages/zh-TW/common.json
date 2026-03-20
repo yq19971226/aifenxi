@@ -114,5 +114,60 @@
     "maintenanceTitle": "綜合分析模組維護中",
     "maintenanceDesc": "系統正在進行升級維護，分析功能暫時不可用。後台數據正常運行，維護完成後將自動恢復。",
     "modeLocked": "該模式需要{tier}會員，請升級後使用"
+  },
+  "emptyStates": {
+    "consensus": {
+      "title": "暫無共識報告",
+      "description": "多智慧體共識報告將在分析完成後展示"
+    },
+    "cases": {
+      "title": "暫無案例數據",
+      "description": "當前篩選條件下沒有匹配的劇本案例"
+    },
+    "alertRules": {
+      "title": "暫無預警規則",
+      "description": "建立您的第一條預警規則，即時監控市場變化"
+    },
+    "alertHistory": {
+      "title": "暫無觸發記錄",
+      "description": "當預警規則條件滿足時，觸發記錄將顯示在這裡"
+    },
+    "chart": {
+      "title": "暫無數據",
+      "description": "數據將在採集後自動展示"
+    },
+    "orders": {
+      "title": "暫無訂單數據"
+    },
+    "users": {
+      "title": "暫無用戶數據"
+    },
+    "notifications": {
+      "title": "暫無通知記錄"
+    },
+    "operators": {
+      "title": "暫無運營員"
+    },
+    "configs": {
+      "title": "暫無配置"
+    },
+    "performance": {
+      "title": "暫無數據",
+      "description": "策略績效數據將在結算後展示"
+    },
+    "playbook": {
+      "title": "暫無劇本匹配",
+      "description": "當前行情未匹配到已知操盤劇本"
+    },
+    "payments": {
+      "title": "暫無支付記錄"
+    },
+    "liquidations": {
+      "title": "暫無爆倉數據",
+      "description": "爆倉數據將在採集後自動展示"
+    },
+    "auditLog": {
+      "title": "暫無審計日誌"
+    }
   }
 }

@@ -8,16 +8,11 @@ import {
   type ExchangeStatusItem,
 } from "@/lib/api/datasources";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 const POLL_INTERVAL = 30_000;
 
-const DOMAIN_LABEL: Record<string, string> = {
-  market: "行情",
-  derivatives: "衍生品",
-  onchain: "链上",
-  macro: "宏观",
-  auxiliary: "辅助",
-};
+
 
 function getOfflineExchanges(exchanges: ExchangeStatusItem[]): ExchangeStatusItem[] {
   return exchanges.filter(
@@ -26,6 +21,14 @@ function getOfflineExchanges(exchanges: ExchangeStatusItem[]): ExchangeStatusIte
 }
 
 export function DataSourceBanner() {
+  const t = useTranslations("dashboard.domainLabels");
+  const domainLabels: Record<string, string> = {
+    market: t("market"),
+    derivatives: t("derivatives"),
+    onchain: t("onchain"),
+    macro: t("macro"),
+    auxiliary: t("auxiliary"),
+  };
   const [snapshot, setSnapshot] = useState<DataSourceStatusSnapshot | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -87,7 +90,7 @@ export function DataSourceBanner() {
             <>
               <span className="opacity-50 mx-1.5">{"\u00B7"}</span>
               <span className="opacity-80">{"\u7F3A\u5931\u4E3B\u57DF\uFF1A"}</span>
-              <span className="font-bold text-white">{missingDomains.map((d) => DOMAIN_LABEL[d] || d).join(" / ")}</span>
+              <span className="font-bold text-white">{missingDomains.map((d) => domainLabels[d] || d).join(" / ")}</span>
             </>
           )}
           {offlineExchanges.length > 0 && (

@@ -957,5 +957,13 @@
       "task": "任务回核 (Task Review)",
       "partner": "合伙人系统 (Partner)"
     }
+  },
+  "apiCallChart": {
+    "title": "API 调用量",
+    "last24h": "过去 24 小时",
+    "total": "总计",
+    "errorRate": "错误率",
+    "calls": "次调用",
+    "errors": "次错误"
   }
 }

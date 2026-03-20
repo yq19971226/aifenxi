@@ -107,5 +107,12 @@
     "avgConfidence": "平均置信度",
     "actionable": "可操作",
     "riskAlert": "风险预警"
+  },
+  "domainLabels": {
+    "market": "行情",
+    "derivatives": "衍生品",
+    "onchain": "链上",
+    "macro": "宏观",
+    "auxiliary": "辅助"
   }
 }

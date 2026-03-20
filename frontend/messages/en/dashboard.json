@@ -107,5 +107,12 @@
     "avgConfidence": "Avg Confidence",
     "actionable": "Actionable",
     "riskAlert": "Risk Alert"
+  },
+  "domainLabels": {
+    "market": "Market",
+    "derivatives": "Derivatives",
+    "onchain": "Onchain",
+    "macro": "Macro",
+    "auxiliary": "Auxiliary"
   }
 }

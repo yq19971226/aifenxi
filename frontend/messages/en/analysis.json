@@ -83,5 +83,17 @@
     "minutesAgo": "{min}m ago",
     "hoursAgo": "{h}h ago",
     "daysAgo": "{d}d ago"
+  },
+  "statusBanner": {
+    "actionable": "Actionable",
+    "degraded": "Degraded",
+    "blocked": "Blocked",
+    "dataCompleteness": "Data completeness"
+  },
+  "strategyQuality": {
+    "prefix": "Quality:",
+    "excellent": "Excellent",
+    "reference": "Reference",
+    "caution": "Caution"
   }
 }

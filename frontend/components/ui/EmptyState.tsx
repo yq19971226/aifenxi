@@ -59,144 +59,160 @@ export function EmptyOnchain() {
 }
 
 export function EmptyConsensus() {
+  const t = useTranslations('common.emptyStates.consensus');
   return (
     <EmptyState
       icon={Brain}
-      title="暂无共识报告"
-      description="多智能体共识报告将在分析完成后展示"
+      title={t('title')}
+      description={t('description')}
     />
   );
 }
 
 export function EmptyCases() {
+  const t = useTranslations('common.emptyStates.cases');
   return (
     <EmptyState
       icon={History}
-      title="暂无案例数据"
-      description="当前筛选条件下没有匹配的剧本案例"
+      title={t('title')}
+      description={t('description')}
     />
   );
 }
 
 export function EmptyAlertRules() {
+  const t = useTranslations('common.emptyStates.alertRules');
   return (
     <EmptyState
       icon={Bell}
-      title="暂无预警规则"
-      description="创建你的第一条预警规则，实时监控市场变化"
+      title={t('title')}
+      description={t('description')}
     />
   );
 }
 
 export function EmptyAlertHistory() {
+  const t = useTranslations('common.emptyStates.alertHistory');
   return (
     <EmptyState
       icon={Zap}
-      title="暂无触发记录"
-      description="当预警规则条件满足时，触发记录将显示在这里"
+      title={t('title')}
+      description={t('description')}
     />
   );
 }
 
 export function EmptyChart() {
+  const t = useTranslations('common.emptyStates.chart');
   return (
     <EmptyState
       icon={BarChart3}
-      title="暂无数据"
-      description="数据将在采集后自动展示"
+      title={t('title')}
+      description={t('description')}
     />
   );
 }
 
 export function EmptyOrders() {
+  const t = useTranslations('common.emptyStates.orders');
   return (
     <EmptyState
       icon={Receipt}
-      title="暂无订单数据"
+      title={t('title')}
     />
   );
 }
 
 export function EmptyUsers() {
+  const t = useTranslations('common.emptyStates.users');
   return (
     <EmptyState
       icon={Users}
-      title="暂无用户数据"
+      title={t('title')}
     />
   );
 }
 
 export function EmptyNotifications() {
+  const t = useTranslations('common.emptyStates.notifications');
   return (
     <EmptyState
       icon={MessageSquare}
-      title="暂无通知记录"
+      title={t('title')}
     />
   );
 }
 
 export function EmptyOperators() {
+  const t = useTranslations('common.emptyStates.operators');
   return (
     <EmptyState
       icon={Shield}
-      title="暂无运营员"
+      title={t('title')}
     />
   );
 }
 
 export function EmptyConfigs() {
+  const t = useTranslations('common.emptyStates.configs');
   return (
     <EmptyState
       icon={Sliders}
-      title="暂无配置"
+      title={t('title')}
     />
   );
 }
 
 export function EmptyPerformance() {
+  const t = useTranslations('common.emptyStates.performance');
   return (
     <EmptyState
       icon={TrendingUp}
-      title="暂无数据"
-      description="策略绩效数据将在结算后展示"
+      title={t('title')}
+      description={t('description')}
     />
   );
 }
 
 export function EmptyPlaybook() {
+  const t = useTranslations('common.emptyStates.playbook');
   return (
     <EmptyState
       icon={FileSearch}
-      title="暂无剧本匹配"
-      description="当前行情未匹配到已知操盘剧本"
+      title={t('title')}
+      description={t('description')}
     />
   );
 }
 
 export function EmptyPayments() {
+  const t = useTranslations('common.emptyStates.payments');
   return (
     <EmptyState
       icon={Receipt}
-      title="暂无支付记录"
+      title={t('title')}
     />
   );
 }
 
 export function EmptyLiquidations() {
+  const t = useTranslations('common.emptyStates.liquidations');
   return (
     <EmptyState
       icon={Zap}
-      title="暂无爆仓数据"
-      description="爆仓数据将在采集后自动展示"
+      title={t('title')}
+      description={t('description')}
     />
   );
 }
 
 export function EmptyAuditLog() {
+  const t = useTranslations('common.emptyStates.auditLog');
   return (
     <EmptyState
       icon={History}
-      title="暂无审计日志"
+      title={t('title')}
     />
   );
 }
+

@@ -114,5 +114,60 @@
     "maintenanceTitle": "Analysis module under maintenance",
     "maintenanceDesc": "System upgrade in progress. Analysis is temporarily unavailable. Background data continues to run — service will auto-restore once complete.",
     "modeLocked": "This mode requires {tier} membership. Please upgrade."
+  },
+  "emptyStates": {
+    "consensus": {
+      "title": "No consensus report",
+      "description": "Multi-agent consensus reports will appear after analysis completes"
+    },
+    "cases": {
+      "title": "No case data",
+      "description": "No matching playbook cases under current filter"
+    },
+    "alertRules": {
+      "title": "No alert rules",
+      "description": "Create your first alert rule to monitor market changes in real time"
+    },
+    "alertHistory": {
+      "title": "No trigger records",
+      "description": "Trigger records will appear here when alert rule conditions are met"
+    },
+    "chart": {
+      "title": "No data",
+      "description": "Data will auto-display after collection"
+    },
+    "orders": {
+      "title": "No orders"
+    },
+    "users": {
+      "title": "No users"
+    },
+    "notifications": {
+      "title": "No notifications"
+    },
+    "operators": {
+      "title": "No operators"
+    },
+    "configs": {
+      "title": "No configurations"
+    },
+    "performance": {
+      "title": "No data",
+      "description": "Strategy performance data will appear after settlement"
+    },
+    "playbook": {
+      "title": "No playbook match",
+      "description": "Current market conditions did not match any known playbook"
+    },
+    "payments": {
+      "title": "No payment records"
+    },
+    "liquidations": {
+      "title": "No liquidation data",
+      "description": "Liquidation data will auto-display after collection"
+    },
+    "auditLog": {
+      "title": "No audit log"
+    }
   }
 }

@@ -1017,5 +1017,13 @@
       "task": "Task Review (Task Review)",
       "partner": "Partner System (Partner)"
     }
+  },
+  "apiCallChart": {
+    "title": "API Call Volume",
+    "last24h": "Last 24 hours",
+    "total": "Total",
+    "errorRate": "Error Rate",
+    "calls": "calls",
+    "errors": "errors"
   }
 }

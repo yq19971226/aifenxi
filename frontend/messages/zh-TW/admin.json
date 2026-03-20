@@ -957,5 +957,13 @@
       "task": "任務回核 (Task Review)",
       "partner": "合夥人系統 (Partner)"
     }
+  },
+  "apiCallChart": {
+    "title": "API 呼叫量",
+    "last24h": "過去 24 小時",
+    "total": "總計",
+    "errorRate": "錯誤率",
+    "calls": "次呼叫",
+    "errors": "次錯誤"
   }
 }

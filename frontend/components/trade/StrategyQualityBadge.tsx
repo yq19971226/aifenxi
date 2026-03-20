@@ -1,22 +1,25 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 interface Props {
   isWorthTaking: boolean;
   confidence: number;
 }
 
 export function StrategyQualityBadge({ isWorthTaking, confidence }: Props) {
-  let label: string;
+  const t = useTranslations("analysis.strategyQuality");
+  let qualityKey: string;
   let colorClass: string;
 
   if (isWorthTaking && confidence >= 0.7) {
-    label = "策略质量：优质";
+    qualityKey = "excellent";
     colorClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
   } else if (isWorthTaking) {
-    label = "策略质量：可参考";
+    qualityKey = "reference";
     colorClass = "bg-amber-500/10 text-amber-400 border-amber-500/20";
   } else {
-    label = "策略质量：谨慎";
+    qualityKey = "caution";
     colorClass = "bg-red-500/10 text-red-400 border-red-500/20";
   }
 
@@ -24,7 +27,8 @@ export function StrategyQualityBadge({ isWorthTaking, confidence }: Props) {
     <span
       className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium ${colorClass}`}
     >
-      {label}
+      {t("prefix")}{t(qualityKey)}
     </span>
   );
 }
+
