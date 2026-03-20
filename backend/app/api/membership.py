@@ -65,13 +65,22 @@ async def _build_feature_matrix() -> list[dict[str, str]]:
     from app.services.config_service import get_config_value
 
     # 读取各等级分析次数（与 analysis_quota.py 使用相同 config key）
-    free_scalp = await get_config_value("analysis_daily_limit_free_scalping", "5")
+    free_scalp_limit = int(await get_config_value("analysis_daily_limit_free_scalping", "0"))
     pro_scalp = await get_config_value("analysis_daily_limit_pro_scalping", "50")
     flag_scalp = await get_config_value("analysis_daily_limit_flagship_scalping", "200")
     pro_intra = await get_config_value("analysis_daily_limit_pro_intraday", "20")
     flag_intra = await get_config_value("analysis_daily_limit_flagship_intraday", "100")
     flag_trend = await get_config_value("analysis_daily_limit_flagship_trend", "50")
     free_trial = await get_config_value("free_trial_intraday_count", "1")
+    welcome_scalp = int(await get_config_value("welcome_bonus_scalping", "10"))
+
+    # 免费用户 scalping 展示：若每日配额为 0，展示注册赠送次数
+    if free_scalp_limit > 0:
+        free_scalp_label = f"{free_scalp_limit}次/天"
+    elif welcome_scalp > 0:
+        free_scalp_label = f"注册赠送{welcome_scalp}次"
+    else:
+        free_scalp_label = "锁定"
 
     try:
         free_trial_count = int(free_trial)
@@ -82,7 +91,7 @@ async def _build_feature_matrix() -> list[dict[str, str]]:
     analysis_features = [
         {
             "name": "实时短线分析",
-            "free": f"{free_scalp}次/天",
+            "free": free_scalp_label,
             "pro": f"{pro_scalp}次/天",
             "flagship": f"{flag_scalp}次/天",
         },
@@ -140,7 +149,7 @@ async def get_plans() -> PlansResponse:
     except Exception:
         logger.warning("读取动态功能矩阵失败，使用静态默认值")
         feature_matrix = [
-            {"name": "实时短线分析", "free": "5次/天", "pro": "50次/天", "flagship": "200次/天"},
+            {"name": "实时短线分析", "free": "注册赠送10次", "pro": "50次/天", "flagship": "200次/天"},
             {"name": "日内博弈分析", "free": "免费体验1次", "pro": "20次/天", "flagship": "100次/天"},
             {"name": "趋势布局分析", "free": "锁定", "pro": "锁定", "flagship": "50次/天"},
         ] + _STATIC_FEATURES
