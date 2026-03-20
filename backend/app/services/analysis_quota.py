@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 ANALYSIS_DAILY_LIMITS: dict[tuple[int, str], int] = {
-    (0, "scalping"): 5,
+    (0, "scalping"): 0,    # 免费用户无每日补充，注册时通过 welcome_bonus 一次性赠送
     (1, "scalping"): 50,
     (2, "scalping"): 200,
     (0, "intraday"): 0,    # locked

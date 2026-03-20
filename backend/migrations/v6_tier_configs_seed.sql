@@ -11,15 +11,25 @@
 -- 以下 SQL 用于记录预期的配置键和默认值。
 -- 实际写入请通过管理后台"配置管理"页面手动添加，或通过启动脚本调用 ConfigService.create_config()。
 
--- ┌─────────────────────────────────┬──────────┬──────────┬─────────────────────────────┐
--- │ config_key                      │ value    │ category │ description                 │
--- ├─────────────────────────────────┼──────────┼──────────┼─────────────────────────────┤
--- │ chat_daily_limit_free           │ 5        │ tier     │ 免费用户每日对话次数上限    │
--- │ chat_daily_limit_pro            │ 50       │ tier     │ 专业用户每日对话次数上限    │
--- │ chat_daily_limit_flagship       │ 200      │ tier     │ 旗舰用户每日对话次数上限    │
--- │ query_limit_free                │ 3        │ tier     │ 免费用户每日查询次数上限    │
--- │ perf_days_free                  │ 7        │ tier     │ 免费用户绩效查看天数        │
--- └─────────────────────────────────┴──────────┴──────────┴─────────────────────────────┘
+-- ┌─────────────────────────────────────────┬──────────┬──────────┬────────────────────────────────────────────┐
+-- │ config_key                              │ value    │ category │ description                                │
+-- ├─────────────────────────────────────────┼──────────┼──────────┼────────────────────────────────────────────┤
+-- │ chat_daily_limit_free                   │ 5        │ tier     │ 免费用户每日对话次数上限                    │
+-- │ chat_daily_limit_pro                    │ 50       │ tier     │ 专业用户每日对话次数上限                    │
+-- │ chat_daily_limit_flagship               │ 200      │ tier     │ 旗舰用户每日对话次数上限                    │
+-- │ query_limit_free                        │ 3        │ tier     │ 免费用户每日查询次数上限                    │
+-- │ perf_days_free                          │ 7        │ tier     │ 免费用户绩效查看天数                        │
+-- │ analysis_daily_limit_free_scalping      │ 0        │ tier     │ 免费用户 scalping 每日配额（0=无每日补充）  │
+-- │ analysis_daily_limit_pro_scalping       │ 50       │ tier     │ 专业用户 scalping 每日配额                  │
+-- │ analysis_daily_limit_flagship_scalping  │ 200      │ tier     │ 旗舰用户 scalping 每日配额                  │
+-- │ analysis_daily_limit_pro_intraday       │ 20       │ tier     │ 专业用户 intraday 每日配额                  │
+-- │ analysis_daily_limit_flagship_intraday  │ 100      │ tier     │ 旗舰用户 intraday 每日配额                  │
+-- │ analysis_daily_limit_flagship_trend     │ 50       │ tier     │ 旗舰用户 trend 每日配额                     │
+-- │ welcome_bonus_scalping                  │ 10       │ tier     │ 新用户注册赠送 scalping 次数（一次性）      │
+-- │ welcome_bonus_intraday                  │ 0        │ tier     │ 新用户注册赠送 intraday 次数（一次性）      │
+-- │ welcome_bonus_trend                     │ 0        │ tier     │ 新用户注册赠送 trend 次数（一次性）         │
+-- └─────────────────────────────────────────┴──────────┴──────────┴────────────────────────────────────────────┘
+
 
 -- 注意: system_configs 表的 encrypted_value 字段需要加密值，
 -- 不能直接 INSERT 明文。请使用以下 Python 启动脚本写入：

@@ -104,8 +104,8 @@
     "resistance": "Resistance"
   },
   "quotaDisplay": {
-    "exhausted": "Daily quota exhausted, resets at UTC 00:00 tomorrow",
-    "remaining": "Daily quota"
+    "exhausted": "Analysis quota exhausted. Upgrade to unlock more.",
+    "remaining": "Today's analysis quota"
   },
   "symbolInput": {
     "label": "Trading Pair Symbol",

@@ -104,7 +104,7 @@
     "resistance": "阻力"
   },
   "quotaDisplay": {
-    "exhausted": "今日配額已用完，明日 UTC 00:00 重置",
+    "exhausted": "分析次數已用完，升級會員解鎖更多次數。",
     "remaining": "今日分析配額"
   },
   "symbolInput": {

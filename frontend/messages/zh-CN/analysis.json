@@ -104,7 +104,7 @@
     "resistance": "阻力"
   },
   "quotaDisplay": {
-    "exhausted": "今日配额已用完，明日 UTC 00:00 重置",
+    "exhausted": "分析次数已用完，升级会员解锁更多次数。",
     "remaining": "今日分析配额"
   },
   "symbolInput": {
