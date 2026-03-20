@@ -244,7 +244,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 app = FastAPI(
     title="Axiom API",
-    version="3.0.0",
+    version=settings.app_version,
     description="加密货币多智能体分析系统",
     lifespan=lifespan,
 )
@@ -314,7 +314,8 @@ async def health() -> dict[str, str]:
 
 
 @app.get("/api/system/market-data-debug", tags=["system"])
-async def market_data_debug(symbol: str = "ETHUSDT", mode: str = "scalping") -> dict:
+async def market_data_debug(symbol: str = "ETHUSDT", mode: str = "scalping",
+                            _admin: UserInfo = Depends(require_admin)) -> dict:
     """调试：运行 _collect_market_data 查看实际采集到的数据。"""
     from app.models.analysis import AnalysisMode
     from app.services.analysis_orchestrator import AnalysisOrchestrator
@@ -339,7 +340,8 @@ async def market_data_debug(symbol: str = "ETHUSDT", mode: str = "scalping") -> 
 
 
 @app.get("/api/system/market-data-debug/trace", tags=["system"])
-async def market_data_debug_trace(symbol: str = "ETHUSDT") -> dict:
+async def market_data_debug_trace(symbol: str = "ETHUSDT",
+                                  _admin: UserInfo = Depends(require_admin)) -> dict:
     """调试：逐步读取 Redis 检查数据链路。"""
     import asyncio, time
     from app.core.redis import get_json, get_redis_pool
@@ -389,7 +391,8 @@ async def market_data_debug_trace(symbol: str = "ETHUSDT") -> dict:
 
 
 @app.get("/api/system/data-check", tags=["system"])
-async def data_check(symbol: str = "ETHUSDT") -> dict:
+async def data_check(symbol: str = "ETHUSDT",
+                     _admin: UserInfo = Depends(require_admin)) -> dict:
     """检查 Redis 中某币种的数据可用性。"""
     from app.core.redis import get_json, get_redis_pool
     result: dict = {"symbol": symbol}
@@ -417,6 +420,7 @@ async def data_check(symbol: str = "ETHUSDT") -> dict:
 async def kline_progress(
     symbols: str = "BTCUSDT,ETHUSDT",
     intervals: str = _DEFAULT_KLINE_INTERVALS_CSV,
+    _admin: UserInfo = Depends(require_admin),
 ) -> dict:
     """查看指定币种 K 线采集与指标联动进度（按周期）。"""
     from app.core.redis import get_json, get_redis_pool
@@ -608,7 +612,7 @@ async def kline_progress(
 
 
 @app.get("/api/system/kline-scheduler", tags=["system"])
-async def kline_scheduler_status() -> dict:
+async def kline_scheduler_status(_admin: UserInfo = Depends(require_admin)) -> dict:
     """查看 K 线自动采集调度器状态。"""
     from app.services.kline_scheduler import INTERVALS, COLLECT_CYCLE_SEC
     from app.services.symbol_registry import get_active_symbols
