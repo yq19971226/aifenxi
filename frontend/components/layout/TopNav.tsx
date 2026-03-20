@@ -230,7 +230,7 @@ export function TopNav() {
                     <div className="min-w-0">
                       <div className="text-sm font-bold truncate text-zinc-200">{user.email?.split("@")[0] ?? "User"}</div>
                       <div className="text-xs text-zinc-500 font-bold font-mono uppercase tracking-widest mt-0.5">
-                      {user.membership_level >= 2 ? t('common.roleAdmin') : user.membership_level >= 1 ? t('common.roleOperator') : t('common.roleUser')}
+                      {user.is_admin ? t('common.roleAdmin') : user.membership_level >= 2 ? t('membership.flagship') : user.membership_level >= 1 ? t('membership.pro') : t('membership.free')}
                       </div>
                     </div>
                   </div>
