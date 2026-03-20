@@ -179,3 +179,25 @@ export async function fetchCurrentUser(): Promise<UserInfo> {
   const res = await authFetch(`${API_BASE}/api/auth/me`);
   return handleApiResponse(res, "获取用户信息失败");
 }
+
+export async function forgotPassword(email: string): Promise<{ message: string }> {
+  const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  return handleApiResponse<{ message: string }>(res, "发送失败");
+}
+
+export async function resetPassword(
+  email: string,
+  code: string,
+  new_password: string
+): Promise<{ message: string }> {
+  const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, code, new_password }),
+  });
+  return handleApiResponse<{ message: string }>(res, "重置失败");
+}
