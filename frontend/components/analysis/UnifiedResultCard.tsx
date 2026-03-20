@@ -238,7 +238,60 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
         />
       </div>
 
+      {/* ── 庄家动态横幅 ── */}
+      {(() => {
+        const phaseSection = report.sections?.find(s => s.title === "操盘阶段");
+        const phaseData = phaseSection?.data as { current_phase?: string; transition?: { from_phase?: string; to_phase?: string; reason?: string } } | undefined;
+        const phase = phaseData?.current_phase;
+        if (!phase || report.status === "blocked") return null;
+
+        const PHASE_META: Record<string, { label: string; eng: string; color: string; border: string; bg: string; desc: string; emoji: string }> = {
+          accumulation: { label: "吸筹", eng: "ACCUMULATION", color: "text-sky-400",    border: "border-sky-500/25",  bg: "bg-sky-500/[0.06]",     desc: "庄家正在低位建仓，逢低买入，市场暂处低迷",        emoji: "🟦" },
+          testing:      { label: "试盘", eng: "TESTING",      color: "text-amber-400",  border: "border-amber-500/25",bg: "bg-amber-500/[0.06]",   desc: "庄家试探市场浮筹，小幅震荡试水，注意短期波动",     emoji: "🟡" },
+          markup:       { label: "拉盘", eng: "MARKUP",       color: "text-emerald-400",border: "border-emerald-500/25",bg: "bg-emerald-500/[0.06]", desc: "庄家拉升价格吸引追多，主升浪阶段可顺势而为",       emoji: "🟢" },
+          distribution: { label: "派发",  eng: "DISTRIBUTION", color: "text-orange-400", border: "border-orange-500/25",bg: "bg-orange-500/[0.06]",  desc: "庄家高位逐步出货，散户接盘，注意阻力位压力",       emoji: "🟠" },
+          escape:       { label: "出逃",  eng: "ESCAPE",       color: "text-red-400",    border: "border-red-500/25",  bg: "bg-red-500/[0.06]",     desc: "庄家快速撤离，大量筹码涌入交易所，风险极高",       emoji: "🔴" },
+          washout:      { label: "洗盘",  eng: "WASHOUT",      color: "text-violet-400", border: "border-violet-500/25",bg: "bg-violet-500/[0.06]", desc: "庄家制造恐慌，强制清洗浮筹，震荡后可能进入拉盘",   emoji: "🟣" },
+        };
+
+        const meta = PHASE_META[phase] ?? { label: phase, eng: phase.toUpperCase(), color: "text-zinc-300", border: "border-zinc-500/25", bg: "bg-zinc-500/[0.04]", desc: "", emoji: "⚪" };
+        const transition = phaseData?.transition;
+
+        return (
+          <div className={`mx-5 mt-4 flex items-start gap-4 rounded-xl border ${meta.border} ${meta.bg} px-5 py-4`}>
+            {/* Phase badge */}
+            <div className="flex flex-col items-center shrink-0">
+              <span className="text-2xl leading-none">{meta.emoji}</span>
+              <span className={`text-[9px] font-mono font-bold mt-1.5 tracking-[0.2em] uppercase ${meta.color}`}>{meta.eng}</span>
+            </div>
+            {/* Divider */}
+            <div className="w-px self-stretch bg-white/[0.06] shrink-0" />
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">庄家当前动作</span>
+                {transition && (
+                  <span className="text-[10px] font-mono text-zinc-600">
+                    ↳ 刚从 <span className={`font-bold ${meta.color}`}>{PHASE_META[transition.from_phase ?? ""]?.label ?? transition.from_phase}</span> 转入
+                  </span>
+                )}
+              </div>
+              <p className={`text-sm font-black tracking-tight mb-1.5 ${meta.color}`}>
+                {meta.label}中
+              </p>
+              <p className="text-xs text-zinc-400 leading-relaxed">{meta.desc}</p>
+              {transition?.reason && (
+                <p className="text-[11px] text-zinc-600 mt-1.5 font-mono">
+                  依据: {transition.reason}
+                </p>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* ── Content Body ── */}
+
       <div className="p-5 grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-6">
         {/* Left: Reasoning & Findings */}
         <div className="space-y-5">
