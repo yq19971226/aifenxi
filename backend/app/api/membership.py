@@ -53,10 +53,9 @@ _STATIC_FEATURES: list[dict[str, str]] = [
     {"name": "链上数据", "free": "延迟15分钟", "pro": "实时", "flagship": "实时"},
     {"name": "多智能体共识", "free": "—", "pro": "—", "flagship": "✓"},
     {"name": "策略推送", "free": "—", "pro": "邮件", "flagship": "邮件+TG"},
-    {"name": "剧本推演", "free": "—", "pro": "基础", "flagship": "完整"},
-    {"name": "对抗防御", "free": "—", "pro": "—", "flagship": "✓"},
+    {"name": "AI 对抗推演", "free": "—", "pro": "—", "flagship": "✓"},
     {"name": "策略回测", "free": "7天", "pro": "30天", "flagship": "180天"},
-    {"name": "API 访问", "free": "—", "pro": "—", "flagship": "✓"},
+    {"name": "积分包充值", "free": "可购买", "pro": "可购买", "flagship": "可购买"},
 ]
 
 
