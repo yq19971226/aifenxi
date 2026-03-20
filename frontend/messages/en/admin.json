@@ -108,7 +108,8 @@
       "partner": "Partner",
       "push": "Push Settings",
       "alerts": "Price Alerts",
-      "online_count": "Online Count"
+      "online_count": "Online Count",
+      "adversarial": "AI Adversarial Sim"
     },
     "paths": {
       "playbook": "/playbook-sim",
@@ -117,7 +118,8 @@
       "partner": "/partner",
       "push": "/settings/push",
       "alerts": "/alerts",
-      "online_count": ""
+      "online_count": "",
+      "adversarial": "/adversarial"
     }
   },
   "push": {
@@ -606,6 +608,10 @@
       "online_count": {
         "label": "Online Count Display",
         "desc": "Show online user count on landing page and dashboard"
+      },
+      "adversarial": {
+        "label": "AI Adversarial Sim",
+        "desc": "/adversarial — AI adversarial simulation system"
       }
     },
     "auditLog": {
@@ -622,7 +628,11 @@
         "delete": "Delete"
       },
       "empty": "No audit records",
-      "error": "Failed to load audit logs"
+      "error": "Failed to load audit logs",
+      "openTitle": "Collapse Audit Log",
+      "pagination": "Page {page}/{total} ({count} records)",
+      "prev": "Previous",
+      "next": "Next"
     },
     "wizard": {
       "title": "System Setup Wizard",

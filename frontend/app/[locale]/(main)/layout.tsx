@@ -1,5 +1,7 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopNav } from "@/components/layout/TopNav";
 import { AuthGuard } from "@/components/layout/AuthGuard";
@@ -19,6 +21,8 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
+  const pathname = usePathname();
+  const isAdminRoute = pathname?.includes("/admin");
   return (
     <AuthGuard>
       <PresenceHeartbeat />
@@ -64,10 +68,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
               </div>
             </main>
 
-            {/* Right Context Sidebar - Desktop Only */}
-            <aside className="hidden xl:block w-[300px] shrink-0 border-l border-border bg-bg-primary/50 sticky top-0 h-screen overflow-y-auto p-4">
-              <ContextSidebar />
-            </aside>
+            {/* Right Context Sidebar - Desktop Only, hidden on admin routes */}
+            {!isAdminRoute && (
+              <aside className="hidden xl:block w-[300px] shrink-0 border-l border-border bg-bg-primary/50 sticky top-0 h-screen overflow-y-auto p-4">
+                <ContextSidebar />
+              </aside>
+            )}
           </div>
         </div>
       </div>
