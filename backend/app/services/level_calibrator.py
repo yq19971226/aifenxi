@@ -142,7 +142,6 @@ def _collect_structural_levels(
         ob_type = getattr(ob, "type", None) or getattr(ob, "ob_type", "")
         if ob_top is None or ob_bot is None:
             continue
-        ob_mid = (ob_top + ob_bot) / 2
 
         if ob_type in ("demand", "bullish"):
             # 需求块：价格下方是支撑
