@@ -457,6 +457,21 @@ function CheckoutSidebar({
               </div>
             )}
 
+            {/* Oxapay 托管支付页面入口 */}
+            {currentPayment.payment_url && currentPayment.status === "pending" && !isExpired && (
+              <a
+                href={currentPayment.payment_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full rounded-lg py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-[11px] font-black uppercase tracking-[0.15em] transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)]"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                打开支付页面
+              </a>
+            )}
+
             <div className="p-3.5 rounded-lg border border-white/[0.05] bg-black/30">
               <span className={`text-[9px] font-mono font-bold uppercase tracking-widest flex items-center gap-2 ${currentPayment.status === "pending" && isExpired ? "text-zinc-600" : st?.text}`}>
                 <span className="h-1.5 w-1.5 rounded-full bg-current opacity-60" />{statusMsg}
@@ -717,6 +732,10 @@ export default function MembershipPage() {
       setCurrentPayment(payment);
       setPaymentExpiresAt(Date.now() + PAYMENT_TIMEOUT_MS);
       queryClient.invalidateQueries({ queryKey: ["paymentHistory"] });
+      // Oxapay 返回托管支付页面，自动打开新标签让用户扫码/转账
+      if (payment.payment_url) {
+        window.open(payment.payment_url, "_blank", "noopener,noreferrer");
+      }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "创建支付失败");
     } finally { setCreating(false); }
