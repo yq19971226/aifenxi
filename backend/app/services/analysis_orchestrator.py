@@ -661,6 +661,13 @@ class AnalysisOrchestrator:
         except Exception as exc:
             logger.warning("confluence_filter_failed (skipping): %s", exc)
 
+        # ── 9.5. 市场方向一致性过滤（逆势信号置信度惩罚）────────
+        try:
+            from app.services.regime_direction_filter import apply_regime_direction_filter
+            report = apply_regime_direction_filter(report, market_data)
+        except Exception as exc:
+            logger.warning("regime_direction_filter failed (skipping): %s", exc)
+
         # ── 10. 信号不足标识：置信度未达阈值且被降级为 neutral ──
         try:
             from app.services.config_service import get_config_value

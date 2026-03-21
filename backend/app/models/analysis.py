@@ -259,6 +259,11 @@ class AnalysisReport(BaseModel):
         default=None,
         description="当前生效的置信度阈值（后台动态配置 consensus_min_confidence）",
     )
+    # ── 方向一致性过滤 ─────────────────────────────────────────
+    regime_direction_penalized: bool = Field(
+        default=False,
+        description="True 表示信号与大周期趋势方向相反，置信度已被惩罚（×0.65）",
+    )
 
 
 # ---------------------------------------------------------------------------
