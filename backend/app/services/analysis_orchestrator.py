@@ -2407,6 +2407,7 @@ class AnalysisOrchestrator:
                                 fvg_list=fvg_results,
                                 ob_list=ob_results,
                                 vp_data=vp_data,
+                                mode="trend",
                             )
                             strategy.snapped_fields = (strategy.snapped_fields or []) + _sf
                         except Exception as _ce:
