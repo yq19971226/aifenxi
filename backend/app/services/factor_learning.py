@@ -258,25 +258,51 @@ def _is_hit(direction: str, pct_change: float) -> bool:
         return abs(pct_change) < 0.005
 
 
+async def _price_at_time(
+    session,
+    symbol: str,
+    target_time: datetime,
+) -> float | None:
+    """从 klines 表查询 target_time 之后最近的 1h 收盘价。
+
+    多时间窗口共用同一个 session，避免频繁建立连接。
+    返回 None 表示该时刻的数据尚未落库（信号太新）。
+    """
+    try:
+        result = await session.execute(
+            text("""
+                SELECT close
+                FROM klines
+                WHERE symbol = :symbol
+                  AND interval = '1h'
+                  AND time >= :target_time
+                ORDER BY time ASC
+                LIMIT 1
+            """),
+            {"symbol": symbol.upper(), "target_time": target_time},
+        )
+        row = result.fetchone()
+        if row and row[0] and float(row[0]) > 0:
+            return float(row[0])
+    except Exception as exc:
+        logger.debug("_price_at_time query failed: %s", exc)
+    return None
+
+
 async def track_outcomes():
     """追踪未回填的因子快照的价格结果。
 
     由定时任务调用（每 15 分钟一次）。
+
+    核心修正：每个时间窗口（15m/1h/4h/24h）使用历史 klines 表中
+    该窗口边界时刻的实际收盘价，而非「追踪时刻」的当前价格。
+    避免以 T+24h 的价格充当 T+4h 的结果，导致命中率系统性失真。
     """
     await _ensure_tables()
 
-    try:
-        from app.core.redis import get_json
-    except ImportError:
-        logger.warning("Redis not available for price lookup")
-        return
-
     async with AsyncSessionLocal() as session:
         # 找出需要追踪的快照（已过去 15m 且未完成追踪的）
-        cutoff_15m = datetime.now(timezone.utc) - timedelta(minutes=16)
-        cutoff_1h = datetime.now(timezone.utc) - timedelta(hours=1, minutes=1)
-        cutoff_4h = datetime.now(timezone.utc) - timedelta(hours=4, minutes=1)
-        cutoff_24h = datetime.now(timezone.utc) - timedelta(hours=24, minutes=1)
+        cutoff_15m = datetime.now(timezone.utc) - timedelta(minutes=15)
 
         rows = await session.execute(
             text("""
@@ -297,72 +323,72 @@ async def track_outcomes():
         if not snapshots:
             return
 
+        now_utc = datetime.now(timezone.utc)
         updated = 0
+
         for row in snapshots:
-            snap_id, symbol, direction, price_at, created_at = row[0], row[1], row[2], row[3], row[4]
+            snap_id, symbol, direction, price_at, created_at = (
+                row[0], row[1], row[2], float(row[3]), row[4],
+            )
             tracking_id = row[5]
-            existing_15m, existing_1h, existing_4h, existing_24h = row[6], row[7], row[8], row[9]
+            existing_15m, existing_1h, existing_4h, existing_24h = (
+                row[6], row[7], row[8], row[9],
+            )
 
-            # 从 Redis 获取当前价格
-            sym_upper = symbol.upper()
-            current_price = 0.0
-
-            # 1) 优先读 latest_price（由 kline_scheduler 写入）
-            raw_price = await get_json(f"latest_price:{sym_upper}")
-            if raw_price is not None and isinstance(raw_price, (int, float)) and raw_price > 0:
-                current_price = float(raw_price)
-
-            # 2) 回退：从 klines 列表取最新 close
-            if current_price <= 0:
-                for itv in ["5m", "15m", "1h"]:
-                    kline_list = await get_json(f"klines:{sym_upper}:{itv}")
-                    if kline_list and isinstance(kline_list, list) and len(kline_list) > 0:
-                        last = kline_list[-1]
-                        if isinstance(last, dict):
-                            current_price = float(last.get("close", last.get("c", 0)))
-                        if current_price > 0:
-                            break
-
-            if current_price <= 0:
+            if not price_at or price_at <= 0:
                 continue
 
-            # 防御：price_at 为 0 时跳过（不应发生，但防止除零）
-            if not price_at or float(price_at) <= 0:
-                continue
+            # 统一保证 created_at 有时区
+            if created_at.tzinfo is None:
+                created_at = created_at.replace(tzinfo=timezone.utc)
 
-            age = datetime.now(timezone.utc) - (created_at if created_at.tzinfo else created_at.replace(tzinfo=timezone.utc))
+            age = now_utc - created_at
+            updates: dict = {}
 
-            # 根据时间填充对应窗口的价格
-            updates = {}
+            # ── 15 分钟窗口 ──────────────────────────────────────
             if existing_15m is None and age >= timedelta(minutes=15):
-                pct = (current_price - price_at) / price_at
-                updates["price_after_15m"] = current_price
-                updates["pct_change_15m"] = pct
-                updates["hit_15m"] = _is_hit(direction, pct)
+                target = created_at + timedelta(minutes=15)
+                p = await _price_at_time(session, symbol, target)
+                if p:
+                    pct = (p - price_at) / price_at
+                    updates["price_after_15m"] = p
+                    updates["pct_change_15m"] = pct
+                    updates["hit_15m"] = _is_hit(direction, pct)
 
+            # ── 1 小时窗口 ───────────────────────────────────────
             if existing_1h is None and age >= timedelta(hours=1):
-                pct = (current_price - price_at) / price_at
-                updates["price_after_1h"] = current_price
-                updates["pct_change_1h"] = pct
-                updates["hit_1h"] = _is_hit(direction, pct)
+                target = created_at + timedelta(hours=1)
+                p = await _price_at_time(session, symbol, target)
+                if p:
+                    pct = (p - price_at) / price_at
+                    updates["price_after_1h"] = p
+                    updates["pct_change_1h"] = pct
+                    updates["hit_1h"] = _is_hit(direction, pct)
 
+            # ── 4 小时窗口 ───────────────────────────────────────
             if existing_4h is None and age >= timedelta(hours=4):
-                pct = (current_price - price_at) / price_at
-                updates["price_after_4h"] = current_price
-                updates["pct_change_4h"] = pct
-                updates["hit_4h"] = _is_hit(direction, pct)
+                target = created_at + timedelta(hours=4)
+                p = await _price_at_time(session, symbol, target)
+                if p:
+                    pct = (p - price_at) / price_at
+                    updates["price_after_4h"] = p
+                    updates["pct_change_4h"] = pct
+                    updates["hit_4h"] = _is_hit(direction, pct)
 
+            # ── 24 小时窗口 ──────────────────────────────────────
             if existing_24h is None and age >= timedelta(hours=24):
-                pct = (current_price - price_at) / price_at
-                updates["price_after_24h"] = current_price
-                updates["pct_change_24h"] = pct
-                updates["hit_24h"] = _is_hit(direction, pct)
+                target = created_at + timedelta(hours=24)
+                p = await _price_at_time(session, symbol, target)
+                if p:
+                    pct = (p - price_at) / price_at
+                    updates["price_after_24h"] = p
+                    updates["pct_change_24h"] = pct
+                    updates["hit_24h"] = _is_hit(direction, pct)
 
             if not updates:
                 continue
 
             if tracking_id is None:
-                # 新建追踪记录
                 cols = ", ".join(["snapshot_id"] + list(updates.keys()))
                 vals = ", ".join([":snapshot_id"] + [f":{k}" for k in updates.keys()])
                 await session.execute(
@@ -370,10 +396,12 @@ async def track_outcomes():
                     {"snapshot_id": snap_id, **updates},
                 )
             else:
-                # 更新已有追踪记录
                 set_clause = ", ".join(f"{k} = :{k}" for k in updates.keys())
                 await session.execute(
-                    text(f"UPDATE vpd_outcome_tracking SET {set_clause}, tracked_at = NOW() WHERE id = :tid"),
+                    text(
+                        f"UPDATE vpd_outcome_tracking "
+                        f"SET {set_clause}, tracked_at = NOW() WHERE id = :tid"
+                    ),
                     {"tid": tracking_id, **updates},
                 )
             updated += 1
