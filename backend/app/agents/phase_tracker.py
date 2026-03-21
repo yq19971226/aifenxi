@@ -283,7 +283,7 @@ async def _save_phase_state(symbol: str, state: PhaseState) -> None:
         await redis.hset(key, mapping={
             "phase": state.phase.value,
             "entered_at": state.entered_at,
-            "score_gap": str(getattr(state, 'score_gap', 0.0)),
+            "score_gap": str(state.score_gap),
             "transitions": json.dumps(state.transitions, ensure_ascii=False),
         })
         # 设置 TTL 7 天，避免无限堆积

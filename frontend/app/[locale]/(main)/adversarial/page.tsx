@@ -223,7 +223,7 @@ export default function AdversarialPage() {
             <span className={`text-sm font-medium ${bannerText}`}>{bannerMsg}</span>
             <span className="ml-auto flex items-center gap-2 text-xs text-zinc-500">
               <span>{t("consistencyConsensus")}: <span className="font-semibold text-zinc-300">{SIGNAL_LABELS[cSignal] || cSignal}</span></span>
-              <span>{t("consistencyConfidence")}: <span className="font-mono text-zinc-300">{(cRef.confidence * 100).toFixed(0)}%</span></span>
+              <span>{t("consistencyConfidence")}: <span className="font-mono text-zinc-300">{(cRef.confidence > 1 ? cRef.confidence : cRef.confidence * 100).toFixed(0)}%</span></span>
             </span>
           </div>
         );
