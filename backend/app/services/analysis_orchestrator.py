@@ -1653,6 +1653,10 @@ class AnalysisOrchestrator:
                     market_regime=regime_val,
                     regime_support=regime_info.support if regime_info else None,
                     regime_resistance=regime_info.resistance if regime_info else None,
+                    klines_1d=market_data.klines_1d or [],
+                    klines_4h=market_data.klines_4h or [],
+                    indicators=market_data.indicators.model_dump() if market_data.indicators else None,
+                    mode="intraday",
                 )
                 try:
                     strategy = await self._point_snapper.snap(strategy, symbol)
@@ -2339,6 +2343,10 @@ class AnalysisOrchestrator:
                     market_regime=regime_info.regime.value if regime_info else None,
                     regime_support=regime_info.support if regime_info else None,
                     regime_resistance=regime_info.resistance if regime_info else None,
+                    klines_1d=market_data.klines_1d or [],
+                    klines_4h=market_data.klines_4h or [],
+                    indicators=market_data.indicators.model_dump() if market_data.indicators else None,
+                    mode="trend",
                 )
                 try:
                     strategy = await self._point_snapper.snap(strategy, symbol)

@@ -350,19 +350,21 @@ class StrategyService:
         market_regime: str | None = None,
         regime_support: float | None = None,
         regime_resistance: float | None = None,
-        klines_1d: list[dict] | None = None,
+        klines_1d: list | None = None,
+        klines_4h: list | None = None,
         indicators: dict | None = None,
+        mode: str = "scalping",
     ) -> StrategyResult:
         """根据 ConsensusReport 生成策略。
 
-        利用共识信号、加权置信度和分歧度生成策略。
-        分歧度高时降低置信度，少数派警告附加到 reasoning。
-        当 ATR 可用时使用 ATR 动态计算入场区间和止损，否则回退到固定百分比。
+        趋势分支优先从真实技术关口（Pivot Point、Swing High/Low、EMA、BB）
+        生成 TP 目标位，候选不足时才回退到 ATR 倍数。
 
         market_regime: "ranging" | "trending" | "volatile" | None
-            当为 "ranging" 时自动切换为区间策略（高抛低吸）。
         klines_1d: 日线 K 线列表（用于 Pivot Point 公式化 S/R）
+        klines_4h: 4小时 K 线列表（日内模式 Swing 头尾位参考）
         indicators: 技术指标字典（含 bb_upper/bb_lower/ema25/ema99）
+        mode: 分析模式，影响 Swing 回溯窗口和 TP 最小间距
         """
         # P3-C: 公式化支撑阻力位交叉验证
         if regime_support or regime_resistance:
@@ -463,37 +465,71 @@ class StrategyService:
                 is_worth_taking=worth,
             )
 
-        # ── 趋势/高波动市场：原有逻辑 ───────────────────────
+        # ── 趋势/高波动市场：优先用结构性关口定 TP ─────────────
+        # 主 K 线数据：日内用 4h，趋势用 1d；均不可用时退到另一个
+        _primary_klines = klines_1d or klines_4h
+        _tp_source = "structural"   # 记录 TP 来源，供 reasoning 标注
+
+        # ── 先用结构性候选池尝试获取 TP ─────────────────────────
+        try:
+            from app.services.formalized_sr import build_tp_candidates
+            _indic_dict = indicators if isinstance(indicators, dict) else (
+                indicators.model_dump() if indicators is not None else None
+            )
+            tp_pool = build_tp_candidates(
+                direction, current_price, _primary_klines, _indic_dict,
+                mode=mode, atr=atr,
+            )
+        except Exception as _tpe:
+            logger.warning("build_tp_candidates failed, using ATR fallback: %s", _tpe)
+            tp_pool = []
+
+        # TP 池至少需要 2 个候选才算有效（避免单点误判）
+        _has_structural_tp = len(tp_pool) >= 2
+
+        # 入场区间和止损仍然用 ATR（ATR 适合描述波动幅度，不适合做 TP）
         if direction == "long":
             if use_atr:
                 m = _atr_multipliers(atr, current_price)
                 entry_low = current_price - m["entry"] * atr
                 stop_loss = current_price - m["stop"] * atr
-                targets = [current_price + t * atr for t in m["targets"]]
             else:
                 entry_low = current_price * 0.98
                 stop_loss = current_price * 0.95
-                targets = [
-                    current_price * 1.03,
-                    current_price * 1.06,
-                    current_price * 1.10,
-                ]
             entry_high = current_price
+
+            if _has_structural_tp:
+                # 从候选池选出大于 entry_high 的前 3 个
+                targets = [t for t in tp_pool if t > entry_high][:3]
+            else:
+                _tp_source = "atr_fallback"
+                if use_atr:
+                    m = _atr_multipliers(atr, current_price)
+                    targets = [current_price + t * atr for t in m["targets"]]
+                else:
+                    targets = [current_price * 1.03, current_price * 1.06, current_price * 1.10]
+
         elif direction == "short":
             entry_low = current_price
             if use_atr:
                 m = _atr_multipliers(atr, current_price)
                 entry_high = current_price + m["entry"] * atr
                 stop_loss = current_price + m["stop"] * atr
-                targets = [current_price - t * atr for t in m["targets"]]
             else:
                 entry_high = current_price * 1.02
                 stop_loss = current_price * 1.05
-                targets = [
-                    current_price * 0.97,
-                    current_price * 0.94,
-                    current_price * 0.90,
-                ]
+
+            if _has_structural_tp:
+                # 从候选池选出小于 entry_low 的前 3 个
+                targets = [t for t in tp_pool if t < entry_low][:3]
+            else:
+                _tp_source = "atr_fallback"
+                if use_atr:
+                    m = _atr_multipliers(atr, current_price)
+                    targets = [current_price - t * atr for t in m["targets"]]
+                else:
+                    targets = [current_price * 0.97, current_price * 0.94, current_price * 0.90]
+
         else:
             if use_atr:
                 entry_low = current_price - 0.5 * atr
@@ -503,11 +539,20 @@ class StrategyService:
                 entry_high = current_price * 1.01
             stop_loss = current_price * 0.95
             targets = []
+            _tp_source = "neutral"
+
+        if _tp_source != "structural":
+            logger.info(
+                "TP source fallback to %s for direction=%s mode=%s "
+                "(pool_size=%d, primary_klines=%d)",
+                _tp_source, direction, mode,
+                len(tp_pool), len(_primary_klines) if _primary_klines else 0,
+            )
 
         # 最终验证：确保方向一致性
         entry_low, entry_high, stop_loss, targets = self._validate_strategy(
             direction, current_price, entry_low, entry_high, stop_loss, targets,
-            market_regime=market_regime,
+            market_regime=market_regime, mode=mode,
         )
 
         # 价格精度优化
@@ -541,10 +586,19 @@ class StrategyService:
         total_votes = len(report.model_votes)
         agree_votes = bull_votes if report.consensus_signal == "bullish" else bear_votes
 
+        # TP 来源标注（帮助用户判断目标位可信度）
+        _tp_source_zh = {
+            "structural": "锚定技术关口（Pivot/Swing/EMA/BB）",
+            "atr_fallback": "ATR估算（关键位不足退回）",
+            "neutral": "",
+        }.get(_tp_source, "")
+
         reasoning = (
             f"共识方向: {_signal_zh}（{agree_votes}/{total_votes} 个智能体一致）。"
             f"置信度: {confidence:.0%}。分歧度: {report.divergence:.1f}%。"
         )
+        if _tp_source_zh:
+            reasoning += f"\nTP目标: {_tp_source_zh}。"
         if _regime_zh:
             reasoning = f"【{_regime_zh}市场】" + reasoning
         if report.minority_warnings:
