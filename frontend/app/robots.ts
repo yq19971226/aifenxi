@@ -26,8 +26,6 @@ export default function robots(): MetadataRoute.Robots {
           "/*/performance/*",
           "/*/backtest",
           "/*/backtest/*",
-          "/*/leaderboard",
-          "/*/leaderboard/*",
           "/*/tasks",
           "/*/tasks/*",
           "/*/partner",

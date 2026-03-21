@@ -157,7 +157,8 @@
     "defenseDetail": "詳情 →",
     "votePanelTitle": "共識投票詳情",
     "weightedScore": "加權分數",
-    "divergenceLabel": "分歧度"
+    "divergenceLabel": "分歧度",
+    "heatmapTitle": "分歧熱力圖"
   },
   "strategy": {
     "priceMap": "價位分佈圖",

@@ -157,7 +157,8 @@
     "defenseDetail": "Detail →",
     "votePanelTitle": "Consensus Vote Details",
     "weightedScore": "Weighted Score",
-    "divergenceLabel": "Divergence"
+    "divergenceLabel": "Divergence",
+    "heatmapTitle": "Divergence Heatmap"
   },
   "strategy": {
     "priceMap": "Price Map",

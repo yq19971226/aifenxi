@@ -113,6 +113,7 @@
     "register": "Sign Up Free",
     "resources": "Resources",
     "guide": "User Guide",
+    "insights": "Insights",
     "docs": "Data Disclosure",
     "faq": "FAQ",
     "legal": "Legal",
@@ -126,6 +127,7 @@
     "features": "Features",
     "modes": "Modes",
     "data": "Data",
+    "insights": "Insights",
     "login": "Log In",
     "enterApp": "Enter App",
     "register": "Sign Up Free"

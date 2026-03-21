@@ -40,6 +40,7 @@ from app.api.datasources import router as datasources_router
 
 from app.api.reflection import router as reflection_router
 from app.api.defense import router as defense_router
+from app.api.defense_public import router as defense_public_router
 from app.api.admin_models import router as admin_models_router
 from app.api.learning import router as learning_router
 from app.api.membership import router as membership_router
@@ -53,6 +54,7 @@ from app.api.admin_system import router as admin_system_router
 from app.api.webhooks_resend import router as webhooks_resend_router
 from app.api.dashboard_overview import router as dashboard_overview_router
 from app.api.leaderboard import router as leaderboard_router
+from app.api.leaderboard_public import router as leaderboard_public_router
 from app.api.autopilots import router as autopilots_router
 from app.core.config import settings
 from app.core.logging import setup_logging
@@ -308,6 +310,8 @@ app.include_router(admin_system_router)
 app.include_router(webhooks_resend_router)
 app.include_router(dashboard_overview_router)
 app.include_router(leaderboard_router)
+app.include_router(leaderboard_public_router)
+app.include_router(defense_public_router)
 app.include_router(autopilots_router)
 
 

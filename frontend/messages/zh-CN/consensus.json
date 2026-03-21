@@ -144,7 +144,8 @@
     "defenseDetail": "详情 →",
     "votePanelTitle": "共识投票详情",
     "weightedScore": "加权分数",
-    "divergenceLabel": "分歧度"
+    "divergenceLabel": "分歧度",
+    "heatmapTitle": "分歧热力图"
   },
   "strategy": {
     "priceMap": "价位分布图",

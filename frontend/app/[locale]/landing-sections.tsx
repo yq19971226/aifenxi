@@ -128,31 +128,38 @@ function HeroSection() {
   );
 }
 
-function TerminalBlock() {
-  const fullLog = [
-    "> 正在授权访问令牌...",
-    "> 同步全球预言节点... [OK]",
-    "> 部署 AI 智能体 (数量: 4)... [已激活]",
-    "> 智能体[技术]: 检测到 $BTC 波动率飙升",
-    "> 智能体[风险]: 对冲比率已调整 -> 0.45",
-    "> 启动蜂群辩论协议...",
-    "> 第1轮: 看多倾向 (65% 置信度)",
-    "> 第2轮: 交叉验证链上数据...",
-    "> 共识达成: 强力买入 (82%)",
-    "> 执行网格策略生成..."
-  ];
+const _TERMINAL_LOG = [
+  "> 正在授权访问令牌...",
+  "> 同步全球预言节点... [OK]",
+  "> 部署 AI 智能体 (数量: 4)... [已激活]",
+  "> 智能体[技术]: 检测到 $BTC 波动率飙升",
+  "> 智能体[风险]: 对冲比率已调整 -> 0.45",
+  "> 启动蜂群辩论协议...",
+  "> 第1轮: 看多倾向 (65% 置信度)",
+  "> 第2轮: 交叉验证链上数据...",
+  "> 共识达成: 强力买入 (82%)",
+  "> 执行网格策略生成...",
+];
 
+function TerminalBlock() {
   const [visibleCount, setVisibleCount] = useState(0);
+  const [ts, setTs] = useState("00:00:00.000");
 
   useEffect(() => {
-    if (visibleCount >= fullLog.length) return;
+    // 客户端才更新时间戳，避免 SSR/客户端水合不一致
+    setTs(new Date().toISOString().split("T")[1].slice(0, 12));
+  }, []);
+
+  useEffect(() => {
+    if (visibleCount >= _TERMINAL_LOG.length) return;
     const timer = setTimeout(() => {
       setVisibleCount((c) => c + 1);
-    }, Math.random() * 400 + 400); // Randomized typing speed
+      setTs(new Date().toISOString().split("T")[1].slice(0, 12));
+    }, Math.random() * 400 + 400);
     return () => clearTimeout(timer);
-  }, [visibleCount, fullLog.length]);
+  }, [visibleCount]);
 
-  const lines = fullLog.slice(0, visibleCount);
+  const lines = _TERMINAL_LOG.slice(0, visibleCount);
 
   return (
     <div className="relative border border-white/[0.05] bg-black/60 backdrop-blur-2xl p-1 font-mono text-[10px] shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden">
@@ -179,10 +186,10 @@ function TerminalBlock() {
         
         <div className="relative z-10 w-full flex flex-col gap-1.5">
           {lines.map((line, i) => {
-            const isHighlight = typeof line === "string" && line.includes("共识");
+            const isHighlight = line?.includes("共识") ?? false;
             return (
               <div key={i} className={`${isHighlight ? 'text-indigo-400 font-bold drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]' : 'text-emerald-400/70'} tracking-wider`}>
-                <span className="text-zinc-600 mr-3 hidden sm:inline-block">[{new Date().toISOString().split('T')[1].slice(0, 11)}]</span>
+                <span className="text-zinc-600 mr-3 hidden sm:inline-block">[{ts}]</span>
                 {line}
               </div>
             );
@@ -525,7 +532,7 @@ export function LandingPage() {
             ) : (
               <>
                 <Link href={`/${locale}/insights`} className="text-zinc-500 font-bold hover:text-white transition-colors hidden sm:block">
-                  {locale.startsWith("zh") ? "洞察" : "Insights"}
+                  {t("nav.insights")}
                 </Link>
                 <Link href={`/${locale}/login`} className="text-zinc-400 hover:text-white border px-4 py-1.5 border-white/10 hover:border-white/30 hover:bg-white/5 transition-colors">
                   {t("nav.login")}
@@ -551,10 +558,12 @@ export function LandingPage() {
       <footer className="py-12 border-t border-white/[0.04] bg-black text-center text-[10px] text-zinc-600 font-mono tracking-widest uppercase">
         <div className="flex flex-wrap items-center justify-center gap-8 mb-6 font-bold">
           <Link href={`/${locale}/guide`} className="hover:text-indigo-400 transition-colors">{t("footer.guide")}</Link>
-          <Link href={`/${locale}/insights`} className="hover:text-indigo-400 transition-colors">{locale.startsWith("zh") ? "洞察专区" : "Insights"}</Link>
-          <Link href={`/${locale}/guide`} className="hover:text-indigo-400 transition-colors">{t("footer.docs")}</Link>
+          <Link href={`/${locale}/insights`} className="hover:text-indigo-400 transition-colors">{t("footer.insights")}</Link>
           <Link href={`/${locale}/guide#faq`} className="hover:text-indigo-400 transition-colors">{t("footer.faq")}</Link>
         </div>
+        <p className="max-w-2xl mx-auto px-4 mb-6 text-[9px] leading-relaxed normal-case tracking-normal text-zinc-500/80 font-sans">
+          {t("footer.riskText")}
+        </p>
         <p className="opacity-50">{t("footerOperational", { year: new Date().getFullYear() })}</p>
       </footer>
     </div>

@@ -1,0 +1,25 @@
+# AXIOM Insight
+
+> AI-powered multi-agent cryptocurrency analysis platform
+
+## About
+
+AXIOM Insight is an AI-driven crypto trading analysis platform that uses multiple specialized AI agents to provide comprehensive market analysis. The system analyzes technical indicators, on-chain data, derivatives markets, and market sentiment to generate actionable trading strategies.
+
+## Public Pages
+
+- [Strategy Leaderboard](https://www.axiom123.cc/zh-CN/rankings): Real-time AI strategy performance rankings sorted by Profit Factor. Includes win rate, average PnL, and detailed trader statistics.
+- [AI Adversarial Analysis](https://www.axiom123.cc/zh-CN/ai-adversarial): Real-time AI adversarial simulation that analyzes market from the market maker's perspective. Identifies stop hunts, fake breakouts, FOMO traps, danger zones, safety zones, and opportunity zones for BTC and ETH.
+- [Insights](https://www.axiom123.cc/zh-CN/insights): Deep analysis articles on market maker behavior, on-chain data interpretation, and AI trading strategies.
+- [What is Market Maker Behavior](https://www.axiom123.cc/zh-CN/insights/what-is-market-maker): Guide to identifying market manipulation signals in crypto markets.
+- [On-Chain Data Guide](https://www.axiom123.cc/zh-CN/insights/onchain-data-guide): Complete guide to tracking smart money through blockchain data.
+- [BTC Manipulation Patterns](https://www.axiom123.cc/zh-CN/insights/btc-manipulation-patterns): Analysis of common pump, dump, and accumulation patterns in Bitcoin.
+- [User Guide](https://www.axiom123.cc/zh-CN/guide): Platform usage guide and feature documentation.
+
+## Key Features
+
+- Multi-agent AI consensus analysis (technical, on-chain, derivatives, sentiment)
+- Real-time strategy generation with auto-tracked performance
+- Public leaderboard with transparent Profit Factor rankings
+- Support for intraday and trend trading modes
+- Available in Chinese (Simplified/Traditional) and English

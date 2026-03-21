@@ -113,6 +113,7 @@
     "register": "免费注册",
     "resources": "资源",
     "guide": "使用指南",
+    "insights": "洞察专区",
     "docs": "数据说明",
     "faq": "常见问题",
     "legal": "法律",
@@ -126,6 +127,7 @@
     "features": "功能",
     "modes": "分析模式",
     "data": "数据来源",
+    "insights": "洞察",
     "login": "登录",
     "enterApp": "进入工作台",
     "register": "免费注册"

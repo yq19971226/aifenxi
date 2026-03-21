@@ -182,5 +182,6 @@
   },
   "rateHistoryChart": {
     "noData": "No rate data available"
-  }
+  },
+  "disclaimer": "All analysis provided on this platform is for reference and research purposes only and does not constitute any investment advice. Cryptocurrency markets carry extremely high risk — please assess risks independently before making decisions."
 }

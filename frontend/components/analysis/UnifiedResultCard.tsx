@@ -563,7 +563,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
         </div>
       )}
 
-      {/* ── P3-A: 共识投票透明度面板 ── */}
+      {/* ── P3-A: 共识投票透明度面板 + 分歧热力图 ── */}
       {consensusDetail && consensusDetail.model_votes.length > 0 && (
         <div className="mx-5 mb-1 rounded-lg border border-indigo-500/15 bg-indigo-500/[0.02] overflow-hidden">
           <button
@@ -573,6 +573,12 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
             <span className="flex items-center gap-2">
               <span className="text-indigo-400">🤖</span>
               {t("card.votePanelTitle")}
+              {/* 分歧度指示器 */}
+              {consensusDetail.divergence != null && consensusDetail.divergence > 30 && (
+                <span className="ml-1 px-1.5 py-0.5 text-[9px] font-bold rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-widest">
+                  {t("card.divergenceLabel")} {consensusDetail.divergence.toFixed(0)}%
+                </span>
+              )}
             </span>
             <ChevronDown
               size={14}
@@ -583,53 +589,124 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
             />
           </button>
           {votesOpen && (
-            <div className="px-4 pb-3 space-y-2 border-t border-indigo-500/10">
-              {consensusDetail.model_votes.map((v) => (
-                <div
-                  key={v.model_key}
-                  className="flex items-center gap-3 py-1.5 text-xs"
-                >
-                  <span className="w-[90px] font-medium text-zinc-300 shrink-0">
-                    {v.label}
-                  </span>
-                  <span
-                    className={cn(
-                      "w-[40px] font-bold text-center shrink-0",
-                      v.signal === "bullish" ? "text-emerald-400" :
-                      v.signal === "bearish" ? "text-red-400" : "text-zinc-500"
-                    )}
-                  >
-                    {v.signal === "bullish" ? "看多" : v.signal === "bearish" ? "看空" : "中性"}
-                  </span>
-                  <div className="flex-1 flex items-center gap-1.5">
-                    <div className="w-16 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+            <div className="border-t border-indigo-500/10">
+              {/* ── 分歧热力图 ── */}
+              <div className="px-4 pt-3 pb-2">
+                <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2.5">
+                  {t("card.heatmapTitle")}
+                </p>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {consensusDetail.model_votes.map((v) => {
+                    // 维度标签映射
+                    // 后端 _anonymize_report() 会将 model_key 脱敏为 analyst_alpha/beta/gamma/delta
+                    const DIMENSION_LABELS: Record<string, { zh: string; en: string; icon: string }> = {
+                      analyst_alpha: { zh: "链上", en: "On-chain", icon: "⛓" },
+                      analyst_beta:  { zh: "宏观", en: "Macro",    icon: "🌐" },
+                      analyst_gamma: { zh: "风控", en: "Risk",     icon: "🛡" },
+                      analyst_delta: { zh: "形态", en: "Pattern",  icon: "📐" },
+                    };
+                    const dim = DIMENSION_LABELS[v.model_key] || { zh: v.label || v.model_key, en: v.label || v.model_key, icon: "🤖" };
+                    // signal → 色值：bullish->绿 bearish->红 neutral->灰
+                    const signalColor =
+                      v.signal === "bullish"
+                        ? `rgba(16, 185, 129, ${0.15 + v.confidence * 0.55})`
+                        : v.signal === "bearish"
+                        ? `rgba(239, 68, 68, ${0.15 + v.confidence * 0.55})`
+                        : `rgba(113, 113, 122, ${0.15 + v.confidence * 0.25})`;
+                    const borderColor =
+                      v.signal === "bullish"
+                        ? `rgba(16, 185, 129, ${0.3 + v.confidence * 0.3})`
+                        : v.signal === "bearish"
+                        ? `rgba(239, 68, 68, ${0.3 + v.confidence * 0.3})`
+                        : `rgba(113, 113, 122, 0.2)`;
+                    const textColor =
+                      v.signal === "bullish" ? "text-emerald-300" :
+                      v.signal === "bearish" ? "text-red-300" : "text-zinc-400";
+
+                    return (
                       <div
-                        className={cn(
-                          "h-full rounded-full",
-                          v.confidence >= 0.6 ? "bg-emerald-500" :
-                          v.confidence >= 0.4 ? "bg-amber-500" : "bg-red-500"
-                        )}
-                        style={{ width: `${Math.round(v.confidence * 100)}%` }}
-                      />
-                    </div>
-                    <span className="text-zinc-500 font-mono w-[32px] text-right">
-                      {Math.round(v.confidence * 100)}%
-                    </span>
-                  </div>
+                        key={v.model_key}
+                        className="relative flex flex-col items-center justify-center py-2.5 px-1 rounded-md transition-all hover:scale-[1.03]"
+                        style={{ backgroundColor: signalColor, border: `1px solid ${borderColor}` }}
+                        title={v.key_findings?.join(" · ") || v.label}
+                      >
+                        <span className="text-sm leading-none mb-1">{dim.icon}</span>
+                        <span className="text-[9px] font-black text-zinc-300 uppercase tracking-widest leading-none mb-1">
+                          {dim.zh}
+                        </span>
+                        <span className={cn("text-xs font-black leading-none", textColor)}>
+                          {v.signal === "bullish" ? "▲ 多" : v.signal === "bearish" ? "▼ 空" : "● 中"}
+                        </span>
+                        <span className="text-[9px] font-mono text-zinc-400 mt-0.5">
+                          {Math.round(v.confidence * 100)}%
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-              {/* 底部汇总: 加权分数 + 分歧度 */}
-              <div className="flex items-center gap-4 pt-2 border-t border-indigo-500/10 text-[10px] text-zinc-500 font-mono">
-                {consensusDetail.weighted_score != null && (
-                  <span>
-                    {t("card.weightedScore")}: <span className="text-zinc-300 font-bold">{consensusDetail.weighted_score.toFixed(2)}</span>
-                  </span>
-                )}
-                {consensusDetail.divergence != null && (
-                  <span>
-                    {t("card.divergenceLabel")}: <span className="text-zinc-300 font-bold">{consensusDetail.divergence.toFixed(1)}%</span>
-                  </span>
-                )}
+              </div>
+
+              {/* ── 详细投票 + 核心发现 ── */}
+              <div className="px-4 pb-3 space-y-1.5">
+                {consensusDetail.model_votes.map((v) => {
+                  const findings = v.key_findings ?? [];
+                  return (
+                    <div key={v.model_key} className="rounded-md bg-white/[0.02] border border-white/[0.04] px-3 py-2">
+                      <div className="flex items-center gap-3 text-xs">
+                        <span className="w-[90px] font-medium text-zinc-300 shrink-0">
+                          {v.label}
+                        </span>
+                        <span
+                          className={cn(
+                            "w-[40px] font-bold text-center shrink-0",
+                            v.signal === "bullish" ? "text-emerald-400" :
+                            v.signal === "bearish" ? "text-red-400" : "text-zinc-500"
+                          )}
+                        >
+                          {v.signal === "bullish" ? "看多" : v.signal === "bearish" ? "看空" : "中性"}
+                        </span>
+                        <div className="flex-1 flex items-center gap-1.5">
+                          <div className="w-16 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                            <div
+                              className={cn(
+                                "h-full rounded-full transition-all",
+                                v.confidence >= 0.6 ? "bg-emerald-500" :
+                                v.confidence >= 0.4 ? "bg-amber-500" : "bg-red-500"
+                              )}
+                              style={{ width: `${Math.round(v.confidence * 100)}%` }}
+                            />
+                          </div>
+                          <span className="text-zinc-500 font-mono w-[32px] text-right">
+                            {Math.round(v.confidence * 100)}%
+                          </span>
+                        </div>
+                      </div>
+                      {/* 核心发现 */}
+                      {findings.length > 0 && (
+                        <div className="mt-1.5 flex flex-wrap gap-1">
+                          {findings.slice(0, 2).map((f, i) => (
+                            <span key={i} className="text-[10px] text-zinc-500 bg-white/[0.03] px-2 py-0.5 rounded border border-white/[0.04] leading-tight">
+                              {f}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                {/* 底部汇总: 加权分数 + 分歧度 */}
+                <div className="flex items-center gap-4 pt-2 border-t border-indigo-500/10 text-[10px] text-zinc-500 font-mono">
+                  {consensusDetail.weighted_score != null && (
+                    <span>
+                      {t("card.weightedScore")}: <span className="text-zinc-300 font-bold">{consensusDetail.weighted_score.toFixed(2)}</span>
+                    </span>
+                  )}
+                  {consensusDetail.divergence != null && (
+                    <span>
+                      {t("card.divergenceLabel")}: <span className={cn("font-bold", consensusDetail.divergence > 50 ? "text-red-400" : consensusDetail.divergence > 30 ? "text-amber-400" : "text-zinc-300")}>{consensusDetail.divergence.toFixed(1)}%</span>
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           )}

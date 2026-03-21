@@ -12,6 +12,7 @@ import { DataSourceBanner } from "@/components/cards/DataSourceBanner";
 import { OfflineBanner } from "@/components/ui/OfflineBanner";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { TelegramSupport } from "@/components/layout/TelegramSupport";
+import { Disclaimer } from "@/components/layout/Disclaimer";
 
 import type { ReactNode } from "react";
 
@@ -65,6 +66,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
               </div>
             </main>
 
+            <Disclaimer />
 
           </div>
         </div>
