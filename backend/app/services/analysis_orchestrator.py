@@ -1681,6 +1681,7 @@ class AnalysisOrchestrator:
                             ob_list=ob_results,
                             vp_data=vp_data,
                             atr=_atr,
+                            mode="intraday",
                         )
                         # 记录校准字段（追加到 snapped_fields）
                         strategy.snapped_fields = (strategy.snapped_fields or []) + _struct_fields
@@ -2369,6 +2370,7 @@ class AnalysisOrchestrator:
                             ob_list=ob_results,
                             vp_data=vp_data,
                             atr=_atr,
+                            mode="trend",
                         )
                         strategy.snapped_fields = (strategy.snapped_fields or []) + _struct_fields
                     except Exception as _ce:

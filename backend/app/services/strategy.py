@@ -447,7 +447,7 @@ class StrategyService:
 
             entry_low, entry_high, stop_loss, targets = self._validate_strategy(
                 direction, current_price, entry_low, entry_high, stop_loss, targets,
-                market_regime="ranging",
+                market_regime="ranging", mode=mode,
             )
             rr, worth = self._calc_risk_reward(direction, entry_low, entry_high, stop_loss, targets)
             worth = worth and confidence >= 0.4

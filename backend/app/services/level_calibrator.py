@@ -26,6 +26,13 @@ logger = logging.getLogger(__name__)
 _MAX_SNAP_PCT = 0.03   # 3% — 超过此距离不强制吸附，保留ATR值
 _TIGHT_SNAP_PCT = 0.015  # 1.5% — 强吸附窗口（OB/FVG质量高时适用）
 
+# 止盈位最小距离（相对当前价）：防止结构吸附把 TP 压到入场区附近
+_MODE_MIN_TP_PCT: dict[str, float] = {
+    "scalping": 0.005,   # 0.5%
+    "intraday": 0.015,   # 1.5%
+    "trend":    0.030,   # 3.0%
+}
+
 
 # ---------------------------------------------------------------------------
 # 操盘阶段 → 信号置信度修正
@@ -192,6 +199,7 @@ def calibrate_strategy_levels(
     ob_list: list,
     vp_data: dict | None,
     atr: float | None = None,
+    mode: str = "scalping",
 ) -> tuple[float, float, float, list[float], list[str]]:
     """用结构性价位精准校准策略点位。
 
@@ -208,6 +216,8 @@ def calibrate_strategy_levels(
         return entry_low, entry_high, stop_loss, targets, []
 
     calibrated: list[str] = []
+    # 当前模式的止盈最小距离（相对当前价），防止结构吸附把 TP 压缩到入场区附近
+    min_tp_pct = _MODE_MIN_TP_PCT.get(mode, _MODE_MIN_TP_PCT["scalping"])
 
     supports, resistances = _collect_structural_levels(
         direction, fvg_list, ob_list, vp_data, current_price,
@@ -238,11 +248,13 @@ def calibrate_strategy_levels(
                 calibrated.append("entry→structure")
 
         # ── 目标位：吸附到结构阻力 ─────────────────────────
+        # 条件：结构位须高于入场区上沿 AND 满足模式最小距离（距当前价 >= min_tp_pct）
+        min_tp_price_long = current_price * (1 + min_tp_pct)
         new_targets: list[float] = []
         for i, t in enumerate(targets[:3]):
-            snap = _closest_above(current_price if i == 0 else (new_targets[-1] if new_targets else t),
-                                   resistances, _MAX_SNAP_PCT)
-            if snap is not None and snap > entry_high:
+            ref = current_price if i == 0 else (new_targets[-1] if new_targets else t)
+            snap = _closest_above(ref, resistances, _MAX_SNAP_PCT)
+            if snap is not None and snap > entry_high and snap >= min_tp_price_long:
                 new_targets.append(round(snap, 8))
                 if snap != t:
                     calibrated.append(f"tp{i+1}→structure")
@@ -271,11 +283,14 @@ def calibrate_strategy_levels(
                 calibrated.append("entry→structure")
 
         # ── 目标位：吸附到结构支撑 ─────────────────────────
+        # 条件：结构位须低于入场区下沿 AND 满足模式最小距离（距当前价 >= min_tp_pct）
+        # 关键修复：ranging 市场 entry_low 可高于当前价，故必须双重验证
+        min_tp_price_short = current_price * (1 - min_tp_pct)
         new_targets = []
         for i, t in enumerate(targets[:3]):
-            snap = _closest_below(current_price if i == 0 else (new_targets[-1] if new_targets else t),
-                                   supports, _MAX_SNAP_PCT)
-            if snap is not None and snap < entry_low:
+            ref = current_price if i == 0 else (new_targets[-1] if new_targets else t)
+            snap = _closest_below(ref, supports, _MAX_SNAP_PCT)
+            if snap is not None and snap < entry_low and snap <= min_tp_price_short:
                 new_targets.append(round(snap, 8))
                 if snap != t:
                     calibrated.append(f"tp{i+1}→structure")
