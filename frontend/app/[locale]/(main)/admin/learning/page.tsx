@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
@@ -531,47 +531,48 @@ function WeightsTab() {
 function CalibrationTab() {
   const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
 
   const { data, isLoading, error } = useQuery<CalibrationParams>({
     queryKey: ["calibrationParams"],
     queryFn: fetchCalibrationParams,
   });
 
-  const [threshold, setThreshold] = useState<number | null>(null);
-  const [minAgree, setMinAgree] = useState<number | null>(null);
-  const [minConf, setMinConf] = useState<number | null>(null);
+  const [threshold, setThreshold] = useState<number>(0.35);
+  const [minAgree, setMinAgree] = useState<number>(2);
+  const [minConf, setMinConf] = useState<number>(0.40);
 
-  const currentThreshold = threshold ?? data?.signal_threshold ?? 0.35;
-  const currentMinAgree = minAgree ?? data?.min_agreement ?? 2;
-  const currentMinConf = minConf ?? data?.min_confidence ?? 0.40;
+  // 从 API 数据初始化表单值
+  useEffect(() => {
+    if (data) {
+      setThreshold(data.signal_threshold);
+      setMinAgree(data.min_agreement);
+      setMinConf(data.min_confidence);
+    }
+  }, [data]);
 
   const handleSave = useCallback(async () => {
     setSaving(true);
     setMsg(null);
     try {
-      const params: { signal_threshold?: number; min_agreement?: number; min_confidence?: number } = {};
-      if (threshold !== null) params.signal_threshold = threshold;
-      if (minAgree !== null) params.min_agreement = minAgree;
-      if (minConf !== null) params.min_confidence = minConf;
-      await updateCalibrationParams(params);
-      setMsg("参数已更新");
+      await updateCalibrationParams({
+        signal_threshold: threshold,
+        min_agreement: minAgree,
+        min_confidence: minConf,
+      });
+      setMsg({ text: "参数已更新", ok: true });
       queryClient.invalidateQueries({ queryKey: ["calibrationParams"] });
-      setThreshold(null);
-      setMinAgree(null);
-      setMinConf(null);
     } catch (err: unknown) {
-      setMsg(err instanceof Error ? err.message : "更新失败");
+      setMsg({ text: err instanceof Error ? err.message : "更新失败", ok: false });
     } finally {
       setSaving(false);
     }
-  }, [threshold, minAgree, queryClient]);
+  }, [threshold, minAgree, minConf, queryClient]);
 
   if (isLoading) return <Loading />;
   if (error) return <ErrorMsg msg={error instanceof Error ? error.message : "加载失败"} />;
 
   const rec = data?.recommended;
-  const hasChanges = threshold !== null || minAgree !== null || minConf !== null;
 
   return (
     <div className="space-y-4">
@@ -589,7 +590,7 @@ function CalibrationTab() {
               step="0.05"
               min={rec?.signal_threshold.min}
               max={rec?.signal_threshold.max}
-              value={currentThreshold}
+              value={threshold}
               onChange={(e) => setThreshold(parseFloat(e.target.value))}
               className="mt-2 w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-accent/40"
             />
@@ -606,7 +607,7 @@ function CalibrationTab() {
               step="1"
               min={rec?.min_agreement.min}
               max={rec?.min_agreement.max}
-              value={currentMinAgree}
+              value={minAgree}
               onChange={(e) => setMinAgree(parseInt(e.target.value))}
               className="mt-2 w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-accent/40"
             />
@@ -623,7 +624,7 @@ function CalibrationTab() {
               step="0.05"
               min={rec?.min_confidence.min ?? 0}
               max={rec?.min_confidence.max ?? 0.9}
-              value={currentMinConf}
+              value={minConf}
               onChange={(e) => setMinConf(parseFloat(e.target.value))}
               className="mt-2 w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-accent/40"
             />
@@ -631,23 +632,25 @@ function CalibrationTab() {
         </div>
 
         {msg && (
-          <p className={`mt-3 text-xs ${msg.includes("失败") ? "text-bear" : "text-bull"}`}>{msg}</p>
+          <p className={`mt-3 text-xs ${msg.ok ? "text-bull" : "text-bear"}`}>{msg.text}</p>
         )}
 
         <div className="mt-4 flex items-center justify-between">
           <button
             onClick={() => {
-              setThreshold(rec?.signal_threshold.default ?? 0.35);
-              setMinAgree(rec?.min_agreement.default ?? 2);
-              setMinConf(rec?.min_confidence.default ?? 0.40);
-            }}
+            if (data) {
+              setThreshold(data.recommended?.signal_threshold.default ?? 0.35);
+              setMinAgree(data.recommended?.min_agreement.default ?? 2);
+              setMinConf(data.recommended?.min_confidence.default ?? 0.40);
+            }
+          }}
             className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
           >
             恢复默认值
           </button>
           <button
             onClick={handleSave}
-            disabled={saving || !hasChanges}
+            disabled={saving}
             className="rounded-lg bg-[var(--color-accent)]/20 px-4 py-2 text-xs font-semibold text-accent transition-all hover:bg-[var(--color-accent)]/30 disabled:opacity-50"
           >
             {saving ? "保存中..." : "保存"}
