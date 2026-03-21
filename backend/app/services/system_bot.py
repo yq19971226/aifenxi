@@ -22,7 +22,7 @@ SYSTEM_BOT_USER_ID = UUID("00000000-0000-0000-0000-000000000001")
 
 # 要分析的币种和模式
 BOT_SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT"]
-BOT_MODES = [AnalysisMode.SCALPING, AnalysisMode.INTRADAY, AnalysisMode.TREND]
+BOT_MODES = [AnalysisMode.SCALPING]
 
 # 每轮各 (symbol, mode) 之间的间隔秒数，避免同时占满资源
 _INTER_ANALYSIS_DELAY = 15.0
