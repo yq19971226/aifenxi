@@ -1755,10 +1755,11 @@ class AnalysisOrchestrator:
         sections: list[ReportSection] = []
 
         # --- 基于 exec_plan.resolved_agents 并行调用智能体 ---
+        _nsed_mode = ctx.execution_plan.contract.mode_id if hasattr(ctx.execution_plan.contract, "mode_id") else "trend"
         async def _safe_nsed() -> ConsensusReport | None:
             try:
                 return await asyncio.wait_for(
-                    run_nsed(market_data), timeout=_AGENT_TIMEOUT * 2,
+                    run_nsed(market_data, mode=_nsed_mode), timeout=_AGENT_TIMEOUT * 2,
                 )
             except asyncio.TimeoutError:
                 logger.warning("NSED 引擎超时")

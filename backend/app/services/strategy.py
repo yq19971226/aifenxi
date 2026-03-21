@@ -81,6 +81,22 @@ class StrategyResult(BaseModel):
     is_fallback: bool = False
 
 
+# ── 模式相关策略参数 ───────────────────────────────────────────
+# 短线濒动幅小（TP 间距 0.5%）；日内需要日内波段级别的深度（>1.5%）；趋势模式应对应天级/周级波动幅（>3%）
+_MODE_TP_MIN_GAP: dict[str, float] = {
+    "scalping": 0.005,   # 0.5%
+    "intraday": 0.015,   # 1.5%
+    "trend":    0.030,   # 3.0%
+}
+
+# 回退策略最小幅度（百分比），防止很小的 TP fallback
+_MODE_FALLBACK_TP_PCTS: dict[str, list[float]] = {
+    "scalping": [0.030, 0.060, 0.100],
+    "intraday": [0.040, 0.080, 0.150],
+    "trend":    [0.060, 0.120, 0.200],
+}
+
+
 class StrategyService:
     """策略生成与查询服务。"""
 
@@ -90,14 +106,16 @@ class StrategyService:
         entry_low: float, entry_high: float,
         stop_loss: float, targets: list[float],
         market_regime: str | None = None,
+        mode: str = "scalping",
     ) -> tuple[float, float, float, list[float]]:
         """确保入场/止损/目标价与方向一致，不一致时回退到百分比默认值。
 
         P1-C: 震荡市场允许 entry 偏离当前价（等回调/反弹入场）。
         P1-D: 强制最小入场宽度 0.3%。
-        P2-D: 止盈位最小间距 0.5%。
+        P2-D: 止盈位最小间距按 mode，日内≥1.5%，趋势≥3%。
         """
         is_ranging = market_regime == "ranging"
+        fallback_pcts = _MODE_FALLBACK_TP_PCTS.get(mode, _MODE_FALLBACK_TP_PCTS["scalping"])
 
         if direction == "long":
             if stop_loss >= price:
@@ -109,7 +127,7 @@ class StrategyService:
             if stop_loss >= entry_low:
                 stop_loss = entry_low * 0.97
             targets = sorted([t for t in targets if t > price])
-            fallback = [price * 1.03, price * 1.06, price * 1.10]
+            fallback = [price * (1 + p) for p in fallback_pcts]
             while len(targets) < 3:
                 targets.append(fallback[len(targets)])
         elif direction == "short":
@@ -122,7 +140,7 @@ class StrategyService:
             if stop_loss <= entry_high:
                 stop_loss = entry_high * 1.03
             targets = sorted([t for t in targets if t < price], reverse=True)
-            fallback = [price * 0.97, price * 0.94, price * 0.90]
+            fallback = [price * (1 - p) for p in fallback_pcts]
             while len(targets) < 3:
                 targets.append(fallback[len(targets)])
 
@@ -135,14 +153,15 @@ class StrategyService:
             entry_low = entry_mid - min_entry_width / 2
             entry_high = entry_mid + min_entry_width / 2
 
-        # P2-D: 止盈位最小间距 0.5%
-        targets = StrategyService._space_targets(targets)
+        # P2-D: 止盈位最小间距（按模式）
+        targets = StrategyService._space_targets(targets, mode=mode)
 
         return entry_low, entry_high, stop_loss, targets
 
     @staticmethod
-    def _space_targets(targets: list[float], min_gap_pct: float = 0.005) -> list[float]:
-        """确保止盈位之间有足够间距（默认 0.5%）。"""
+    def _space_targets(targets: list[float], mode: str = "scalping") -> list[float]:
+        """确保止盈位之间有足够间距（按模式：短线0.5%，日内1.5%，趋势3%）。"""
+        min_gap_pct = _MODE_TP_MIN_GAP.get(mode, 0.005)
         if not targets:
             return targets
         spaced = [targets[0]]

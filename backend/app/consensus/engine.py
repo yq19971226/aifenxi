@@ -139,8 +139,11 @@ def _parse_model_vote(model_key: str, raw: dict) -> ModelVote:
 # ── Round 1: 独立分析 ────────────────────────────────────────
 
 
-async def _round1_analyze(market_data: MarketData) -> list[ModelVote]:
-    """4 模型并行独立分析，各自使用专责分析器。"""
+async def _round1_analyze(market_data: MarketData, mode: str = "scalping") -> list[ModelVote]:
+    """4 模型并行独立分析，各自使用专责分析器。
+
+    mode 参数传递给每个分析器，决定其使用的主要分析周期和 Prompt 视角。
+    """
     from app.consensus.analyzers import (
         deepseek_analyze,
         grok_analyze,
@@ -149,10 +152,10 @@ async def _round1_analyze(market_data: MarketData) -> list[ModelVote]:
     )
 
     results = await asyncio.gather(
-        deepseek_analyze(market_data),
-        grok_analyze(market_data),
-        claude_analyze(market_data),
-        qwen_analyze(market_data),
+        deepseek_analyze(market_data, mode),
+        grok_analyze(market_data, mode),
+        claude_analyze(market_data, mode),
+        qwen_analyze(market_data, mode),
     )
     return list(results)
 
@@ -410,7 +413,16 @@ async def _enrich_sentiment(market_data: MarketData) -> MarketData:
 # ── 主入口 ────────────────────────────────────────────────────
 
 
-async def run_nsed(market_data: MarketData) -> ConsensusReport:
+# ── 模式相关默认参数 ─────────────────────────────────────────────────
+# 短线要求至少 2 个智能体方向一致；日内/趋势大周期信号稀少，降为 1 个即可出方向。
+_MODE_CONSENSUS_DEFAULTS: dict[str, dict] = {
+    "scalping":  {"min_agreement": 2, "signal_threshold": 0.35, "min_confidence": 0.50},
+    "intraday":  {"min_agreement": 1, "signal_threshold": 0.25, "min_confidence": 0.40},
+    "trend":     {"min_agreement": 1, "signal_threshold": 0.20, "min_confidence": 0.35},
+}
+
+
+async def run_nsed(market_data: MarketData, mode: str = "scalping") -> ConsensusReport:
     """NSED 共识引擎主入口 — 三轮结构化评估与辩论。
 
     1. 情绪数据覆盖：优先从 Redis 读取 sentiment_worker 采集的恐慌贪婪指数
@@ -423,8 +435,8 @@ async def run_nsed(market_data: MarketData) -> ConsensusReport:
     # 情绪数据覆盖：优先从 Redis 读取 sentiment_worker 采集的数据
     market_data = await _enrich_sentiment(market_data)
 
-    # Round 1 — 独立分析
-    r1_votes = await _round1_analyze(market_data)
+    # Round 1 — 独立分析（传入 mode，分析器将按周期选择正确的 K 线范围）
+    r1_votes = await _round1_analyze(market_data, mode)
     logger.info(
         "Round 1 complete",
         extra={"votes": [(v.model_key, v.signal) for v in r1_votes]},
@@ -437,16 +449,36 @@ async def run_nsed(market_data: MarketData) -> ConsensusReport:
         extra={"votes": [(v.model_key, v.signal) for v in r2_votes]},
     )
 
-    # Round 3 — 加权聚合（从动态配置读取校准参数，后台信号校准頁可调整）
+    # Round 3 — 加权聚合（从动态配置读取校准参数，后台信号校准页可调整）
+    # 优先读取 per-mode 配置 key，不存在则用模式默认值。
     weights = await _get_dynamic_weights()
+    _mode_defaults = _MODE_CONSENSUS_DEFAULTS.get(mode, _MODE_CONSENSUS_DEFAULTS["scalping"])
     try:
         from app.services.config_service import get_config_value
-        _sig_thr = float(await get_config_value("consensus_signal_threshold", "0.35"))
-        _min_agr = int(await get_config_value("consensus_min_agreement", "2"))
-        _min_conf = float(await get_config_value("consensus_min_confidence", "0.50"))
+        # 优先读 mode-specific 配置，不存在则读全局配置，再退到模式默认值
+        _sig_thr = float(await get_config_value(
+            f"consensus_signal_threshold_{mode}",
+            await get_config_value("consensus_signal_threshold", str(_mode_defaults["signal_threshold"]))
+        ))
+        _min_agr = int(await get_config_value(
+            f"consensus_min_agreement_{mode}",
+            await get_config_value("consensus_min_agreement", str(_mode_defaults["min_agreement"]))
+        ))
+        _min_conf = float(await get_config_value(
+            f"consensus_min_confidence_{mode}",
+            await get_config_value("consensus_min_confidence", str(_mode_defaults["min_confidence"]))
+        ))
         _flip_ratio = float(await get_config_value("consensus_flip_ratio", "0.6"))
     except Exception:
-        _sig_thr, _min_agr, _min_conf, _flip_ratio = 0.35, 2, 0.50, 0.6
+        _sig_thr = _mode_defaults["signal_threshold"]
+        _min_agr = _mode_defaults["min_agreement"]
+        _min_conf = _mode_defaults["min_confidence"]
+        _flip_ratio = 0.6
+
+    logger.info(
+        "Consensus params for mode=%s: min_agreement=%d signal_threshold=%.2f min_confidence=%.2f",
+        mode, _min_agr, _sig_thr, _min_conf,
+    )
 
     # ── P1-E: 震荡市场动态降低迟滞强度 ──
     # 读取 market_regime，震荡市场让信号更灵活地跟随区间内价格
