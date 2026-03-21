@@ -349,8 +349,3 @@ async def public_credit_packs() -> list[CreditPackInfo]:
         if info:
             packs.append(info)
     return packs
-""",
-    "Complexity": 7,
-    "Description": "New admin membership API providing structured CRUD for credit packs, subscription plans, and quota matrix — all backed by config_service",
-    "EmptyFile": false
-}
