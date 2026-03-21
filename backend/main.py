@@ -664,6 +664,75 @@ async def presence_heartbeat(
     return {"ok": True}
 
 
+@app.get("/api/system/datasource-health", tags=["system"])
+async def datasource_health(
+    _: UserInfo = Depends(get_current_user),
+) -> dict:
+    """P2-A: 数据源健康状态（认证用户可访问）。
+
+    返回所有数据能力的聚合健康状态，按 domain 分组。
+    - healthy: 所有能力 available
+    - degraded: 存在 degraded 或 tier-limited 能力
+    - error: 存在 unavailable / disabled 能力
+    """
+    from app.core.capability_state import get_all_capabilities
+
+    all_caps = await get_all_capabilities()
+
+    # 按 domain 聚合
+    domain_agg: dict[str, dict] = {}
+    for cap, info in all_caps.items():
+        domain = info.get("domain", "other")
+        status = info.get("status", "unknown")
+        if domain not in domain_agg:
+            domain_agg[domain] = {"ok": 0, "warn": 0, "err": 0, "items": []}
+        if status == "available":
+            domain_agg[domain]["ok"] += 1
+        elif status in ("degraded", "tier-limited"):
+            domain_agg[domain]["warn"] += 1
+        else:
+            domain_agg[domain]["err"] += 1
+        domain_agg[domain]["items"].append({
+            "key": cap,
+            "status": status,
+            "reason": info.get("reason", ""),
+            "owner": info.get("owner", ""),
+        })
+
+    sources = []
+    for domain, agg in domain_agg.items():
+        if agg["err"] > 0:
+            overall = "error"
+        elif agg["warn"] > 0:
+            overall = "degraded"
+        else:
+            overall = "healthy"
+        sources.append({
+            "domain": domain,
+            "status": overall,
+            "ok": agg["ok"],
+            "warn": agg["warn"],
+            "err": agg["err"],
+            "items": agg["items"],
+        })
+
+    # 按状态严重度排序：error → degraded → healthy
+    _order = {"error": 0, "degraded": 1, "healthy": 2}
+    sources.sort(key=lambda s: _order.get(s["status"], 9))
+
+    overall_status = (
+        "error" if any(s["status"] == "error" for s in sources)
+        else "degraded" if any(s["status"] == "degraded" for s in sources)
+        else "healthy"
+    )
+
+    return {
+        "status": overall_status,
+        "sources": sources,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
 @app.get("/api/admin/stats/online", tags=["admin"])
 async def admin_online_stats(
     admin: UserInfo = Depends(require_admin),

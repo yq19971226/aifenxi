@@ -68,6 +68,8 @@ async def get_signal_stability(
             "duration_minutes": 135,    # 当前信号已持续的分钟数
             "total_count": 8,           # 历史总条数
             "stability_grade": "高",    # 稳定度等级
+            "range_position": 0.42,     # P2-E: 震荡市场价格位置（0=支撑,1=阻力），None=非震荡
+            "latest_regime": "ranging", # 最新体制
         }
     """
     try:
@@ -138,6 +140,29 @@ async def get_signal_stability(
             for e in entries[:5]
         ]
 
+        # P2-E: 读取市场体制数据，计算震荡区间位置
+        latest_regime: str | None = entries[0].get("regime") if entries else None
+        range_position: float | None = None
+        try:
+            regime_raw = await redis.get(f"market:regime:{symbol.upper()}")
+            if regime_raw:
+                regime_dict = json.loads(regime_raw) if isinstance(regime_raw, str) else regime_raw
+                if isinstance(regime_dict, dict):
+                    latest_regime = regime_dict.get("regime", latest_regime)
+                    if latest_regime == "ranging":
+                        support = regime_dict.get("support")
+                        resistance = regime_dict.get("resistance")
+                        cur_price = regime_dict.get("current_price") or regime_dict.get("price")
+                        if (
+                            support is not None and resistance is not None
+                            and cur_price is not None
+                            and float(resistance) > float(support)
+                        ):
+                            rp = (float(cur_price) - float(support)) / (float(resistance) - float(support))
+                            range_position = round(max(0.0, min(1.0, rp)), 4)
+        except Exception as _rp_exc:
+            logger.debug("range_position calc failed: %s", _rp_exc)
+
         return {
             "recent_signals": recent,
             "consistency": round(consistency, 2),
@@ -146,6 +171,8 @@ async def get_signal_stability(
             "duration_minutes": duration_minutes,
             "total_count": total,
             "stability_grade": grade,
+            "range_position": range_position,
+            "latest_regime": latest_regime,
         }
 
     except Exception as exc:
@@ -162,4 +189,6 @@ def _empty_stability() -> dict:
         "duration_minutes": 0,
         "total_count": 0,
         "stability_grade": "no_data",
+        "range_position": None,
+        "latest_regime": None,
     }

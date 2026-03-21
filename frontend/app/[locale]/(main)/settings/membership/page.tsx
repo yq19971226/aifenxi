@@ -16,8 +16,10 @@ import {
   fetchPlans,
   fetchFreeTrialStatus,
   claimFreeTrial,
+  fetchCreditPacks,
   type PlansResponse,
   type FreeTrialStatus,
+  type CreditPack,
 } from "@/lib/api/membership";
 import type { UserInfo } from "@/lib/api/auth";
 import { STATUS_STYLES, getPaymentStatusMessage } from "@/lib/payment-status";
@@ -341,13 +343,7 @@ function PaymentHistory({ payments }: { payments: PaymentInfo[] }) {
   );
 }
 
-// ── Credits Pack Options ─────────────────────────────────────
-
-const CREDITS_PACKS = [
-  { plan: 3 as const, label: "S 档", credits: "130次", price: 10, desc: "轻量补充" },
-  { plan: 4 as const, label: "M 档", credits: "420次", price: 30, desc: "日常使用" },
-  { plan: 5 as const, label: "L 档", credits: "1500次", price: 100, desc: "高频交易" },
-];
+// ── Credits Pack Options（动态，从后台 /api/membership/credit-packs 读取）──
 
 // ── Checkout Sidebar ──────────────────────────────────────────
 
@@ -359,6 +355,7 @@ function CheckoutSidebar({
   proTotal, flagshipTotal,
   creating, error, handleCreatePayment,
   currentPayment, paymentExpiresAt,
+  creditsPacks,
 }: any) {
   const [tab, setTab] = useState<"sub" | "credits">("sub");
   const [selectedCredits, setSelectedCredits] = useState<3 | 4 | 5>(3);
@@ -389,7 +386,16 @@ function CheckoutSidebar({
     : "shadow-[0_0_25px_rgba(99,102,241,0.15)]";
   const accentBorder = tab === "credits" ? "border-emerald-500/20" : isFlagship ? "border-[#F5A623]/20" : "border-indigo-500/20";
 
-  const selectedPack = CREDITS_PACKS.find(p => p.plan === selectedCredits)!;
+  // 动态积分包：由后台配置驱动，加载期间使用空占位
+  const packsToShow: Array<{ plan: 3|4|5; label: string; credits: string; price: number; desc: string }> =
+    (creditsPacks ?? []).map((p: CreditPack) => ({
+      plan: p.plan as 3 | 4 | 5,
+      label: p.label.replace("积分包 ", "") + " 档",
+      credits: `${p.credits}次`,
+      price: p.price,
+      desc: p.description,
+    }));
+  const selectedPack = packsToShow.find(p => p.plan === selectedCredits) ?? packsToShow[0];
 
   return (
     <div className={`sticky top-24 rounded-2xl bg-[#0a0a0a] border ${accentBorder} overflow-hidden ${tab === "credits" ? "shadow-[0_0_25px_rgba(52,211,153,0.12)]" : accentGlow}`}>
@@ -588,8 +594,14 @@ function CheckoutSidebar({
 
             {/* Pack Selection */}
             <div className="flex flex-col gap-2">
-              {CREDITS_PACKS.map(pack => (
-                <button key={pack.plan} onClick={() => setSelectedCredits(pack.plan)}
+              {packsToShow.length === 0 && (
+                <div className="flex items-center justify-center py-6 text-[10px] font-mono text-zinc-600">
+                  <span className="animate-spin w-3.5 h-3.5 border border-current border-t-transparent rounded-full mr-2" />
+                  加载中...
+                </div>
+              )}
+              {packsToShow.map(pack => (
+                <button key={pack.plan} onClick={() => setSelectedCredits(pack.plan as 3 | 4 | 5)}
                   className={`relative flex items-center justify-between rounded-xl border p-4 text-left transition-all ${
                     selectedCredits === pack.plan
                       ? "border-emerald-500/40 bg-emerald-500/[0.06] shadow-[inset_0_0_20px_rgba(52,211,153,0.05)]"
@@ -644,20 +656,20 @@ function CheckoutSidebar({
               <div className="flex items-end justify-between mb-4">
                 <div>
                   <p className="text-[8px] text-zinc-600 font-mono uppercase tracking-[0.2em] mb-1">应付总计</p>
-                  <p className="text-[9px] text-emerald-500/70 font-mono">{selectedPack.credits} · 一次性 · 永不过期</p>
+                  <p className="text-[9px] text-emerald-500/70 font-mono">{selectedPack?.credits ?? "--"} · 一次性 · 永不过期</p>
                 </div>
                 <div className="flex items-end gap-1">
                   <span className="text-lg font-bold font-mono text-white">$</span>
-                  <span className="text-4xl font-black font-mono leading-none tracking-tighter text-white">{selectedPack.price}</span>
+                  <span className="text-4xl font-black font-mono leading-none tracking-tighter text-white">{selectedPack?.price ?? "--"}</span>
                 </div>
               </div>
 
-              <button onClick={() => handleCreatePayment("credits", selectedCredits)} disabled={creating}
+              <button onClick={() => handleCreatePayment("credits", selectedCredits)} disabled={creating || !selectedPack}
                 className="group relative w-full rounded-lg py-3.5 flex items-center justify-center gap-2 font-mono text-[11px] font-black uppercase tracking-[0.15em] transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(52,211,153,0.15)] hover:shadow-[0_0_30px_rgba(52,211,153,0.3)]">
                 {creating ? (
                   <><span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" /> 创建中</>
                 ) : (
-                  <>充值 {selectedPack.credits}
+                  <>充值 {selectedPack?.credits ?? "--"}
                     <svg className="w-4 h-4 transition-transform group-hover:translate-x-1 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
@@ -698,6 +710,13 @@ export default function MembershipPage() {
   const { data: user } = useQuery<UserInfo>({ queryKey: ["currentUser"], queryFn: fetchCurrentUser });
   const { data: plansData } = useQuery<PlansResponse>({ queryKey: ["membershipPlans"], queryFn: fetchPlans });
   const { data: trial } = useQuery<FreeTrialStatus>({ queryKey: ["freeTrial"], queryFn: fetchFreeTrialStatus });
+  // 动态积分包：后台再配置价格/次数后，前台自动同步
+  const { data: creditPacks } = useQuery<CreditPack[]>({
+    queryKey: ["creditPacks"],
+    queryFn: fetchCreditPacks,
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
+  });
   const { history, currentPayment: synced } = usePaymentStatusSync(currentPayment);
 
   useEffect(() => {
@@ -770,6 +789,7 @@ export default function MembershipPage() {
             creating={creating} error={error}
             handleCreatePayment={handleCreatePayment}
             currentPayment={synced} paymentExpiresAt={paymentExpiresAt}
+            creditsPacks={creditPacks}
           />
         </div>
       </div>

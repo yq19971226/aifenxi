@@ -50,3 +50,20 @@ export async function fetchPlans(): Promise<PlansResponse> {
   const res = await authFetch(`${API_BASE}/api/membership/plans`);
   return handleApiResponse(res, "获取套餐信息失败");
 }
+
+// ── 积分包（动态，从后台配置读取）─────────────────────────────
+
+export interface CreditPack {
+  plan: number;      // 3=S, 4=M, 5=L
+  label: string;     // "积分包 S"
+  price: number;     // USD
+  credits: number;   // 次数
+  mode: string;      // scalping | intraday | trend | all
+  description: string;
+}
+
+export async function fetchCreditPacks(): Promise<CreditPack[]> {
+  // /api/membership/credit-packs 是无需鉴权的公共端点
+  const res = await fetch(`${API_BASE}/api/membership/credit-packs`);
+  return handleApiResponse(res, "获取积分包信息失败");
+}

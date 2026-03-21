@@ -633,7 +633,7 @@ async def handle_webhook(
         result = await session.execute(
             text(
                 """
-                SELECT id, user_id, plan, network, status
+                SELECT id, user_id, plan, network, status, amount_usd
                 FROM payments
                 WHERE payment_id = :payment_id
                 """
@@ -759,10 +759,10 @@ async def handle_webhook(
                     )
                 await upgrade_membership(session, user_id, plan, duration_days=duration)
 
-            # 合伙人佣金发放（订阅和积分包都参与分佣）
+            # 佣金发放：使用数据库记录的订单金额，确保 Webhook payload 为空时也正确计算
             commission_result = None
             try:
-                amount_usd = payload.get_amount() or 0
+                amount_usd = float(existing.get("amount_usd") or 0)
                 if amount_usd > 0:
                     commission_result = await grant_commission(
                         session, user_id, str(existing["id"]), amount_usd

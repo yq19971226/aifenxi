@@ -20,6 +20,9 @@ interface SignalStabilityData {
   duration_minutes: number;
   total_count: number;
   stability_grade: string;
+  // P2-E: 震荡市场区间位置 (0=支撑位, 1=阻力位, null=非震荡)
+  range_position: number | null;
+  latest_regime: string | null;
 }
 
 const SIGNAL_COLORS: Record<string, string> = {
@@ -85,11 +88,15 @@ export function SignalStabilityBar({
   const signalLabel = t(`signal.${data.dominant_signal}` as "signal.bullish" | "signal.bearish" | "signal.neutral");
 
   // P1-F: 震荡市场体制矛盾检测
-  const latestRegime = data.recent_signals?.[0]?.regime;
+  // P2-E: 优先使用后端新字段 latest_regime（包含实时 market:regime 数据）
+  const latestRegime = data.latest_regime ?? data.recent_signals?.[0]?.regime;
   const isRegimeConflict =
     latestRegime === "ranging" &&
     data.current_streak >= 3 &&
     data.dominant_signal !== "neutral";
+
+  // P2-E: 震荡市场区间位置（百分比显示）
+  const rangePosPct = data.range_position != null ? Math.round(data.range_position * 100) : null;
 
   return (
     <motion.div
@@ -166,14 +173,24 @@ export function SignalStabilityBar({
               <div
                 className={cn(
                   "h-full rounded-full transition-all",
-                  consistencyPct >= 80 ? "bg-emerald-500" :
-                  consistencyPct >= 60 ? "bg-amber-500" : "bg-red-500"
+                  latestRegime === "ranging" && rangePosPct != null
+                    ? "bg-indigo-500"
+                    : consistencyPct >= 80 ? "bg-emerald-500"
+                    : consistencyPct >= 60 ? "bg-amber-500" : "bg-red-500"
                 )}
-                style={{ width: `${consistencyPct}%` }}
+                style={{
+                  width: `${
+                    latestRegime === "ranging" && rangePosPct != null
+                      ? rangePosPct
+                      : consistencyPct
+                  }%`
+                }}
               />
             </div>
             <span>
-              {latestRegime === "ranging" ? t("rangePosition") : t("consistency")} <span className="text-white font-bold">{consistencyPct}%</span>
+              {latestRegime === "ranging" && rangePosPct != null
+                ? <>{t("rangePosition")} <span className="text-indigo-300 font-bold">{rangePosPct}%</span>​<span className="text-zinc-500 ml-0.5">{t("rangePositionHint")}</span></>
+                : <>{t("consistency")} <span className="text-white font-bold">{consistencyPct}%</span></>}
             </span>
           </div>
 

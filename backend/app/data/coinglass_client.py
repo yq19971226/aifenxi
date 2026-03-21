@@ -70,6 +70,15 @@ _USAGE_ME_PATH = "/usage/me"
 _QUOTA_FRESHNESS_SECONDS = 3600  # 供应商真值 1 小时内视为新鲜
 _QUOTA_SYNC_LOCK_TTL = 120
 
+# P2-C: 熔断器分级退避阈值
+# 3 次 → 降频 30s/次；10 次 → 降频 5min/次；100 次 → 完全熔断（30min 后自动半开）
+_CB_STAGE1_THRESHOLD = 3     # 连续失败 3 次 → 降频到 30s 间隔
+_CB_STAGE2_THRESHOLD = 10    # 连续失败 10 次 → 降频到 300s 间隔
+_CB_OPEN_THRESHOLD = 100     # 连续失败 100 次 → 完全熔断
+_CB_STAGE1_SLEEP = 30        # 降频 1 级：30 秒
+_CB_STAGE2_SLEEP = 300       # 降频 2 级：5 分钟
+_CB_HALF_OPEN_TTL = 1800     # 熔断自动半开：30 分钟
+
 _PAIR_QUOTES = ("USDT", "USDC", "BUSD", "USD", "PERP")
 
 
@@ -138,6 +147,17 @@ class CoinGlassClient:
         Returns:
             成功时返回 JSON 响应体（dict 或 list），失败返回 None。
         """
+        # 0. P2-C: 快速失败 — 若当前通道处于全熔断（cg_circuit_open:{ch} 存在），直接返回 None
+        #    半开逻辑：Redis key 因 TTL 过期则自动解除，下次重试恢复
+        _quick_channel = await self._resolve_channel()
+        if _quick_channel and await self._is_circuit_open(_quick_channel):
+            logger.warning(
+                "circuit_breaker_blocking_request",
+                channel=_quick_channel,
+                endpoint=endpoint,
+            )
+            return None
+
         # 1. 解析活跃通道
         channel_id = await self._resolve_channel()
         if channel_id is None:
@@ -277,6 +297,10 @@ class CoinGlassClient:
                 await self._on_request_success(fallback_id)
                 return fb_result
 
+        # P2-C: 分级退避（不切换通道，只延迟）
+        if not is_overflow:
+            await self._graduated_backoff(channel_id, failure_count)
+
         return None
 
     async def close(self) -> None:
@@ -413,10 +437,59 @@ class CoinGlassClient:
             pipe.incr(key)
             pipe.expire(key, 120)  # TTL 120s 自动衰减
             results = await pipe.execute()
-            return int(results[0])
+            cnt = int(results[0])
+
+            # P2-C: 达到全熔断阈值，写熔断键（30min TTL 自动半开）
+            if cnt >= _CB_OPEN_THRESHOLD:
+                cb_key = f"cg_circuit_open:{channel_id}"
+                try:
+                    await redis.set(cb_key, str(int(time.time())), ex=_CB_HALF_OPEN_TTL)
+                    logger.warning(
+                        "circuit_breaker_open",
+                        channel=channel_id,
+                        failures=cnt,
+                        half_open_in_secs=_CB_HALF_OPEN_TTL,
+                    )
+                except Exception:
+                    pass
+
+            return cnt
         except Exception as exc:
             logger.warning("on_request_failure_redis_error", error=str(exc))
             return 0
+
+    async def _graduated_backoff(self, channel_id: str, failure_count: int) -> None:
+        """P2-C: 分级退避睡眠（不切换通道）。
+
+        - failure_count >= _CB_STAGE2_THRESHOLD (10): 5 分钟
+        - failure_count >= _CB_STAGE1_THRESHOLD  (3): 30 秒
+        - 其他: 不睡眠
+        """
+        if failure_count >= _CB_STAGE2_THRESHOLD:
+            logger.warning(
+                "circuit_backoff_stage2",
+                channel=channel_id,
+                failures=failure_count,
+                sleep_secs=_CB_STAGE2_SLEEP,
+            )
+            await asyncio.sleep(_CB_STAGE2_SLEEP)
+        elif failure_count >= _CB_STAGE1_THRESHOLD:
+            logger.warning(
+                "circuit_backoff_stage1",
+                channel=channel_id,
+                failures=failure_count,
+                sleep_secs=_CB_STAGE1_SLEEP,
+            )
+            await asyncio.sleep(_CB_STAGE1_SLEEP)
+
+    async def _is_circuit_open(self, channel_id: str) -> bool:
+        """P2-C: 检查该通道是否处于熔断状态（cg_circuit_open:{channel} 键存在）。"""
+        try:
+            redis = get_redis_pool()
+            val = await redis.get(f"cg_circuit_open:{channel_id}")
+            return val is not None
+        except Exception:
+            return False  # fail-open
 
     # ----------------------------------------------------------
     # Proxy 配额保护

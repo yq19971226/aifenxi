@@ -112,7 +112,8 @@ class PerformanceTracker:
 
         # 按 analysis_mode 动态超时（后台可配置：settle_timeout_scalping/intraday/trend）
         mode = snapshot.get("analysis_mode") or ""
-        _DEFAULT_TIMEOUT = {"scalping": 6, "intraday": 10, "trend": 72}
+        # P1-A: 按 spec 建议调整默认超时（scalping:3h, intraday:8h, trend:96h）
+        _DEFAULT_TIMEOUT = {"scalping": 3, "intraday": 8, "trend": 96}
         try:
             from app.services.config_service import get_config_value
             _key = f"settle_timeout_{mode}" if mode else None

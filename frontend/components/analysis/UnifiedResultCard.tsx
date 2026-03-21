@@ -142,6 +142,20 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
       .catch(() => {});
   }, [report.symbol, isBlocked]);
 
+  // P2-A: 数据源健康状态
+  interface DsSource { domain: string; status: string; ok: number; warn: number; err: number; }
+  const [dsHealth, setDsHealth] = useState<{ status: string; sources: DsSource[] } | null>(null);
+  useEffect(() => {
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+    authFetch(`${API_BASE}/api/system/datasource-health`)
+      .then((res: Response) => res.ok ? res.json() : null)
+      .then((data: { status: string; sources: DsSource[] } | null) => {
+        if (data?.sources) setDsHealth(data);
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.98 }}
@@ -633,6 +647,27 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
             <Shield size={12} />
             {t("card.engine")}
           </span>
+          {/* P2-A: 数据源健康彩点 */}
+          {dsHealth && (
+            <span className="flex items-center gap-1" title={`数据源: ${dsHealth.status}`}>
+              <Database size={11} className="text-zinc-600" />
+              {dsHealth.sources.map((s) => (
+                <span
+                  key={s.domain}
+                  title={`${s.domain}: ${s.status} (✓${s.ok} ⚠${s.warn} ✗${s.err})`}
+                  className={
+                    s.status === "healthy"
+                      ? "text-emerald-500 text-[10px] leading-none cursor-default"
+                      : s.status === "degraded"
+                      ? "text-amber-400 text-[10px] leading-none cursor-default"
+                      : "text-red-400 text-[10px] leading-none cursor-default"
+                  }
+                >
+                  ●
+                </span>
+              ))}
+            </span>
+          )}
         </div>
         <div className="text-zinc-500">
           {t("card.id")}: <span className="text-zinc-400">{(report as { report_id?: string }).report_id?.substring(0, 8) ?? report.timestamp.slice(0, 19).replace(/[-:T]/g, "").slice(0, 8)}</span>

@@ -76,7 +76,8 @@
     "regimeConflict": "⚠️ {streak} consecutive {signal} signals in a ranging market — watch for reversal",
     "rangingLabel": "📊 Ranging",
     "rangingHint": "Direction signals are for reference only",
-    "rangePosition": "Range Position"
+    "rangePosition": "Range Position",
+    "rangePositionHint": "(S→R)"
   },
   "timeline": {
     "title": "Signals",

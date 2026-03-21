@@ -76,7 +76,8 @@
     "regimeConflict": "⚠️ 震盪市場中連續 {streak} 次{signal}信號，注意反轉風險",
     "rangingLabel": "📊 震盪區間",
     "rangingHint": "方向信號僅供參考",
-    "rangePosition": "區間位置"
+    "rangePosition": "區間位置",
+    "rangePositionHint": "(支撐→阻力)"
   },
   "timeline": {
     "title": "綜合訊號",
