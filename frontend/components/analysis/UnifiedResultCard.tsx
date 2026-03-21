@@ -150,7 +150,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
     authFetch(`${API_BASE}/api/system/datasource-health`)
       .then((res: Response) => res.ok ? res.json() : null)
       .then((data: { status: string; sources: DsSource[] } | null) => {
-        if (data?.sources) setDsHealth(data);
+        if (data && Array.isArray(data.sources)) setDsHealth(data);
       })
       .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -648,7 +648,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
             {t("card.engine")}
           </span>
           {/* P2-A: 数据源健康彩点 */}
-          {dsHealth && (
+          {dsHealth && Array.isArray(dsHealth.sources) && (
             <span className="flex items-center gap-1" title={`数据源: ${dsHealth.status}`}>
               <Database size={11} className="text-zinc-600" />
               {dsHealth.sources.map((s) => (
