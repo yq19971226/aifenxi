@@ -448,6 +448,23 @@ async def run_nsed(market_data: MarketData) -> ConsensusReport:
     except Exception:
         _sig_thr, _min_agr, _min_conf, _flip_ratio = 0.35, 2, 0.50, 0.6
 
+    # ── P1-E: 震荡市场动态降低迟滞强度 ──
+    # 读取 market_regime，震荡市场让信号更灵活地跟随区间内价格
+    try:
+        regime_key = f"market:regime:{market_data.symbol}"
+        regime_data = await get_json(regime_key)
+        market_regime = regime_data.get("regime", "unknown") if isinstance(regime_data, dict) else "unknown"
+    except Exception:
+        market_regime = "unknown"
+
+    if market_regime == "ranging":
+        # 震荡市场 → 几乎无迟滞，让信号在支撑/阻力间灵活切换
+        _flip_ratio = min(_flip_ratio, 0.9)
+        logger.info(
+            "P1-E: Ranging market detected, flip_ratio capped at 0.9",
+            extra={"symbol": market_data.symbol, "original_flip_ratio": _flip_ratio},
+        )
+
     # ── 迟滞锚定：读取上一次共识信号 ──
     prev_signal: str | None = None
     try:

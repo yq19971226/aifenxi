@@ -224,8 +224,8 @@ function FeatureTable({ plansData }: { plansData: PlansResponse | undefined }) {
   return (
     <div className="rounded-2xl bg-[#0a0a0a] border border-white/5 overflow-hidden">
       {/* Header */}
-      <div className="grid grid-cols-[1fr_80px_100px_110px] border-b border-white/[0.06] bg-black/30">
-        <div className="px-6 py-5 text-[9px] font-black font-mono uppercase tracking-[0.25em] text-zinc-600 flex items-center gap-2">
+      <div className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_80px_100px_110px] border-b border-white/[0.06] bg-black/30">
+        <div className="px-3 sm:px-6 py-5 text-[9px] font-black font-mono uppercase tracking-[0.25em] text-zinc-600 flex items-center gap-2">
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="square" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
@@ -251,8 +251,8 @@ function FeatureTable({ plansData }: { plansData: PlansResponse | undefined }) {
       {/* Body */}
       {Object.entries(sections).map(([section, rows], si) => (
         <div key={section}>
-          <div className="grid grid-cols-[1fr_80px_100px_110px] bg-black/20">
-            <div className="px-6 py-2 text-[8px] font-black font-mono uppercase tracking-[0.25em] text-zinc-700 col-span-4">
+          <div className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_80px_100px_110px] bg-black/20">
+            <div className="px-3 sm:px-6 py-2 text-[8px] font-black font-mono uppercase tracking-[0.25em] text-zinc-700 col-span-4">
               {section}
             </div>
           </div>
@@ -262,9 +262,9 @@ function FeatureTable({ plansData }: { plansData: PlansResponse | undefined }) {
               initial={{ opacity: 0, x: -4 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: (si * rows.length + fi) * 0.03 }}
-              className="grid grid-cols-[1fr_80px_100px_110px] border-t border-white/[0.03] group hover:bg-white/[0.015] transition-colors"
+              className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_80px_100px_110px] border-t border-white/[0.03] group hover:bg-white/[0.015] transition-colors"
             >
-              <div className="px-6 py-3.5 text-[11px] text-zinc-400 font-mono tracking-wide group-hover:text-zinc-200 transition-colors uppercase">
+              <div className="px-3 sm:px-6 py-3.5 text-[10px] sm:text-[11px] text-zinc-400 font-mono tracking-wide group-hover:text-zinc-200 transition-colors uppercase">
                 {f.name}
               </div>
               <div className="py-3.5 flex items-center justify-center border-l border-white/[0.03]">

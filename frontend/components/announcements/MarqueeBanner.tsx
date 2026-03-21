@@ -22,6 +22,7 @@ export function MarqueeBanner() {
   const items = data.map(item => ({
     id: item.id,
     text: item.title,
+    summary: item.summary || "",
     href: item.action_href
   }));
 
@@ -42,8 +43,8 @@ export function MarqueeBanner() {
       <div className="flex-1 overflow-hidden relative flex group">
         <div className="animate-marquee flex whitespace-nowrap group-hover:[animation-play-state:paused] items-center">
           {repeatedItems.map((item, i) => (
-            <span key={`${item.id}-${i}`} className="mx-8 text-xs text-zinc-300 flex items-center">
-              <span className="text-indigo-500/50 mr-3 text-[10px]">◆</span>
+            <span key={`${item.id}-${i}`} className="mx-8 text-xs text-zinc-300 flex items-center gap-1.5">
+              <span className="text-indigo-500/50 mr-1 text-[10px]">◆</span>
               {item.href ? (
                 item.href.startsWith("http") ? (
                   <a href={item.href} target="_blank" rel="noreferrer" className="hover:text-indigo-400 transition-colors font-medium">
@@ -56,6 +57,9 @@ export function MarqueeBanner() {
                 )
               ) : (
                 <span className="cursor-default font-medium">{item.text}</span>
+              )}
+              {item.summary && (
+                <span className="text-zinc-500 text-[11px]">— {item.summary}</span>
               )}
             </span>
           ))}

@@ -227,6 +227,12 @@ class AnalysisReport(BaseModel):
     regime_suggestion: Optional[str] = Field(default=None, description="市场状态建议文案")
     regime_support: Optional[float] = Field(default=None, description="震荡区间支撑位")
     regime_resistance: Optional[float] = Field(default=None, description="震荡区间阻力位")
+    # ── P1-J 体制-阶段交叉校验字段 ────────────────────────────
+    regime_original: Optional[str] = Field(default=None, description="原始体制检测结果（风控使用）")
+    regime_effective: Optional[str] = Field(default=None, description="交叉校验后的有效体制（策略/信号使用）")
+    regime_conflict: bool = Field(default=False, description="体制与阶段是否存在冲突")
+    regime_conflict_detail: Optional[str] = Field(default=None, description="冲突说明文案")
+    phase_score_gap: Optional[float] = Field(default=None, description="阶段判断置信度(score_gap)")
     # ── 跨周期共振 + 巨鲸陷阱过滤字段（Phase 1/2/3）─────────
     confluence_tags: list[str] = Field(
         default_factory=list,

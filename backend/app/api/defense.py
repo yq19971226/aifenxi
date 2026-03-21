@@ -46,6 +46,7 @@ class DefenseSummary(BaseModel):
     adversarial: Optional[dict[str, Any]] = None
     collusion: Optional[dict[str, Any]] = None
     alert_level: str = "none"
+    consensus_ref: Optional[dict[str, Any]] = None  # P1-H: 共识信号参考
 
 
 # ── 端点 ─────────────────────────────────────────────────────
@@ -85,11 +86,26 @@ async def get_latest_defense(
 
         alert_level = _compute_alert_level(adversarial, collusion)
 
+        # P1-H: 读取共识信号供前端一致性对比
+        consensus_ref = None
+        try:
+            consensus_raw = await get_json(f"consensus:latest:{symbol}")
+            if consensus_raw and isinstance(consensus_raw, dict):
+                consensus_ref = {
+                    "signal": consensus_raw.get("consensus_signal", "neutral"),
+                    "confidence": consensus_raw.get("consensus_confidence", 0),
+                    "divergence": consensus_raw.get("divergence", 0),
+                    "mode": consensus_raw.get("mode", "trend"),
+                }
+        except Exception:
+            pass  # Redis 不可用时降级
+
         summary = DefenseSummary(
             symbol=symbol,
             adversarial=adversarial,
             collusion=collusion,
             alert_level=alert_level,
+            consensus_ref=consensus_ref,
         )
 
         # 缓存摘要

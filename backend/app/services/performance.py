@@ -122,6 +122,20 @@ class PerformanceTracker:
                 timeout_hours = 72
         except Exception:
             timeout_hours = _DEFAULT_TIMEOUT.get(mode, 72)
+
+        # P3-B: ATR 动态超时修正 — 从 market:regime 缓存读取 atr_ratio
+        try:
+            regime_data = await get_json(f"market:regime:{snapshot['symbol']}")
+            if regime_data and isinstance(regime_data, dict):
+                atr_ratio_pct = regime_data.get("atr_ratio")  # 百分比形式
+                if atr_ratio_pct is not None and atr_ratio_pct > 0:
+                    # atr_ratio 以百分比存储（如 2.0 = 2%），基准为 2%
+                    volatility_factor = 1 + (atr_ratio_pct / 2.0)
+                    volatility_factor = max(0.5, min(3.0, volatility_factor))
+                    timeout_hours = timeout_hours * volatility_factor
+        except Exception:
+            pass  # ATR 读取失败不影响结算
+
         if elapsed_hours >= timeout_hours:
             return await self._settle(
                 snapshot_id, snapshot, current_price, SettlementStatus.TIMEOUT

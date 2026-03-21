@@ -72,7 +72,11 @@
     "duration": "Duration",
     "durationMin": "{min}m",
     "durationHourMin": "{h}h {min}m",
-    "durationHour": "{h}h"
+    "durationHour": "{h}h",
+    "regimeConflict": "⚠️ {streak} consecutive {signal} signals in a ranging market — watch for reversal",
+    "rangingLabel": "📊 Ranging",
+    "rangingHint": "Direction signals are for reference only",
+    "rangePosition": "Range Position"
   },
   "timeline": {
     "title": "Signals",

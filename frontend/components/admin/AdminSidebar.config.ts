@@ -8,7 +8,7 @@ import {
   Coins,
   Users,
   Bell,
-  FileCheck,
+  CreditCard,
   ClipboardCheck,
   ListChecks,
   Wallet,
@@ -41,7 +41,25 @@ export const ADMIN_MENU_GROUPS: AdminMenuGroup[] = [
       { labelKey: "monitor", href: "/admin/monitor", icon: Activity, frequency: "high" },
     ],
   },
-  // ── 配置 ──────────────────────────────────
+  // ── 商业运营 ──────────────────────────────
+  {
+    labelKey: "business",
+    items: [
+      { labelKey: "membership", href: "/admin/membership", icon: CreditCard, frequency: "high" },
+      { labelKey: "users", href: "/admin/users", icon: Users, frequency: "high" },
+      { labelKey: "withdrawals", href: "/admin/withdrawals", icon: Wallet, badgeKey: "withdrawals", badgeColor: "blue" },
+    ],
+  },
+  // ── 内容运营 ──────────────────────────────
+  {
+    labelKey: "content",
+    items: [
+      { labelKey: "announcements", href: "/admin/announcements", icon: Bell },
+      { labelKey: "taskReview", href: "/admin/task-review", icon: ClipboardCheck, badgeKey: "taskReview", badgeColor: "amber" },
+      { labelKey: "taskTemplates", href: "/admin/task-templates", icon: ListChecks },
+    ],
+  },
+  // ── 系统配置 ──────────────────────────────
   {
     labelKey: "config",
     items: [
@@ -51,19 +69,7 @@ export const ADMIN_MENU_GROUPS: AdminMenuGroup[] = [
       { labelKey: "symbols", href: "/admin/symbols", icon: Coins, frequency: "high" },
     ],
   },
-  // ── 运营 ──────────────────────────────────
-  {
-    labelKey: "operations",
-    items: [
-      { labelKey: "users", href: "/admin/users", icon: Users, frequency: "high" },
-
-      { labelKey: "taskReview", href: "/admin/task-review", icon: ClipboardCheck, badgeKey: "taskReview", badgeColor: "amber" },
-      { labelKey: "taskTemplates", href: "/admin/task-templates", icon: ListChecks },
-      { labelKey: "announcements", href: "/admin/announcements", icon: Bell },
-      { labelKey: "withdrawals", href: "/admin/withdrawals", icon: Wallet, badgeKey: "withdrawals", badgeColor: "blue" },
-    ],
-  },
-  // ── 智能 ──────────────────────────────────
+  // ── 智能体与数据 ──────────────────────────
   {
     labelKey: "intelligence",
     items: [

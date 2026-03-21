@@ -43,6 +43,7 @@ from app.api.defense import router as defense_router
 from app.api.admin_models import router as admin_models_router
 from app.api.learning import router as learning_router
 from app.api.membership import router as membership_router
+from app.api.admin_membership import router as admin_membership_router, public_router as credit_packs_router
 
 from app.api.backtest import router as backtest_router
 from app.api.partner import user_router as partner_user_router, admin_router as partner_admin_router, withdrawal_admin_router
@@ -295,6 +296,8 @@ app.include_router(partner_admin_router)
 app.include_router(withdrawal_admin_router)
 app.include_router(learning_router)
 app.include_router(membership_router)
+app.include_router(admin_membership_router)
+app.include_router(credit_packs_router)
 
 app.include_router(backtest_router)
 app.include_router(tasks_user_router)

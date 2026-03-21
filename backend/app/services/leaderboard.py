@@ -19,8 +19,8 @@ from app.core.sql_compat import count_filter, sum_filter, avg_filter, now_minus_
 logger = logging.getLogger(__name__)
 
 _CACHE_TTL = 300  # 5 分钟
-# 默认上榜最低策略数（后台可配置：leaderboard_min_strategies）
-_MIN_STRATEGIES_DEFAULT = 1
+# 默认上榜最低策略数（P1-B：从 1 提升到 10，避免小样本排名异常）
+_MIN_STRATEGIES_DEFAULT = 10
 
 
 async def _get_min_strategies(mode: str = "all") -> int:
@@ -124,6 +124,7 @@ class LeaderboardService:
                 "win_rate": _win_rate,
                 "profit_factor": float(row["profit_factor"]),
                 "avg_pnl": float(row["avg_pnl"] or 0),
+                "sharpe": float(row.get("sharpe") or 0),
             })
 
         return {"rankings": rankings, "total": total}
@@ -159,6 +160,7 @@ class LeaderboardService:
                     "win_rate": _win_rate,
                     "profit_factor": float(my_row["profit_factor"]),
                     "avg_pnl": float(my_row["avg_pnl"] or 0),
+                    "sharpe": float(my_row.get("sharpe") or 0),
                 }
         except Exception as exc:
             logger.warning("查询用户排名失败: %s", exc)
@@ -188,7 +190,14 @@ class LeaderboardService:
                         CAST(CAST({_wins} AS FLOAT)
                         / NULLIF({_settled}, 0) AS NUMERIC),
                         4
-                    ) AS win_rate
+                    ) AS win_rate,
+                    ROUND(CAST(
+                        COALESCE(
+                            CAST({_avg} AS FLOAT)
+                            / NULLIF(STDDEV(CASE WHEN status != 'pending' THEN pnl_pct END), 0),
+                            0
+                        ) AS NUMERIC
+                    ), 4) AS sharpe
                 FROM strategy_snapshots
                 WHERE published = TRUE
                   AND user_id IS NOT NULL
@@ -198,10 +207,10 @@ class LeaderboardService:
                 HAVING {_having} >= :min_strategies
             ), ranked AS (
                 SELECT
-                    user_id, settled, wins, losses, avg_pnl, win_rate, total_profit,
+                    user_id, settled, wins, losses, avg_pnl, win_rate, total_profit, sharpe,
                     {least_val('ROUND(CAST(total_profit / total_loss AS NUMERIC), 2)', '99.9')} AS profit_factor,
                     ROW_NUMBER() OVER (
-                        ORDER BY {least_val('ROUND(CAST(total_profit / total_loss AS NUMERIC), 2)', '99.9')} DESC, settled DESC
+                        ORDER BY {least_val('ROUND(CAST(total_profit / total_loss AS NUMERIC), 2)', '99.9')} DESC, sharpe DESC, settled DESC
                     ) AS rank
                 FROM user_stats
             )

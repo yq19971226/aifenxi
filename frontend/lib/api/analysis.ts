@@ -91,6 +91,17 @@ export interface AnalysisReport {
   signal_insufficient?: boolean;
   /** 当前生效的置信度阈值（后台动态配置 consensus_min_confidence） */
   confidence_threshold?: number | null;
+  // ── P1-F/J: 体制-阶段交叉校验字段 ────────────────────────
+  /** 原始市场体制（交叉校验前） */
+  regime_original?: MarketRegimeType | null;
+  /** 生效市场体制（交叉校验后，策略/信号使用此值） */
+  regime_effective?: MarketRegimeType | null;
+  /** 体制-阶段是否存在冲突 */
+  regime_conflict?: boolean;
+  /** 冲突详情文案 */
+  regime_conflict_detail?: string | null;
+  /** 阶段评分间隙（置信度指标） */
+  phase_score_gap?: number | null;
 }
 
 export interface ProgressEvent {

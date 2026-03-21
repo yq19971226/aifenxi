@@ -202,7 +202,77 @@ async def get_datasource_status() -> DataSourceStatusSnapshot:
     return await manager.get_status_snapshot()
 
 
-# ── 管理员端点 ─────────────────────────────────────────────────
+@router.get(
+    "/api/system/datasource-health",
+    summary="数据源健康状态（公开）",
+    description=(
+        "P2-A: 返回各数据源健康标签（connected/stale/error/disabled），"
+        "供前端展示运行状态。缓存 60 秒。"
+    ),
+)
+async def get_public_datasource_health(request: "Request") -> dict:
+    """公开版数据源健康：简化为三字段（status, last_seen, cb_state）"""
+    from app.core.redis import get_json, set_with_ttl
+
+    cache_key = "ds:public_health_cache"
+    cached = await get_json(cache_key)
+    if cached:
+        return cached
+
+    monitor = getattr(request.app.state, "health_monitor", None)
+    if monitor is None:
+        from app.services.health_monitor import HealthMonitor
+        monitor = HealthMonitor()
+        manager = get_datasource_manager()
+        monitor.set_manager(manager)
+
+    summary = await monitor.get_health_summary()
+    payload = summary.model_dump(mode="json")
+    sources_raw: dict = payload.get("sources", {})
+
+    # 简化为公开字段
+    sources_public: dict[str, dict] = {}
+    for sid, s in sources_raw.items():
+        sources_public[sid] = {
+            "status": _classify_health(s),
+            "last_seen": s.get("last_message_at"),
+            "circuit_breaker": s.get("circuit_breaker_state", "closed"),
+        }
+
+    # 整体健康评分 = 正常源 / 总源
+    total = len(sources_public)
+    healthy = sum(1 for s in sources_public.values() if s["status"] == "ok")
+    overall = round(healthy / total, 2) if total > 0 else 0
+
+    result = {
+        "overall_score": overall,
+        "sources": sources_public,
+        "checked_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    try:
+        await set_with_ttl(cache_key, result, 60)
+    except Exception:
+        pass
+
+    return result
+
+
+def _classify_health(source: dict) -> str:
+    """将数据源健康指标简化为 ok/stale/error/disabled 四级标签。"""
+    cb = source.get("circuit_breaker_state", "closed")
+    if cb == "open":
+        return "error"
+    connected = source.get("connected", False)
+    if not connected:
+        return "disabled"
+    errors = source.get("error_count", 0)
+    if errors >= 10:
+        return "error"
+    rate = source.get("message_rate", 0)
+    if connected and rate == 0:
+        return "stale"
+    return "ok"
 
 
 @router.get(

@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import {
@@ -11,6 +13,8 @@ import {
   Database,
   Shield,
   AlertTriangle,
+  Swords,
+  ChevronDown,
 } from "lucide-react";
 
 import type { AnalysisReport as AnalysisReportType } from "@/lib/api/analysis";
@@ -19,11 +23,34 @@ import {
   modeLabel,
 } from "./helpers";
 import { cn } from "@/lib/utils";
+import { authFetch } from "@/lib/api/auth";
 import { useConsensusData } from "./UnifiedSections";
 import { PositionCalculator } from "@/components/trade/PositionCalculator";
 import { GridStrategyCard } from "@/components/trade/GridStrategyCard";
 import { fromStrategy } from "@/lib/utils/position-sizing";
 import type { StrategyData } from "@/lib/types/strategy";
+
+interface ConsensusVote {
+  model_key: string;
+  label: string;
+  signal: string;
+  confidence: number;
+  key_findings?: string[];
+}
+
+interface ConsensusDetail {
+  model_votes: ConsensusVote[];
+  weighted_score?: number;
+  divergence?: number;
+  consensus_signal?: string;
+}
+
+interface DefenseBrief {
+  signal?: string;
+  strategy_label?: string;
+  intent?: string;
+  consensus_ref?: { signal?: string };
+}
 
 // ── Technical Blueprint Style Card ─────────────────────────
 
@@ -74,6 +101,47 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
   const confBarColor = confidenceValue >= 60 ? "bg-bull" : confidenceValue >= confThresholdPct ? "bg-amber-400" : "bg-red-400";
   const glowClass = isBlocked || isLowConf ? "" : rawSignal === "bullish" ? "glow-green" : rawSignal === "bearish" ? "glow-red" : "";
 
+  // P2-F: 获取对抗推演摘要
+  const [defenseBrief, setDefenseBrief] = useState<DefenseBrief | null>(null);
+  useEffect(() => {
+    if (!report.symbol || isBlocked) return;
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+    authFetch(`${API_BASE}/api/defense/latest?symbol=${encodeURIComponent(report.symbol)}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.adversarial) {
+          setDefenseBrief({
+            signal: data.adversarial?.signal,
+            strategy_label: data.adversarial?.strategy_label,
+            intent: data.adversarial?.intent,
+            consensus_ref: data.consensus_ref,
+          });
+        }
+      })
+      .catch(() => {});
+  }, [report.symbol, isBlocked]);
+
+  // P3-A: 获取共识投票详情
+  const [consensusDetail, setConsensusDetail] = useState<ConsensusDetail | null>(null);
+  const [votesOpen, setVotesOpen] = useState(false);
+  useEffect(() => {
+    if (!report.symbol || isBlocked) return;
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+    authFetch(`${API_BASE}/api/consensus/latest?symbol=${encodeURIComponent(report.symbol)}`)
+      .then((res: Response) => res.ok ? res.json() : null)
+      .then((data: Record<string, unknown> | null) => {
+        if (data?.model_votes) {
+          setConsensusDetail({
+            model_votes: data.model_votes as ConsensusVote[],
+            weighted_score: data.weighted_score as number | undefined,
+            divergence: data.divergence as number | undefined,
+            consensus_signal: data.consensus_signal as string | undefined,
+          });
+        }
+      })
+      .catch(() => {});
+  }, [report.symbol, isBlocked]);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.98 }}
@@ -113,18 +181,21 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
         </div>
 
         {/* Signal Badge - Premium Plate Style */}
+        {/* P0-A: Low confidence → gray/muted badge, no pulse, dashed border */}
         <div className={cn(
-          "flex items-center gap-3 px-4 py-2 rounded-lg border-[1.5px] font-black tracking-tighter uppercase transition-all duration-500",
-          rawSignal === 'bullish' ? 'border-bull/30 bg-bull/10 text-bull shadow-[0_0_20px_rgba(16,185,129,0.1)]' :
-          rawSignal === 'bearish' ? 'border-bear/30 bg-bear/10 text-bear shadow-[0_0_20px_rgba(239,68,68,0.1)]' :
-          'border-zinc-500/30 bg-zinc-500/10 text-zinc-300'
+          "flex items-center gap-3 px-4 py-2 rounded-lg font-black tracking-tighter uppercase transition-all duration-500",
+          isLowConf || isBlocked
+            ? 'border-[1.5px] border-dashed border-zinc-600/40 bg-zinc-700/10 text-zinc-500'
+            : rawSignal === 'bullish' ? 'border-[1.5px] border-bull/30 bg-bull/10 text-bull shadow-[0_0_20px_rgba(16,185,129,0.1)]' :
+              rawSignal === 'bearish' ? 'border-[1.5px] border-bear/30 bg-bear/10 text-bear shadow-[0_0_20px_rgba(239,68,68,0.1)]' :
+              'border-[1.5px] border-zinc-500/30 bg-zinc-500/10 text-zinc-300'
         )}>
-          <signalConfig.icon size={18} strokeWidth={3} className={isLowConf ? "" : "animate-pulse"} />
+          <signalConfig.icon size={18} strokeWidth={3} className={(!isLowConf && !isBlocked) ? "animate-pulse" : "opacity-50"} />
           <div className="flex flex-col leading-none">
             <span className="text-[10px] uppercase font-bold tracking-widest opacity-80 mb-1">
               {t("card.decision")}
             </span>
-            <span className="text-base leading-none">{signalConfig.label}</span>
+            <span className={cn("text-base leading-none", (isLowConf || isBlocked) && "opacity-60")}>{signalConfig.label}</span>
           </div>
           <div className="h-8 w-px bg-current opacity-20 mx-2" />
           <div className="flex flex-col leading-none text-right">
@@ -290,6 +361,40 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
         );
       })()}
 
+      {/* ── P1-F: 体制-阶段冲突标签 ── */}
+      {report.regime_conflict && report.regime_conflict_detail && (
+        <div className="mx-5 mt-3 flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/[0.04] px-4 py-3">
+          <AlertTriangle className="h-4 w-4 text-amber-400 mt-0.5 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <span className="text-[10px] font-bold text-amber-300 uppercase tracking-widest">
+                {t("card.regimeConflictTitle")}
+              </span>
+              {report.regime_original && report.regime_effective && report.regime_original !== report.regime_effective && (
+                <span className="text-[9px] font-mono text-zinc-500">
+                  {report.regime_original} → {report.regime_effective}
+                </span>
+              )}
+              {report.phase_score_gap != null && (
+                <span className={cn(
+                  "text-[9px] font-mono px-1.5 py-0.5 rounded border",
+                  report.phase_score_gap >= 1.5
+                    ? "text-emerald-400 border-emerald-500/25 bg-emerald-500/10"
+                    : report.phase_score_gap >= 0.5
+                    ? "text-amber-400 border-amber-500/25 bg-amber-500/10"
+                    : "text-orange-400 border-orange-500/25 bg-orange-500/10"
+                )}>
+                  {t("card.phaseConfidence")}: {report.phase_score_gap >= 1.5 ? t("card.phaseHigh") : report.phase_score_gap >= 0.5 ? t("card.phaseMedium") : t("card.phaseLow")}
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-zinc-400 leading-relaxed">
+              {report.regime_conflict_detail}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* ── Content Body ── */}
 
       <div className="p-5 grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-6">
@@ -338,21 +443,37 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
                {t("card.tpTargets")}
              </h4>
              <div className="space-y-5">
-               {report.strategy?.targets?.map((target: number, idx: number) => (
-                 <div key={idx} className="relative pl-4 border-l-[3px] border-bull/30 py-0.5 hover:border-bull transition-colors">
-                   <div className="absolute -left-[5.5px] top-1.5 w-2 h-2 rounded-full bg-bull shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                   <div className="flex justify-between items-baseline mb-1">
-                     <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">TP{idx+1}</span>
-                     <span className="text-xs text-bull font-mono font-bold bg-bull/10 px-1.5 rounded">+{(((target / (report.strategy?.entry_high || target)) - 1) * 100).toFixed(1)}%</span>
+               {report.strategy?.targets?.map((target: number, idx: number) => {
+                 const profitPct = ((target / (report.strategy?.entry_high || target)) - 1) * 100;
+                 const isLowProfit = profitPct < 0.5;
+                 return (
+                   <div key={idx} className="relative pl-4 border-l-[3px] border-bull/30 py-0.5 hover:border-bull transition-colors">
+                     <div className="absolute -left-[5.5px] top-1.5 w-2 h-2 rounded-full bg-bull shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                     <div className="flex justify-between items-baseline mb-1">
+                       {/* P0-B: TP → 止盈位 */}
+                       <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t("card.tpLabel", { n: idx + 1 })}</span>
+                       <span className={cn(
+                         "text-xs font-mono font-bold px-1.5 rounded",
+                         isLowProfit ? "text-amber-400 bg-amber-500/10" : "text-bull bg-bull/10"
+                       )}>+{profitPct.toFixed(1)}%</span>
+                     </div>
+                     <div className="text-lg flex items-center font-mono font-black leading-none tracking-tight text-white mb-1">
+                       {formatPrice(target)}
+                     </div>
+                     <div className="flex items-center gap-2">
+                       <p className="text-[11px] text-zinc-500 font-medium">
+                         {idx === 0 ? t("card.initialResistance") : idx === 1 ? t("card.secondaryExtension") : t("card.trendObjective")}
+                       </p>
+                       {/* P2-B: 止盈位利润不足警告 */}
+                       {isLowProfit && idx === 0 && (
+                         <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded px-1.5 py-0.5">
+                           {t("card.lowProfitWarning")}
+                         </span>
+                       )}
+                     </div>
                    </div>
-                   <div className="text-lg flex items-center font-mono font-black leading-none tracking-tight text-white mb-1">
-                     {formatPrice(target)}
-                   </div>
-                   <p className="text-[11px] text-zinc-500 font-medium">
-                     {idx === 0 ? t("card.initialResistance") : idx === 1 ? t("card.secondaryExtension") : t("card.trendObjective")}
-                   </p>
-                 </div>
-               )) || (
+                 );
+               }) || (
                  <div className="text-xs text-zinc-600 italic bg-bg-surface p-3 rounded-lg">{t("card.noData")}</div>
                )}
              </div>
@@ -394,6 +515,110 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
       {report.mode !== "scalping" && strategy && strategy.direction !== "neutral" && !strategy.is_fallback && (
         <div className="px-5 pb-5">
           <GridStrategyCard report={report} />
+        </div>
+      )}
+
+      {/* ── P2-F: 对抗推演摘要行 ── */}
+      {defenseBrief && (
+        <div className="mx-5 mb-1 flex items-center gap-3 rounded-lg border border-violet-500/15 bg-violet-500/[0.03] px-4 py-2.5">
+          <Swords size={14} className="text-violet-400 shrink-0" />
+          <div className="flex-1 min-w-0 text-xs font-medium">
+            <span className="text-zinc-500">{t("card.defenseLabel")}</span>
+            {defenseBrief.intent && (
+              <span className="text-violet-300 ml-1.5">
+                {t("card.defenseIntent")}{defenseBrief.intent}
+              </span>
+            )}
+            {defenseBrief.strategy_label && (
+              <span className="text-zinc-400 ml-1.5">· {defenseBrief.strategy_label}</span>
+            )}
+            {defenseBrief.signal && defenseBrief.consensus_ref?.signal && (
+              defenseBrief.signal === defenseBrief.consensus_ref.signal ? (
+                <span className="text-emerald-400 ml-1.5">· ✅ {t("card.defenseConsistent")}</span>
+              ) : (
+                <span className="text-amber-400 ml-1.5">· ⚠️ {t("card.defenseConflict")}</span>
+              )
+            )}
+          </div>
+          <a
+            href={`/adversarial?symbol=${report.symbol}`}
+            className="text-[10px] text-violet-400/70 hover:text-violet-300 font-mono uppercase tracking-wider shrink-0 transition-colors"
+          >
+            {t("card.defenseDetail")}
+          </a>
+        </div>
+      )}
+
+      {/* ── P3-A: 共识投票透明度面板 ── */}
+      {consensusDetail && consensusDetail.model_votes.length > 0 && (
+        <div className="mx-5 mb-1 rounded-lg border border-indigo-500/15 bg-indigo-500/[0.02] overflow-hidden">
+          <button
+            onClick={() => setVotesOpen(!votesOpen)}
+            className="w-full flex items-center justify-between px-4 py-2.5 text-xs font-medium text-zinc-400 hover:text-zinc-300 transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <span className="text-indigo-400">🤖</span>
+              {t("card.votePanelTitle")}
+            </span>
+            <ChevronDown
+              size={14}
+              className={cn(
+                "text-zinc-500 transition-transform duration-200",
+                votesOpen && "rotate-180"
+              )}
+            />
+          </button>
+          {votesOpen && (
+            <div className="px-4 pb-3 space-y-2 border-t border-indigo-500/10">
+              {consensusDetail.model_votes.map((v) => (
+                <div
+                  key={v.model_key}
+                  className="flex items-center gap-3 py-1.5 text-xs"
+                >
+                  <span className="w-[90px] font-medium text-zinc-300 shrink-0">
+                    {v.label}
+                  </span>
+                  <span
+                    className={cn(
+                      "w-[40px] font-bold text-center shrink-0",
+                      v.signal === "bullish" ? "text-emerald-400" :
+                      v.signal === "bearish" ? "text-red-400" : "text-zinc-500"
+                    )}
+                  >
+                    {v.signal === "bullish" ? "看多" : v.signal === "bearish" ? "看空" : "中性"}
+                  </span>
+                  <div className="flex-1 flex items-center gap-1.5">
+                    <div className="w-16 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                      <div
+                        className={cn(
+                          "h-full rounded-full",
+                          v.confidence >= 0.6 ? "bg-emerald-500" :
+                          v.confidence >= 0.4 ? "bg-amber-500" : "bg-red-500"
+                        )}
+                        style={{ width: `${Math.round(v.confidence * 100)}%` }}
+                      />
+                    </div>
+                    <span className="text-zinc-500 font-mono w-[32px] text-right">
+                      {Math.round(v.confidence * 100)}%
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {/* 底部汇总: 加权分数 + 分歧度 */}
+              <div className="flex items-center gap-4 pt-2 border-t border-indigo-500/10 text-[10px] text-zinc-500 font-mono">
+                {consensusDetail.weighted_score != null && (
+                  <span>
+                    {t("card.weightedScore")}: <span className="text-zinc-300 font-bold">{consensusDetail.weighted_score.toFixed(2)}</span>
+                  </span>
+                )}
+                {consensusDetail.divergence != null && (
+                  <span>
+                    {t("card.divergenceLabel")}: <span className="text-zinc-300 font-bold">{consensusDetail.divergence.toFixed(1)}%</span>
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

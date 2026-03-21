@@ -17,7 +17,7 @@ from uuid import UUID
 from app.agents.ai_detector import AIDetector, AIDetectorResult
 from app.agents.base import AgentReport, BaseAgent
 from app.services.anti_ai_adjuster import AntiAIAdjuster
-from app.agents.phase_tracker import AccelerationWarning, detect_acceleration, detect_transition, get_current_phase
+from app.agents.phase_tracker import AccelerationWarning, PhaseState, _load_phase_state, detect_acceleration, detect_transition, get_current_phase
 from app.agents.technical import TechnicalAgent
 from app.agents.onchain import OnchainAgent
 from app.agents.risk import RiskAgent
@@ -29,6 +29,7 @@ from app.agents.collusion_detector import CollusionDetector
 from app.agents.calendar import CalendarAgent
 from app.consensus.engine import ConsensusReport, run_nsed
 from app.services.market_regime import detect_market_regime
+from app.services.regime_resolver import resolve_regime_conflict
 from app.services.push_dispatcher import dispatch_fire_and_forget
 from app.core.circuit_breaker import CircuitBreaker
 from app.core.redis import get_json, get_redis_pool, publish_stream, set_with_ttl
@@ -1129,10 +1130,30 @@ class AnalysisOrchestrator:
 
         # --- 市场状态检测 ---
         regime_info = None
+        _regime_original = None
+        _regime_effective = None
+        _regime_conflict = False
+        _regime_conflict_detail = None
+        _phase_score_gap = None
         try:
             regime_klines = market_data.klines_15m or market_data.klines_5m
             if regime_klines and len(regime_klines) >= 30:
                 regime_info = detect_market_regime(regime_klines, symbol)
+                _regime_original = regime_info.regime.value
+                # P1-J: 交叉校验 regime vs phase
+                try:
+                    _phase_state = await _load_phase_state(symbol)
+                    if _phase_state:
+                        _p = _phase_state.phase
+                        _sg = _phase_state.score_gap
+                        _phase_score_gap = _sg
+                        regime_info, _regime_conflict_detail, _regime_conflict = resolve_regime_conflict(
+                            regime_info, _p, _sg,
+                        )
+                        _regime_effective = regime_info.regime.value
+                except Exception as _rc_exc:
+                    logger.warning("P1-J regime cross-validation failed: %s", _rc_exc)
+                    _regime_effective = _regime_original
         except Exception as exc:
             logger.warning("市场状态检测失败: %s", exc)
 
@@ -1195,6 +1216,11 @@ class AnalysisOrchestrator:
             regime_suggestion=regime_info.suggestion if regime_info else None,
             regime_support=regime_info.support if regime_info else None,
             regime_resistance=regime_info.resistance if regime_info else None,
+            regime_original=_regime_original,
+            regime_effective=_regime_effective,
+            regime_conflict=_regime_conflict,
+            regime_conflict_detail=_regime_conflict_detail,
+            phase_score_gap=_phase_score_gap,
         )
 
     # ===================================================================
@@ -1408,10 +1434,29 @@ class AnalysisOrchestrator:
 
         # --- 市场状态检测（移到信号聚合前，供权重矩阵使用）---
         regime_info = None
+        _regime_original_i = None
+        _regime_effective_i = None
+        _regime_conflict_i = False
+        _regime_conflict_detail_i = None
+        _phase_score_gap_i = None
         try:
             regime_klines = market_data.klines_1h or market_data.klines_4h or market_data.klines_15m
             if regime_klines and len(regime_klines) >= 30:
                 regime_info = detect_market_regime(regime_klines, symbol)
+                _regime_original_i = regime_info.regime.value
+                # P1-J: 交叉校验 regime vs phase
+                try:
+                    _phase_state_i = await _load_phase_state(symbol)
+                    if _phase_state_i:
+                        _sg_i = _phase_state_i.score_gap
+                        _phase_score_gap_i = _sg_i
+                        regime_info, _regime_conflict_detail_i, _regime_conflict_i = resolve_regime_conflict(
+                            regime_info, _phase_state_i.phase, _sg_i,
+                        )
+                        _regime_effective_i = regime_info.regime.value
+                except Exception as _rc_exc:
+                    logger.warning("P1-J intraday regime cross-validation failed: %s", _rc_exc)
+                    _regime_effective_i = _regime_original_i
         except Exception as exc:
             logger.warning("市场状态检测失败，跳过: %s", exc)
 
@@ -1678,6 +1723,11 @@ class AnalysisOrchestrator:
             regime_suggestion=regime_info.suggestion if regime_info else None,
             regime_support=regime_info.support if regime_info else None,
             regime_resistance=regime_info.resistance if regime_info else None,
+            regime_original=_regime_original_i,
+            regime_effective=_regime_effective_i,
+            regime_conflict=_regime_conflict_i,
+            regime_conflict_detail=_regime_conflict_detail_i,
+            phase_score_gap=_phase_score_gap_i,
         )
 
     # ===================================================================
@@ -2013,6 +2063,11 @@ class AnalysisOrchestrator:
 
         # --- 市场状态检测 ---
         regime_info = None
+        _regime_original_t = None
+        _regime_effective_t = None
+        _regime_conflict_t = False
+        _regime_conflict_detail_t = None
+        _phase_score_gap_t = None
         try:
             # 使用最长周期的 K 线检测市场状态
             regime_klines = (
@@ -2021,11 +2076,25 @@ class AnalysisOrchestrator:
             )
             if regime_klines and len(regime_klines) >= 30:
                 regime_info = detect_market_regime(regime_klines, symbol)
+                _regime_original_t = regime_info.regime.value
                 logger.info(
                     "Market regime detected",
                     extra={"symbol": symbol, "regime": regime_info.regime.value,
                            "adx": regime_info.adx, "confidence": regime_info.confidence},
                 )
+                # P1-J: 交叉校验 regime vs phase
+                try:
+                    _phase_state_t = await _load_phase_state(symbol)
+                    if _phase_state_t:
+                        _sg_t = _phase_state_t.score_gap
+                        _phase_score_gap_t = _sg_t
+                        regime_info, _regime_conflict_detail_t, _regime_conflict_t = resolve_regime_conflict(
+                            regime_info, _phase_state_t.phase, _sg_t,
+                        )
+                        _regime_effective_t = regime_info.regime.value
+                except Exception as _rc_exc:
+                    logger.warning("P1-J trend regime cross-validation failed: %s", _rc_exc)
+                    _regime_effective_t = _regime_original_t
         except Exception as exc:
             logger.warning("市场状态检测失败，跳过: %s", exc)
 
@@ -2392,6 +2461,11 @@ class AnalysisOrchestrator:
             regime_suggestion=regime_info.suggestion if regime_info else None,
             regime_support=regime_info.support if regime_info else None,
             regime_resistance=regime_info.resistance if regime_info else None,
+            regime_original=_regime_original_t,
+            regime_effective=_regime_effective_t,
+            regime_conflict=_regime_conflict_t,
+            regime_conflict_detail=_regime_conflict_detail_t,
+            phase_score_gap=_phase_score_gap_t,
         )
 
     # ===================================================================

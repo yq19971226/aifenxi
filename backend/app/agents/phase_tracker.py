@@ -77,14 +77,19 @@ class PhaseState(BaseModel):
 
     phase: MarketPhase = MarketPhase.ACCUMULATION
     entered_at: str = ""  # ISO format datetime string
+    score_gap: float = 0.0  # P1-I: 阶段判断置信度
     transitions: list[dict[str, str]] = Field(default_factory=list)
 
 
-def _detect_phase_from_data(market_data: MarketData) -> tuple[MarketPhase, str]:
+def _detect_phase_from_data(market_data: MarketData) -> tuple[MarketPhase, str, float]:
     """基于链上特征 + 技术形态组合规则检测当前阶段。
 
     Returns:
-        (detected_phase, reason) 元组
+        (detected_phase, reason, score_gap) 元组
+        score_gap: 最高分与次高分的差值
+          >= 1.5: 高置信度
+          0.5-1.5: 中置信度
+          < 0.5: 低置信度（不确定，不应触发 regime 覆盖）
     """
     onchain = market_data.onchain
     indicators = market_data.indicators
@@ -205,18 +210,39 @@ def _detect_phase_from_data(market_data: MarketData) -> tuple[MarketPhase, str]:
             scores[MarketPhase.WASHOUT] += 1.5
             reasons[MarketPhase.WASHOUT].append(f"大规模爆仓(${derivatives.liquidation_1h_usd/1e6:.0f}M)")
 
-    # 选择得分最高的阶段
-    best_phase = max(scores, key=lambda p: scores[p])
-    best_score = scores[best_phase]
+    # 选择得分最高的阶段 — P1-I: 计算 score_gap 作为置信度指标
+    sorted_phases = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    best_phase = sorted_phases[0][0]
+    best_score = sorted_phases[0][1]
+    second_score = sorted_phases[1][1] if len(sorted_phases) > 1 else 0
+    score_gap = best_score - second_score
 
     # 得分过低时默认 accumulation
     if best_score < 1.0:
         best_phase = MarketPhase.ACCUMULATION
         reason = "数据不足，默认吸筹阶段"
+        score_gap = 0.0  # 不确定
     else:
         reason = "; ".join(reasons[best_phase])
 
-    return best_phase, reason
+    # P2-G: 链上数据降级处理 — 链上因子少于 2 个时压低 score_gap
+    onchain_factors_used = 0
+    if onchain:
+        if onchain.exchange_netflow is not None:
+            onchain_factors_used += 1
+        if onchain.whale_change_24h is not None:
+            onchain_factors_used += 1
+        if onchain.fear_greed_index is not None:
+            onchain_factors_used += 1
+        if onchain.mvrv is not None:
+            onchain_factors_used += 1
+
+    if onchain_factors_used < 2:
+        # 降级模式：score_gap 自动压低，禁止触发 regime 覆盖
+        score_gap = min(score_gap, 0.3)
+        reason += " [链上数据不足，阶段判断已降级]"
+
+    return best_phase, reason, score_gap
 
 
 async def _load_phase_state(symbol: str) -> PhaseState | None:
@@ -236,6 +262,7 @@ async def _load_phase_state(symbol: str) -> PhaseState | None:
         return PhaseState(
             phase=MarketPhase(data.get("phase", "accumulation")),
             entered_at=data.get("entered_at", ""),
+            score_gap=float(data.get("score_gap", 0.0)),
             transitions=transitions,
         )
     except Exception as exc:
@@ -256,6 +283,7 @@ async def _save_phase_state(symbol: str, state: PhaseState) -> None:
         await redis.hset(key, mapping={
             "phase": state.phase.value,
             "entered_at": state.entered_at,
+            "score_gap": str(getattr(state, 'score_gap', 0.0)),
             "transitions": json.dumps(state.transitions, ensure_ascii=False),
         })
         # 设置 TTL 7 天，避免无限堆积
@@ -314,7 +342,7 @@ async def detect_transition(
         Redis 不可用时优雅降级返回 None。
     """
     try:
-        detected_phase, reason = _detect_phase_from_data(market_data)
+        detected_phase, reason, score_gap = _detect_phase_from_data(market_data)
 
         # 加载当前状态
         current_state = await _load_phase_state(symbol)
@@ -326,13 +354,17 @@ async def detect_transition(
             new_state = PhaseState(
                 phase=detected_phase,
                 entered_at=now_iso,
+                score_gap=score_gap,
                 transitions=[],
             )
             await _save_phase_state(symbol, new_state)
             return None
 
-        # 阶段未变化
+        # 阶段未变化 — 但 score_gap 可能变化，需更新供下游使用
         if detected_phase == current_state.phase:
+            if abs(score_gap - current_state.score_gap) > 0.1:
+                current_state.score_gap = score_gap
+                await _save_phase_state(symbol, current_state)
             return None
 
         # 检查是否为合法转换
@@ -370,6 +402,7 @@ async def detect_transition(
         new_state = PhaseState(
             phase=detected_phase,
             entered_at=now_iso,
+            score_gap=score_gap,
             transitions=history,
         )
         await _save_phase_state(symbol, new_state)

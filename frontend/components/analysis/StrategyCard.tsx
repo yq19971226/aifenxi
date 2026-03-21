@@ -87,7 +87,7 @@ export function StrategyRangeBar({
             style={{ left: `${pct(tp)}%` }}
           >
             <span className="absolute bottom-1 left-2 text-[11px] font-mono font-bold text-emerald-400 whitespace-nowrap bg-black/60 px-1 rounded">
-              T{i + 1}
+              {t("tpLabel", { n: i + 1 })}
             </span>
           </div>
         ))}
@@ -211,7 +211,7 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
             <div className="flex gap-2.5 flex-wrap">
               {targets.map((tp, i) => (
                 <div key={i} className="flex flex-col rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 transition-all duration-300 hover:bg-emerald-500/20 hover:border-emerald-500/40 hover:shadow-[0_0_15px_rgba(52,211,153,0.15)] cursor-default">
-                  <span className="text-[11px] text-emerald-500/70 font-bold mb-0.5 tracking-wider">T{i + 1}</span>
+                  <span className="text-[11px] text-emerald-500/70 font-bold mb-0.5 tracking-wider">{t("tpLabel", { n: i + 1 })}</span>
                   <span className="text-xs md:text-sm font-mono font-black text-emerald-400 tracking-tight drop-shadow-sm">
                     {formatPrice(tp)}
                   </span>

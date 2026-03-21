@@ -161,8 +161,8 @@ class AdversarialAgent(BaseAgent):
         # 1. 收集上下文（PlaybookAgent + AIDetector 的缓存结果）
         context = await self._gather_context(data.symbol)
 
-        # 2. 构建 prompt
-        user_prompt = self._build_prompt(data, context)
+        # 2. 构建 prompt（P1-G: 异步读取共识信号）
+        user_prompt = await self._build_prompt(data, context)
 
         # 3. 调用 deepseek-reasoner 进行深度博弈推理
         try:
@@ -249,8 +249,8 @@ class AdversarialAgent(BaseAgent):
     # ── Prompt 构建 ───────────────────────────────────────────
 
     @staticmethod
-    def _build_prompt(data: MarketData, context: dict[str, Any]) -> str:
-        """构建对抗推演的用户提示词。"""
+    async def _build_prompt(data: MarketData, context: dict[str, Any]) -> str:
+        """构建对抗推演的用户提示词。（P1-G: 异步，读取共识信号）"""
         parts: list[str] = [
             f"## 对抗推演任务：{data.symbol}",
             f"当前价格: {data.current_price}",
@@ -340,6 +340,24 @@ class AdversarialAgent(BaseAgent):
             parts.append(f"进场: {strat.get('entry_price', '?')}")
             parts.append(f"止损: {strat.get('stop_loss', '?')}")
             parts.append(f"止盈: {strat.get('take_profit', '?')}")
+
+        # ── P1-G: 注入共识引擎信号，要求 LLM 显式对比 ──
+        try:
+            consensus = await get_json(f"consensus:latest:{data.symbol.upper()}")
+            if consensus and isinstance(consensus, dict):
+                c_signal = consensus.get("consensus_signal", "unknown")
+                c_conf = consensus.get("consensus_confidence", 0)
+                c_div = consensus.get("divergence", 0)
+                parts.append("\n### 共识引擎当前判断（你必须显式对比）")
+                parts.append(f"方向: {c_signal}")
+                parts.append(f"置信度: {c_conf}")
+                parts.append(f"分歧度: {c_div}%")
+                parts.append(
+                    "如果你的推演方向与共识不同，必须在 reasoning 中用一段话解释"
+                    "为什么庄家视角的判断与技术面共识不同，以及散户应该听哪一个。"
+                )
+        except Exception:
+            pass  # Redis 不可用时降级，不影响推演
 
         # 合约数据（庄家的杠杆操控线索）
         if data.derivatives:

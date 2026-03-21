@@ -12,5 +12,10 @@
   "lastUpdated": "Last updated",
   "autoRefresh": "Auto-refreshes every 60s",
   "emptyTitle": "No adversarial data available",
-  "emptySubtitle": "Please wait for automatic analysis or select another symbol"
+  "emptySubtitle": "Please wait for automatic analysis or select another symbol",
+  "consistencyAligned": "Adversarial signal aligns with trend analysis",
+  "consistencyDirectionConflict": "Adversarial signal conflicts with trend analysis direction",
+  "consistencyStrategyConflict": "Direction aligned with analysis but strategy suggests caution",
+  "consistencyConsensus": "Trend Analysis",
+  "consistencyConfidence": "Confidence"
 }

@@ -2,6 +2,8 @@
   "sidebar": {
     "groups": {
       "overview": "Overview",
+      "business": "Business",
+      "content": "Content",
       "config": "Configuration",
       "operations": "Operations",
       "intelligence": "Intelligence"
@@ -9,6 +11,7 @@
     "items": {
       "dashboard": "Dashboard",
       "monitor": "System Monitor",
+      "membership": "Membership & Products",
       "setup": "Feature Toggles",
       "apiKeys": "API Keys",
       "datasources": "Data Sources",

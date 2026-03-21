@@ -2,13 +2,16 @@
   "sidebar": {
     "groups": {
       "overview": "總覽",
-      "config": "配置",
+      "business": "商業運營",
+      "content": "內容運營",
+      "config": "系統配置",
       "operations": "運營",
-      "intelligence": "智能"
+      "intelligence": "智慧體與資料"
     },
     "items": {
       "dashboard": "後台總覽",
       "monitor": "系統監控",
+      "membership": "會員與商品",
       "setup": "功能開關",
       "apiKeys": "API 密鑰",
       "datasources": "數據源管理",

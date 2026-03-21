@@ -72,7 +72,11 @@
     "duration": "持續",
     "durationMin": "{min}分鐘",
     "durationHourMin": "{h}小時{min}分",
-    "durationHour": "{h}小時"
+    "durationHour": "{h}小時",
+    "regimeConflict": "⚠️ 震盪市場中連續 {streak} 次{signal}信號，注意反轉風險",
+    "rangingLabel": "📊 震盪區間",
+    "rangingHint": "方向信號僅供參考",
+    "rangePosition": "區間位置"
   },
   "timeline": {
     "title": "綜合訊號",

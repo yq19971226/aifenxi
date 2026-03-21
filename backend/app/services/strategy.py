@@ -89,12 +89,21 @@ class StrategyService:
         direction: str, price: float,
         entry_low: float, entry_high: float,
         stop_loss: float, targets: list[float],
+        market_regime: str | None = None,
     ) -> tuple[float, float, float, list[float]]:
-        """确保入场/止损/目标价与方向一致，不一致时回退到百分比默认值。"""
+        """确保入场/止损/目标价与方向一致，不一致时回退到百分比默认值。
+
+        P1-C: 震荡市场允许 entry 偏离当前价（等回调/反弹入场）。
+        P1-D: 强制最小入场宽度 0.3%。
+        P2-D: 止盈位最小间距 0.5%。
+        """
+        is_ranging = market_regime == "ranging"
+
         if direction == "long":
             if stop_loss >= price:
                 stop_loss = price * 0.95
-            if entry_low > price:
+            # P1-C: 震荡市场允许 entry_low 低于当前价（等回调到支撑位买入）
+            if not is_ranging and entry_low > price:
                 entry_low = price * 0.98
             # 关键：止损必须在入场区间下方（不能在区间内部）
             if stop_loss >= entry_low:
@@ -106,7 +115,8 @@ class StrategyService:
         elif direction == "short":
             if stop_loss <= price:
                 stop_loss = price * 1.05
-            if entry_high < price:
+            # P1-C: 震荡市场允许 entry_high 高于当前价（等反弹到阻力位做空）
+            if not is_ranging and entry_high < price:
                 entry_high = price * 1.02
             # 关键：止损必须在入场区间上方（不能在区间内部）
             if stop_loss <= entry_high:
@@ -115,7 +125,37 @@ class StrategyService:
             fallback = [price * 0.97, price * 0.94, price * 0.90]
             while len(targets) < 3:
                 targets.append(fallback[len(targets)])
-        return entry_low, entry_high, stop_loss, targets[:3]
+
+        targets = targets[:3]
+
+        # P1-D: 入场区间最小宽度 0.3%
+        entry_mid = (entry_low + entry_high) / 2
+        min_entry_width = entry_mid * 0.003
+        if entry_high - entry_low < min_entry_width:
+            entry_low = entry_mid - min_entry_width / 2
+            entry_high = entry_mid + min_entry_width / 2
+
+        # P2-D: 止盈位最小间距 0.5%
+        targets = StrategyService._space_targets(targets)
+
+        return entry_low, entry_high, stop_loss, targets
+
+    @staticmethod
+    def _space_targets(targets: list[float], min_gap_pct: float = 0.005) -> list[float]:
+        """确保止盈位之间有足够间距（默认 0.5%）。"""
+        if not targets:
+            return targets
+        spaced = [targets[0]]
+        for tp in targets[1:]:
+            if abs(tp - spaced[-1]) / max(abs(spaced[-1]), 1e-8) >= min_gap_pct:
+                spaced.append(tp)
+            else:
+                # 按方向拉开：tp > prev 则向上拉，反之向下
+                if tp >= spaced[-1]:
+                    spaced.append(spaced[-1] * (1 + min_gap_pct))
+                else:
+                    spaced.append(spaced[-1] * (1 - min_gap_pct))
+        return spaced
 
     @staticmethod
     def _calc_risk_reward(
@@ -252,7 +292,7 @@ class StrategyService:
 
         entry_low, entry_high, stop_loss, targets = self._validate_strategy(
             direction, price, entry_low, entry_high, stop_loss, targets,
-        )
+        )  # generate_from_report: non-ranging default
 
         # 价格精度优化：根据价格量级自动四舍五入
         def _fmt(val: float) -> float:
@@ -291,6 +331,8 @@ class StrategyService:
         market_regime: str | None = None,
         regime_support: float | None = None,
         regime_resistance: float | None = None,
+        klines_1d: list[dict] | None = None,
+        indicators: dict | None = None,
     ) -> StrategyResult:
         """根据 ConsensusReport 生成策略。
 
@@ -300,7 +342,25 @@ class StrategyService:
 
         market_regime: "ranging" | "trending" | "volatile" | None
             当为 "ranging" 时自动切换为区间策略（高抛低吸）。
+        klines_1d: 日线 K 线列表（用于 Pivot Point 公式化 S/R）
+        indicators: 技术指标字典（含 bb_upper/bb_lower/ema25/ema99）
         """
+        # P3-C: 公式化支撑阻力位交叉验证
+        if regime_support or regime_resistance:
+            try:
+                from app.services.formalized_sr import compute_formula_levels, cross_validate_sr
+                formula = compute_formula_levels(klines=klines_1d, indicators=indicators)
+                validated_s, validated_r, sr_notes = cross_validate_sr(
+                    regime_support, regime_resistance, formula,
+                )
+                if validated_s is not None:
+                    regime_support = validated_s
+                if validated_r is not None:
+                    regime_resistance = validated_r
+                if sr_notes:
+                    logger.info("P3-C SR cross-validation: %s", "; ".join(sr_notes))
+            except Exception as exc:
+                logger.warning("P3-C SR cross-validation skipped: %s", exc)
         # 方向映射
         if report.consensus_signal == "bullish":
             direction = "long"
@@ -366,6 +426,7 @@ class StrategyService:
 
             entry_low, entry_high, stop_loss, targets = self._validate_strategy(
                 direction, current_price, entry_low, entry_high, stop_loss, targets,
+                market_regime="ranging",
             )
             rr, worth = self._calc_risk_reward(direction, entry_low, entry_high, stop_loss, targets)
             worth = worth and confidence >= 0.4
@@ -427,6 +488,7 @@ class StrategyService:
         # 最终验证：确保方向一致性
         entry_low, entry_high, stop_loss, targets = self._validate_strategy(
             direction, current_price, entry_low, entry_high, stop_loss, targets,
+            market_regime=market_regime,
         )
 
         # 价格精度优化

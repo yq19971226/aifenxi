@@ -2,13 +2,16 @@
   "sidebar": {
     "groups": {
       "overview": "概览",
-      "config": "配置",
+      "business": "商业运营",
+      "content": "内容运营",
+      "config": "系统配置",
       "operations": "运营",
-      "intelligence": "智能"
+      "intelligence": "智能体与数据"
     },
     "items": {
       "dashboard": "后台总览",
       "monitor": "系统监控",
+      "membership": "会员与商品",
       "setup": "功能开关",
       "apiKeys": "API 密钥",
       "datasources": "数据源管理",

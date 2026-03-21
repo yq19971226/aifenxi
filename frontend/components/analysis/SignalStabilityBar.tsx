@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Activity, TrendingUp, TrendingDown, Minus, Timer } from "lucide-react";
+import { Activity, TrendingUp, TrendingDown, Minus, Timer, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { authFetch } from "@/lib/api/auth";
 import { useTranslations } from "next-intl";
@@ -84,6 +84,13 @@ export function SignalStabilityBar({
 
   const signalLabel = t(`signal.${data.dominant_signal}` as "signal.bullish" | "signal.bearish" | "signal.neutral");
 
+  // P1-F: 震荡市场体制矛盾检测
+  const latestRegime = data.recent_signals?.[0]?.regime;
+  const isRegimeConflict =
+    latestRegime === "ranging" &&
+    data.current_streak >= 3 &&
+    data.dominant_signal !== "neutral";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -8 }}
@@ -123,25 +130,37 @@ export function SignalStabilityBar({
 
         {/* Right: Metrics */}
         <div className="flex items-center gap-5 text-[11px] text-zinc-400 font-mono">
-          {/* Streak */}
-          <div className="flex items-center gap-1.5">
-            {(() => {
-              const Icon = SIGNAL_ICONS[data.dominant_signal] || Minus;
-              return <Icon size={12} className={
-                data.dominant_signal === "bullish" ? "text-emerald-400" :
-                data.dominant_signal === "bearish" ? "text-red-400" : "text-zinc-500"
-              } />;
-            })()}
-            <span>
-              {t("streak")}<span className="text-white font-bold mx-0.5">{data.current_streak}</span>{t("streakTimes", { count: "" })}
-              <span className={
-                data.dominant_signal === "bullish" ? "text-emerald-400" :
-                data.dominant_signal === "bearish" ? "text-red-400" : "text-zinc-400"
-              }>{signalLabel}</span>
-            </span>
-          </div>
+          {/* Streak / Ranging position */}
+          {latestRegime === "ranging" ? (
+            <div className="flex items-center gap-1.5">
+              <Minus size={12} className="text-indigo-400" />
+              <span className="text-indigo-300 font-bold">
+                {t("rangingLabel")}
+              </span>
+              <span className="text-zinc-500 ml-1">
+                {t("rangingHint")}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              {(() => {
+                const Icon = SIGNAL_ICONS[data.dominant_signal] || Minus;
+                return <Icon size={12} className={
+                  data.dominant_signal === "bullish" ? "text-emerald-400" :
+                  data.dominant_signal === "bearish" ? "text-red-400" : "text-zinc-500"
+                } />;
+              })()}
+              <span>
+                {t("streak")}<span className="text-white font-bold mx-0.5">{data.current_streak}</span>{t("streakTimes", { count: "" })}
+                <span className={
+                  data.dominant_signal === "bullish" ? "text-emerald-400" :
+                  data.dominant_signal === "bearish" ? "text-red-400" : "text-zinc-400"
+                }>{signalLabel}</span>
+              </span>
+            </div>
+          )}
 
-          {/* Consistency */}
+          {/* Consistency / Range position */}
           <div className="flex items-center gap-1.5">
             <div className="w-10 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
               <div
@@ -153,7 +172,9 @@ export function SignalStabilityBar({
                 style={{ width: `${consistencyPct}%` }}
               />
             </div>
-            <span>{t("consistency")} <span className="text-white font-bold">{consistencyPct}%</span></span>
+            <span>
+              {latestRegime === "ranging" ? t("rangePosition") : t("consistency")} <span className="text-white font-bold">{consistencyPct}%</span>
+            </span>
           </div>
 
           {/* Duration */}
@@ -165,6 +186,20 @@ export function SignalStabilityBar({
           )}
         </div>
       </div>
+
+      {/* P1-F: Regime conflict warning banner */}
+      {isRegimeConflict && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          className="px-4 py-2 bg-amber-500/10 border-t border-amber-500/20 flex items-center gap-2"
+        >
+          <AlertTriangle size={14} className="text-amber-400 shrink-0 animate-pulse" />
+          <span className="text-[11px] text-amber-300 font-medium">
+            {t("regimeConflict", { streak: data.current_streak, signal: signalLabel })}
+          </span>
+        </motion.div>
+      )}
     </motion.div>
   );
 }

@@ -84,7 +84,7 @@ CREDITS_PACK_CONFIG: dict[int, dict] = {
         "mode_key": "credits_pack_s_mode",
         "default_price": 10.0,
         "default_credits": 130,
-        "default_mode": "scalping",
+        "default_mode": "all",
         "label": "积分包 S",
     },
     4: {
@@ -93,7 +93,7 @@ CREDITS_PACK_CONFIG: dict[int, dict] = {
         "mode_key": "credits_pack_m_mode",
         "default_price": 30.0,
         "default_credits": 420,
-        "default_mode": "scalping",
+        "default_mode": "all",
         "label": "积分包 M",
     },
     5: {
@@ -102,7 +102,7 @@ CREDITS_PACK_CONFIG: dict[int, dict] = {
         "mode_key": "credits_pack_l_mode",
         "default_price": 100.0,
         "default_credits": 1500,
-        "default_mode": "scalping",
+        "default_mode": "all",
         "label": "积分包 L",
     },
 }
@@ -706,15 +706,31 @@ async def handle_webhook(
                     from app.services.analysis_quota import AnalysisQuotaService
                     from uuid import UUID
                     quota_svc = AnalysisQuotaService()
-                    mode = AnalysisMode(pack_info["mode"])
-                    await quota_svc.add_bonus_credits(
-                        UUID(user_id), mode, pack_info["credits"]
-                    )
-                    logger.info(
-                        "Credits granted: payment_id=%s, user_id=%s, plan=%d, "
-                        "mode=%s, credits=%d",
-                        payment_id, user_id, plan, pack_info["mode"], pack_info["credits"],
-                    )
+                    pack_mode = pack_info["mode"]
+                    total_credits = pack_info["credits"]
+
+                    if pack_mode == "all":
+                        # 多模式：平均分配到 scalping/intraday/trend
+                        per_mode = total_credits // 3
+                        remainder = total_credits - per_mode * 3
+                        for i, m in enumerate([AnalysisMode.SCALPING, AnalysisMode.INTRADAY, AnalysisMode.TREND]):
+                            amount = per_mode + (1 if i < remainder else 0)
+                            await quota_svc.add_bonus_credits(UUID(user_id), m, amount)
+                        logger.info(
+                            "Credits granted (all modes): payment_id=%s, user_id=%s, "
+                            "plan=%d, total=%d, per_mode≈%d",
+                            payment_id, user_id, plan, total_credits, per_mode,
+                        )
+                    else:
+                        mode = AnalysisMode(pack_mode)
+                        await quota_svc.add_bonus_credits(
+                            UUID(user_id), mode, total_credits
+                        )
+                        logger.info(
+                            "Credits granted: payment_id=%s, user_id=%s, plan=%d, "
+                            "mode=%s, credits=%d",
+                            payment_id, user_id, plan, pack_mode, total_credits,
+                        )
                 else:
                     logger.error(
                         "Credits pack config missing at webhook time: payment_id=%s, plan=%d",

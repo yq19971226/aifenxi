@@ -12,5 +12,10 @@
   "lastUpdated": "最後更新",
   "autoRefresh": "每60秒自動刷新",
   "emptyTitle": "暫無對抗推演數據",
-  "emptySubtitle": "請等待系統自動分析或選擇其他交易對"
+  "emptySubtitle": "請等待系統自動分析或選擇其他交易對",
+  "consistencyAligned": "推演信號與趨勢分析一致",
+  "consistencyDirectionConflict": "推演信號與趨勢分析方向不同",
+  "consistencyStrategyConflict": "推演方向與分析一致，但策略建議觀望",
+  "consistencyConsensus": "趨勢分析",
+  "consistencyConfidence": "置信度"
 }

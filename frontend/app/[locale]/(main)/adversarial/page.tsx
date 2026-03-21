@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
 import {
   Swords, RefreshCw, Shield, AlertTriangle,
-  TrendingUp, TrendingDown, Minus, Clock,
+  TrendingUp, TrendingDown, Minus, Clock, CheckCircle2, AlertCircle, RotateCcw,
 } from "lucide-react";
 
 import { SymbolSelector } from "@/components/layout/SymbolSelector";
@@ -48,6 +48,7 @@ interface DefenseData {
   adversarial: Record<string, unknown> | null;
   collusion: Record<string, unknown> | null;
   alert_level: string;
+  consensus_ref?: { signal: string; confidence: number; divergence: number } | null;
 }
 
 export default function AdversarialPage() {
@@ -179,6 +180,54 @@ export default function AdversarialPage() {
           <h3 className="text-lg font-mono text-red-400 uppercase tracking-widest">{t("loading")}</h3>
         </div>
       )}
+
+      {/* ── P1-H: Consistency Banner ── */}
+      {data && adv && data.consensus_ref && (() => {
+        const cRef = data.consensus_ref;
+        const advSignal = signal;  // bullish/bearish/neutral
+        const cSignal = cRef.signal || "neutral";
+        const isAligned = advSignal === cSignal;
+        const isStrategyConflict = isAligned && strategyType === "wait";
+        const isDirectionConflict = !isAligned && advSignal !== "neutral" && cSignal !== "neutral";
+
+        let bannerBg: string, bannerBorder: string, bannerText: string, bannerIcon: React.ReactNode, bannerMsg: string;
+        if (isDirectionConflict) {
+          bannerBg = "bg-amber-500/10";
+          bannerBorder = "border-amber-500/30";
+          bannerText = "text-amber-400";
+          bannerIcon = <AlertCircle size={16} className="text-amber-400 shrink-0" />;
+          bannerMsg = t("consistencyDirectionConflict");
+        } else if (isStrategyConflict) {
+          bannerBg = "bg-sky-500/10";
+          bannerBorder = "border-sky-500/30";
+          bannerText = "text-sky-400";
+          bannerIcon = <RotateCcw size={16} className="text-sky-400 shrink-0" />;
+          bannerMsg = t("consistencyStrategyConflict");
+        } else {
+          bannerBg = "bg-emerald-500/10";
+          bannerBorder = "border-emerald-500/30";
+          bannerText = "text-emerald-400";
+          bannerIcon = <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />;
+          bannerMsg = t("consistencyAligned");
+        }
+
+        const SIGNAL_LABELS: Record<string, string> = {
+          bullish: SIGNAL_MAP.bullish.label,
+          bearish: SIGNAL_MAP.bearish.label,
+          neutral: SIGNAL_MAP.neutral.label,
+        };
+
+        return (
+          <div className={`card flex items-center gap-3 px-4 py-3 border ${bannerBorder} ${bannerBg}`}>
+            {bannerIcon}
+            <span className={`text-sm font-medium ${bannerText}`}>{bannerMsg}</span>
+            <span className="ml-auto flex items-center gap-2 text-xs text-zinc-500">
+              <span>{t("consistencyConsensus")}: <span className="font-semibold text-zinc-300">{SIGNAL_LABELS[cSignal] || cSignal}</span></span>
+              <span>{t("consistencyConfidence")}: <span className="font-mono text-zinc-300">{(cRef.confidence * 100).toFixed(0)}%</span></span>
+            </span>
+          </div>
+        );
+      })()}
 
       {/* ── Data Display ── */}
       {data && adv && (
