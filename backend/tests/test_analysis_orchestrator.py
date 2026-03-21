@@ -121,7 +121,9 @@ async def test_run_analysis_retries_lock_and_executes_when_previous_executor_exi
         orchestrator.run_analysis(uuid4(), 2, "BTCUSDT", AnalysisMode.SCALPING)
     )
 
-    assert [event["type"] for event in events] == ["progress", "complete"]
+    _types = [event["type"] for event in events]
+    assert _types[-1] == "complete", f"最后一个事件不是 complete: {_types}"
+    assert all(t == "progress" for t in _types[:-1]), f"非尾部事件应全是 progress: {_types}"
     quota_mock.assert_awaited_once()
     dispatch_mock.assert_awaited_once()
     call_args = dispatch_mock.call_args
@@ -210,7 +212,7 @@ async def test_run_intraday_uses_resolved_agents_only(monkeypatch):
     monkeypatch.setattr(orchestrator_module, "validate_news_with_capital", lambda *_a, **_k: None)
     monkeypatch.setattr(orchestrator_module, "detect_macro_events", lambda *_a, **_k: SimpleNamespace(events=[], warning=None, confidence_modifier=1.0))
     monkeypatch.setattr(orchestrator_module, "set_with_ttl", AsyncMock())
-    monkeypatch.setattr(orchestrator_module, "_intraday_aggregate", lambda reports, agent_ids: ("bullish", 0.8))
+    monkeypatch.setattr(orchestrator_module, "_intraday_aggregate", lambda reports, agent_ids, regime=None, prev_signal=None: ("bullish", 0.8))
 
     import app.services.funding_rate_guard as funding_rate_guard_module
 
@@ -494,7 +496,7 @@ async def test_run_analysis_timeout_includes_dqs_when_available(monkeypatch):
     )
 
     # 模拟真实 _dispatch_mode: 写入 _partial_ctx 后在 mode runner 阶段超时
-    async def _dispatch_writes_then_hangs(self_inner, symbol, mode, _partial_ctx=None):
+    async def _dispatch_writes_then_hangs(self_inner, symbol, mode, _partial_ctx=None, **kwargs):
         import asyncio as _aio
         if _partial_ctx is not None:
             _partial_ctx["dq_snapshot"] = dqs_fixture

@@ -479,7 +479,8 @@ class AnalysisOrchestrator:
             _bg = asyncio.create_task(
                 run_post_complete_tasks(user_id, symbol, mode, report)
             )
-            _bg.add_done_callback(_post_task_done)
+            if _bg is not None:
+                _bg.add_done_callback(_post_task_done)
         finally:
             if lock_acquired:
                 # 释放锁
