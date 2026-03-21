@@ -36,7 +36,9 @@
     "title": "找回密码",
     "promptSend": "输入注册邮箱，我们将发送验证码",
     "contactPrompt": "请联系管理员或通过注册邮箱找回密码。",
-    "promptCode": "请输入邮箱中收到的验证码"
+    "promptCode": "请输入邮箱中收到的验证码",
+    "resetSuccess": "密码重置成功",
+    "loginWithNewPassword": "请使用新密码登录"
   },
   "strength": {
     "weak": "弱",
@@ -62,6 +64,7 @@
   "success": {
     "registerCodeSent": "注册验证码已发送到邮箱，请在 10 分钟内完成注册",
     "codeSent": "验证码已发送到邮箱，请10分钟内有效",
+    "codeSentWithEmail": "验证码已发送至 {email}，请在 10 分钟内完成重置",
     "passwordReset": "密码重置成功，请登录"
   },
   "features": {

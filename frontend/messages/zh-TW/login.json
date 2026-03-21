@@ -36,7 +36,9 @@
     "title": "找回密碼",
     "promptSend": "輸入註冊信箱，我們將發送驗證碼",
     "contactPrompt": "請聯繫管理員或透過註冊信箱找回密碼。",
-    "promptCode": "請輸入信箱中收到的驗證碼"
+    "promptCode": "請輸入信箱中收到的驗證碼",
+    "resetSuccess": "密碼重設成功",
+    "loginWithNewPassword": "請使用新密碼登入"
   },
   "strength": {
     "weak": "弱",
@@ -62,6 +64,7 @@
   "success": {
     "registerCodeSent": "註冊驗證碼已發送至信箱，請在 10 分鐘內完成註冊",
     "codeSent": "驗證碼已發送至信箱，請於10分鐘內使用",
+    "codeSentWithEmail": "驗證碼已發送至 {email}，請在 10 分鐘內完成重設",
     "passwordReset": "密碼重設成功，請登入"
   },
   "features": {

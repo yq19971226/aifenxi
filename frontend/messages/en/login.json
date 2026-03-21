@@ -36,7 +36,9 @@
     "title": "Reset Password",
     "promptSend": "Enter your email and we'll send a verification code",
     "contactPrompt": "Please contact the administrator or use your registration email to reset your password.",
-    "promptCode": "Enter the code sent to your email"
+    "promptCode": "Enter the code sent to your email",
+    "resetSuccess": "Password reset successful",
+    "loginWithNewPassword": "Please sign in with your new password"
   },
   "strength": {
     "weak": "Weak",
@@ -62,6 +64,7 @@
   "success": {
     "registerCodeSent": "Registration code sent to your email. Please complete sign up within 10 minutes",
     "codeSent": "Verification code sent to your email, valid for 10 minutes",
+    "codeSentWithEmail": "Verification code sent to {email}. Please reset within 10 minutes",
     "passwordReset": "Password reset successful, please log in"
   },
   "features": {

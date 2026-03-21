@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
       setStep(2);
       setSentHint(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "发送失败，请稍后重试");
+      setError(err instanceof Error ? err.message : t("errors.sendFailed"));
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,7 @@ export default function ForgotPasswordPage() {
       await resetPassword(email, codeVal, newPwd);
       setStep(3);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "重置失败，请检查验证码是否正确");
+      setError(err instanceof Error ? err.message : t("errors.resetFailed"));
     } finally {
       setLoading(false);
     }
@@ -80,7 +80,7 @@ export default function ForgotPasswordPage() {
               {t("forgot.title")}
             </p>
             <p className="text-xs text-zinc-600 font-mono mt-1 leading-relaxed">
-              输入注册邮箱，验证码将发送到该邮箱
+              {t("forgot.promptSend")}
             </p>
           </div>
 
@@ -138,7 +138,7 @@ export default function ForgotPasswordPage() {
         <form onSubmit={handleStep2} className="space-y-6">
           {sentHint && (
             <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-sm font-medium tracking-tight backdrop-blur-md">
-              验证码已发送至 {email}，请在 10 分钟内完成重置
+              {t("success.codeSentWithEmail", { email })}
             </div>
           )}
           {error && (
@@ -173,7 +173,7 @@ export default function ForgotPasswordPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1 group">
               <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-indigo-400 transition-colors">
-                新密码
+                {t("fields.newPassword")}
               </label>
               <div className="relative">
                 <input
@@ -239,10 +239,10 @@ export default function ForgotPasswordPage() {
           </div>
           <div>
             <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] mb-3">
-              密码重置成功
+              {t("forgot.resetSuccess")}
             </p>
             <p className="text-xs text-zinc-600 font-mono leading-relaxed">
-              请使用新密码登录
+              {t("forgot.loginWithNewPassword")}
             </p>
           </div>
           <button
