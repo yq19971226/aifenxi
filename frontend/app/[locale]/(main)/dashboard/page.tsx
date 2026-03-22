@@ -59,11 +59,11 @@ function formatPrice(val: number | null | undefined): string {
 }
 
 const SIGNAL_ICON_MAP: Record<string, { icon: typeof TrendingUp; color: string; bg: string }> = {
-  direction_change: { icon: RefreshCw, color: "text-blue-400", bg: "bg-blue-500/10" },
-  confidence_rise: { icon: ArrowUpRight, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  confidence_drop: { icon: ArrowDownRight, color: "text-amber-400", bg: "bg-amber-500/10" },
-  opportunity: { icon: Zap, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  risk_alert: { icon: ShieldAlert, color: "text-red-400", bg: "bg-red-500/10" },
+  direction_change: { icon: RefreshCw, color: "text-primary", bg: "bg-primary/10" },
+  confidence_rise: { icon: ArrowUpRight, color: "text-bull", bg: "bg-bull/10" },
+  confidence_drop: { icon: ArrowDownRight, color: "text-warn", bg: "bg-warn/10" },
+  opportunity: { icon: Zap, color: "text-bull", bg: "bg-bull/10" },
+  risk_alert: { icon: ShieldAlert, color: "text-bear", bg: "bg-bear/10" },
 };
 
 const INSIGHT_ICON_MAP: Record<string, typeof LinkIcon> = {
@@ -166,10 +166,10 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8 md:space-y-12 max-w-[1400px] mx-auto px-4 md:px-8 py-8 md:py-12">
       {/* ── Zone 1: Hero Summary ── */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#09090B]/60 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] backdrop-blur-2xl">
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-background/80 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] backdrop-blur-2xl">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-indigo-500/[0.04] blur-[100px] -mr-32 -mt-32" />
-          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] rounded-full bg-emerald-500/[0.03] blur-[80px] -ml-20 -mb-20" />
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-[#00E5FF]/[0.05] blur-[100px] -mr-32 -mt-32" />
+          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] rounded-full bg-[#F500FF]/[0.03] blur-[80px] -ml-20 -mb-20" />
         </div>
         <div className="relative z-10 p-6 md:p-10">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -179,8 +179,8 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center gap-2 text-[11px] md:text-xs font-mono font-bold text-zinc-400 hidden md:flex uppercase tracking-widest bg-white/5 py-2 px-4 rounded-xl">
               <span className="relative flex h-2.5 w-2.5 mr-1">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00E676] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00E676] shadow-[0_0_12px_rgba(0,230,118,0.5)]" />
               </span>
               {t("autoRefresh")}
             </div>
@@ -245,7 +245,7 @@ export default function DashboardPage() {
             {/* New signals count */}
             <div className="card-surface p-5 md:p-6 flex flex-col justify-center group">
               <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 md:mb-4 flex items-center gap-1.5"><Activity size={14}/>{t("timeline.title")}</span>
-              <span className="text-3xl md:text-4xl lg:text-4xl font-black text-white tracking-tighter group-hover:text-indigo-400 transition-colors flex items-end">
+              <span className="text-3xl md:text-4xl lg:text-4xl font-black text-white tracking-tighter group-hover:text-primary transition-colors drop-shadow-sm flex items-end">
                 {signals?.total ?? 0}
                 <span className="text-[11px] font-bold font-mono text-zinc-500 ml-2 tracking-widest mb-1.5 uppercase opacity-80">{t("signalsGenerated")}</span>
               </span>
@@ -264,8 +264,8 @@ export default function DashboardPage() {
 
       {/* ── Zone 2: Symbol Signal Cards ── */}
       {sortedSymbols.length === 0 ? (
-        <div className="rounded-3xl border border-white/5 bg-[#09090B]/40 p-16 md:p-24 text-center">
-          <Target size={48} className="text-zinc-400 mx-auto mb-6" />
+        <div className="rounded-3xl border border-white/5 bg-background/40 p-16 md:p-24 text-center">
+          <Target size={48} className="text-zinc-600 mx-auto mb-6" />
           <p className="text-xl font-bold text-zinc-300 tracking-wide">{t("noSignalsData")}</p>
           <p className="text-base font-medium text-zinc-500 mt-3">{t("enablePairsInAdmin")}</p>
         </div>
@@ -284,7 +284,7 @@ export default function DashboardPage() {
           <div className="card h-[500px] flex flex-col">
             <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <Zap size={18} className="text-indigo-400" />
+                <Zap size={18} className="text-primary drop-shadow-[0_0_8px_rgba(0,229,255,0.6)]" />
                 <span className="text-base font-black text-white tracking-widest uppercase">{t("timeline.title")}</span>
               </div>
               <Link
@@ -312,7 +312,7 @@ export default function DashboardPage() {
         <div className="lg:col-span-5">
           <div className="card h-[500px] flex flex-col">
             <div className="px-6 py-5 border-b border-white/5 flex items-center gap-3 shrink-0">
-              <Target size={18} className="text-amber-400" />
+              <Target size={18} className="text-fuchsia drop-shadow-[0_0_8px_rgba(245,0,255,0.5)]" />
               <span className="text-base font-black text-white tracking-widest uppercase">{t("insights.title")}</span>
             </div>
             <div className="p-6 md:p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 flex-1">
@@ -380,7 +380,7 @@ function SymbolCard({
             {s.symbol.substring(0, 1)}
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-2xl font-black text-white tracking-tighter group-hover:text-indigo-400 transition-colors block leading-none">
+            <span className="text-2xl font-black text-white tracking-tighter group-hover:text-primary transition-colors block leading-none hover:drop-shadow-[0_0_8px_rgba(0,229,255,0.6)]">
               {s.display_name || s.symbol.replace("USDT", "")}
             </span>
             <span className="text-sm font-mono font-bold text-zinc-400 group-hover:text-zinc-300 transition-colors block">
@@ -408,7 +408,7 @@ function SymbolCard({
 
       {/* Row 2: Confidence bar */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="flex-1 h-2 rounded-full bg-black/40 border border-white/5 overflow-hidden shadow-inner relative">
+        <div className="flex-1 h-2 rounded-full bg-background/80 border border-white/5 overflow-hidden shadow-inner relative">
           <div
             className={`absolute top-0 bottom-0 left-0 transition-all duration-1000 ease-out-expo ${barColor}`}
             style={{ width: `${Math.min(conf, 100)}%` }}
@@ -449,7 +449,7 @@ function SymbolCard({
           {s.risk_reward_ratio > 0 && (
             <div className="flex flex-col gap-1">
               <span className="text-[11px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{t("riskReward")}</span>
-              <span className="text-indigo-400 font-black font-mono tracking-tight text-base">1:{s.risk_reward_ratio.toFixed(1)}</span>
+              <span className="text-primary font-black font-mono tracking-tight text-base">1:{s.risk_reward_ratio.toFixed(1)}</span>
             </div>
           )}
         </div>
@@ -476,7 +476,7 @@ function SymbolCard({
 
       {/* Free user upgrade hint overlay */}
       {!canSeeStrategy && s.direction !== "neutral" && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-bg-surface/90 backdrop-blur-sm border border-border px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-indigo-400 flex items-center gap-2 shadow-lg">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-bg-surface/90 backdrop-blur-sm border border-border px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2 shadow-lg">
           <Lock size={14} /> {t("membership.upgradeHint")}
         </div>
       )}

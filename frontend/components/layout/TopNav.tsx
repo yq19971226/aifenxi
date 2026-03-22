@@ -97,7 +97,7 @@ export function TopNav() {
       {/* Mobile Top Bar - 移动端占满宽，避免与内容区并排留白 */}
       <header className="md:hidden sticky top-0 z-50 flex h-14 w-full min-w-0 shrink-0 items-center justify-between border-b border-border bg-bg-primary/60 backdrop-blur-xl px-4">
         <Link href={`/${locale}`} className="flex items-center gap-2">
-          <LogoMark className="h-6 w-6 text-primary" />
+          <LogoMark className="h-6 w-6 text-primary drop-shadow-[0_0_8px_rgba(0,229,255,0.6)]" />
           <span className="font-bold tracking-tight text-sm">AXIOM</span>
         </Link>
 
@@ -186,12 +186,12 @@ export function TopNav() {
                             className={cn(
                               "flex items-center gap-4 px-4 py-3.5 rounded-xl font-bold transition-all active:scale-[0.98]",
                               isActive
-                                ? "bg-indigo-500/10 text-indigo-400 shadow-inner"
-                                : "text-zinc-300 hover:bg-white/5 border border-transparent",
+                                ? "bg-primary/10 text-primary shadow-[inset_0_0_15px_rgba(0,229,255,0.1)]"
+                                : "text-zinc-300 hover:bg-white/5 border border-transparent hover:text-white",
                               isMaintenance && "opacity-60",
                             )}
                           >
-                            <Icon size={22} className={cn("shrink-0", isActive ? "text-indigo-400" : "text-zinc-500")} />
+                            <Icon size={22} className={cn("shrink-0 drop-shadow-md", isActive ? "text-primary drop-shadow-[0_0_8px_rgba(0,229,255,0.8)]" : "text-zinc-500")} />
                             <span className="flex-1">{t(`main.${item.key}`)}</span>
                             {isMaintenance && (
                               <span className="text-[10px] font-bold font-mono text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-md uppercase tracking-widest">
@@ -199,7 +199,7 @@ export function TopNav() {
                               </span>
                             )}
                             {isActive && (
-                              <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
+                              <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(0,229,255,0.8)]" />
                             )}
                           </Link>
                         );

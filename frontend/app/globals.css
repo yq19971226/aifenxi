@@ -3,88 +3,74 @@
 @tailwind utilities;
 
 :root {
-  /* Background - Pro Max Dark (Zinc 950 Base) */
-  --bg-primary:       #09090B;    /* Zinc 950 - The ultimate premium dark base */
-  --bg-secondary:     #111113;    /* Very subtle step up */
-  --bg-elevated:      #18181B;    /* Zinc 900 */
-  --bg-surface:       #27272A;    /* Zinc 800 */
-  --bg-card:          rgba(24, 24, 27, 0.4); /* Frosted Zinc 900 */
-  --bg-card-hover:    rgba(39, 39, 42, 0.5); /* Hover Zinc 800 */
+  /* ── Backgrounds: Deep Space Midnight (Nexus / Web3 Style) ── */
+  --bg-primary:       #0A0D14;    /* Midnight Slate */
+  --bg-secondary:     #111621;    
+  --bg-elevated:      #171D2D;    
+  --bg-surface:       #1C2336;    
+  --bg-card:          rgba(10, 13, 20, 0.6); 
+  --bg-card-hover:    rgba(17, 22, 33, 0.8); 
 
-  /* Borders - Micro-contrast & Crisp */
-  --border-subtle:    rgba(255, 255, 255, 0.03);
-  --border-default:   rgba(255, 255, 255, 0.08); /* Crisp separation */
-  --border-hover:     rgba(255, 255, 255, 0.15);
-  --border-active:    rgba(255, 255, 255, 0.25);
+  /* ── Neon Borders ── */
+  --border-subtle:    rgba(0, 229, 255, 0.05); /* Cyan tint */
+  --border-default:   rgba(82, 113, 255, 0.15); /* Bluish tint */
+  --border-hover:     rgba(0, 229, 255, 0.4); 
+  --border-active:    rgba(0, 229, 255, 0.8);
 
-  /* Signals - Vibrant but not burning (Pro Max standard) */
-  --color-bull:       #10B981; /* Emerald 500 */
-  --color-bull-muted: rgba(16, 185, 129, 0.15);
-  --color-bear:       #EF4444; /* Red 500 */
-  --color-bear-muted: rgba(239, 68, 68, 0.15);
-  --color-warn:       #F59E0B; /* Amber 500 */
-  --color-warn-muted: rgba(245, 158, 11, 0.15);
-  --color-info:       #6366F1; /* Indigo 500 */
-  --color-info-muted: rgba(99, 102, 241, 0.15);
+  /* ── Neon Signals (Cyberpunk High Saturations) ── */
+  --color-bull:       #00E676; /* Neon Green */
+  --color-bull-muted: rgba(0, 230, 118, 0.15);
+  --color-bear:       #FF1744; /* Neon Crimson */
+  --color-bear-muted: rgba(255, 23, 68, 0.15);
+  --color-warn:       #FFEA00; /* Neon Yellow */
+  --color-warn-muted: rgba(255, 234, 0, 0.15);
+  --color-info:       #00E5FF; /* Cyan */
+  --color-info-muted: rgba(0, 229, 255, 0.15);
+  
+  --color-fuchsia:    #F500FF; /* Magenta/Fuchsia */
 
-  /* Text - High Legibility (Geist / Inter styling) */
-  --color-text:          #FAFAFA; /* Zinc 50 */
-  --color-text-secondary:#A1A1AA; /* Zinc 400 */
-  --color-text-muted:    #71717A; /* Zinc 500 */
-  --color-text-ghost:    #52525B; /* Zinc 600 */
+  /* ── Typography: Crisp Web3 Contrast ── */
+  --color-text:          #F8FAFC; 
+  --color-text-secondary:#94A3B8; 
+  --color-text-muted:    #64748B; 
+  --color-text-ghost:    #475569; 
 
-  /* Typography */
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", "Roboto Mono", ui-monospace, monospace;
+  /* ── Web3 Radii ── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
 
-  /* Radius - Professional Apple/Vercel tight curves */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-
-  /* Shadows - Ambient Light, Inner Glow & Depth */
-  /* The secret to Pro Max cards is a subtle 1px inner white border (inset shadow) and a soft ambient drop shadow */
-  --shadow-card:     inset 0 1px 0 0 rgba(255,255,255,0.05), 0 4px 20px -8px rgba(0,0,0,0.8);
-  --shadow-hover:    inset 0 1px 0 0 rgba(255,255,255,0.1), 0 12px 32px -12px rgba(0,0,0,0.9), 0 0 32px -8px rgba(99, 102, 241, 0.15);
-  --shadow-dropdown: inset 0 1px 0 0 rgba(255,255,255,0.08), 0 16px 48px -12px rgba(0,0,0,1);
-  --shadow-modal:    inset 0 1px 0 0 rgba(255,255,255,0.08), 0 24px 64px rgba(0,0,0,0.95);
-
-  /* Motion - Snappy & Buttery smooth */
-  --transition-fast:   150ms cubic-bezier(0.32, 0.72, 0, 1);
-  --transition-normal: 300ms cubic-bezier(0.32, 0.72, 0, 1);
-
-  /* SimianX / Axiom Brand Accents */
-  --color-accent: #6366F1; /* Primary Indigo */
-  --color-fundamental: #10B981; /* Emerald */
-  --color-indicator: #F59E0B; /* Amber */
-  --color-intelligence: #8B5CF6; /* Violet */
-  --color-decision: #3B82F6; /* Blue */
+  /* ── Cyberpunk Shadows & Glows ── */
+  --shadow-card:     0 4px 20px -8px rgba(0,0,0,0.8);
+  --shadow-hover:    0 0 15px rgba(0, 229, 255, 0.25), 0 0 30px rgba(0, 229, 255, 0.1);
+  --shadow-neon-cyan:  0 0 15px rgba(0, 229, 255, 0.4), 0 0 30px rgba(0, 229, 255, 0.2);
+  --shadow-neon-green: 0 0 15px rgba(0, 230, 118, 0.4), 0 0 30px rgba(0, 230, 118, 0.2);
+  --shadow-neon-red:   0 0 15px rgba(255, 23, 68, 0.4), 0 0 30px rgba(255, 23, 68, 0.2);
 }
 
+/* Base styles and Grid */
 @layer base {
-  * {
-    border-color: var(--border-default);
-  }
+  * { border-color: var(--border-default); }
 
   html {
-    font-size: 14px; /* Dense information density */
     -webkit-text-size-adjust: 100%;
   }
 
   body {
     background-color: var(--bg-primary);
-    background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.06), transparent 70%);
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.08), transparent 60%),
+      radial-gradient(circle at 100% 100%, rgba(245, 0, 255, 0.05), transparent 50%);
     background-attachment: fixed;
     color: var(--color-text);
     font-family: var(--font-sans);
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    background: rgba(59, 130, 246, 0.2);
+    background: rgba(0, 229, 255, 0.3);
     color: #ffffff;
   }
 }
@@ -93,47 +79,47 @@
   width: 6px;
   height: 6px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-elevated);
+  background: var(--bg-surface);
   border-radius: 3px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-ghost);
 }
 
-/* ── Form inputs：深色背景 + 浅色字，避免“太亮看不到字” ─────── */
+/* ── Web3 Inputs & Buttons ── */
 @layer components {
+  /* Input fields: Cyberpunk underline glow style */
   .input {
-    background-color: var(--bg-elevated);
+    background-color: rgba(17, 22, 33, 0.4);
     color: var(--color-text);
     border: 1px solid var(--border-default);
+    border-bottom: 2px solid rgba(0, 229, 255, 0.2);
     border-radius: var(--radius-md);
     padding: 0.5rem 0.75rem;
     width: 100%;
-    transition: border-color var(--transition-fast);
+    transition: all 0.2s ease-out;
   }
   .input::placeholder {
     color: var(--color-text-muted);
   }
   .input:hover {
-    border-color: var(--border-hover);
+    border-color: rgba(0, 229, 255, 0.3);
   }
   .input:focus {
     outline: none;
-    border-color: var(--border-active);
-    box-shadow: 0 0 0 1px var(--border-active);
+    border-color: rgba(0, 229, 255, 0.4);
+    border-bottom-color: rgba(0, 229, 255, 1);
+    box-shadow: 0 4px 15px -4px rgba(0, 229, 255, 0.3);
+    background-color: rgba(17, 22, 33, 0.8);
   }
   .input:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
-  /* 覆盖浏览器自动填充的高亮背景，避免白/黄底导致看不清字 */
   .input:-webkit-autofill,
   .input:-webkit-autofill:hover,
   .input:-webkit-autofill:focus,
@@ -143,124 +129,130 @@
     caret-color: var(--color-text);
   }
 
-  /* ── Pro Max Buttons ── */
+  /* ── Cyberpunk Neon Buttons ── */
   .btn-primary {
-    @apply inline-flex items-center justify-center font-bold tracking-wide transition-all duration-300 ease-out-expo text-[#FAFAFA] bg-indigo-600 rounded-lg;
-    box-shadow: 0 2px 10px rgba(79, 70, 229, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    @apply inline-flex items-center justify-center font-bold tracking-wide transition-all duration-300 text-white rounded-lg;
+    background: linear-gradient(135deg, #00E5FF 0%, #D500F9 100%);
+    box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: none;
   }
   .btn-primary:not(:disabled):hover {
-    @apply bg-indigo-500 scale-[1.02] -translate-y-[1px];
-    box-shadow: var(--shadow-hover), 0 0 20px rgba(99, 102, 241, 0.4);
-    border-color: rgba(255, 255, 255, 0.2);
+    @apply scale-[1.02];
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    filter: brightness(1.1);
   }
   .btn-primary:active {
-    @apply scale-[0.98] translate-y-[0px];
-    box-shadow: 0 0 0 rgba(99, 102, 241, 0);
+    @apply scale-[0.98];
   }
-  
+
+  /* Secondary = stealthy dark cyan */
   .btn-secondary {
-    @apply inline-flex items-center justify-center font-bold tracking-wide transition-all duration-300 ease-out-expo text-zinc-300 bg-zinc-800/80 rounded-lg;
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    @apply inline-flex items-center justify-center font-bold tracking-wide transition-all duration-300 rounded-lg;
+    background: rgba(0, 229, 255, 0.05);
+    color: var(--color-text);
+    border: 1px solid rgba(0, 229, 255, 0.2);
   }
   .btn-secondary:not(:disabled):hover {
-    @apply bg-zinc-700/80 text-white scale-[1.02] -translate-y-[1px];
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(0, 229, 255, 0.15);
+    border-color: rgba(0, 229, 255, 0.6);
+    box-shadow: var(--shadow-neon-cyan);
+    color: #FFF;
   }
   .btn-secondary:active {
-    @apply scale-[0.98] translate-y-[0px];
+    @apply scale-[0.98];
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center font-bold tracking-wide transition-all duration-300 ease-out-expo text-white bg-red-600/90 rounded-lg;
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    @apply inline-flex items-center justify-center font-bold tracking-wide transition-all duration-300 rounded-lg text-white;
+    background: rgba(255, 23, 68, 0.9);
+    box-shadow: 0 4px 12px rgba(255, 23, 68, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
   .btn-danger:not(:disabled):hover {
-    @apply bg-red-500 scale-[1.02] -translate-y-[1px];
-    box-shadow: var(--shadow-hover), 0 0 20px rgba(239, 68, 68, 0.4);
-    border-color: rgba(255, 255, 255, 0.2);
+    @apply scale-[1.02];
+    background: rgba(255, 23, 68, 1);
+    box-shadow: var(--shadow-neon-red);
+    border-color: rgba(255, 23, 68, 0.4);
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center font-bold tracking-wide transition-all duration-300 ease-out-expo text-zinc-400 bg-transparent rounded-lg;
+    @apply inline-flex items-center justify-center font-bold tracking-wide transition-all duration-300 rounded-lg text-zinc-400 bg-transparent;
   }
   .btn-ghost:not(:disabled):hover {
-    @apply text-zinc-100 bg-white/5;
+    @apply text-white bg-white/5;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
-  
-  /* ── Pro Max Cards ── */
+
+  /* ── Web3 Cyber Cards ── */
   .card {
-    @apply bg-[rgba(24,24,27,0.4)] backdrop-blur-[16px] rounded-xl transition-all duration-300 ease-out-expo;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: var(--shadow-card);
+    @apply backdrop-blur-[12px] rounded-xl transition-all duration-300;
+    background: linear-gradient(180deg, rgba(17, 22, 33, 0.6) 0%, rgba(10, 13, 20, 0.8) 100%);
+    border: 1px solid rgba(82, 113, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
   }
   
   .card-surface {
-    @apply bg-bg-surface/50 backdrop-blur-xl rounded-xl transition-all duration-300 ease-out-expo;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.02);
+    @apply backdrop-blur-xl rounded-xl transition-all duration-300;
+    background: rgba(17, 22, 33, 0.5);
+    border: 1px solid rgba(0, 229, 255, 0.1);
   }
   
   .card-interactive {
-    @apply bg-[rgba(24,24,27,0.4)] backdrop-blur-[16px] rounded-xl cursor-pointer transition-all duration-300 ease-out-expo;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    @apply backdrop-blur-[12px] rounded-xl cursor-pointer transition-all duration-300;
+    background: linear-gradient(180deg, rgba(17, 22, 33, 0.6) 0%, rgba(10, 13, 20, 0.8) 100%);
+    border: 1px solid rgba(82, 113, 255, 0.15);
     box-shadow: var(--shadow-card);
   }
   .card-interactive:hover {
-    @apply bg-[rgba(39,39,42,0.6)] -translate-y-[2px];
-    border-color: rgba(255, 255, 255, 0.15);
-    box-shadow: var(--shadow-hover);
+    @apply -translate-y-[2px];
+    background: linear-gradient(180deg, rgba(23, 30, 45, 0.8) 0%, rgba(14, 18, 28, 0.9) 100%);
+    border-color: rgba(0, 229, 255, 0.5);
+    box-shadow: var(--shadow-neon-cyan);
   }
 }
 
-/* ── Premium UI Utilities ────────────────────────────────────── */
+/* ── Web3 UI Utilities (Grids, Glowing Text) ── */
 
 .bg-grid {
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(to right, rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
 .bg-grid-dense {
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    linear-gradient(to right, rgba(0, 229, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 229, 255, 0.02) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
-.glass-card {
-  background: var(--bg-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-default);
-  box-shadow: var(--shadow-card);
+.text-neon-cyan {
+  color: #00E5FF;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.6), 0 0 20px rgba(0, 229, 255, 0.3);
 }
 
-.glass-card-hover {
-  transition: all var(--transition-normal);
+.text-neon-green {
+  color: #00E676;
+  text-shadow: 0 0 10px rgba(0, 230, 118, 0.6), 0 0 20px rgba(0, 230, 118, 0.3);
 }
 
-.glass-card-hover:hover {
-  background: var(--bg-card-hover);
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
+.text-neon-red {
+  color: #FF1744;
+  text-shadow: 0 0 10px rgba(255, 23, 68, 0.6), 0 0 20px rgba(255, 23, 68, 0.3);
 }
 
 .glow-purple {
-  box-shadow: 0 0 40px -10px rgba(168, 85, 247, 0.15);
+  box-shadow: 0 0 30px rgba(245, 0, 255, 0.3);
 }
-
 .glow-green {
-  box-shadow: 0 0 40px -10px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 30px rgba(0, 230, 118, 0.3);
 }
-
+.glow-cyan {
+  box-shadow: 0 0 30px rgba(0, 229, 255, 0.3);
+}
 .glow-red {
-  box-shadow: 0 0 40px -10px rgba(239, 68, 68, 0.15);
+  box-shadow: 0 0 30px rgba(255, 23, 68, 0.3);
 }
 
 @keyframes float {
@@ -268,29 +260,25 @@
   50% { transform: translateY(-10px); }
   100% { transform: translateY(0px); }
 }
-
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
-
-/* ── Adversarial (Glitch & Scanlines) ───────────────────────── */
 
 .bg-scanline {
   background: linear-gradient(
     to bottom,
     transparent 50%,
-    rgba(255, 255, 255, 0.05) 50%
+    rgba(0, 229, 255, 0.05) 50%
   );
   background-size: 100% 4px;
 }
 
 @keyframes glitch {
   0%, 92%, 100% { transform: translate(0); text-shadow: none; }
-  93% { transform: translate(-2px, 1px); text-shadow: -2px 0 #ef4444, 2px 0 #06b6d4; }
-  95% { transform: translate(2px, -1px); text-shadow: 2px 0 #ef4444, -2px 0 #06b6d4; }
-  97% { transform: translate(-1px, -1px); text-shadow: -1px 0 #ef4444, 1px 0 #06b6d4; }
+  93% { transform: translate(-2px, 1px); text-shadow: -2px 0 #FF1744, 2px 0 #00E5FF; }
+  95% { transform: translate(2px, -1px); text-shadow: 2px 0 #FF1744, -2px 0 #00E5FF; }
+  97% { transform: translate(-1px, -1px); text-shadow: -1px 0 #FF1744, 1px 0 #00E5FF; }
 }
-
 .animate-glitch {
   animation: glitch 4s ease-in-out infinite;
 }

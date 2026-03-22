@@ -142,7 +142,7 @@ export function Sidebar() {
     >
       {/* Logo Area */}
       <div className="flex h-14 items-center border-b border-border px-4">
-        <LogoMark className="h-6 w-6 text-primary shrink-0" />
+        <LogoMark className="h-6 w-6 text-primary shrink-0 drop-shadow-[0_0_8px_rgba(0,229,255,0.6)]" />
         <AnimatePresence>
           {expanded && (
             <motion.span
@@ -180,10 +180,10 @@ export function Sidebar() {
                   }}
                   className={cn(
                     "group flex items-center h-11 px-3.5 rounded-xl transition-all relative font-semibold hover:-translate-y-[1px]",
-                    isActive ? "bg-white/5 text-white shadow-inner" : "text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
+                    isActive ? "bg-primary/10 text-primary shadow-[inset_0_0_15px_rgba(0,229,255,0.1)]" : "text-zinc-500 hover:bg-white/5 hover:text-white"
                   )}
                 >
-                  <item.icon size={20} className={cn("shrink-0 transition-colors", isActive && "text-indigo-400")} />
+                  <item.icon size={20} className={cn("shrink-0 transition-colors drop-shadow-md", isActive && "text-primary drop-shadow-[0_0_8px_rgba(0,229,255,0.8)]")} />
                   
                   <AnimatePresence>
                     {expanded && (
@@ -206,7 +206,7 @@ export function Sidebar() {
                   
                   {/* Active Indicator Line */}
                   {isActive && !expanded && (
-                    <div className="absolute left-0 top-2.5 bottom-2.5 w-1.5 rounded-r-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
+                    <div className="absolute left-0 top-2.5 bottom-2.5 w-1.5 rounded-r-full bg-primary shadow-[0_0_10px_rgba(0,229,255,0.8)]" />
                   )}
                 </Link>
 
@@ -230,7 +230,7 @@ export function Sidebar() {
                             href={`/${locale}${sub.href}`}
                             className={cn(
                               "block py-2.5 px-3 text-xs font-bold tracking-wide rounded-lg transition-colors",
-                              isSubActive ? "text-indigo-400 bg-indigo-500/10 shadow-inner" : "text-zinc-500 hover:text-zinc-200 hover:bg-bg-surface"
+                              isSubActive ? "text-primary bg-primary/10 shadow-[inset_0_0_10px_rgba(0,229,255,0.1)]" : "text-zinc-500 hover:text-white hover:bg-white/5"
                             )}
                           >
                             {t(getSubLabelKey(item.key, sub.key))}
@@ -308,11 +308,9 @@ export function Sidebar() {
             </AnimatePresence>
           </div>
         ) : (
-          expanded && (
-            <Link href={`/${locale}/login`} className="flex w-full items-center justify-center h-10 rounded-lg bg-indigo-500 text-white font-bold hover:bg-indigo-600 transition-colors shadow-lg">
+            <Link href={`/${locale}/login`} className="btn-primary flex w-full items-center justify-center h-10 rounded-lg text-[11px] uppercase tracking-[0.2em] shadow-lg">
               {t('common.login')}
             </Link>
-          )
         )}
       </div>
     </motion.aside>

@@ -51,10 +51,10 @@ function HeroSection() {
   const locale = useLocale();
 
   return (
-    <section className="relative min-h-screen flex items-center pt-24 pb-32 overflow-hidden bg-black selection:bg-indigo-500/30">
+    <section className="relative min-h-screen flex items-center pt-24 pb-32 overflow-hidden bg-background bg-grid selection:bg-[#00E5FF]/30">
       {/* 极客深渊背景网络 */}
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_0%,#000_20%,transparent_100%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_0%,transparent_20%,#0A0D14_100%)] pointer-events-none" />
       
       {/* 巨大的缓慢旋转的模糊光晕 Spotlight */}
       <motion.div
@@ -62,18 +62,18 @@ function HeroSection() {
         transition={{ duration: 150, repeat: Infinity, ease: "linear" }}
         className="absolute w-[150vw] h-[150vw] -left-[25vw] -top-[50vw] opacity-30 pointer-events-none"
       >
-        <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 bg-indigo-500/20 rounded-full blur-[150px] mix-blend-screen" />
-        <div className="absolute bottom-1/4 right-1/4 w-1/2 h-1/2 bg-emerald-500/10 rounded-full blur-[150px] mix-blend-screen" />
+        <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 bg-[#00E5FF]/20 rounded-full blur-[150px] mix-blend-screen" />
+        <div className="absolute bottom-1/4 right-1/4 w-1/2 h-1/2 bg-[#F500FF]/15 rounded-full blur-[150px] mix-blend-screen" />
       </motion.div>
       
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
         {/* Left: Copy */}
         <div className="max-w-2xl">
           <FadeIn delay={0.1}>
-            <div className="inline-flex items-center gap-3 px-3 py-1.5 border-l-2 border-indigo-500 bg-indigo-500/10 text-[10px] font-mono text-indigo-400 mb-8 shadow-[0_0_20px_rgba(99,102,241,0.1)] uppercase tracking-[0.2em] backdrop-blur-md">
+            <div className="inline-flex items-center gap-3 px-3 py-1.5 border-l-2 border-[#00E5FF] bg-[#00E5FF]/10 text-[10px] font-mono text-[#00E5FF] mb-8 shadow-[0_0_20px_rgba(0,229,255,0.2)] uppercase tracking-[0.2em] backdrop-blur-md">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full bg-indigo-400 opacity-75"></span>
-                <span className="relative inline-flex h-1.5 w-1.5 bg-indigo-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full bg-[#00E5FF] opacity-75"></span>
+                <span className="relative inline-flex h-1.5 w-1.5 bg-[#00E5FF]"></span>
               </span>
               {t("hero.badge")}
             </div>
@@ -82,7 +82,7 @@ function HeroSection() {
           <FadeIn delay={0.2}>
             <h1 className="text-5xl sm:text-7xl font-black tracking-tighter text-white mb-6 leading-[1.05] uppercase">
               {t("hero.titleLine1")} <br />
-              <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-white to-emerald-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+              <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#00E5FF] via-white to-[#F500FF] drop-shadow-[0_0_20px_rgba(0,229,255,0.6)]">
                 {t("hero.titleLine2")}
               </span>
             </h1>
@@ -100,20 +100,17 @@ function HeroSection() {
             <div className="flex flex-wrap gap-4">
               <Link
                 href={`/${locale}/login`}
-                className="relative group h-14 px-8 bg-indigo-500/10 border border-indigo-500/40 text-indigo-400 font-mono text-[11px] uppercase tracking-[0.2em] flex items-center gap-3 transition-all hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] overflow-hidden"
+                className="btn-primary h-14 px-8 text-[11px] tracking-[0.2em] flex items-center gap-3"
               >
-                <div className="absolute inset-0 bg-indigo-500/20 w-0 group-hover:w-full transition-all duration-500 ease-out z-0" />
                 <span className="relative z-10 flex items-center gap-2">
                   {t("hero.ctaPrimary")} <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                 </span>
-                <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-indigo-400 pointer-events-none" />
               </Link>
               <Link
                 href={`/${locale}/guide`}
-                className="h-14 px-8 border border-white/[0.1] bg-white/[0.02] backdrop-blur-md text-zinc-400 font-mono text-[11px] tracking-[0.2em] uppercase flex items-center hover:bg-white/[0.06] hover:text-white hover:border-white/[0.3] transition-colors relative"
+                className="btn-secondary h-14 px-8 text-[11px] uppercase tracking-[0.2em] flex items-center relative"
               >
                 {t("hero.ctaSecondary")}
-                <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-zinc-500 pointer-events-none" />
               </Link>
             </div>
           </FadeIn>
@@ -162,7 +159,7 @@ function TerminalBlock() {
   const lines = _TERMINAL_LOG.slice(0, visibleCount);
 
   return (
-    <div className="relative border border-white/[0.05] bg-black/60 backdrop-blur-2xl p-1 font-mono text-[10px] shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden">
+    <div className="relative border border-[#00E5FF]/20 bg-background/80 backdrop-blur-2xl p-1 font-mono text-[10px] shadow-[0_0_50px_rgba(0,229,255,0.15)] overflow-hidden">
       {/* HUD Corners */}
       <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20" />
       <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/20" />
@@ -170,8 +167,8 @@ function TerminalBlock() {
       <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20" />
 
       <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.05] bg-white/[0.01]">
-        <div className="text-[9px] font-bold text-indigo-400 uppercase tracking-[0.3em] flex items-center gap-2">
-          <div className="w-1.5 h-1.5 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)] animate-pulse" />
+        <div className="text-[9px] font-bold text-[#00E5FF] uppercase tracking-[0.3em] flex items-center gap-2">
+          <div className="w-1.5 h-1.5 bg-[#00E5FF] shadow-[0_0_8px_rgba(0,229,255,0.8)] animate-pulse" />
            AXIOM 终端 V5
         </div>
         <div className="flex gap-4 text-[8px] text-zinc-400 tracking-widest">
@@ -188,13 +185,13 @@ function TerminalBlock() {
           {lines.map((line, i) => {
             const isHighlight = line?.includes("共识") ?? false;
             return (
-              <div key={i} className={`${isHighlight ? 'text-indigo-400 font-bold drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]' : 'text-emerald-400/70'} tracking-wider`}>
-                <span className="text-zinc-400 mr-3 hidden sm:inline-block">[{ts}]</span>
+              <div key={i} className={`${isHighlight ? 'text-[#00E5FF] font-bold drop-shadow-[0_0_8px_rgba(0,229,255,0.6)]' : 'text-[#00E676]/70'} tracking-wider`}>
+                <span className="text-zinc-500 mr-3 hidden sm:inline-block">[{ts}]</span>
                 {line}
               </div>
             );
           })}
-          <div className="animate-pulse text-emerald-400 font-black text-sm ml-1 mt-1 block w-2 h-4 bg-emerald-400/80 shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
+          <div className="animate-pulse text-[#00E676] font-black text-sm ml-1 mt-1 block w-2 h-4 bg-[#00E676]/80 shadow-[0_0_8px_rgba(0,230,118,0.5)]" />
         </div>
       </div>
     </div>
@@ -207,7 +204,7 @@ function PainPointsSection() {
   const t = useTranslations("landing.painPoints");
   const items = t.raw("items") as { problem: string; solution: string }[];
   return (
-    <section className="py-24 border-t border-white/[0.05] bg-black">
+    <section className="py-24 border-t border-white/[0.05] bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <FadeIn>
           <h2 className="text-4xl md:text-5xl font-black mb-16 tracking-tighter text-white uppercase">{t("title")}</h2>
@@ -238,7 +235,7 @@ function PainPointsSection() {
 function CapabilitiesSection() {
   const t = useTranslations("landing.capabilities");
   return (
-    <section className="py-24 border-t border-white/[0.05] bg-black">
+    <section className="py-24 border-t border-white/[0.05] bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <FadeIn>
           <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter text-white uppercase">{t("title")}</h2>
@@ -277,9 +274,9 @@ function CapabilitiesSection() {
 function ModesSection() {
   const t = useTranslations("landing.modes");
   return (
-    <section className="py-32 border-t border-white/[0.05] bg-black relative overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_10%,transparent_100%)] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] md:w-[600px] md:h-[600px] rounded-full bg-indigo-500/10 blur-[150px] pointer-events-none" />
+    <section className="py-32 border-t border-white/[0.05] bg-background bg-grid relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,transparent_10%,#0A0D14_100%)] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] md:w-[600px] md:h-[600px] rounded-full bg-[#00E5FF]/10 blur-[150px] pointer-events-none" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <FadeIn>
           <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">{t("title")}</h2>
@@ -339,7 +336,7 @@ function ProductSection() {
   const consensusHighlights = t.raw("consensus.highlights") as string[];
   const playbookHighlights = t.raw("playbook.highlights") as string[];
   return (
-    <section className="py-24 border-t border-white/[0.05] bg-black">
+    <section className="py-24 border-t border-white/[0.05] bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <FadeIn>
           <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter text-white uppercase">{t("title")}</h2>
@@ -391,7 +388,7 @@ function DataSection() {
   const t = useTranslations("landing.data");
   const tags = ["exchange", "onchain", "derivatives", "macro", "sentiment", "news"] as const;
   return (
-    <section className="py-24 border-t border-white/[0.05] bg-black relative">
+    <section className="py-24 border-t border-white/[0.05] bg-background relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <FadeIn>
           <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter text-white uppercase">{t("title")}</h2>
@@ -417,9 +414,10 @@ function CTASection() {
   const t = useTranslations("landing.cta");
   const locale = useLocale();
   return (
-    <section className="py-32 border-t border-white/[0.05] bg-black relative overflow-hidden">
+    <section className="py-32 border-t border-white/[0.05] bg-background bg-grid relative overflow-hidden">
       {/* Background ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-indigo-500/10 blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#F500FF]/15 blur-[150px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,transparent_10%,#0A0D14_100%)] pointer-events-none" />
       
       <div className="max-w-3xl mx-auto px-4 text-center relative z-10">
         <FadeIn>
@@ -429,18 +427,15 @@ function CTASection() {
         <FadeIn delay={0.1} className="flex flex-wrap items-center justify-center gap-4">
           <Link
             href={`/${locale}/register`}
-            className="relative group h-14 px-8 bg-indigo-500/10 border border-indigo-500/40 text-indigo-400 font-mono text-[11px] uppercase tracking-[0.2em] flex items-center justify-center transition-all hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] min-w-[200px]"
+            className="btn-primary h-14 px-8 text-[11px] uppercase tracking-[0.2em] flex items-center justify-center min-w-[200px]"
           >
-            <div className="absolute inset-0 bg-indigo-500/20 w-0 group-hover:w-full transition-all duration-500 ease-out z-0" />
             <span className="relative z-10">{t("button")}</span>
-            <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-indigo-400 pointer-events-none" />
           </Link>
           <Link
             href={`/${locale}/login`}
-            className="relative group h-14 px-8 border border-white/[0.1] bg-white/[0.02] text-zinc-400 font-mono text-[11px] uppercase tracking-[0.2em] flex items-center justify-center transition-all hover:border-white/[0.3] hover:text-white min-w-[200px]"
+            className="btn-secondary h-14 px-8 text-[11px] uppercase tracking-[0.2em] flex items-center justify-center min-w-[200px]"
           >
             <span className="relative z-10">{t("login")}</span>
-            <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-zinc-500 pointer-events-none" />
           </Link>
         </FadeIn>
       </div>
@@ -458,7 +453,7 @@ function FeaturesSection() {
   const items = t.raw("items") as { title: string; desc: string }[];
 
   return (
-    <section id="features" className="py-32 border-t border-white/[0.05] bg-black">
+    <section id="features" className="py-32 border-t border-white/[0.05] bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-20">
           <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter text-white uppercase">{t("sectionTitle")}</h2>
@@ -497,7 +492,7 @@ function FeaturesSection() {
 function TrustSection() {
   const t = useTranslations("landing.trust");
   return (
-    <div className="border-y border-white/[0.06] bg-black overflow-hidden py-4">
+    <div className="border-y border-white/[0.06] bg-background overflow-hidden py-4">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em] overflow-x-auto whitespace-nowrap gap-12 scrollbar-none">
         <span className="flex items-center gap-3">{t("status")}<span className="text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse">{t("statusValue")}</span></span>
         <span className="flex items-center gap-3">{t("analyzed")}<span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">{t("analyzedValue")}</span></span>
@@ -516,8 +511,8 @@ export function LandingPage() {
   const t = useTranslations("landing");
   const { user } = useAuth();
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-indigo-500/30">
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-black/60 backdrop-blur-2xl">
+    <div className="min-h-screen bg-background text-white font-sans selection:bg-[#00E5FF]/30">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-background/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <LogoMark className="h-6 w-6 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
@@ -555,7 +550,7 @@ export function LandingPage() {
         <CTASection />
       </main>
 
-      <footer className="py-12 border-t border-white/[0.04] bg-black text-center text-[10px] text-zinc-400 font-mono tracking-widest uppercase">
+      <footer className="py-12 border-t border-white/[0.04] bg-background text-center text-[10px] text-zinc-400 font-mono tracking-widest uppercase">
         <div className="flex flex-wrap items-center justify-center gap-8 mb-6 font-bold">
           <Link href={`/${locale}/guide`} className="hover:text-indigo-400 transition-colors">{t("footer.guide")}</Link>
           <Link href={`/${locale}/insights`} className="hover:text-indigo-400 transition-colors">{t("footer.insights")}</Link>

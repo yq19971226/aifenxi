@@ -93,59 +93,55 @@ export default function RegisterPage() {
           )}
 
           <div className="space-y-1 group">
-            <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-indigo-400 transition-colors">{t("fields.email")}</label>
+            <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-[#00E5FF] transition-colors">{t("fields.email")}</label>
             <div className="relative">
               <input
                 name="email"
                 type="email"
                 required
-                className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-500/50"
+                className="input font-mono text-base tracking-widest placeholder:tracking-normal"
                 placeholder="user@system.com"
               />
-              <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-indigo-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
             </div>
           </div>
 
           <div className="space-y-1 group">
-            <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-indigo-400 transition-colors">{t("fields.referralCodeOptional")}</label>
+            <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-[#00E5FF] transition-colors">{t("fields.referralCodeOptional")}</label>
             <div className="relative">
               <input
                 name="referralCode"
                 type="text"
-                className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-500/50 uppercase tracking-[0.2em]"
+                className="input font-mono text-base uppercase tracking-widest placeholder:tracking-normal"
                 placeholder=""
               />
-              <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-indigo-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1 group">
-              <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-indigo-400 transition-colors">{t("fields.password")}</label>
+              <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-[#00E5FF] transition-colors">{t("fields.password")}</label>
               <div className="relative">
                 <input
                   name="password"
                   type="password"
                   required
                   minLength={8}
-                  className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-500/50 tracking-[0.2em]"
+                  className="input font-mono text-base tracking-[0.2em] placeholder:tracking-normal"
                   placeholder="••••••••"
                 />
-                <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-indigo-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
               </div>
             </div>
             <div className="space-y-1 group">
-              <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-indigo-400 transition-colors">{t("page.confirm")}</label>
+              <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-[#00E5FF] transition-colors">{t("page.confirm")}</label>
               <div className="relative">
                 <input
                   name="confirmPassword"
                   type="password"
                   required
                   minLength={8}
-                  className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-500/50 tracking-[0.2em]"
+                  className="input font-mono text-base tracking-[0.2em] placeholder:tracking-normal"
                   placeholder="••••••••"
                 />
-                <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-indigo-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
               </div>
             </div>
           </div>
@@ -153,9 +149,8 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full relative group h-12 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-none font-mono text-[11px] uppercase tracking-[0.3em] overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-10"
+            className="w-full btn-primary h-12 font-mono text-[11px] uppercase tracking-[0.3em] overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-10"
           >
-            <div className="absolute inset-0 bg-indigo-500/20 w-0 group-hover:w-full transition-all duration-500 ease-out z-0" />
             <span className="relative z-10 flex items-center justify-center gap-3">
               {loading ? (
                 <Loader2 size={16} className="animate-spin" />
@@ -169,7 +164,7 @@ export default function RegisterPage() {
 
           <div className="text-center mt-6 pt-6 border-t border-white/[0.04]">
             <span className="text-[10px] font-mono text-zinc-400 tracking-widest uppercase">{t("page.haveAccount")}</span>
-            <Link href={`/${locale}/login`} className="ml-3 text-[10px] font-mono font-bold tracking-[0.2em] text-white hover:text-indigo-400 transition-colors uppercase">
+            <Link href={`/${locale}/login`} className="ml-3 text-[10px] font-mono font-bold tracking-[0.2em] text-white hover:text-[#00E5FF] transition-colors uppercase">
               AUTHENTICATE
             </Link>
           </div>
@@ -192,7 +187,7 @@ export default function RegisterPage() {
             {t("placeholders.verificationCode")}
           </p>
           <div className="space-y-1 group mt-8">
-            <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-emerald-400 transition-colors">{t("fields.verificationCode")}</label>
+            <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-neon-cyan transition-colors">{t("fields.verificationCode")}</label>
             <div className="relative">
               <input
                 name="code"
@@ -202,19 +197,17 @@ export default function RegisterPage() {
                 required
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                className="w-full h-14 bg-transparent border-b border-white/[0.1] focus:border-emerald-500 px-1 outline-none transition-all font-mono text-2xl text-emerald-400 placeholder:text-zinc-500/50 tracking-[0.5em] text-center"
+                className="input h-14 font-mono text-2xl text-neon-cyan placeholder:text-zinc-500/50 tracking-[0.5em] text-center"
                 placeholder="000000"
               />
-              <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-emerald-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
             </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full relative group h-12 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-none font-mono text-[11px] uppercase tracking-[0.3em] overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-10"
+            className="w-full btn-primary h-12 font-mono text-[11px] uppercase tracking-[0.3em] overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-10"
           >
-            <div className="absolute inset-0 bg-emerald-500/20 w-0 group-hover:w-full transition-all duration-500 ease-out z-0" />
             <span className="relative z-10 flex items-center justify-center gap-3">
               {loading ? (
                 <Loader2 size={16} className="animate-spin" />
@@ -236,7 +229,7 @@ export default function RegisterPage() {
 
           <div className="text-center mt-6 pt-6 border-t border-white/[0.04]">
             <span className="text-[10px] font-mono text-zinc-400 tracking-widest uppercase">{t("page.haveAccount")}</span>
-            <Link href={`/${locale}/login`} className="ml-3 text-[10px] font-mono font-bold tracking-[0.2em] text-white hover:text-indigo-400 transition-colors uppercase">
+            <Link href={`/${locale}/login`} className="ml-3 text-[10px] font-mono font-bold tracking-[0.2em] text-white hover:text-neon-cyan transition-colors uppercase">
               AUTHENTICATE
             </Link>
           </div>
