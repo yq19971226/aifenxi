@@ -94,7 +94,7 @@ export function TopNav() {
   return (
     <>
       {/* Mobile Top Bar - 移动端占满宽，避免与内容区并排留白 */}
-      <header className="md:hidden sticky top-0 z-50 flex h-14 w-full min-w-0 shrink-0 items-center justify-between border-b border-border bg-bg-primary/95 backdrop-blur-md px-4">
+      <header className="md:hidden sticky top-0 z-50 flex h-14 w-full min-w-0 shrink-0 items-center justify-between border-b border-border bg-bg-primary/60 backdrop-blur-xl px-4">
         <Link href={`/${locale}`} className="flex items-center gap-2">
           <LogoMark className="h-6 w-6 text-primary" />
           <span className="font-bold tracking-tight text-sm">AXIOM</span>
@@ -112,7 +112,7 @@ export function TopNav() {
       </header>
 
       {/* Mobile Bottom Bar - Essential Actions Only */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 h-16 border-t border-border bg-bg-primary/90 backdrop-blur-xl pb-safe">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 h-16 border-t border-border bg-bg-primary/70 backdrop-blur-xl pb-safe">
         <div className="grid h-full grid-cols-4 items-center justify-items-center">
           <Link href={`/${locale}/dashboard`} className={cn("flex flex-col items-center justify-center gap-0.5 min-h-[44px] min-w-[44px]", pathname.includes("/dashboard") ? "text-primary" : "text-muted-foreground")}>
             <LayoutDashboard size={22} />
@@ -145,7 +145,7 @@ export function TopNav() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-[60] bg-bg-primary md:hidden flex flex-col"
+            className="fixed inset-0 z-[60] bg-bg-primary/80 backdrop-blur-xl md:hidden flex flex-col"
           >
             {/* Drawer Header */}
             <div className="flex h-14 items-center justify-between border-b border-border px-4">
@@ -186,7 +186,7 @@ export function TopNav() {
                               "flex items-center gap-4 px-4 py-3.5 rounded-xl font-bold transition-all active:scale-[0.98]",
                               isActive
                                 ? "bg-indigo-500/10 text-indigo-400 shadow-inner"
-                                : "text-zinc-300 hover:bg-bg-surface border border-transparent",
+                                : "text-zinc-300 hover:bg-white/5 border border-transparent",
                               isMaintenance && "opacity-60",
                             )}
                           >

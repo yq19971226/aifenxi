@@ -77,6 +77,13 @@ const config: Config = {
         "card-hover": "var(--shadow-hover)",
         dropdown: "var(--shadow-dropdown)",
         modal: "var(--shadow-modal)",
+        glow: "0 0 20px rgba(99, 102, 241, 0.15)",
+        glass: "0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)",
+        "glass-hover": "0 12px 48px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.1)",
+      },
+      transitionTimingFunction: {
+        "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
+        spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
       },
       keyframes: {
         "skeleton-shimmer": {

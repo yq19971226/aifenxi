@@ -137,7 +137,7 @@ export function Sidebar() {
         setExpanded(false);
         setOpenSubmenus([]);
       }}
-      className="hidden md:flex fixed left-0 top-0 z-40 h-screen flex-col border-r border-border bg-bg-primary/95 backdrop-blur-md"
+      className="hidden md:flex fixed left-0 top-0 z-40 h-screen flex-col border-r border-border bg-bg-primary/60 backdrop-blur-xl"
     >
       {/* Logo Area */}
       <div className="flex h-14 items-center border-b border-border px-4">
@@ -177,8 +177,8 @@ export function Sidebar() {
                   }
                 }}
                 className={cn(
-                  "group flex items-center h-11 px-3.5 rounded-xl transition-all relative font-semibold",
-                  isActive ? "bg-bg-elevated text-white shadow-inner" : "text-zinc-500 hover:bg-bg-surface hover:text-zinc-200"
+                  "group flex items-center h-11 px-3.5 rounded-xl transition-all relative font-semibold hover:-translate-y-[1px]",
+                  isActive ? "bg-white/5 text-white shadow-inner" : "text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
                 )}
               >
                 <item.icon size={20} className={cn("shrink-0 transition-colors", isActive && "text-indigo-400")} />
@@ -244,10 +244,10 @@ export function Sidebar() {
       </div>
 
       {/* User Footer */}
-      <div className="p-3 border-t border-border bg-bg-primary/50">
+      <div className="p-3 border-t border-border bg-bg-primary/20 backdrop-blur-md">
         {user ? (
-          <div className={cn("flex items-center gap-3 px-2 py-2.5 rounded-xl transition-colors", expanded ? "hover:bg-bg-surface" : "")}>
-            <div className="h-9 w-9 rounded-full bg-bg-surface flex items-center justify-center text-sm font-black font-mono shadow-inner shrink-0 border border-border text-zinc-300">
+          <div className={cn("flex items-center gap-3 px-2 py-2.5 rounded-xl transition-all", expanded ? "hover:bg-white/5 hover:-translate-y-[1px]" : "")}>
+            <div className="h-9 w-9 rounded-full bg-white/5 flex items-center justify-center text-sm font-black font-mono shadow-inner shrink-0 border border-white/10 text-zinc-300">
               {(user.email?.split("@")[0] ?? "U").substring(0, 2).toUpperCase()}
             </div>
             <AnimatePresence>
