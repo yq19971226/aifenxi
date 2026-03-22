@@ -157,7 +157,7 @@ export default function ConsensusPage() {
                 <span className={`rounded-lg px-3 py-1 font-mono font-bold tracking-widest uppercase border ${selected ? "bg-indigo-500/20 border-indigo-500/30 text-indigo-400" : "bg-white/[0.04] border-white/5 text-zinc-400"}`}>
                   {cfg.agents}
                 </span>
-                <span className={`font-mono font-bold tracking-widest uppercase ${selected ? "text-indigo-300/60" : "text-zinc-600"}`}>
+                <span className={`font-mono font-bold tracking-widest uppercase ${selected ? "text-indigo-300/60" : "text-zinc-400"}`}>
                   {cfg.periods}
                 </span>
               </div>
@@ -176,7 +176,7 @@ export default function ConsensusPage() {
               ? "bg-white/[0.05] text-zinc-400 border border-white/[0.1]"
               : canStart
                 ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-500 hover:to-violet-500 shadow-[0_4px_20px_rgba(99,102,241,0.3)] hover:shadow-[0_6px_30px_rgba(99,102,241,0.4)]"
-                : "bg-white/[0.02] text-zinc-600 border border-white/[0.05]"
+                : "bg-white/[0.02] text-zinc-400 border border-white/[0.05]"
           }`}
         >
           {running ? (

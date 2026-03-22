@@ -98,8 +98,8 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
         className="flex items-center justify-center gap-4 pt-4 pb-1 flex-wrap"
       >
         <div className="flex items-center gap-1.5">
-          <Zap className="h-3 w-3 text-zinc-600" />
-          <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-wider">
+          <Zap className="h-3 w-3 text-zinc-400" />
+          <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
             {new Date(report.timestamp).toLocaleString("zh-CN")}
           </p>
         </div>
@@ -107,8 +107,8 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
           <>
             <span className="text-zinc-800">·</span>
             <div className="flex items-center gap-1.5">
-              <Info className="h-3 w-3 text-zinc-600" />
-              <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-wider">
+              <Info className="h-3 w-3 text-zinc-400" />
+              <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
                 {report.engine_type && <span>{ENGINE_LABELS[report.engine_type] || report.engine_type}</span>}
                 {report.engine_type && report.mode_contract_version && (
                   <span> · </span>
@@ -125,7 +125,7 @@ export function AnalysisReport({ report }: AnalysisReportProps) {
       {/* ⚠️ Legal Disclaimer — 合规必须项 */}
       <div className="flex items-start gap-2.5 border border-amber-500/15 bg-amber-500/[0.04] rounded-lg px-4 py-3">
         <AlertTriangle size={13} className="text-amber-500/60 shrink-0 mt-0.5" />
-        <p className="text-[10px] text-zinc-600 leading-relaxed">
+        <p className="text-[10px] text-zinc-400 leading-relaxed">
           {t("disclaimer")}
         </p>
       </div>

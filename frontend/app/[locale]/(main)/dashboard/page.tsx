@@ -231,7 +231,7 @@ export default function DashboardPage() {
                   <Lock size={14} /> {t("membership.upgradeHint")}
                 </span>
               ) : (
-                <span className="text-3xl font-black text-zinc-600 z-10">—</span>
+                <span className="text-3xl font-black text-zinc-400 z-10">—</span>
               )}
                {/* Background chart trace decoration */}
                <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none transition-transform group-hover:scale-110 group-hover:opacity-20">
@@ -265,7 +265,7 @@ export default function DashboardPage() {
       {/* ── Zone 2: Symbol Signal Cards ── */}
       {sortedSymbols.length === 0 ? (
         <div className="rounded-3xl border border-white/5 bg-[#09090B]/40 p-16 md:p-24 text-center">
-          <Target size={48} className="text-zinc-600 mx-auto mb-6" />
+          <Target size={48} className="text-zinc-400 mx-auto mb-6" />
           <p className="text-xl font-bold text-zinc-300 tracking-wide">{t("noSignalsData")}</p>
           <p className="text-base font-medium text-zinc-500 mt-3">{t("enablePairsInAdmin")}</p>
         </div>
@@ -425,15 +425,15 @@ function SymbolCard({
           {s.entry_low && s.entry_high && (
             <div className="flex flex-col gap-1">
               <span className="text-[11px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{t("entryRange")}</span>
-              <span className={canSeeStrategy ? "text-white font-black font-mono tracking-tight text-base" : "text-zinc-600 blur-[5px] select-none font-black font-mono text-base"}>
-                {canSeeStrategy ? formatPrice(s.entry_low) : blurPrice(s.entry_low)} <span className="text-zinc-600 font-normal mx-1">-</span> {canSeeStrategy ? formatPrice(s.entry_high) : blurPrice(s.entry_high)}
+              <span className={canSeeStrategy ? "text-white font-black font-mono tracking-tight text-base" : "text-zinc-400 blur-[5px] select-none font-black font-mono text-base"}>
+                {canSeeStrategy ? formatPrice(s.entry_low) : blurPrice(s.entry_low)} <span className="text-zinc-400 font-normal mx-1">-</span> {canSeeStrategy ? formatPrice(s.entry_high) : blurPrice(s.entry_high)}
               </span>
             </div>
           )}
           {s.stop_loss && (
             <div className="flex flex-col gap-1">
               <span className="text-[11px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{t("stopLoss")}</span>
-              <span className={canSeeStrategy ? "text-bear font-black font-mono tracking-tight text-base" : "text-zinc-600 blur-[5px] select-none font-black font-mono text-base"}>
+              <span className={canSeeStrategy ? "text-bear font-black font-mono tracking-tight text-base" : "text-zinc-400 blur-[5px] select-none font-black font-mono text-base"}>
                 {canSeeStrategy ? formatPrice(s.stop_loss) : blurPrice(s.stop_loss)}
               </span>
             </div>
@@ -441,7 +441,7 @@ function SymbolCard({
           {s.targets?.[0] && (
              <div className="flex flex-col gap-1">
               <span className="text-[11px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{t("target")}</span>
-              <span className={canSeeStrategy ? "text-bull font-black font-mono tracking-tight text-base" : "text-zinc-600 blur-[5px] select-none font-black font-mono text-base"}>
+              <span className={canSeeStrategy ? "text-bull font-black font-mono tracking-tight text-base" : "text-zinc-400 blur-[5px] select-none font-black font-mono text-base"}>
                 {canSeeStrategy ? formatPrice(s.targets[0]) : blurPrice(s.targets[0])}
               </span>
             </div>
@@ -470,7 +470,7 @@ function SymbolCard({
               {relativeTime(s.strategy_updated_at, t)}
             </span>
           )}
-          <ChevronRight size={18} className="text-zinc-600 group-hover:text-white transition-colors" />
+          <ChevronRight size={18} className="text-zinc-400 group-hover:text-white transition-colors" />
         </div>
       </div>
 

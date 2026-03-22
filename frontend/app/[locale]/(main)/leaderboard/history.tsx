@@ -170,7 +170,7 @@ export function StrategyHistory({
   if (items.length === 0) {
     return (
       <div className="border border-white/[0.05] bg-white/[0.02] p-10 text-center">
-        <p className="text-[10px] font-black font-mono text-zinc-600 uppercase tracking-widest">{t("strategyHistory.noRecords")}</p>
+        <p className="text-[10px] font-black font-mono text-zinc-400 uppercase tracking-widest">{t("strategyHistory.noRecords")}</p>
       </div>
     );
   }

@@ -114,7 +114,7 @@ function AccuracyPanel({ modes, period }: { modes: ModeAccuracy[]; period: strin
               <span className={`text-3xl font-black tracking-tight font-mono ${MODE_COLOR[m.mode] || "text-white"}`}>
                 {(m.win_rate * 100).toFixed(1)}%
               </span>
-              <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-[0.2em] font-mono mt-2">{t("accuracy.winRate")}</span>
+              <span className="text-[9px] uppercase font-bold text-zinc-400 tracking-[0.2em] font-mono mt-2">{t("accuracy.winRate")}</span>
               <div className="w-full h-px bg-white/[0.05] my-4" />
               <div className="flex items-center justify-between w-full text-[10px] font-mono font-bold uppercase tracking-widest">
                 <span className="text-zinc-400">{m.wins}/{m.losses}</span>
@@ -129,7 +129,7 @@ function AccuracyPanel({ modes, period }: { modes: ModeAccuracy[]; period: strin
           <span className="flex items-center gap-2">
             {t("accuracy.overall")}: <span className="font-black text-indigo-400 bg-indigo-500/10 px-2 py-0.5 border border-indigo-500/20">{(overallWr * 100).toFixed(1)}%</span>
           </span>
-          <span className="text-zinc-700">|</span>
+          <span className="text-zinc-500">|</span>
           <span className="flex items-center gap-2">
             {t("comp.settled")}: <span className="font-black text-white">{totalSettled}</span>
           </span>
@@ -145,7 +145,7 @@ function PublicRankingTable({ rankings }: { rankings: RankingsResponse["rankings
   if (rankings.length === 0) {
     return (
       <div className="border border-white/[0.05] bg-black/40 py-24 text-center mt-8">
-        <Trophy size={32} className="text-zinc-600 mx-auto mb-6" />
+        <Trophy size={32} className="text-zinc-400 mx-auto mb-6" />
         <p className="text-[11px] font-black font-mono text-zinc-400 uppercase tracking-[0.3em]">{t("comp.noRankData")}</p>
       </div>
     );
@@ -182,21 +182,21 @@ function PublicRankingTable({ rankings }: { rankings: RankingsResponse["rankings
         <table className="w-full">
           <thead>
             <tr className="border-b border-white/[0.05] bg-white/[0.01]">
-              <th className="px-6 py-4 text-left text-[9px] font-black uppercase text-zinc-600 tracking-[0.2em] font-mono w-16">{t("comp.rank")}</th>
-              <th className="px-6 py-4 text-left text-[9px] font-black uppercase text-zinc-600 tracking-[0.2em] font-mono">{t("comp.trader")}</th>
-              <th className="px-6 py-4 text-right text-[9px] font-black uppercase text-zinc-600 tracking-[0.2em] font-mono">{t("comp.winLoss")}</th>
-              <th className="px-6 py-4 text-right text-[9px] font-black uppercase text-zinc-600 tracking-[0.2em] font-mono">{t("comp.avgPnl")}</th>
-              <th className="px-6 py-4 text-right text-[9px] font-black uppercase text-zinc-600 tracking-[0.2em] font-mono">PF</th>
+              <th className="px-6 py-4 text-left text-[9px] font-black uppercase text-zinc-400 tracking-[0.2em] font-mono w-16">{t("comp.rank")}</th>
+              <th className="px-6 py-4 text-left text-[9px] font-black uppercase text-zinc-400 tracking-[0.2em] font-mono">{t("comp.trader")}</th>
+              <th className="px-6 py-4 text-right text-[9px] font-black uppercase text-zinc-400 tracking-[0.2em] font-mono">{t("comp.winLoss")}</th>
+              <th className="px-6 py-4 text-right text-[9px] font-black uppercase text-zinc-400 tracking-[0.2em] font-mono">{t("comp.avgPnl")}</th>
+              <th className="px-6 py-4 text-right text-[9px] font-black uppercase text-zinc-400 tracking-[0.2em] font-mono">PF</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.02]">
             {rankings.map((e) => (
               <tr key={e.rank} className="hover:bg-white/[0.02] transition-colors">
-                <td className="px-6 py-4"><span className="text-[11px] font-mono font-black text-zinc-600">{e.rank}</span></td>
+                <td className="px-6 py-4"><span className="text-[11px] font-mono font-black text-zinc-400">{e.rank}</span></td>
                 <td className="px-6 py-4"><span className="text-xs text-white font-mono font-bold tracking-wider">{e.anonymous_id}</span></td>
                 <td className="px-6 py-4 text-right">
                   <span className="text-xs font-mono font-black text-white">{winRatePct(e.wins, e.losses, e.win_rate)}</span>
-                  <span className="ml-2 text-[10px] font-mono text-zinc-600 tracking-widest">({e.wins}/{e.losses})</span>
+                  <span className="ml-2 text-[10px] font-mono text-zinc-400 tracking-widest">({e.wins}/{e.losses})</span>
                 </td>
                 <td className="px-6 py-4 text-right">
                   <span className={`text-xs font-mono font-black ${e.avg_pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatPnl(e.avg_pnl)}</span>
@@ -317,7 +317,7 @@ export function LeaderboardClient({
       {/* Rankings */}
       {rankingsLoading ? (
         <div className="border border-white/[0.05] bg-black/40 py-24 text-center mt-8 animate-pulse">
-          <p className="text-[10px] font-black font-mono text-zinc-600 uppercase tracking-[0.3em]">{t("comp.loading")}</p>
+          <p className="text-[10px] font-black font-mono text-zinc-400 uppercase tracking-[0.3em]">{t("comp.loading")}</p>
         </div>
       ) : (
         <PublicRankingTable rankings={rankingsData?.rankings ?? []} />

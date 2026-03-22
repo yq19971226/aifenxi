@@ -226,13 +226,13 @@ function PlansTab() {
 
                 <div className="grid grid-cols-2 gap-2 text-xs text-zinc-500">
                   <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-2.5">
-                    <span className="text-zinc-600">季付</span>
+                    <span className="text-zinc-400">季付</span>
                     <p className="font-mono text-zinc-300 mt-0.5">
                       ${(Number(currentPrice) * 3 * qDiscount).toFixed(0)}
                     </p>
                   </div>
                   <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-2.5">
-                    <span className="text-zinc-600">年付</span>
+                    <span className="text-zinc-400">年付</span>
                     <p className="font-mono text-zinc-300 mt-0.5">
                       ${(Number(currentPrice) * 12 * yDiscount).toFixed(0)}
                     </p>
@@ -386,7 +386,7 @@ function PacksTab() {
                       className={`rounded-md border px-2.5 py-1 text-xs font-medium transition-all ${
                         currentMode === key
                           ? modeColor
-                          : "text-zinc-600 bg-transparent border-white/[0.06] hover:text-zinc-400"
+                          : "text-zinc-400 bg-transparent border-white/[0.06] hover:text-zinc-400"
                       }`}
                     >
                       {label}
@@ -526,7 +526,7 @@ function QuotasTab() {
                     if (!cell) {
                       return (
                         <td key={lvl} className="p-3 text-center">
-                          <span className="text-xs text-zinc-600">—</span>
+                          <span className="text-xs text-zinc-400">—</span>
                         </td>
                       );
                     }
@@ -540,7 +540,7 @@ function QuotasTab() {
                           }
                           className="w-20 text-center rounded-lg border border-white/[0.08] bg-white/[0.06] px-2 py-1 text-sm text-zinc-200 outline-none focus:border-indigo-500/40"
                         />
-                        <span className="text-[10px] text-zinc-600 ml-1">次/天</span>
+                        <span className="text-[10px] text-zinc-400 ml-1">次/天</span>
                       </td>
                     );
                   })}
@@ -577,7 +577,7 @@ function QuotasTab() {
                         }
                         className="w-full rounded-lg border border-white/[0.08] bg-white/[0.06] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-emerald-500/40"
                       />
-                      <span className="text-xs text-zinc-600 shrink-0">次</span>
+                      <span className="text-xs text-zinc-400 shrink-0">次</span>
                     </div>
                   </div>
                 );
@@ -598,7 +598,7 @@ function QuotasTab() {
                     }
                     className="w-full rounded-lg border border-white/[0.08] bg-white/[0.06] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-emerald-500/40"
                   />
-                  <span className="text-xs text-zinc-600 shrink-0">次</span>
+                  <span className="text-xs text-zinc-400 shrink-0">次</span>
                 </div>
               </div>
             </>

@@ -67,7 +67,7 @@ export default function LoginPage() {
               name="email"
               type="email"
               required
-              className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-700/50"
+              className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-500/50"
               placeholder="user@system.com"
             />
             <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-indigo-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
@@ -77,7 +77,7 @@ export default function LoginPage() {
         <div className="space-y-1 group">
           <div className="flex justify-between items-center ml-1">
             <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] group-focus-within:text-indigo-400 transition-colors">{t("fields.password")}</label>
-            <Link href={`/${locale}/forgot-password`} className="text-[9px] font-mono text-zinc-600 hover:text-indigo-400 transition-colors uppercase tracking-[0.2em]">
+            <Link href={`/${locale}/forgot-password`} className="text-[9px] font-mono text-zinc-400 hover:text-indigo-400 transition-colors uppercase tracking-[0.2em]">
               {t("page.forgotLink")}
             </Link>
           </div>
@@ -86,7 +86,7 @@ export default function LoginPage() {
               name="password"
               type="password"
               required
-              className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-700/50 tracking-[0.2em]"
+              className="w-full h-10 bg-transparent border-b border-white/[0.1] focus:border-indigo-500 px-1 outline-none transition-all font-mono text-base text-white placeholder:text-zinc-500/50 tracking-[0.2em]"
               placeholder="••••••••"
             />
             <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-indigo-400 opacity-0 group-focus-within:w-full group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
@@ -111,7 +111,7 @@ export default function LoginPage() {
         </button>
 
         <div className="text-center mt-6 pt-6 border-t border-white/[0.04]">
-          <span className="text-[10px] font-mono text-zinc-600 tracking-widest uppercase">{t("page.noAccount")}</span>
+          <span className="text-[10px] font-mono text-zinc-400 tracking-widest uppercase">{t("page.noAccount")}</span>
           <Link href={`/${locale}/register`} className="ml-3 text-[10px] font-mono font-bold tracking-[0.2em] text-white hover:text-indigo-400 transition-colors uppercase">
             {t("page.applyForAccess")}
           </Link>

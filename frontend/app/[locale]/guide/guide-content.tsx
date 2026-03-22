@@ -109,7 +109,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
         {open ? (
           <ChevronUp size={16} className="shrink-0 text-white" />
         ) : (
-          <ChevronDown size={16} className="shrink-0 text-zinc-600 group-hover:text-indigo-400 transition-colors" />
+          <ChevronDown size={16} className="shrink-0 text-zinc-400 group-hover:text-indigo-400 transition-colors" />
         )}
       </button>
       {open && (
@@ -164,7 +164,7 @@ function TableOfContents({
             className={`group relative flex items-center justify-between py-2 text-[10px] uppercase font-bold font-mono tracking-[0.2em] transition-all duration-300 ${
               isActive
                 ? "text-indigo-400 bg-white/[0.02]"
-                : "text-zinc-600 hover:text-white"
+                : "text-zinc-400 hover:text-white"
             } px-3`}
           >
             {isActive && <div className="absolute -right-[1px] top-1/2 -translate-y-1/2 w-0.5 h-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,1)]" />}
@@ -337,8 +337,8 @@ function DevSection({
       </SubSection>
 
       <div className="mt-6 flex gap-2 items-start rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3">
-        <MessageCircle size={14} className="mt-0.5 shrink-0 text-zinc-600" />
-        <p className="text-sm text-zinc-600">{t("feedback")}</p>
+        <MessageCircle size={14} className="mt-0.5 shrink-0 text-zinc-400" />
+        <p className="text-sm text-zinc-400">{t("feedback")}</p>
       </div>
     </section>
   );
@@ -457,7 +457,7 @@ export function GuideContent() {
           {/* Sidebar — desktop */}
           <aside className="hidden lg:block w-56 shrink-0">
             <div className="sticky top-20">
-              <p className="text-xs font-medium text-zinc-600 uppercase tracking-wider mb-4 px-3">
+              <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-4 px-3">
                 {t("title")}
               </p>
               <TableOfContents activeSection={activeSection} />

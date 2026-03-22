@@ -188,7 +188,7 @@ export default function ManipulationPatternsPage({ params: { locale } }: { param
                       </h3>
                     </div>
                     <div className="mb-4">
-                      <p className="text-[10px] font-black font-mono text-zinc-600 uppercase tracking-widest mb-2">
+                      <p className="text-[10px] font-black font-mono text-zinc-400 uppercase tracking-widest mb-2">
                         {isZh ? "识别信号" : "Recognition Signals"}
                       </p>
                       <ul className="space-y-1.5">
@@ -201,7 +201,7 @@ export default function ManipulationPatternsPage({ params: { locale } }: { param
                       </ul>
                     </div>
                     <div className="border-t border-white/[0.05] pt-4">
-                      <p className="text-[10px] font-black font-mono text-zinc-600 uppercase tracking-widest mb-2">
+                      <p className="text-[10px] font-black font-mono text-zinc-400 uppercase tracking-widest mb-2">
                         {isZh ? "庄家如何操作" : "How Market Makers Execute"}
                       </p>
                       <p className="text-zinc-500 text-[13px]">{isZh ? p.howZh : p.howEn}</p>

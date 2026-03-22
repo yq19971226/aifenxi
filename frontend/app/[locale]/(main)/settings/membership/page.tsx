@@ -88,7 +88,7 @@ function Cell({ value, tier }: { value: string; tier: "free" | "pro" | "flagship
       </svg>
     </span>
   );
-  if (isDash || isLocked) return <span className="text-zinc-700 text-[11px]">—</span>;
+  if (isDash || isLocked) return <span className="text-zinc-500 text-[11px]">—</span>;
   return (
     <span className={`text-[11px] font-bold font-mono ${
       tier === "flagship" ? "text-[#F5A623]" :
@@ -141,7 +141,7 @@ function AccountHero({ user, trial }: { user: UserInfo; trial?: FreeTrialStatus 
         {/* Left */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-[9px] uppercase font-mono tracking-[0.25em] text-zinc-600">当前账号</span>
+            <span className="text-[9px] uppercase font-mono tracking-[0.25em] text-zinc-400">当前账号</span>
             <span className="text-[10px] font-mono text-zinc-400 bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.06]">{user.email}</span>
           </div>
           <div className="flex items-end gap-3 md:gap-4">
@@ -161,7 +161,7 @@ function AccountHero({ user, trial }: { user: UserInfo; trial?: FreeTrialStatus 
                   )}
                 </>
               ) : (
-                <span className="text-[11px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-[4px] border border-zinc-700/50 text-zinc-600 bg-zinc-700/10 w-max">未开通</span>
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-[4px] border border-zinc-700/50 text-zinc-400 bg-zinc-700/10 w-max">未开通</span>
               )}
             </div>
           </div>
@@ -185,7 +185,7 @@ function AccountHero({ user, trial }: { user: UserInfo; trial?: FreeTrialStatus 
                 {claiming ? "领取中..." : "立即领取"}
               </button>
             ) : (
-              <div className={`text-center py-2.5 rounded-md border text-xs font-black font-mono uppercase tracking-[0.15em] ${trial.remaining > 0 ? "border-emerald-500/25 text-emerald-400 bg-emerald-500/8" : "border-zinc-700 text-zinc-600 bg-zinc-800/50"}`}>
+              <div className={`text-center py-2.5 rounded-md border text-xs font-black font-mono uppercase tracking-[0.15em] ${trial.remaining > 0 ? "border-emerald-500/25 text-emerald-400 bg-emerald-500/8" : "border-zinc-700 text-zinc-400 bg-zinc-800/50"}`}>
                 {trial.remaining > 0 ? `✓ 已领取 · ${trial.remaining} 次剩余` : "已全部用完"}
               </div>
             )}
@@ -254,7 +254,7 @@ function FeatureTable({ plansData }: { plansData: PlansResponse | undefined }) {
       {Object.entries(sections).map(([section, rows], si) => (
         <div key={section}>
           <div className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_90px_110px_120px] bg-black/20">
-            <div className="px-4 sm:px-6 py-2.5 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-zinc-600 col-span-4 border-y border-white/[0.02]">
+            <div className="px-4 sm:px-6 py-2.5 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-zinc-400 col-span-4 border-y border-white/[0.02]">
               {section}
             </div>
           </div>
@@ -285,8 +285,8 @@ function FeatureTable({ plansData }: { plansData: PlansResponse | undefined }) {
 
       {/* Footer note */}
       <div className="px-6 py-4 border-t border-white/[0.04] bg-black/20 flex items-start gap-2">
-        <span className="text-zinc-700 text-[9px] mt-0.5">※</span>
-        <p className="text-[9px] font-mono text-zinc-700 leading-relaxed">
+        <span className="text-zinc-500 text-[9px] mt-0.5">※</span>
+        <p className="text-[9px] font-mono text-zinc-500 leading-relaxed">
           分析次数为每日重置配额，次数不累计。超出配额可购买积分包按量补充。专业/旗舰会员到期后恢复免费等级，历史数据保留。
         </p>
       </div>
@@ -305,17 +305,17 @@ function PaymentHistory({ payments }: { payments: PaymentInfo[] }) {
   return (
     <div className="rounded-2xl bg-[#0a0a0a] border border-white/5 overflow-hidden">
       <div className="px-6 py-5 border-b border-white/[0.05] flex items-center gap-2">
-        <svg className="w-3.5 h-3.5 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="square" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span className="text-[9px] font-black font-mono uppercase tracking-[0.25em] text-zinc-600">支付记录</span>
+        <span className="text-[9px] font-black font-mono uppercase tracking-[0.25em] text-zinc-400">支付记录</span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm font-mono whitespace-nowrap">
           <thead>
             <tr className="border-b border-white/[0.04] bg-black/20">
               {["时间", "套餐", "金额", "网络", "状态"].map(h => (
-                <th key={h} className="px-6 py-3 text-left text-[8px] font-black text-zinc-700 tracking-[0.2em] uppercase">{h}</th>
+                <th key={h} className="px-6 py-3 text-left text-[8px] font-black text-zinc-500 tracking-[0.2em] uppercase">{h}</th>
               ))}
             </tr>
           </thead>
@@ -324,11 +324,11 @@ function PaymentHistory({ payments }: { payments: PaymentInfo[] }) {
               const st = STATUS_STYLES[p.status] ?? STATUS_STYLES.pending;
               return (
                 <tr key={p.id} className="border-b border-white/[0.02] hover:bg-white/[0.015] transition-colors">
-                  <td className="px-6 py-3.5 text-[10px] text-zinc-600">{p.created_at ? formatDate(p.created_at) : "—"}</td>
+                  <td className="px-6 py-3.5 text-[10px] text-zinc-400">{p.created_at ? formatDate(p.created_at) : "—"}</td>
                   <td className="px-6 py-3.5 text-[10px] text-zinc-300 font-bold uppercase tracking-wider">{planNames[p.plan] ?? `套餐${p.plan}`}</td>
                   <td className="px-6 py-3.5 text-[11px] font-black text-white">${p.amount_usd}</td>
                   <td className="px-6 py-3.5">
-                    <span className="text-[9px] text-zinc-600 bg-white/[0.03] border border-white/[0.05] px-1.5 py-0.5 rounded">{p.network ?? "—"}</span>
+                    <span className="text-[9px] text-zinc-400 bg-white/[0.03] border border-white/[0.05] px-1.5 py-0.5 rounded">{p.network ?? "—"}</span>
                   </td>
                   <td className="px-6 py-3.5">
                     <span className={`inline-flex px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.15em] rounded-sm border ${st.text} ${st.bg} border-current/25`}>{st.label}</span>
@@ -442,17 +442,17 @@ function CheckoutSidebar({
             </div>
 
             <div className="bg-white/[0.02] border border-white/[0.05] rounded-lg p-4">
-              <p className="text-[8px] font-black font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2">应付金额</p>
+              <p className="text-[8px] font-black font-mono uppercase tracking-[0.2em] text-zinc-400 mb-2">应付金额</p>
               <div className="flex items-baseline gap-1.5">
                 <span className="text-3xl font-black font-mono text-white">{currentPayment.pay_amount}</span>
                 <span className="text-sm font-bold text-zinc-500">{currentPayment.pay_currency?.toUpperCase()}</span>
               </div>
-              <p className="text-[9px] font-mono text-zinc-600 mt-1">网络：<span className="text-zinc-400">{currentPayment.network}</span></p>
+              <p className="text-[9px] font-mono text-zinc-400 mt-1">网络：<span className="text-zinc-400">{currentPayment.network}</span></p>
             </div>
 
             {currentPayment.pay_address && (
               <div>
-                <p className="text-[8px] font-black font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2">收款地址</p>
+                <p className="text-[8px] font-black font-mono uppercase tracking-[0.2em] text-zinc-400 mb-2">收款地址</p>
                 <div className="relative">
                   <p className="font-mono text-[10px] text-indigo-300 break-all leading-relaxed p-4 pr-12 border border-white/[0.08] rounded-lg bg-black/40">{currentPayment.pay_address}</p>
                   <button onClick={handleCopy} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 bg-black rounded border border-white/10 hover:bg-white/10 transition-colors">
@@ -479,10 +479,10 @@ function CheckoutSidebar({
             )}
 
             <div className="p-3.5 rounded-lg border border-white/[0.05] bg-black/30">
-              <span className={`text-[9px] font-mono font-bold uppercase tracking-widest flex items-center gap-2 ${currentPayment.status === "pending" && isExpired ? "text-zinc-600" : st?.text}`}>
+              <span className={`text-[9px] font-mono font-bold uppercase tracking-widest flex items-center gap-2 ${currentPayment.status === "pending" && isExpired ? "text-zinc-400" : st?.text}`}>
                 <span className="h-1.5 w-1.5 rounded-full bg-current opacity-60" />{statusMsg}
               </span>
-              <p className="mt-1.5 text-[8px] text-zinc-700 font-mono italic">
+              <p className="mt-1.5 text-[8px] text-zinc-500 font-mono italic">
                 {currentPayment.plan >= 3 ? "链上到账后自动发放积分，通常 1-3 个确认块" : "链上到账后自动升级，通常 1-3 个确认块（约 1 分钟）"}
               </p>
             </div>
@@ -580,7 +580,7 @@ function CheckoutSidebar({
                   <p className="text-[9px] font-mono font-bold text-red-400 text-center">{error}</p>
                 </div>
               )}
-              <p className="mt-3 text-[8px] font-mono text-zinc-700 text-center leading-relaxed">
+              <p className="mt-3 text-[8px] font-mono text-zinc-500 text-center leading-relaxed">
                 到账后自动升级 · 链上不可退款 · 到期后恢复免费等级
               </p>
             </div>
@@ -612,7 +612,7 @@ function CheckoutSidebar({
                       <span className={`text-[11px] font-black font-mono uppercase tracking-widest ${
                         selectedCredits === pack.plan ? "text-emerald-400" : "text-zinc-500"
                       }`}>{pack.label}</span>
-                      <span className="text-[9px] font-mono text-zinc-600 bg-white/[0.04] border border-white/[0.06] px-1.5 py-[2px] rounded">{pack.desc}</span>
+                      <span className="text-[9px] font-mono text-zinc-400 bg-white/[0.04] border border-white/[0.06] px-1.5 py-[2px] rounded">{pack.desc}</span>
                     </div>
                     <span className={`text-sm tracking-widest font-bold font-mono ${
                       selectedCredits === pack.plan ? "text-emerald-300" : "text-zinc-400"
@@ -621,13 +621,13 @@ function CheckoutSidebar({
                   <div className="text-right pr-2">
                     <div className="flex items-end gap-1">
                       <span className={`text-xl font-bold font-mono mb-0.5 ${
-                        selectedCredits === pack.plan ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" : "text-zinc-600"
+                        selectedCredits === pack.plan ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" : "text-zinc-400"
                       }`}>$</span>
                       <span className={`text-4xl font-black font-mono leading-none tracking-tighter ${
                         selectedCredits === pack.plan ? "text-white" : "text-zinc-400"
                       }`}>{pack.price}</span>
                     </div>
-                    <span className="text-[10px] font-mono font-bold tracking-widest text-zinc-600 inline-block mt-1">
+                    <span className="text-[10px] font-mono font-bold tracking-widest text-zinc-400 inline-block mt-1">
                       ≈ ${(pack.price / parseInt(pack.credits)).toFixed(2)}/次
                     </span>
                   </div>
@@ -682,7 +682,7 @@ function CheckoutSidebar({
                   <p className="text-[9px] font-mono font-bold text-red-400 text-center">{error}</p>
                 </div>
               )}
-              <p className="mt-3 text-[8px] font-mono text-zinc-700 text-center leading-relaxed">
+              <p className="mt-3 text-[8px] font-mono text-zinc-500 text-center leading-relaxed">
                 到账后自动到账 · 永久有效 · 用完即止 · 链上不可退款
               </p>
             </div>

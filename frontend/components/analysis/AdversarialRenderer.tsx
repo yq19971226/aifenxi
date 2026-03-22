@@ -137,11 +137,11 @@ export function AdversarialRenderer({ data }: { data: AdversarialData }) {
                   </div>
                   <div className="mt-1 flex items-center gap-3 text-[10px] text-zinc-500">
                     <span className="flex items-center gap-1">
-                      <Zap size={10} className="text-zinc-600" /> {move.timeframe}
+                      <Zap size={10} className="text-zinc-400" /> {move.timeframe}
                     </span>
                     {move.target_price && (
                       <span className="flex items-center gap-1 font-mono">
-                        <Target size={10} className="text-zinc-600" /> {move.target_price}
+                        <Target size={10} className="text-zinc-400" /> {move.target_price}
                       </span>
                     )}
                   </div>

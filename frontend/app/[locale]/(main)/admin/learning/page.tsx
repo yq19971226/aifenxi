@@ -1128,7 +1128,7 @@ function FactorTab() {
               "🤖 启动 AI 训练"
             )}
           </button>
-          <span className="text-[10px] text-zinc-600">分析近 {statsDays} 天数据</span>
+          <span className="text-[10px] text-zinc-400">分析近 {statsDays} 天数据</span>
         </div>
 
         {/* AI 结果 */}
@@ -1162,7 +1162,7 @@ function FactorTab() {
                     <span className="font-mono text-zinc-500">
                       {(c.old * 100).toFixed(1)}%
                     </span>
-                    <span className="text-zinc-600">→</span>
+                    <span className="text-zinc-400">→</span>
                     <span className={`font-mono font-bold ${
                       c.new > c.old ? "text-emerald-400" : c.new < c.old ? "text-red-400" : "text-zinc-400"
                     }`}>
@@ -1198,7 +1198,7 @@ function FactorTab() {
               >
                 忽略
               </button>
-              <span className="text-[10px] text-zinc-600">
+              <span className="text-[10px] text-zinc-400">
                 置信度: {((aiResult.ai_result.confidence || 0) * 100).toFixed(0)}%
               </span>
             </div>

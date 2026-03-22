@@ -527,7 +527,7 @@ export default function ApiKeysPage() {
       <div className="card-surface p-6 rounded-xl border border-border">
         <div className="flex items-center justify-between mb-4">
           <span className="text-[11px] font-bold font-mono tracking-widest text-zinc-400 uppercase">配置进度</span>
-          <span className="text-sm font-bold font-mono text-zinc-100">{configuredCount} <span className="text-zinc-600 font-normal">/</span> {API_KEYS.length}</span>
+          <span className="text-sm font-bold font-mono text-zinc-100">{configuredCount} <span className="text-zinc-400 font-normal">/</span> {API_KEYS.length}</span>
         </div>
         <div className="h-2 rounded-full bg-bg-elevated overflow-hidden border border-border/50">
           <div
@@ -543,7 +543,7 @@ export default function ApiKeysPage() {
               ? "✓ 核心密钥已配置"
               : `核心密钥 ${requiredConfigured}/${requiredTotal}，请先配置必填项`}
           </span>
-          <span className="text-zinc-700">/</span>
+          <span className="text-zinc-500">/</span>
           <span className="text-zinc-400">其余数据源可按需补充</span>
         </div>
       </div>

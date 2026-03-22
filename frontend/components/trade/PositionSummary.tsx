@@ -66,7 +66,7 @@ export function PositionSummary({ input }: Props) {
         <button
           type="button"
           onClick={() => setShowModal(true)}
-          className="text-zinc-600 hover:text-indigo-400 transition-colors ml-auto"
+          className="text-zinc-400 hover:text-indigo-400 transition-colors ml-auto"
           title={t("editPrefs")}
         >
           <Settings size={12} />

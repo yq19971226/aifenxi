@@ -319,7 +319,7 @@ export function AdversarialPublicClient({
           <div className="relative border border-white/[0.05] bg-black/40 p-6 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/60 to-black z-10" />
             <div className="relative z-20 text-center py-8">
-              <Swords size={28} className="text-zinc-600 mx-auto mb-4" />
+              <Swords size={28} className="text-zinc-400 mx-auto mb-4" />
               <p className="text-sm font-bold text-white mb-2">
                 {isZh ? "更多详细分析需登录查看" : "Login to view full analysis"}
               </p>

@@ -68,7 +68,7 @@ export function SymbolInput({
             ? "bg-white/[0.05] text-zinc-400 border border-white/[0.1]"
             : canStart
               ? "bg-indigo-600 text-white hover:bg-indigo-500"
-              : "bg-white/[0.02] text-zinc-600 border border-white/[0.05]"
+              : "bg-white/[0.02] text-zinc-400 border border-white/[0.05]"
         }`}
       >
         {running ? (

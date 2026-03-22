@@ -108,14 +108,14 @@ export default function AdversarialPage() {
           <p className="text-sm text-zinc-400 leading-relaxed mb-2">
             基于多模架构智能体对抗推演，识别主力操盘、合谋、逆空逼多信号。
           </p>
-          <p className="text-xs text-zinc-600 font-mono mb-8">旗舰专属 · Flagship Only</p>
+          <p className="text-xs text-zinc-400 font-mono mb-8">旗舰专属 · Flagship Only</p>
           <Link
             href={`/${locale}/settings/membership`}
             className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-[#F5A623] hover:bg-[#f0a010] text-black font-black font-mono uppercase tracking-widest text-sm py-3.5 transition-all shadow-[0_0_20px_rgba(245,166,35,0.25)] hover:shadow-[0_0_30px_rgba(245,166,35,0.4)]"
           >
             升级旗舰解锁
           </Link>
-          <p className="mt-4 text-[10px] text-zinc-700 font-mono">当前等级：{['免费','专业','旗舰'][userLevel] ?? '免费'}</p>
+          <p className="mt-4 text-[10px] text-zinc-500 font-mono">当前等级：{['免费','专业','旗舰'][userLevel] ?? '免费'}</p>
         </div>
       </div>
     );
@@ -300,7 +300,7 @@ export default function AdversarialPage() {
 
           {/* ── Last Updated ── */}
           {updatedAt && (
-            <div className="flex items-center gap-1.5 text-[10px] text-zinc-600">
+            <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
               <Clock size={10} />
               {t("lastUpdated")}: {updatedAt} · {t("autoRefresh")}
             </div>

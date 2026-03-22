@@ -196,7 +196,7 @@ export default function PushSettingsPage() {
 
       {/* Channels */}
       <section>
-        <h2 className="mb-6 text-[11px] font-black text-zinc-600 font-mono uppercase tracking-[0.3em] pl-1 relative">
+        <h2 className="mb-6 text-[11px] font-black text-zinc-400 font-mono uppercase tracking-[0.3em] pl-1 relative">
            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-3 bg-indigo-500"></span>
            <span className="ml-3">{t('channels.title')}</span>
         </h2>
@@ -243,7 +243,7 @@ export default function PushSettingsPage() {
 
       {/* Events */}
       <section>
-         <h2 className="mb-6 text-[11px] font-black text-zinc-600 font-mono uppercase tracking-[0.3em] pl-1 relative">
+         <h2 className="mb-6 text-[11px] font-black text-zinc-400 font-mono uppercase tracking-[0.3em] pl-1 relative">
            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-3 bg-zinc-400"></span>
            <span className="ml-3">{t('events.title')}</span>
         </h2>

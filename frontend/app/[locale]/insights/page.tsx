@@ -169,7 +169,7 @@ export default async function InsightsPage({
           </div>
 
           <section aria-label={isZh ? "深度文章" : "Articles"}>
-            <h2 className="text-[10px] font-black font-mono text-zinc-600 uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+            <h2 className="text-[10px] font-black font-mono text-zinc-400 uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
               <span className="w-0.5 h-3 bg-indigo-500" />
               {isZh ? "深度解析" : "Deep Analysis"}
             </h2>
@@ -197,7 +197,7 @@ export default async function InsightsPage({
                         <p className="text-zinc-500 text-[13px] font-mono leading-relaxed">
                           {isZh ? article.descZh : article.descEn}
                         </p>
-                        <div className="mt-4 flex items-center gap-2 text-[10px] font-bold font-mono text-zinc-600 group-hover:text-indigo-400 uppercase tracking-widest transition-colors">
+                        <div className="mt-4 flex items-center gap-2 text-[10px] font-bold font-mono text-zinc-400 group-hover:text-indigo-400 uppercase tracking-widest transition-colors">
                           {isZh ? "阅读全文" : "Read More"} →
                         </div>
                       </div>
@@ -209,7 +209,7 @@ export default async function InsightsPage({
           </section>
 
           <section className="mt-20" aria-label={isZh ? "常见问题" : "FAQ"}>
-            <h2 className="text-[10px] font-black font-mono text-zinc-600 uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+            <h2 className="text-[10px] font-black font-mono text-zinc-400 uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
               <span className="w-0.5 h-3 bg-zinc-500" />
               {isZh ? "常见问题" : "Frequently Asked Questions"}
             </h2>
@@ -244,7 +244,7 @@ export default async function InsightsPage({
           </section>
         </main>
 
-        <footer className="py-8 border-t border-white/[0.04] text-center text-[10px] text-zinc-700 font-mono tracking-widest uppercase">
+        <footer className="py-8 border-t border-white/[0.04] text-center text-[10px] text-zinc-500 font-mono tracking-widest uppercase">
           <p>© {new Date().getFullYear()} AXIOM洞察 · {isZh ? "保留所有权利" : "All Rights Reserved"}</p>
         </footer>
       </div>

@@ -230,9 +230,9 @@ export function RankingTable({
   if (rankings.length === 0) {
     return (
       <div className="border border-white/[0.05] bg-black/40 py-24 text-center relative overflow-hidden mt-8">
-        <Trophy size={32} className="text-zinc-600 mx-auto mb-6" />
+        <Trophy size={32} className="text-zinc-400 mx-auto mb-6" />
         <p className="text-[11px] font-black font-mono text-zinc-400 uppercase tracking-[0.3em]">{t("comp.noRankData")}</p>
-        <p className="text-[10px] font-mono text-zinc-600 mt-2 uppercase tracking-[0.1em]">{t("comp.noRankDataDesc")}</p>
+        <p className="text-[10px] font-mono text-zinc-400 mt-2 uppercase tracking-[0.1em]">{t("comp.noRankDataDesc")}</p>
       </div>
     );
   }
@@ -296,13 +296,13 @@ export function RankingTable({
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/[0.05] bg-white/[0.01]">
-                  <th className="px-6 py-4 text-left text-[9px] font-black uppercase text-zinc-600 tracking-[0.2em] font-mono w-16">{t("comp.rank")}</th>
-                  <th className="px-6 py-4 text-left text-[9px] font-black uppercase text-zinc-600 tracking-[0.2em] font-mono">{t("comp.trader")}</th>
-                  <th className="px-6 py-4 text-right text-[9px] font-black uppercase text-zinc-600 tracking-[0.2em] font-mono">{t("comp.winLoss")}</th>
-                  <th className="px-6 py-4 text-right text-[9px] font-black uppercase text-zinc-600 tracking-[0.2em] font-mono">
+                  <th className="px-6 py-4 text-left text-[9px] font-black uppercase text-zinc-400 tracking-[0.2em] font-mono w-16">{t("comp.rank")}</th>
+                  <th className="px-6 py-4 text-left text-[9px] font-black uppercase text-zinc-400 tracking-[0.2em] font-mono">{t("comp.trader")}</th>
+                  <th className="px-6 py-4 text-right text-[9px] font-black uppercase text-zinc-400 tracking-[0.2em] font-mono">{t("comp.winLoss")}</th>
+                  <th className="px-6 py-4 text-right text-[9px] font-black uppercase text-zinc-400 tracking-[0.2em] font-mono">
                     {t("comp.avgPnl")}
                   </th>
-                  <th className="px-6 py-4 text-right text-[9px] font-black uppercase text-zinc-600 tracking-[0.2em] font-mono">PF</th>
+                  <th className="px-6 py-4 text-right text-[9px] font-black uppercase text-zinc-400 tracking-[0.2em] font-mono">PF</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/[0.02]">
@@ -321,7 +321,7 @@ export function RankingTable({
                     >
                       <td className="px-6 py-4 relative">
                         {isMe && <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500" />}
-                        <span className="text-[11px] font-mono font-black text-zinc-600">{entry.rank}</span>
+                        <span className="text-[11px] font-mono font-black text-zinc-400">{entry.rank}</span>
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-xs text-white font-mono font-bold tracking-wider">{entry.anonymous_id}</span>
@@ -335,7 +335,7 @@ export function RankingTable({
                         <span className={`text-xs font-mono font-black tracking-wider ${isHighWR ? 'text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]' : 'text-white'}`}>
                            {winRatePct(entry.wins, entry.losses, entry.win_rate)}
                         </span>
-                        <span className="ml-2 text-[10px] font-mono text-zinc-600 tracking-widest">
+                        <span className="ml-2 text-[10px] font-mono text-zinc-400 tracking-widest">
                           ({entry.wins}/{entry.losses})
                         </span>
                       </td>
@@ -394,8 +394,8 @@ export function Pagination({
         <ChevronLeft size={14} />
       </button>
       <span className="text-[10px] uppercase font-bold font-mono text-zinc-500 tracking-widest">
-        {page} <span className="text-zinc-700 mx-1">/</span> {totalPages}
-        <span className="hidden sm:inline text-zinc-600 ml-3">
+        {page} <span className="text-zinc-500 mx-1">/</span> {totalPages}
+        <span className="hidden sm:inline text-zinc-400 ml-3">
           ({total} {label})
         </span>
       </span>
@@ -417,8 +417,8 @@ export function RankingsSkeleton() {
     <div className="border border-white/[0.05] bg-black/40 py-24 text-center mt-8 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-16 h-[1px] bg-gradient-to-r from-transparent to-white/20" />
       <div className="absolute bottom-0 left-0 w-16 h-[1px] bg-gradient-to-l from-transparent to-white/20" />
-      <BarChart3 size={24} className="text-zinc-700 mx-auto mb-6 animate-pulse" />
-      <p className="text-[10px] font-black font-mono text-zinc-600 uppercase tracking-[0.3em]">{t("comp.loading")}</p>
+      <BarChart3 size={24} className="text-zinc-500 mx-auto mb-6 animate-pulse" />
+      <p className="text-[10px] font-black font-mono text-zinc-400 uppercase tracking-[0.3em]">{t("comp.loading")}</p>
     </div>
   );
 }

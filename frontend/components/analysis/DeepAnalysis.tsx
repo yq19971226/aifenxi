@@ -140,7 +140,7 @@ export function DeepAnalysis({
               {count > 0 && (
                 <span className={cn(
                    "ml-1 text-[10px] font-mono px-1 rounded bg-white/[0.05]",
-                   isActive ? "text-current" : "text-zinc-600"
+                   isActive ? "text-current" : "text-zinc-400"
                 )}>{count}</span>
               )}
               {isActive && (

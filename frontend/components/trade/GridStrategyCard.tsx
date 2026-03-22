@@ -165,8 +165,8 @@ export function GridStrategyCard({ report }: Props) {
           {/* Visual grid ladder - Terminal Style */}
           <div className="bg-black/40 rounded-xl p-5 border border-white/[0.04]">
             <div className="flex justify-between items-center mb-4">
-               <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-[0.2em]">{t("labels.buy")} / {t("labels.sell")}</span>
-               <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-[0.2em]">{t("labels.current")}</span>
+               <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-[0.2em]">{t("labels.buy")} / {t("labels.sell")}</span>
+               <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-[0.2em]">{t("labels.current")}</span>
             </div>
             <div className="relative flex flex-col gap-[2px]">
               {grid.gridLevels.slice().reverse().slice(0, 12).map((price, idx, arr) => {
@@ -198,7 +198,7 @@ export function GridStrategyCard({ report }: Props) {
                         "text-[9px] font-bold font-mono uppercase tracking-widest",
                         isFirst ? "text-emerald-400" :
                         isLast ? "text-red-400" :
-                        isMid ? "text-indigo-400" : "text-zinc-600"
+                        isMid ? "text-indigo-400" : "text-zinc-400"
                       )}>
                         {isFirst ? t("labels.tp") : isLast ? t("labels.sl") : isMid ? "ENTRY" : `G${total - idx}`}
                       </span>
@@ -228,7 +228,7 @@ export function GridStrategyCard({ report }: Props) {
                 );
               })}
               {grid.gridLevels.length > 12 && (
-                <div className="text-center text-[10px] font-mono font-bold text-zinc-600 py-3 uppercase tracking-[0.2em]">
+                <div className="text-center text-[10px] font-mono font-bold text-zinc-400 py-3 uppercase tracking-[0.2em]">
                   ... +{grid.gridLevels.length - 12} {t("labels.gridLevels")}
                 </div>
               )}
@@ -318,7 +318,7 @@ function ParamCell({
         {highlight && (
           <div className="absolute left-0 top-1/4 bottom-1/4 w-[2px] bg-amber-500 rounded-r-full shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
         )}
-        <p className="text-[9px] font-mono text-zinc-600 uppercase tracking-[0.2em] mb-1 line-clamp-1 pl-1">{label}</p>
+        <p className="text-[9px] font-mono text-zinc-400 uppercase tracking-[0.2em] mb-1 line-clamp-1 pl-1">{label}</p>
         <p className={cn("text-[13px] font-sans font-black tracking-tight tabular-nums pl-1", valueColor === "text-white" ? "text-zinc-200" : valueColor)}>{value}</p>
       </div>
     );

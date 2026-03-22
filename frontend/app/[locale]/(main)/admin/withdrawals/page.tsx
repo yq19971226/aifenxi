@@ -126,20 +126,20 @@ export default function WithdrawalsPage() {
                       
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
                         <div>
-                          <p className="text-[9px] font-bold font-mono text-zinc-600 uppercase tracking-widest mb-1">{t("withdrawals.userEmail")}</p>
+                          <p className="text-[9px] font-bold font-mono text-zinc-400 uppercase tracking-widest mb-1">{t("withdrawals.userEmail")}</p>
                           <p className="text-[11px] font-mono text-zinc-300 tracking-wider truncate">{w.email}</p>
                         </div>
                         <div>
-                          <p className="text-[9px] font-bold font-mono text-zinc-600 uppercase tracking-widest mb-1">{t("withdrawals.withdrawAddress")}</p>
+                          <p className="text-[9px] font-bold font-mono text-zinc-400 uppercase tracking-widest mb-1">{t("withdrawals.withdrawAddress")}</p>
                           <p className="text-[11px] font-mono text-zinc-400 tracking-wider truncate">{w.trc20_address}</p>
                         </div>
                         <div>
-                          <p className="text-[9px] font-bold font-mono text-zinc-600 uppercase tracking-widest mb-1">{t("withdrawals.applyTime")}</p>
+                          <p className="text-[9px] font-bold font-mono text-zinc-400 uppercase tracking-widest mb-1">{t("withdrawals.applyTime")}</p>
                           <p className="text-[11px] font-mono text-zinc-400 tracking-wider">{new Date(w.created_at).toLocaleString("zh-CN")}</p>
                         </div>
                         {w.tx_hash && (
                           <div>
-                            <p className="text-[9px] font-bold font-mono text-zinc-600 uppercase tracking-widest mb-1">{t("withdrawals.txHash")}</p>
+                            <p className="text-[9px] font-bold font-mono text-zinc-400 uppercase tracking-widest mb-1">{t("withdrawals.txHash")}</p>
                             <p className="flex items-center gap-2 text-[11px] font-mono text-emerald-400 tracking-wider">
                               <ExternalLink size={10} />
                               <span className="truncate">{w.tx_hash}</span>
@@ -148,7 +148,7 @@ export default function WithdrawalsPage() {
                         )}
                         {w.reject_reason && (
                           <div className="sm:col-span-2">
-                             <p className="text-[9px] font-bold font-mono text-zinc-600 uppercase tracking-widest mb-1">{t("withdrawals.rejectReason")}</p>
+                             <p className="text-[9px] font-bold font-mono text-zinc-400 uppercase tracking-widest mb-1">{t("withdrawals.rejectReason")}</p>
                              <p className="text-[11px] font-mono text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2 tracking-wider">{w.reject_reason}</p>
                           </div>
                         )}
@@ -180,7 +180,7 @@ export default function WithdrawalsPage() {
                         value={txHash}
                         onChange={(e) => setTxHash(e.target.value)}
                         placeholder={t("withdrawals.enterTxHash")}
-                        className="flex-1 border border-emerald-500/30 bg-emerald-500/5 px-4 py-3 text-[11px] text-white font-mono uppercase tracking-widest placeholder:text-zinc-600 focus:border-emerald-500/60 focus:bg-emerald-500/10 outline-none transition-all"
+                        className="flex-1 border border-emerald-500/30 bg-emerald-500/5 px-4 py-3 text-[11px] text-white font-mono uppercase tracking-widest placeholder:text-zinc-400 focus:border-emerald-500/60 focus:bg-emerald-500/10 outline-none transition-all"
                       />
                       <button
                         onClick={() => approveMutation.mutate({ id: w.id, tx_hash: txHash })}
@@ -205,7 +205,7 @@ export default function WithdrawalsPage() {
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
                         placeholder={t("withdrawals.enterRejectReason")}
-                        className="flex-1 border border-red-500/30 bg-red-500/5 px-4 py-3 text-[11px] text-white font-mono uppercase tracking-widest placeholder:text-zinc-600 focus:border-red-500/60 focus:bg-red-500/10 outline-none transition-all"
+                        className="flex-1 border border-red-500/30 bg-red-500/5 px-4 py-3 text-[11px] text-white font-mono uppercase tracking-widest placeholder:text-zinc-400 focus:border-red-500/60 focus:bg-red-500/10 outline-none transition-all"
                       />
                       <button
                         onClick={() => rejectMutation.mutate({ id: w.id, reason: rejectReason })}

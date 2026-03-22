@@ -38,7 +38,7 @@ function StepContainer({
       
       {/* Step Node */}
       <div className={`absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded border text-[10px] font-black font-mono z-10 transition-colors duration-500
-        ${isActive ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]' : isDone ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]' : 'bg-white/5 border-white/10 text-zinc-600'}`}>
+        ${isActive ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]' : isDone ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]' : 'bg-white/5 border-white/10 text-zinc-400'}`}>
         {isDone ? <CheckCircle2 size={16} /> : step}
       </div>
 
@@ -98,14 +98,14 @@ export default function TasksPage() {
 
   if (isLoading) return <PageTransition><div className="mx-auto max-w-3xl px-4 py-10 space-y-6">{[1,2,3].map(i => <div key={i} className="h-32 bg-white/[0.02] border border-white/[0.05] animate-pulse relative overflow-hidden"><div className="absolute top-0 right-0 w-4 h-[1px] bg-white/20"/><div className="absolute bottom-0 left-0 w-4 h-[1px] bg-white/20"/></div>)}</div></PageTransition>;
 
-  if (isError) return <PageTransition><div className="mx-auto max-w-3xl px-4 py-20"><div className="border border-white/[0.05] bg-black/40 p-10 text-center relative"><div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-white/20"/><div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-white/20"/><Gift size={32} className="mx-auto text-zinc-700 mb-6 shrink-0" /><p className="text-[11px] font-black font-mono text-zinc-400 uppercase tracking-[0.3em]">{t('error.loadFailed')}</p></div></div></PageTransition>;
+  if (isError) return <PageTransition><div className="mx-auto max-w-3xl px-4 py-20"><div className="border border-white/[0.05] bg-black/40 p-10 text-center relative"><div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-white/20"/><div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-white/20"/><Gift size={32} className="mx-auto text-zinc-500 mb-6 shrink-0" /><p className="text-[11px] font-black font-mono text-zinc-400 uppercase tracking-[0.3em]">{t('error.loadFailed')}</p></div></div></PageTransition>;
 
   const canSubmit = home?.can_submit ?? false;
   const todaySub = home?.today_submission;
   const templates = home?.templates ?? [];
   const bonus = home?.bonus_credits ?? {};
   
-  const inputCls = "w-full bg-white/[0.02] border border-white/[0.1] px-4 py-3.5 text-xs font-mono text-zinc-300 placeholder:text-zinc-600 focus:border-indigo-500/50 focus:bg-indigo-500/10 focus:outline-none transition-all shadow-inner";
+  const inputCls = "w-full bg-white/[0.02] border border-white/[0.1] px-4 py-3.5 text-xs font-mono text-zinc-300 placeholder:text-zinc-400 focus:border-indigo-500/50 focus:bg-indigo-500/10 focus:outline-none transition-all shadow-inner";
 
   return (
     <PageTransition>
@@ -137,7 +137,7 @@ export default function TasksPage() {
         {/* Tabs */}
         <div className="flex gap-2 border-b border-white/[0.05] w-full mt-8 mb-8">
           {(["today", "history"] as Tab[]).map(tabKey => (
-            <button key={tabKey} onClick={() => setTab(tabKey)} className={`relative px-6 py-3 text-[11px] font-bold font-mono uppercase tracking-[0.2em] transition-all ${tab === tabKey ? "text-indigo-400" : "text-zinc-600 hover:text-white"}`}>
+            <button key={tabKey} onClick={() => setTab(tabKey)} className={`relative px-6 py-3 text-[11px] font-bold font-mono uppercase tracking-[0.2em] transition-all ${tab === tabKey ? "text-indigo-400" : "text-zinc-400 hover:text-white"}`}>
               {t(`tabs.${tabKey}`)}
               {tab === tabKey && (
                 <motion.div layoutId="taskTab" className="absolute bottom-0 left-0 right-0 h-[2px] bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
@@ -211,7 +211,7 @@ export default function TasksPage() {
                             <span className="text-[10px] font-black font-mono text-emerald-400 uppercase tracking-[0.1em] bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
                               +{tpl.reward_amount} {MODE_LABELS[tpl.reward_mode] ?? tpl.reward_mode}
                             </span>
-                            <span className="text-[9px] font-bold font-mono text-zinc-600 uppercase tracking-[0.2em]">≥{tpl.min_views} Views</span>
+                            <span className="text-[9px] font-bold font-mono text-zinc-400 uppercase tracking-[0.2em]">≥{tpl.min_views} Views</span>
                           </div>
                         </button>
                       ))}
@@ -298,7 +298,7 @@ export default function TasksPage() {
                 <div className="border border-white/[0.05] bg-black/40 py-24 text-center relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-8 h-[2px] bg-white/[0.1]" />
                   <div className="absolute bottom-0 left-0 w-8 h-[2px] bg-white/[0.1]" />
-                  <History size={32} className="mx-auto text-zinc-700 mb-6 shrink-0" />
+                  <History size={32} className="mx-auto text-zinc-500 mb-6 shrink-0" />
                   <p className="text-[11px] font-black font-mono text-zinc-400 uppercase tracking-[0.3em]">{t('history.empty')}</p>
                 </div>
               ) : hist.map((s: TaskSubmission, idx: number) => { 

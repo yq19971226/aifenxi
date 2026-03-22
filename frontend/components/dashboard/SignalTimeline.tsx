@@ -97,7 +97,7 @@ export function SignalTimeline({ signals }: { signals: SignalEvent[] }) {
                 <span className="text-xs text-zinc-500 font-mono">
                   {formatRelativeTime(sig.timestamp)}
                 </span>
-                <ChevronRight size={12} className="text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ChevronRight size={12} className="text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
             </motion.div>
           );

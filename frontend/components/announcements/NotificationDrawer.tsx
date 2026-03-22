@@ -148,7 +148,7 @@ export function NotificationDrawer() {
                           ) : (
                             <span className="text-indigo-400 flex items-center gap-1"><Megaphone size={10} /> {t("announcement")}</span>
                           )}
-                          <span className="text-zinc-600 px-1">•</span>
+                          <span className="text-zinc-400 px-1">•</span>
                           <span className="text-zinc-500 font-mono flex items-center gap-1">
                             <Clock size={10} className="opacity-70" /> {dateString}
                           </span>

@@ -90,7 +90,7 @@ export function AdversarialFlow({ report }: { report: AnalysisReportType }) {
             {i < steps.length - 1 && (
               <ChevronRight
                 size={14}
-                className={`hidden sm:block ${step.done ? "text-zinc-500 shrink-0" : "text-zinc-700 shrink-0"}`}
+                className={`hidden sm:block ${step.done ? "text-zinc-500 shrink-0" : "text-zinc-500 shrink-0"}`}
               />
             )}
           </div>

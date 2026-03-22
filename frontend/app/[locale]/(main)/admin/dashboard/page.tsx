@@ -165,7 +165,7 @@ function ConfigHealthList({ configs }: { configs: SystemConfig[] }) {
               {item.status !== "ok" && (
                 <ArrowRight
                   size={14}
-                  className="text-zinc-600 group-hover:text-zinc-400 group-hover:translate-x-0.5 transition-all shrink-0"
+                  className="text-zinc-400 group-hover:text-zinc-400 group-hover:translate-x-0.5 transition-all shrink-0"
                 />
               )}
             </Link>
@@ -338,7 +338,7 @@ function CrawlerStatsCard({ stats }: { stats: CrawlerStats }) {
       </div>
       
       {bots.length === 0 ? (
-        <div className="py-8 flex flex-col items-center justify-center gap-3 text-zinc-600 bg-bg-primary/50 rounded-xl border border-dashed border-border/50">
+        <div className="py-8 flex flex-col items-center justify-center gap-3 text-zinc-400 bg-bg-primary/50 rounded-xl border border-dashed border-border/50">
           <Wifi size={24} className="animate-pulse opacity-50" />
           <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">{t("dashboard.crawler.waiting")}</p>
         </div>
@@ -365,7 +365,7 @@ function CrawlerStatsCard({ stats }: { stats: CrawlerStats }) {
                   ))}
                 </div>
                 {bot.last_seen && (
-                  <span className="text-[9px] font-bold font-mono text-zinc-600 uppercase tracking-widest">
+                  <span className="text-[9px] font-bold font-mono text-zinc-400 uppercase tracking-widest">
                     Last: {new Date(bot.last_seen).toLocaleTimeString()}
                   </span>
                 )}

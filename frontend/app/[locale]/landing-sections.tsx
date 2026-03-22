@@ -174,7 +174,7 @@ function TerminalBlock() {
           <div className="w-1.5 h-1.5 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)] animate-pulse" />
            AXIOM 终端 V5
         </div>
-        <div className="flex gap-4 text-[8px] text-zinc-600 tracking-widest">
+        <div className="flex gap-4 text-[8px] text-zinc-400 tracking-widest">
            <span>端口: 5092</span>
            <span>网络: 主网</span>
         </div>
@@ -189,7 +189,7 @@ function TerminalBlock() {
             const isHighlight = line?.includes("共识") ?? false;
             return (
               <div key={i} className={`${isHighlight ? 'text-indigo-400 font-bold drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]' : 'text-emerald-400/70'} tracking-wider`}>
-                <span className="text-zinc-600 mr-3 hidden sm:inline-block">[{ts}]</span>
+                <span className="text-zinc-400 mr-3 hidden sm:inline-block">[{ts}]</span>
                 {line}
               </div>
             );
@@ -498,7 +498,7 @@ function TrustSection() {
   const t = useTranslations("landing.trust");
   return (
     <div className="border-y border-white/[0.06] bg-black overflow-hidden py-4">
-      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between font-mono text-[10px] font-bold text-zinc-600 uppercase tracking-[0.3em] overflow-x-auto whitespace-nowrap gap-12 scrollbar-none">
+      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em] overflow-x-auto whitespace-nowrap gap-12 scrollbar-none">
         <span className="flex items-center gap-3">{t("status")}<span className="text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse">{t("statusValue")}</span></span>
         <span className="flex items-center gap-3">{t("analyzed")}<span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">{t("analyzedValue")}</span></span>
         <span className="flex items-center gap-3">{t("signals")}<span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">{t("signalsValue")}</span></span>
@@ -555,7 +555,7 @@ export function LandingPage() {
         <CTASection />
       </main>
 
-      <footer className="py-12 border-t border-white/[0.04] bg-black text-center text-[10px] text-zinc-600 font-mono tracking-widest uppercase">
+      <footer className="py-12 border-t border-white/[0.04] bg-black text-center text-[10px] text-zinc-400 font-mono tracking-widest uppercase">
         <div className="flex flex-wrap items-center justify-center gap-8 mb-6 font-bold">
           <Link href={`/${locale}/guide`} className="hover:text-indigo-400 transition-colors">{t("footer.guide")}</Link>
           <Link href={`/${locale}/insights`} className="hover:text-indigo-400 transition-colors">{t("footer.insights")}</Link>

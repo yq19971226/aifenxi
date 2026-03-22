@@ -321,7 +321,7 @@ export default function AdminSetupPage() {
                             className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-all ${
                               selected
                                 ? opt.color
-                                : "text-zinc-600 bg-transparent border-white/[0.06] hover:text-zinc-400 hover:border-white/[0.1]"
+                                : "text-zinc-400 bg-transparent border-white/[0.06] hover:text-zinc-400 hover:border-white/[0.1]"
                             } ${isSaving ? "opacity-50 cursor-wait" : ""}`}
                           >
                             {isSaving && selected ? (

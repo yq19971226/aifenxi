@@ -185,7 +185,7 @@ export default function AutopilotsPage() {
                   {isCompleted ? <CheckCircle2 size={20} /> : <Icon size={18} />}
                 </div>
                 <span className={`text-[11px] font-mono tracking-widest uppercase ${
-                  isActive ? "text-indigo-400" : isCompleted ? "text-emerald-400" : "text-zinc-600"
+                  isActive ? "text-indigo-400" : isCompleted ? "text-emerald-400" : "text-zinc-400"
                 }`}>
                   {step.title}
                 </span>
@@ -419,7 +419,7 @@ export default function AutopilotsPage() {
                             animate={{ opacity: 1, x: 0 }}
                             className={`${log.includes("SUCCESS") || log.includes("PASS") || log.includes("online") ? "text-emerald-400" : "text-zinc-400"}`}
                           >
-                            <span className="text-zinc-600 mr-2">{'>'}</span>{log}
+                            <span className="text-zinc-400 mr-2">{'>'}</span>{log}
                           </motion.div>
                         ))}
                         {!deployed && deployLogs.length < DEPLOY_LOGS.length && (
@@ -456,7 +456,7 @@ export default function AutopilotsPage() {
               disabled={currentStep === 0 || isDeploying}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
                 currentStep === 0 || isDeploying
-                  ? "text-zinc-700 cursor-not-allowed" 
+                  ? "text-zinc-500 cursor-not-allowed" 
                   : "text-zinc-300 hover:text-white hover:bg-white/10"
               }`}
             >
@@ -503,9 +503,9 @@ export default function AutopilotsPage() {
           </div>
         ) : activePilots.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-40 border border-white/[0.05] bg-[#09090b]/80 rounded-xl text-center px-4">
-            <Server className="text-zinc-600 mb-2" size={24} />
+            <Server className="text-zinc-400 mb-2" size={24} />
             <p className="text-sm text-zinc-400">{t("active.empty")}</p>
-            <p className="text-xs text-zinc-600 mt-1">{t("active.emptyHint")}</p>
+            <p className="text-xs text-zinc-400 mt-1">{t("active.emptyHint")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

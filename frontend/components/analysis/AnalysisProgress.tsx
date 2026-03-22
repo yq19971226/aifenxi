@@ -385,7 +385,7 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
         >
           {t("progress.connecting")}
         </motion.p>
-        <span className="mt-3 font-mono text-xs text-zinc-600">{elapsed}s</span>
+        <span className="mt-3 font-mono text-xs text-zinc-400">{elapsed}s</span>
       </motion.div>
     );
   }
@@ -439,8 +439,8 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
 
       {/* ── Expert Team Status Bar ── */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-white/[0.04] bg-white/[0.01] overflow-x-auto">
-        <Bot size={12} className="text-zinc-600 shrink-0" />
-        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 shrink-0 mr-1">{t("progress.team")}</span>
+        <Bot size={12} className="text-zinc-400 shrink-0" />
+        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 shrink-0 mr-1">{t("progress.team")}</span>
         {Object.entries(AGENT_ICONS).slice(0, 8).map(([name, { icon: Icon, color }]) => {
           const isActive = steps.some(s => s.step.includes(name) && s.status === 'running');
           const isDone = steps.some(s => s.step.includes(name) && s.status === 'completed');
@@ -451,15 +451,15 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
                 isActive ? "bg-blue-500/10" : isDone ? "bg-emerald-500/5" : "opacity-20"
               }`}
             >
-              <Icon size={10} className={isActive ? color : isDone ? "text-emerald-400" : "text-zinc-700"} />
-              <span className={`text-[9px] font-medium ${isActive ? 'text-zinc-200' : isDone ? 'text-zinc-500' : 'text-zinc-700'}`}>
+              <Icon size={10} className={isActive ? color : isDone ? "text-emerald-400" : "text-zinc-500"} />
+              <span className={`text-[9px] font-medium ${isActive ? 'text-zinc-200' : isDone ? 'text-zinc-500' : 'text-zinc-500'}`}>
                 {name}
               </span>
               {isActive && <span className="h-1 w-1 rounded-full bg-blue-400 animate-pulse" />}
             </div>
           );
         })}
-        <span className="ml-auto font-mono text-[10px] font-bold text-zinc-600 shrink-0 tabular-nums">
+        <span className="ml-auto font-mono text-[10px] font-bold text-zinc-400 shrink-0 tabular-nums">
           {elapsed}s
         </span>
       </div>
@@ -501,7 +501,7 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
                         <AgentIconComp className={`h-3 w-3 shrink-0 ${
                           step.status === "completed" ? agentIcon!.color
                             : step.status === "running" ? agentIcon!.color
-                            : "text-zinc-600"
+                            : "text-zinc-400"
                         }`} />
                       )}
                       <p className={`text-sm font-medium leading-5 ${statusTextClass(step.status)}`}>
@@ -567,7 +567,7 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
                       transition={{ duration: 0.25 }}
                       className="flex items-center gap-2 py-[3px]"
                     >
-                      <span className="text-[9px] font-mono text-zinc-600 shrink-0 tabular-nums w-[54px]">
+                      <span className="text-[9px] font-mono text-zinc-400 shrink-0 tabular-nums w-[54px]">
                         {line.ts}
                       </span>
                       <IconComp size={10} className={`shrink-0 ${line.color}`} />

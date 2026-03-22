@@ -63,17 +63,17 @@ export function ModeSelector({ mode, userLevel, running, lockedModes, onSelect }
             title={locked ? t("locked", { tier: opt.tierLabel }) : undefined}
           >
             <div className="flex items-center gap-2 w-full">
-              <Icon size={14} className={selected ? "text-indigo-400" : locked ? "text-zinc-600" : "text-zinc-500"} />
+              <Icon size={14} className={selected ? "text-indigo-400" : locked ? "text-zinc-400" : "text-zinc-500"} />
               <span className={`text-sm font-semibold ${
-                selected ? "text-indigo-400" : locked ? "text-zinc-600" : "text-zinc-200"
+                selected ? "text-indigo-400" : locked ? "text-zinc-400" : "text-zinc-200"
               }`}>
                 {t(`${opt.value}.label`)}
               </span>
-              {locked && <Lock size={11} className="ml-auto text-zinc-600" />}
+              {locked && <Lock size={11} className="ml-auto text-zinc-400" />}
               {selected && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-indigo-400" />}
             </div>
             <p className={`text-sm mt-1.5 ${
-              selected ? "text-zinc-400" : locked ? "text-zinc-600" : "text-zinc-500"
+              selected ? "text-zinc-400" : locked ? "text-zinc-400" : "text-zinc-500"
             }`}>
               {t(`${opt.value}.desc`, { count: opt.agents })}
             </p>

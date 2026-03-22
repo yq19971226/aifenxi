@@ -356,7 +356,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
               <div className="flex items-baseline gap-2 mb-1">
                 <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">庄家当前动作</span>
                 {transition && (
-                  <span className="text-[10px] font-mono text-zinc-600">
+                  <span className="text-[10px] font-mono text-zinc-400">
                     ↳ 刚从 <span className={`font-bold ${meta.color}`}>{PHASE_META[transition.from_phase ?? ""]?.label ?? transition.from_phase}</span> 转入
                   </span>
                 )}
@@ -366,7 +366,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
               </p>
               <p className="text-xs text-zinc-400 leading-relaxed">{meta.desc}</p>
               {transition?.reason && (
-                <p className="text-[11px] text-zinc-600 mt-1.5 font-mono">
+                <p className="text-[11px] text-zinc-400 mt-1.5 font-mono">
                   依据: {transition.reason}
                 </p>
               )}
@@ -488,7 +488,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
                    </div>
                  );
                }) || (
-                 <div className="text-xs text-zinc-600 italic bg-bg-surface p-3 rounded-lg">{t("card.noData")}</div>
+                 <div className="text-xs text-zinc-400 italic bg-bg-surface p-3 rounded-lg">{t("card.noData")}</div>
                )}
              </div>
            </div>
@@ -727,7 +727,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
           {/* P2-A: 数据源健康彩点 */}
           {dsHealth && Array.isArray(dsHealth.sources) && (
             <span className="flex items-center gap-1" title={`数据源: ${dsHealth.status}`}>
-              <Database size={11} className="text-zinc-600" />
+              <Database size={11} className="text-zinc-400" />
               {dsHealth.sources.map((s) => (
                 <span
                   key={s.domain}

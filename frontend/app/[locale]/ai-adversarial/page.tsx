@@ -190,7 +190,7 @@ export default async function PublicAdversarialPage({
               ? "本平台提供的所有分析内容仅供参考研究，不构成任何投资建议。加密货币市场风险极高，请根据自身情况独立判断。"
               : "All analysis provided is for reference only and does not constitute investment advice. Cryptocurrency markets carry extremely high risk."}
           </p>
-          <p className="text-[10px] text-zinc-700 font-mono tracking-widest uppercase">
+          <p className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase">
             © {new Date().getFullYear()} AXIOM · {isZh ? "保留所有权利" : "All Rights Reserved"}
           </p>
         </footer>

@@ -538,7 +538,7 @@ export default function AdminDataSourcesPage() {
                       <div className={`flex h-10 w-10 items-center justify-center rounded-xl shadow-inner ${meta.tone}`}>{meta.icon}</div>
                       <div>
                         <div className="text-sm font-bold text-zinc-100">{source.name}</div>
-                        <div className="text-xs font-mono tracking-widest uppercase text-zinc-500 mt-0.5">{source.domain} <span className="text-zinc-700 mx-1">/</span> {source.owner}</div>
+                        <div className="text-xs font-mono tracking-widest uppercase text-zinc-500 mt-0.5">{source.domain} <span className="text-zinc-500 mx-1">/</span> {source.owner}</div>
                       </div>
                     </div>
                     <StatusBadge status={source.status} variant="readiness" />
@@ -548,7 +548,7 @@ export default function AdminDataSourcesPage() {
                   <div className="mt-5 rounded-lg bg-bg-elevated/50 p-3 flex items-center justify-between text-xs border border-border/50">
                     <span className="text-zinc-500 font-mono tracking-widest uppercase">缓存覆盖</span>
                     <span className="text-zinc-200 font-medium font-mono">
-                      <span className="text-accent">{source.ready_count}</span> <span className="text-zinc-600 mx-1">/</span> {source.target_count}
+                      <span className="text-accent">{source.ready_count}</span> <span className="text-zinc-400 mx-1">/</span> {source.target_count}
                     </span>
                   </div>
                   
@@ -597,7 +597,7 @@ export default function AdminDataSourcesPage() {
         {/* ── 兼容运行组分隔 ── */}
         <div className="flex items-center gap-4 py-4 opacity-70">
           <div className="flex-1 border-t border-border" />
-          <span className="shrink-0 text-xs font-bold font-mono tracking-[0.2em] uppercase text-zinc-600">兼容运行组 · 旧数据源管理视图</span>
+          <span className="shrink-0 text-xs font-bold font-mono tracking-[0.2em] uppercase text-zinc-400">兼容运行组 · 旧数据源管理视图</span>
           <div className="flex-1 border-t border-border" />
         </div>
 
@@ -712,13 +712,13 @@ export default function AdminDataSourcesPage() {
                   <div className="text-[11px] font-bold font-mono tracking-widest uppercase text-zinc-500 mb-2 flex items-center justify-between">
                     <span>月度额度</span>
                     {geckoUsage && (
-                      <span className="text-zinc-600 font-mono">{geckoUsage.usage_pct}%</span>
+                      <span className="text-zinc-400 font-mono">{geckoUsage.usage_pct}%</span>
                     )}
                   </div>
                   {geckoUsage ? (
                     <>
                       <div className="font-bold font-mono text-zinc-200">
-                        {geckoUsage.used.toLocaleString()} <span className="text-zinc-600 mx-1">/</span> {geckoUsage.limit.toLocaleString()}
+                        {geckoUsage.used.toLocaleString()} <span className="text-zinc-400 mx-1">/</span> {geckoUsage.limit.toLocaleString()}
                       </div>
                       <div className="mt-2 h-1.5 rounded-full bg-bg-elevated overflow-hidden border border-border/50">
                         <div
@@ -794,7 +794,7 @@ export default function AdminDataSourcesPage() {
                 <h2 className="text-sm font-bold text-zinc-100">
                   Exchange_Direct_Combo
                 </h2>
-                <span className="text-xs font-mono tracking-widest uppercase text-zinc-500 mt-0.5 block">免费交易所直连 <span className="text-zinc-700 mx-1">/</span> Binance Futures</span>
+                <span className="text-xs font-mono tracking-widest uppercase text-zinc-500 mt-0.5 block">免费交易所直连 <span className="text-zinc-500 mx-1">/</span> Binance Futures</span>
               </div>
             </div>
 
@@ -994,7 +994,7 @@ export default function AdminDataSourcesPage() {
                   <div>
                     <h2 className="text-sm font-bold text-zinc-100">{group.name}</h2>
                     <span className="text-[10px] font-bold font-mono tracking-widest uppercase text-zinc-500 mt-1 block">
-                      {group.group_type === "paid" ? "付费数据源" : "免费数据源"} <span className="text-zinc-700 mx-1">/</span> {group.sources.length} 个采集器
+                      {group.group_type === "paid" ? "付费数据源" : "免费数据源"} <span className="text-zinc-500 mx-1">/</span> {group.sources.length} 个采集器
                     </span>
                   </div>
                 </div>
@@ -1150,15 +1150,15 @@ export default function AdminDataSourcesPage() {
           <h3 className="mb-4 text-[11px] font-bold font-mono tracking-[0.2em] uppercase text-zinc-500">熔断器说明</h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
              <div className="rounded-xl bg-bg-surface/50 border border-border p-4">
-              <span className="font-bold font-mono text-[11px] tracking-widest uppercase text-bull">正常 <span className="text-zinc-600 font-normal">/</span> closed</span>
+              <span className="font-bold font-mono text-[11px] tracking-widest uppercase text-bull">正常 <span className="text-zinc-400 font-normal">/</span> closed</span>
               <p className="mt-2 text-[11px] text-zinc-400 leading-relaxed font-mono">数据源连接稳定，正常采集数据。</p>
             </div>
              <div className="rounded-xl bg-bg-surface/50 border border-border p-4">
-              <span className="font-bold font-mono text-[11px] tracking-widest uppercase text-bear">熔断中 <span className="text-zinc-600 font-normal">/</span> open</span>
+              <span className="font-bold font-mono text-[11px] tracking-widest uppercase text-bear">熔断中 <span className="text-zinc-400 font-normal">/</span> open</span>
               <p className="mt-2 text-[11px] text-zinc-400 leading-relaxed font-mono">连续 3 次健康检查失败后自动触发，暂停采集。每 120 秒自动尝试恢复。</p>
             </div>
              <div className="rounded-xl bg-bg-surface/50 border border-border p-4">
-              <span className="font-bold font-mono text-[11px] tracking-widest uppercase text-amber-500">探测恢复 <span className="text-zinc-600 font-normal">/</span> half_open</span>
+              <span className="font-bold font-mono text-[11px] tracking-widest uppercase text-amber-500">探测恢复 <span className="text-zinc-400 font-normal">/</span> half_open</span>
               <p className="mt-2 text-[11px] text-zinc-400 leading-relaxed font-mono">正在尝试重新连接，若成功则恢复正常，若失败则重新熔断。</p>
             </div>
           </div>

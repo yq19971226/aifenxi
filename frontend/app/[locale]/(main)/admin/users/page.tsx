@@ -709,7 +709,7 @@ export default function AdminUsersPage() {
                         ) : u.expires_at ? (
                           formatDate(u.expires_at)
                         ) : (
-                          <span className="text-zinc-600 font-sans">—</span>
+                          <span className="text-zinc-400 font-sans">—</span>
                         )}
                       </td>
                       <td className="px-6 py-4">
@@ -794,7 +794,7 @@ export default function AdminUsersPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between border-t border-border/50 bg-bg-surface/50 px-6 py-4 mt-auto">
               <span className="text-[11px] font-bold font-mono tracking-widest text-zinc-500 uppercase">
-                共 <span className="text-zinc-200">{data.total}</span> 条 <span className="text-zinc-700 mx-1">/</span> 第 <span className="text-zinc-200">{data.page}</span> 页 <span className="text-zinc-700 mx-1">/</span> 共 {totalPages} 页
+                共 <span className="text-zinc-200">{data.total}</span> 条 <span className="text-zinc-500 mx-1">/</span> 第 <span className="text-zinc-200">{data.page}</span> 页 <span className="text-zinc-500 mx-1">/</span> 共 {totalPages} 页
               </span>
               <div className="flex gap-2">
                 <button

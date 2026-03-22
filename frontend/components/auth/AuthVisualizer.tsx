@@ -78,7 +78,7 @@ export function AuthVisualizer() {
           <div className="w-1.5 h-1.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse" />
           <span className="text-[9px] font-mono text-white tracking-[0.2em] uppercase">认证节点</span>
         </div>
-        <div className="space-y-1 text-[9px] font-mono text-zinc-600 tracking-[0.1em] uppercase">
+        <div className="space-y-1 text-[9px] font-mono text-zinc-400 tracking-[0.1em] uppercase">
           <p>安全链路 // 已激活</p>
           <p>量化引擎 // 预热中</p>
           <p>延迟 // 14毫秒</p>
@@ -90,7 +90,7 @@ export function AuthVisualizer() {
           <span className="text-[9px] font-mono text-white tracking-[0.2em] uppercase">全球蜂群网络</span>
           <div className="w-1.5 h-1.5 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
         </div>
-        <div className="space-y-1 text-[9px] font-mono text-zinc-600 tracking-[0.1em] uppercase">
+        <div className="space-y-1 text-[9px] font-mono text-zinc-400 tracking-[0.1em] uppercase">
           <div className="flex items-center justify-end gap-3">
              <span>节点数</span>
              <span className="text-zinc-400">8,492</span>

@@ -73,7 +73,7 @@ const CONFIDENCE_STYLES: Record<string, { emoji: string; label: string; color: s
   high:   { emoji: "🔥", label: "高度匹配",  color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" },
   medium: { emoji: "⚡", label: "中度匹配",  color: "text-amber-400 bg-amber-500/10 border-amber-500/30" },
   low:    { emoji: "💡", label: "弱匹配",    color: "text-zinc-400 bg-zinc-500/10 border-zinc-500/30" },
-  none:   { emoji: "—",  label: "证据不足",  color: "text-zinc-600 bg-zinc-500/5 border-zinc-500/20" },
+  none:   { emoji: "—",  label: "证据不足",  color: "text-zinc-400 bg-zinc-500/5 border-zinc-500/20" },
 };
 
 const RISK_COLORS: Record<string, string> = {
@@ -162,7 +162,7 @@ export function PlaybookRenderer({ data }: { data: PlaybookData }) {
                 </div>
                 {data.stage_description && (
                   <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
-                    <span className="text-zinc-600 mr-1">{t("renderers.playbook.stage")}:</span>
+                    <span className="text-zinc-400 mr-1">{t("renderers.playbook.stage")}:</span>
                     {localizeText(data.stage_description)}
                   </p>
                 )}
@@ -218,7 +218,7 @@ export function PlaybookRenderer({ data }: { data: PlaybookData }) {
           )}>
             {PHASE_LABELS[data.phase_transition.from] || data.phase_transition.from}
           </span>
-          <Target size={14} className="text-zinc-600 shrink-0" />
+          <Target size={14} className="text-zinc-400 shrink-0" />
           <span className={cn(
             "rounded-md border px-2.5 py-1 text-[11px] font-bold uppercase animate-pulse",
             PHASE_COLORS[data.phase_transition.to] || "text-zinc-400 border-zinc-500/30 bg-zinc-500/10"
@@ -298,7 +298,7 @@ export function PlaybookRenderer({ data }: { data: PlaybookData }) {
                         </div>
                         <span className={cn(
                           "text-[10px] font-mono w-[40px] text-right shrink-0",
-                          isMatch ? "text-violet-400" : "text-zinc-600"
+                          isMatch ? "text-violet-400" : "text-zinc-400"
                         )}>
                           {pct}%
                         </span>
@@ -337,7 +337,7 @@ export function PlaybookRenderer({ data }: { data: PlaybookData }) {
           <div className="grid grid-cols-2 gap-2">
             {(data.counter_strategy.entry_trigger || data.counter_strategy.entry_price) && (
               <div className="rounded-md bg-white/[0.03] border border-white/[0.04] px-3 py-2">
-                <span className="text-[9px] text-zinc-600 uppercase block mb-0.5">{t("renderers.playbook.entry")}</span>
+                <span className="text-[9px] text-zinc-400 uppercase block mb-0.5">{t("renderers.playbook.entry")}</span>
                 <span className="text-sm font-bold font-mono text-zinc-200">
                   {data.counter_strategy.entry_trigger || data.counter_strategy.entry_price}
                 </span>
@@ -371,9 +371,9 @@ export function PlaybookRenderer({ data }: { data: PlaybookData }) {
 
           {(data.counter_strategy.confirmation_signal || data.counter_strategy.wait_signal) && (
             <div className="flex items-start gap-2 text-xs">
-              <Activity size={12} className="text-zinc-600 mt-0.5 shrink-0" />
+              <Activity size={12} className="text-zinc-400 mt-0.5 shrink-0" />
               <div>
-                <span className="text-zinc-600 text-[9px] uppercase">{t("renderers.playbook.waitSignal")}: </span>
+                <span className="text-zinc-400 text-[9px] uppercase">{t("renderers.playbook.waitSignal")}: </span>
                 <span className="text-zinc-400">{localizeText(data.counter_strategy.confirmation_signal || data.counter_strategy.wait_signal)}</span>
               </div>
             </div>

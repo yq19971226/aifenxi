@@ -58,7 +58,7 @@ export function OpportunityRank({ symbols }: { symbols: SymbolOverview[] }) {
                       {item.display_name || (item.symbol ?? "").replace("USDT", "")}
                     </span>
                     <span className="text-xs text-zinc-500 font-mono">{item.symbol}</span>
-                    <ExternalLink size={10} className="text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <ExternalLink size={10} className="text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                   <div className="flex items-center gap-2 mt-1 text-xs text-zinc-500 font-mono">
                     {item.latest_price != null && (
@@ -84,7 +84,7 @@ export function OpportunityRank({ symbols }: { symbols: SymbolOverview[] }) {
                   <span className="text-xs text-zinc-500 font-mono">
                     {Math.round(item.confidence * 100)}%
                   </span>
-                  <ChevronRight size={14} className="text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <ChevronRight size={14} className="text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </Link>
             </motion.div>
@@ -130,7 +130,7 @@ export function RiskRadar({ symbols }: { symbols: SymbolOverview[] }) {
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className={`text-sm ${cfg.color}`}>{t(`levels.${item.alert_level || "none"}`)}</span>
-                    <ChevronRight size={14} className="text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <ChevronRight size={14} className="text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </Link>
               </motion.div>

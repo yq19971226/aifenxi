@@ -66,7 +66,7 @@ export function AICitationSnippet({ report }: AICitationSnippetProps) {
       <p className="text-[11px] leading-relaxed text-zinc-500 font-mono italic">
         &quot;{generateSnippet()}&quot;
       </p>
-      <div className="mt-2 text-[9px] text-zinc-600">
+      <div className="mt-2 text-[9px] text-zinc-400">
         {t("snippet.tip")}
       </div>
     </div>

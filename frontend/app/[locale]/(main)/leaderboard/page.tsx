@@ -85,7 +85,7 @@ function SystemAccuracyHero({
               <span className={`text-3xl font-black tracking-tight font-mono ${MODE_COLOR[m.mode] || "text-white"}`}>
                 {(m.win_rate * 100).toFixed(1)}%
               </span>
-              <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-[0.2em] font-mono mt-2">{t("accuracy.winRate")}</span>
+              <span className="text-[9px] uppercase font-bold text-zinc-400 tracking-[0.2em] font-mono mt-2">{t("accuracy.winRate")}</span>
               
               <div className="w-full h-px bg-white/[0.05] my-4" />
               
@@ -103,7 +103,7 @@ function SystemAccuracyHero({
           <span className="flex items-center gap-2">
             {t("accuracy.overall")}: <span className="font-black text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.5)] bg-indigo-500/10 px-2 py-0.5 border border-indigo-500/20">{(overallWr * 100).toFixed(1)}%</span>
           </span>
-          <span className="text-zinc-700">|</span>
+          <span className="text-zinc-500">|</span>
           <span className="flex items-center gap-2">
             {t("comp.settled")}: <span className="font-black text-white">{totalSettled}</span>
           </span>

@@ -55,7 +55,7 @@ export function StrategyRangeBar({
     <div className="mt-5 space-y-2">
       <div className="flex items-center justify-between mb-2">
         <p className="text-[11px] text-zinc-500 uppercase tracking-widest font-bold">{t("priceMap")}</p>
-        <span className="text-[11px] text-zinc-600 font-mono">{(range).toFixed(2)} {t("spread")}</span>
+        <span className="text-[11px] text-zinc-400 font-mono">{(range).toFixed(2)} {t("spread")}</span>
       </div>
       <div className="relative h-10 rounded-lg bg-black/40 border border-white/[0.04] overflow-hidden backdrop-blur-md">
         {/* Entry range highlight */}
@@ -176,7 +176,7 @@ export function StrategyCard({ strategy }: { strategy: StrategyData }) {
                   {entryLow != null ? formatPrice(entryLow) : "\u2014"}
                 </p>
                 <p className="text-sm md:text-[15px] font-mono font-bold text-zinc-400 tracking-tight">
-                  <span className="text-zinc-600 mr-1 hidden md:inline">-</span>
+                  <span className="text-zinc-400 mr-1 hidden md:inline">-</span>
                   {entryHigh != null ? formatPrice(entryHigh) : "\u2014"}
                 </p>
               </div>

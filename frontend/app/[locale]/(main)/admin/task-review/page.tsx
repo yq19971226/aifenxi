@@ -177,7 +177,7 @@ export default function TaskReviewPage() {
                       </span>
                     </div>
                     
-                    <div className="mt-4 text-[9px] font-mono tracking-widest text-zinc-600 uppercase flex items-center gap-2">
+                    <div className="mt-4 text-[9px] font-mono tracking-widest text-zinc-400 uppercase flex items-center gap-2">
                       <Clock size={10} /> {t("taskReview.submittedAt")}: {new Date(s.submitted_at).toLocaleString("zh-CN")}
                     </div>
                   </div>
@@ -209,7 +209,7 @@ export default function TaskReviewPage() {
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder={t("taskReview.enterRejectReason")}
-                      className="flex-1 border border-red-500/30 bg-red-500/5 px-4 py-3 text-[11px] text-white font-mono uppercase tracking-widest placeholder:text-zinc-600 focus:border-red-500/60 focus:bg-red-500/10 outline-none transition-all"
+                      className="flex-1 border border-red-500/30 bg-red-500/5 px-4 py-3 text-[11px] text-white font-mono uppercase tracking-widest placeholder:text-zinc-400 focus:border-red-500/60 focus:bg-red-500/10 outline-none transition-all"
                     />
                     <button
                       onClick={() =>

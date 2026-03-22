@@ -77,7 +77,7 @@ export default function PartnerPage() {
   }
 
   if (isError || !dashboard) {
-    return (<PageTransition><div className="mx-auto max-w-4xl px-4 py-8"><div className="bg-bg-surface border border-border rounded-xl p-8 text-center shadow-inner"><Users size={32} className="mx-auto text-zinc-600 mb-4 opacity-50" /><p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">{t('error.loadFailed')}</p><p className="text-[10px] font-mono font-bold text-zinc-500 mt-2 uppercase tracking-widest">&nbsp;</p></div></div></PageTransition>);
+    return (<PageTransition><div className="mx-auto max-w-4xl px-4 py-8"><div className="bg-bg-surface border border-border rounded-xl p-8 text-center shadow-inner"><Users size={32} className="mx-auto text-zinc-400 mb-4 opacity-50" /><p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">{t('error.loadFailed')}</p><p className="text-[10px] font-mono font-bold text-zinc-500 mt-2 uppercase tracking-widest">&nbsp;</p></div></div></PageTransition>);
   }
 
   const d = dashboard;
@@ -142,7 +142,7 @@ export default function PartnerPage() {
                  <code className="truncate text-[10px] text-zinc-400 font-mono tracking-widest">{effectiveLink}</code>
                </div>
                <div className="flex items-center gap-2 text-[10px] font-bold font-mono uppercase tracking-widest text-zinc-500 shrink-0">
-                  <Percent size={12} className="text-zinc-600" />
+                  <Percent size={12} className="text-zinc-400" />
                   {t('overview.commissionRate')}: 
                   <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 ml-1 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
                     {(d.commission_rate * 100).toFixed(0)}%
@@ -199,7 +199,7 @@ export default function PartnerPage() {
             <motion.div key="inv" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
               {invitations.length === 0 ? (
                 <div className="relative bg-black border border-white/[0.05] py-20 text-center overflow-hidden">
-                   <Users size={32} className="mx-auto text-zinc-700 mb-6" />
+                   <Users size={32} className="mx-auto text-zinc-500 mb-6" />
                    <p className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em]">{t('invitations.empty')}</p>
                 </div>
               ) : (
@@ -210,10 +210,10 @@ export default function PartnerPage() {
                      <table className="w-full text-sm font-mono">
                        <thead>
                          <tr className="border-b border-white/[0.1]">
-                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">用户邮箱</th>
-                           <th className="pb-4 text-center text-[10px] font-bold text-zinc-600 tracking-widest uppercase">等级</th>
-                           <th className="pb-4 text-center text-[10px] font-bold text-zinc-600 tracking-widest uppercase">注册日期</th>
-                           <th className="pb-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase">佣金</th>
+                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-400 tracking-widest uppercase">用户邮箱</th>
+                           <th className="pb-4 text-center text-[10px] font-bold text-zinc-400 tracking-widest uppercase">等级</th>
+                           <th className="pb-4 text-center text-[10px] font-bold text-zinc-400 tracking-widest uppercase">注册日期</th>
+                           <th className="pb-4 text-right text-[10px] font-bold text-zinc-400 tracking-widest uppercase">佣金</th>
                          </tr>
                        </thead>
                        <tbody>
@@ -229,7 +229,7 @@ export default function PartnerPage() {
                                {inv.registered_at ? new Date(inv.registered_at).toLocaleDateString() : "—"}
                              </td>
                              <td className="py-4 text-right font-mono text-[11px] font-black tracking-widest pr-2">
-                               {inv.total_commission > 0 ? <span className="text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">+${inv.total_commission.toFixed(2)}</span> : <span className="text-zinc-600">--</span>}
+                               {inv.total_commission > 0 ? <span className="text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">+${inv.total_commission.toFixed(2)}</span> : <span className="text-zinc-400">--</span>}
                              </td>
                            </tr>
                          ))}
@@ -245,7 +245,7 @@ export default function PartnerPage() {
             <motion.div key="com" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
               {commissions.length === 0 ? (
                 <div className="relative bg-black border border-white/[0.05] py-20 text-center overflow-hidden">
-                   <DollarSign size={32} className="mx-auto text-zinc-700 mb-6" />
+                   <DollarSign size={32} className="mx-auto text-zinc-500 mb-6" />
                    <p className="text-[11px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em]">{t('commissions.empty')}</p>
                 </div>
               ) : (
@@ -256,10 +256,10 @@ export default function PartnerPage() {
                      <table className="w-full text-sm font-mono">
                        <thead>
                          <tr className="border-b border-white/[0.1]">
-                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">来源用户</th>
-                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">详情</th>
-                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">日期</th>
-                           <th className="pb-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase">奖励</th>
+                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-400 tracking-widest uppercase">来源用户</th>
+                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-400 tracking-widest uppercase">详情</th>
+                           <th className="pb-4 text-left text-[10px] font-bold text-zinc-400 tracking-widest uppercase">日期</th>
+                           <th className="pb-4 text-right text-[10px] font-bold text-zinc-400 tracking-widest uppercase">奖励</th>
                          </tr>
                        </thead>
                        <tbody>
@@ -307,7 +307,7 @@ export default function PartnerPage() {
                 
                 <div className="flex flex-col sm:flex-row gap-4 relative z-10">
                   <input value={trc20Input} onChange={(e) => setTrc20Input(e.target.value)} placeholder={t('wallet.addressPlaceholder')}
-                    className="flex-1 border border-white/[0.1] bg-white/[0.02] px-4 py-3 text-[11px] font-mono text-zinc-200 placeholder:text-zinc-600 focus:border-purple-500/50 focus:bg-purple-500/5 outline-none transition-all" />
+                    className="flex-1 border border-white/[0.1] bg-white/[0.02] px-4 py-3 text-[11px] font-mono text-zinc-200 placeholder:text-zinc-400 focus:border-purple-500/50 focus:bg-purple-500/5 outline-none transition-all" />
                   <button onClick={() => walletMut.mutate(trc20Input)} disabled={trc20Input.length !== 34 || walletMut.isPending}
                     className="border border-purple-500/40 bg-purple-600/20 px-8 py-3 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-purple-300 hover:bg-purple-600/40 hover:text-white disabled:opacity-40 transition-all shadow-[0_0_15px_rgba(168,85,247,0.1)] tabular-nums shrink-0">
                     {walletMut.isPending ? "..." : wallet?.trc20_address ? t('wallet.change') : t('wallet.bind')}
@@ -329,16 +329,16 @@ export default function PartnerPage() {
               <div className="mt-8 pt-8 border-t border-white/[0.05]">
                 <h3 className="text-[10px] font-black font-mono text-zinc-500 uppercase tracking-[0.3em] mb-6 px-1">{t('wallet.history.title')}</h3>
                 {withdrawals.length === 0 ? (
-                  <div className="relative bg-black border border-white/[0.05] py-16 text-center overflow-hidden"><p className="text-[10px] font-black font-mono text-zinc-600 uppercase tracking-widest">{t('wallet.history.empty')}</p></div>
+                  <div className="relative bg-black border border-white/[0.05] py-16 text-center overflow-hidden"><p className="text-[10px] font-black font-mono text-zinc-400 uppercase tracking-widest">{t('wallet.history.empty')}</p></div>
                 ) : (
                   <div className="overflow-x-auto border border-white/[0.05] bg-black">
                      <table className="w-full text-sm font-mono">
                        <thead>
                          <tr className="border-b border-white/[0.05]">
-                           <th className="py-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase pl-6">金额</th>
-                           <th className="py-4 text-left text-[10px] font-bold text-zinc-600 tracking-widest uppercase">地址</th>
-                           <th className="py-4 text-center text-[10px] font-bold text-zinc-600 tracking-widest uppercase">状态</th>
-                           <th className="py-4 text-right text-[10px] font-bold text-zinc-600 tracking-widest uppercase pr-6">日期</th>
+                           <th className="py-4 text-left text-[10px] font-bold text-zinc-400 tracking-widest uppercase pl-6">金额</th>
+                           <th className="py-4 text-left text-[10px] font-bold text-zinc-400 tracking-widest uppercase">地址</th>
+                           <th className="py-4 text-center text-[10px] font-bold text-zinc-400 tracking-widest uppercase">状态</th>
+                           <th className="py-4 text-right text-[10px] font-bold text-zinc-400 tracking-widest uppercase pr-6">日期</th>
                          </tr>
                        </thead>
                        <tbody>
@@ -353,7 +353,7 @@ export default function PartnerPage() {
                                      {st.label}
                                   </span>
                                </td>
-                               <td className="py-4 pr-6 text-right text-[10px] font-bold text-zinc-600 uppercase tracking-widest">{new Date(w.created_at).toLocaleDateString()}</td>
+                               <td className="py-4 pr-6 text-right text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{new Date(w.created_at).toLocaleDateString()}</td>
                              </tr>
                            );
                          })}

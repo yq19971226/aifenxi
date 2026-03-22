@@ -217,7 +217,7 @@ function DataSourceHealthCard() {
         </div>
         <div className="text-right">
            <div className="text-xl font-bold text-emerald-400">{(data?.completeness_score || 0).toFixed(1)}%</div>
-           <div className="text-[10px] text-zinc-600 uppercase font-bold tracking-tighter">Completeness</div>
+           <div className="text-[10px] text-zinc-400 uppercase font-bold tracking-tighter">Completeness</div>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -344,7 +344,7 @@ export default function AdminMonitorPage() {
               ? health.env
               : "—"}
             {health?.status !== "ok" && (
-              <span className="ml-1 text-zinc-600">({t("monitor.statusError")})</span>
+              <span className="ml-1 text-zinc-400">({t("monitor.statusError")})</span>
             )}
           </p>
         </div>

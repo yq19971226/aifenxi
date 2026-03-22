@@ -133,7 +133,7 @@ export function CollusionRenderer({ data }: { data: CollusionData }) {
                 <div className="space-y-1.5">
                   {pattern.evidence.map((ev, eIdx) => (
                     <div key={eIdx} className="flex items-start gap-2 text-[11px] text-zinc-400">
-                       <Search size={10} className="mt-0.5 text-zinc-600 shrink-0" />
+                       <Search size={10} className="mt-0.5 text-zinc-400 shrink-0" />
                        <span className="leading-tight">{localizeText(ev)}</span>
                     </div>
                   ))}
@@ -175,7 +175,7 @@ export function CollusionRenderer({ data }: { data: CollusionData }) {
             <div className="space-y-3">
                <div className="flex justify-between text-xs">
                  <span className="text-zinc-500">{t("renderers.collusion.syncMovement")}</span>
-                 <span className={cn("font-bold font-mono", data.whale_coordination.synchronized_movements ? "text-emerald-400" : "text-zinc-600")}>
+                 <span className={cn("font-bold font-mono", data.whale_coordination.synchronized_movements ? "text-emerald-400" : "text-zinc-400")}>
                     {data.whale_coordination.synchronized_movements ? t("renderers.collusion.statusActive").toUpperCase() : t("renderers.collusion.statusStable").toUpperCase()}
                  </span>
                </div>
@@ -184,7 +184,7 @@ export function CollusionRenderer({ data }: { data: CollusionData }) {
                  <span className="text-zinc-300 font-bold uppercase">{localizeText(data.whale_coordination.direction)}</span>
                </div>
                <div className="pt-2 border-t border-white/[0.03] flex justify-between items-end">
-                  <span className="text-[10px] text-zinc-600 uppercase font-mono">{t("renderers.collusion.entities")}</span>
+                  <span className="text-[10px] text-zinc-400 uppercase font-mono">{t("renderers.collusion.entities")}</span>
                   <span className="text-xl font-black font-mono leading-none">{data.whale_coordination.entity_count}</span>
                </div>
             </div>
@@ -194,8 +194,8 @@ export function CollusionRenderer({ data }: { data: CollusionData }) {
 
       {/* Footer Security Stamp */}
       <div className="flex items-center justify-center gap-2 pt-2 border-t border-white/[0.02]">
-         <Lock size={10} className="text-zinc-700" />
-         <span className="text-[9px] text-zinc-700 uppercase tracking-[0.2em] font-medium">
+         <Lock size={10} className="text-zinc-500" />
+         <span className="text-[9px] text-zinc-500 uppercase tracking-[0.2em] font-medium">
            {t("renderers.collusion.footer")}
          </span>
       </div>
