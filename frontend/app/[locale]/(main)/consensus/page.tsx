@@ -87,19 +87,19 @@ export default function ConsensusPage() {
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/10 blur-[120px] pointer-events-none rounded-full" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-violet-500/10 blur-[120px] pointer-events-none rounded-full" />
       
-      <div className="mx-auto max-w-5xl px-4 md:px-8 py-8 space-y-8 relative z-10">
+      <div className="mx-auto max-w-[1400px] px-4 md:px-8 py-8 md:py-12 space-y-8 md:space-y-12 relative z-10">
       <JSONLD report={displayReport || displayConsensus} />
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 md:gap-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-2">{t("title")}</h1>
-          <p className="text-sm font-medium text-zinc-500 tracking-wide uppercase">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tighter text-white mb-3">{t("title")}</h1>
+          <p className="text-sm md:text-base font-bold text-zinc-500 tracking-widest uppercase">
             {t("subtitle")}
           </p>
         </div>
         <SymbolSelector value={symbol} onChange={setSymbol} />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
         {MODE_CONFIGS.map((cfg) => {
           const locked = isModeLocked(cfg.value);
           const canUseMode = !locked || hasQuotaForMode(cfg.value);
@@ -110,34 +110,34 @@ export default function ConsensusPage() {
               type="button"
               onClick={() => handleModeSelect(cfg.value)}
               disabled={running}
-              className={`relative overflow-hidden p-5 text-left rounded-xl transition-all duration-300 ${
+              className={`relative overflow-hidden p-6 md:p-8 text-left rounded-3xl transition-all duration-300 ease-out-expo ${
                 selected
-                  ? "border border-indigo-500 bg-indigo-500/[0.08] shadow-[0_0_30px_rgba(99,102,241,0.15)] ring-1 ring-indigo-500 scale-[1.02] sm:scale-100"
+                  ? "border-2 border-indigo-500 bg-indigo-500/10 shadow-[0_0_40px_rgba(99,102,241,0.2)] scale-[1.02] sm:scale-100"
                   : !canUseMode
                     ? "border border-white/5 bg-black/40 opacity-50 cursor-not-allowed"
-                    : "border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20 cursor-pointer glass-card"
+                    : "card-interactive"
               }`}
             >
               {/* Highlight active indicator for mobile clarity */}
               {selected && (
-                <div className="absolute top-0 left-0 bottom-0 w-1 bg-indigo-500 shadow-[2px_0_12px_rgba(99,102,241,0.8)]" />
+                <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-indigo-500 shadow-[2px_0_15px_rgba(99,102,241,1)]" />
               )}
               
-              <div className="flex items-start justify-between mb-2">
-                <div className={`p-2 rounded-lg ${selected ? "bg-indigo-500/20 text-indigo-400" : "bg-white/[0.04] text-zinc-400"}`}>
+              <div className="flex items-start justify-between mb-4">
+                <div className={`p-3 rounded-2xl [&>svg]:w-7 [&>svg]:h-7 ${selected ? "bg-indigo-500/20 text-indigo-400" : "bg-white/[0.04] text-zinc-400"}`}>
                   {cfg.icon}
                 </div>
                 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   {selected && (
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500/20 shrink-0">
-                      <div className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-500/20 shrink-0">
+                      <div className="h-2.5 w-2.5 rounded-full bg-indigo-500 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
                     </div>
                   )}
                   {locked && !hasQuotaForMode(cfg.value) && (
-                    <div className="flex items-center gap-1.5 shrink-0 bg-amber-500/10 border border-amber-500/20 text-amber-500 px-2 py-1 rounded shadow-[0_0_10px_rgba(245,158,11,0.1)]">
-                      <Lock size={12} />
-                      <span className="text-[10px] font-black tracking-widest uppercase">
+                    <div className="flex items-center gap-1.5 shrink-0 bg-amber-500/10 border border-amber-500/20 text-amber-500 px-3 py-1.5 rounded-lg shadow-[0_0_10px_rgba(245,158,11,0.1)]">
+                      <Lock size={14} />
+                      <span className="text-[11px] font-black tracking-widest uppercase">
                         {cfg.tierLabel || "高级版"}
                       </span>
                     </div>
@@ -145,19 +145,19 @@ export default function ConsensusPage() {
                 </div>
               </div>
 
-              <h3 className={`mt-3 text-base font-bold tracking-wide ${selected ? "text-indigo-50" : "text-white"}`}>
+              <h3 className={`mt-5 text-xl md:text-2xl font-black tracking-tighter ${selected ? "text-indigo-50" : "text-white"}`}>
                 {t(`modes.${cfg.value}.label`)}
               </h3>
               
-              <p className={`mt-1 text-xs leading-relaxed ${selected ? "text-indigo-200/80" : "text-zinc-500"}`}>
+              <p className={`mt-2 text-sm md:text-base leading-relaxed font-medium ${selected ? "text-indigo-200/80" : "text-zinc-500"}`}>
                 {t(`modes.${cfg.value}.desc`, { count: cfg.agents.split(" ")[0] })}
               </p>
               
-              <div className="mt-4 flex items-center gap-2 text-[11px]">
-                <span className={`rounded px-2 py-0.5 font-mono font-medium border ${selected ? "bg-indigo-500/20 border-indigo-500/30 text-indigo-300" : "bg-white/[0.04] border-white/5 text-zinc-400"}`}>
+              <div className="mt-6 flex items-center gap-3 text-xs">
+                <span className={`rounded-lg px-3 py-1 font-mono font-bold tracking-widest uppercase border ${selected ? "bg-indigo-500/20 border-indigo-500/30 text-indigo-400" : "bg-white/[0.04] border-white/5 text-zinc-400"}`}>
                   {cfg.agents}
                 </span>
-                <span className={`font-mono ${selected ? "text-indigo-300/60" : "text-zinc-500"}`}>
+                <span className={`font-mono font-bold tracking-widest uppercase ${selected ? "text-indigo-300/60" : "text-zinc-600"}`}>
                   {cfg.periods}
                 </span>
               </div>

@@ -174,11 +174,11 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
             </span>
           </div>
           <div>
-            <div className="flex items-center gap-3">
-              <h3 className="text-xl font-bold font-mono tracking-tight text-white group-hover:glow-text transition-all">
+            <div className="flex items-center gap-4">
+              <h3 className="text-3xl md:text-4xl font-black font-mono tracking-tighter text-white group-hover:glow-text transition-all">
                 {report.symbol}
               </h3>
-              <span className="text-[10px] text-zinc-400 px-2 py-0.5 rounded border border-border bg-bg-surface font-bold uppercase tracking-widest leading-none">
+              <span className="text-[11px] text-zinc-400 px-2 py-1 rounded border border-white/10 bg-black/20 font-bold uppercase tracking-widest leading-none">
                 {t("card.perp")}
               </span>
             </div>
@@ -206,17 +206,17 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
         )}>
           <signalConfig.icon size={18} strokeWidth={3} className={(!isLowConf && !isBlocked) ? "animate-pulse" : "opacity-50"} />
           <div className="flex flex-col leading-none">
-            <span className="text-[10px] uppercase font-bold tracking-widest opacity-80 mb-1">
+            <span className="text-[11px] uppercase font-bold tracking-widest opacity-80 mb-1">
               {t("card.decision")}
             </span>
-            <span className={cn("text-base leading-none", (isLowConf || isBlocked) && "opacity-60")}>{signalConfig.label}</span>
+            <span className={cn("text-2xl md:text-3xl font-black tracking-tighter leading-none mt-1", (isLowConf || isBlocked) && "opacity-60")}>{signalConfig.label}</span>
           </div>
-          <div className="h-8 w-px bg-current opacity-20 mx-2" />
+          <div className="h-10 w-px bg-current opacity-20 mx-3 md:mx-4" />
           <div className="flex flex-col leading-none text-right">
-            <span className="text-[10px] uppercase font-bold tracking-widest opacity-80 mb-1">
+            <span className="text-[11px] uppercase font-bold tracking-widest opacity-80 mb-1">
               {t("card.score")}
             </span>
-            <span className="text-base font-mono leading-none">{confidence}%</span>
+            <span className="text-2xl md:text-3xl font-black tracking-tighter font-mono leading-none mt-1">{confidence}%</span>
           </div>
         </div>
       </div>
@@ -295,7 +295,7 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
       })()}
 
       {/* ── Key Metrics Grid ── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border border-b border-border bg-bg-surface/30">
+      <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-white/5 border-b border-white/5 bg-black/20">
         <MetricItem
           label={t("card.consensus")}
           value={confidenceValue > 0 ? `${confidence}%` : "—"}
@@ -463,15 +463,15 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
                  return (
                    <div key={idx} className="relative pl-4 border-l-[3px] border-bull/30 py-0.5 hover:border-bull transition-colors">
                      <div className="absolute -left-[5.5px] top-1.5 w-2 h-2 rounded-full bg-bull shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                     <div className="flex justify-between items-baseline mb-1">
+                     <div className="flex justify-between items-baseline mb-2">
                        {/* P0-B: TP → 止盈位 */}
-                       <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t("card.tpLabel", { n: idx + 1 })}</span>
+                       <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest">{t("card.tpLabel", { n: idx + 1 })}</span>
                        <span className={cn(
-                         "text-xs font-mono font-bold px-1.5 rounded",
+                         "text-sm font-mono font-bold px-2 py-0.5 rounded",
                          isLowProfit ? "text-amber-400 bg-amber-500/10" : "text-bull bg-bull/10"
                        )}>+{profitPct.toFixed(1)}%</span>
                      </div>
-                     <div className="text-lg flex items-center font-mono font-black leading-none tracking-tight text-white mb-1">
+                     <div className="text-2xl lg:text-3xl flex items-center font-mono font-black leading-none tracking-tighter text-white mb-2">
                        {formatPrice(target)}
                      </div>
                      <div className="flex items-center gap-2">
@@ -756,13 +756,13 @@ export function UnifiedResultCard({ report }: { report: AnalysisReportType }) {
 
 function MetricItem({ label, value, sub, valueColor = "text-foreground", fontMono = false }: { label: string, value: string | number, sub: string, valueColor?: string, fontMono?: boolean }) {
   return (
-    <div className="p-4 lg:p-5 flex flex-col justify-center bg-bg-primary/30 hover:bg-bg-surface transition-colors group">
-      <div className="flex items-center gap-2 mb-2 lg:mb-3 opacity-70 group-hover:opacity-100 transition-opacity">
-        <span className="w-1 h-3 rounded-sm bg-indigo-500/50" />
-        <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest leading-none">{label}</span>
+    <div className="p-5 lg:p-6 flex flex-col justify-center bg-white/[0.01] hover:bg-white/[0.03] transition-colors group">
+      <div className="flex items-center gap-2 mb-3 lg:mb-4 opacity-70 group-hover:opacity-100 transition-opacity">
+        <span className="w-1.5 h-4 rounded-sm bg-indigo-500/50 shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
+        <span className="text-[11px] text-zinc-400 font-bold uppercase tracking-widest leading-none">{label}</span>
       </div>
-      <span className={cn("text-lg lg:text-2xl font-black tracking-tight text-white mb-1", valueColor !== "text-foreground" ? valueColor : "", fontMono && "font-mono")}>{value}</span>
-      <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{sub}</span>
+      <span className={cn("text-2xl lg:text-3xl xl:text-4xl font-black tracking-tighter text-white mb-2", valueColor !== "text-foreground" ? valueColor : "", fontMono && "font-mono")}>{value}</span>
+      <span className="text-[11px] text-zinc-500 font-bold uppercase tracking-wider">{sub}</span>
     </div>
   );
 }
