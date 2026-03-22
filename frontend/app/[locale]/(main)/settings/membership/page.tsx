@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations, useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle2 } from "lucide-react";
 import { fetchCurrentUser } from "@/lib/api/auth";
 import { usePaymentStatusSync } from "@/lib/hooks/usePaymentStatusSync";
 import {
@@ -27,21 +28,21 @@ import { STATUS_STYLES, getPaymentStatusMessage } from "@/lib/payment-status";
 // ── Constants ─────────────────────────────────────────────────
 
 const LEVEL_COLORS: Record<number, string> = {
-  0: "text-zinc-400",
-  1: "text-indigo-400",
-  2: "text-[#F5A623]",
+  0: "text-zinc-500",
+  1: "text-[#00E5FF] drop-shadow-[0_0_15px_rgba(0,229,255,0.5)] glow-cyan",
+  2: "text-amber-400 drop-shadow-[0_0_20px_rgba(251,191,36,0.6)] glow-amber",
 };
 
 const LEVEL_BG: Record<number, string> = {
-  0: "from-zinc-900/0 to-zinc-900/0",
-  1: "from-indigo-500/5 to-transparent",
-  2: "from-[#F5A623]/8 to-transparent",
+  0: "from-white/[0.02] to-transparent",
+  1: "from-[#00E5FF]/10 to-transparent",
+  2: "from-amber-500/10 to-transparent",
 };
 
 const LEVEL_BORDER: Record<number, string> = {
   0: "border-white/5",
-  1: "border-indigo-500/20",
-  2: "border-[#F5A623]/25",
+  1: "border-[#00E5FF]/20",
+  2: "border-amber-500/30",
 };
 
 const NETWORKS: PaymentNetwork[] = ["TRC-20", "ERC-20", "BEP-20"];
@@ -82,16 +83,14 @@ function Cell({ value, tier }: { value: string; tier: "free" | "pro" | "flagship
   const isLocked = value === "锁定";
 
   if (isCheck) return (
-    <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${tier === "flagship" ? "bg-[#F5A623]/15 text-[#F5A623]" : "bg-indigo-500/15 text-indigo-400"}`}>
-      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-      </svg>
+    <span className={`inline-flex items-center justify-center ${tier === "flagship" ? "text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.8)]" : "text-[#00E5FF] drop-shadow-[0_0_10px_rgba(0,229,255,0.8)]"}`}>
+      <CheckCircle2 className="w-[18px] h-[18px]" strokeWidth={2.5} />
     </span>
   );
-  if (isDash || isLocked) return <span className="text-zinc-500 text-[11px]">—</span>;
+  if (isDash || isLocked) return <span className="text-zinc-600 text-[11px]">—</span>;
   return (
     <span className={`text-[11px] font-bold font-mono ${
-      tier === "flagship" ? "text-[#F5A623]" :
+      tier === "flagship" ? "text-amber-400" :
       tier === "pro" ? "text-zinc-200" : "text-zinc-500"
     }`}>{value}</span>
   );
@@ -132,11 +131,9 @@ function AccountHero({ user, trial }: { user: UserInfo; trial?: FreeTrialStatus 
   }, [claiming, trial, queryClient]);
 
   return (
-    <div className={`relative rounded-2xl bg-gradient-to-br ${bg} border ${border} overflow-hidden`}>
-      <div className="absolute inset-0 bg-[#0a0a0a]" />
-      {level === 2 && <div className="absolute inset-0 bg-gradient-to-br from-[#F5A623]/6 to-transparent pointer-events-none" />}
-      {level === 1 && <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent pointer-events-none" />}
-
+    <div className={`relative rounded-2xl backdrop-blur-xl bg-[#0a0d14]/80 border ${border} overflow-hidden shadow-2xl`}>
+      <div className="absolute inset-0 bg-scanline pointer-events-none opacity-50" />
+      <div className={`absolute inset-0 bg-gradient-to-br ${bg} pointer-events-none`} />
       <div className="relative p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
         {/* Left */}
         <div className="flex flex-col gap-3">
@@ -151,17 +148,21 @@ function AccountHero({ user, trial }: { user: UserInfo; trial?: FreeTrialStatus 
             <div className="pb-2 md:pb-3 flex flex-col gap-1.5 md:gap-2">
               {isPremium ? (
                 <>
-                  <span className={`text-[11px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-[4px] border border-current/25 ${color} bg-current/10 w-max`}>
-                    生效中
+                  <span className={`flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-[4px] border border-current/25 ${color} bg-current/10 w-max`}>
+                    <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse shadow-[0_0_8px_currentColor]" />
+                    SYSTEM ONLINE
                   </span>
                   {daysLeft > 0 && (
-                    <span className={`text-[11px] font-mono ${daysLeft <= 7 ? "text-red-400 animate-pulse" : daysLeft <= 30 ? "text-amber-400" : "text-zinc-500"} whitespace-nowrap`}>
+                    <span className={`text-[11px] font-mono ${daysLeft <= 7 ? "text-[#FF1744] animate-pulse glow-red" : daysLeft <= 30 ? "text-amber-400" : "text-zinc-500"} whitespace-nowrap`}>
                       剩余 {daysLeft} 天 · 到期 {expiryStr}
                     </span>
                   )}
                 </>
               ) : (
-                <span className="text-[11px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-[4px] border border-zinc-700/50 text-zinc-400 bg-zinc-700/10 w-max">未开通</span>
+                <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-[4px] border border-zinc-700/50 text-zinc-500 bg-zinc-800/30 w-max">
+                  <span className="h-1.5 w-1.5 rounded-full bg-zinc-600" />
+                  OFFLINE
+                </span>
               )}
             </div>
           </div>
@@ -224,29 +225,31 @@ function FeatureTable({ plansData }: { plansData: PlansResponse | undefined }) {
   }
 
   return (
-    <div className="rounded-2xl bg-[#0a0a0a] border border-white/5 overflow-hidden">
+    <div className="rounded-2xl backdrop-blur-lg bg-[#0a0d14]/60 border border-white/[0.04] overflow-hidden shadow-2xl">
       {/* Header */}
-      <div className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_90px_110px_120px] border-b border-white/[0.06] bg-black/30">
+      <div className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_90px_110px_120px] border-b border-white/[0.06] bg-[#0A0D14]/90">
         <div className="px-4 sm:px-6 py-5 text-[11px] font-black font-mono uppercase tracking-[0.25em] text-zinc-500 flex items-center gap-2">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="square" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
-          等级权益对比
+          ACCESS PRIVILEGES [MATRIX]
         </div>
         {/* Free */}
-        <div className="py-5 text-center border-l border-white/[0.04]">
+        <div className="py-5 text-center border-l border-white/[0.02]">
           <div className="text-[10px] sm:text-[11px] font-black font-mono uppercase tracking-widest text-zinc-500">免费</div>
-          <div className="text-[10px] text-zinc-500 bg-zinc-800/50 inline-block px-2 py-0.5 rounded mt-1.5 font-bold">$0 / M</div>
+          <div className="text-[10px] text-zinc-500 bg-white/[0.02] border border-white/[0.04] inline-block px-2 py-0.5 rounded mt-1.5 font-bold">$0 / M</div>
         </div>
         {/* Pro */}
-        <div className="py-5 text-center border-l border-indigo-500/10 bg-indigo-500/[0.03]">
-          <div className="text-[10px] sm:text-[11px] font-black font-mono uppercase tracking-widest text-indigo-400">专业</div>
-          <div className="text-[10px] text-indigo-300 bg-indigo-500/10 border border-indigo-500/15 inline-block px-2 py-0.5 rounded mt-1.5 font-bold">${proPrice} / M</div>
+        <div className="py-5 text-center border-l border-[#00E5FF]/10 bg-[#00E5FF]/[0.02] relative overflow-hidden">
+          <div className="absolute top-0 inset-x-0 h-[1px] bg-[#00E5FF]/30" />
+          <div className="text-[10px] sm:text-[11px] font-black font-mono uppercase tracking-widest text-[#00E5FF] drop-shadow-[0_0_8px_rgba(0,229,255,0.4)]">专业</div>
+          <div className="text-[10px] text-[#00E5FF] bg-[#00E5FF]/10 border border-[#00E5FF]/20 inline-block px-2 py-0.5 rounded mt-1.5 font-bold">${proPrice} / M</div>
         </div>
         {/* Flagship */}
-        <div className="py-5 text-center border-l border-[#F5A623]/10 bg-[#F5A623]/[0.03]">
-          <div className="text-[10px] sm:text-[11px] font-black font-mono uppercase tracking-widest text-[#F5A623]">旗舰</div>
-          <div className="text-[10px] text-[#F5A623] bg-[#F5A623]/10 border border-[#F5A623]/15 inline-block px-2 py-0.5 rounded mt-1.5 font-bold">${flagPrice} / M</div>
+        <div className="py-5 text-center border-l border-amber-500/10 bg-amber-500/[0.02] relative overflow-hidden">
+          <div className="absolute top-0 inset-x-0 h-[1px] bg-amber-500/40" />
+          <div className="text-[10px] sm:text-[11px] font-black font-mono uppercase tracking-widest text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]">旗舰</div>
+          <div className="text-[10px] text-amber-400 bg-amber-500/10 border border-amber-500/20 inline-block px-2 py-0.5 rounded mt-1.5 font-bold">${flagPrice} / M</div>
         </div>
       </div>
 
@@ -264,18 +267,18 @@ function FeatureTable({ plansData }: { plansData: PlansResponse | undefined }) {
               initial={{ opacity: 0, x: -4 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: (si * rows.length + fi) * 0.03 }}
-              className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_90px_110px_120px] border-t border-white/[0.03] group hover:bg-white/[0.015] transition-colors"
+              className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_90px_110px_120px] border-b border-white/[0.02] group hover:bg-white/[0.015] transition-colors"
             >
               <div className="px-4 sm:px-6 py-4 text-[11px] sm:text-xs text-zinc-400 font-mono tracking-wide group-hover:text-zinc-200 transition-colors uppercase">
                 {f.name}
               </div>
-              <div className="py-4 flex items-center justify-center border-l border-white/[0.03]">
+              <div className="py-4 flex items-center justify-center border-l border-white/[0.02]">
                 <Cell value={f.free} tier="free" />
               </div>
-              <div className="py-4 flex items-center justify-center border-l border-indigo-500/[0.07] bg-indigo-500/[0.02]">
+              <div className="py-4 flex items-center justify-center border-l border-[#00E5FF]/[0.07] bg-[#00E5FF]/[0.02]">
                 <Cell value={f.pro} tier="pro" />
               </div>
-              <div className="py-4 flex items-center justify-center border-l border-[#F5A623]/[0.07] bg-[#F5A623]/[0.02]">
+              <div className="py-4 flex items-center justify-center border-l border-amber-500/[0.07] bg-amber-500/[0.02]">
                 <Cell value={f.flagship} tier="flagship" />
               </div>
             </motion.div>
@@ -398,21 +401,28 @@ function CheckoutSidebar({
   const selectedPack = packsToShow.find(p => p.plan === selectedCredits) ?? packsToShow[0];
 
   return (
-    <div className={`sticky top-24 rounded-2xl bg-[#0a0a0a] border ${accentBorder} overflow-hidden ${tab === "credits" ? "shadow-[0_0_25px_rgba(52,211,153,0.12)]" : accentGlow}`}>
+    <div className={`sticky top-24 rounded-2xl bg-[#0a0d14]/80 backdrop-blur-2xl border ${accentBorder} overflow-hidden shadow-2xl`}>
       {/* Tab Switch */}
-      <div className="flex border-b border-white/[0.05]">
-        {(["sub", "credits"] as const).map((t) => (
-          <button key={t} onClick={() => setTab(t)}
-            className={`flex-1 py-4 text-[11px] font-black font-mono uppercase tracking-[0.2em] transition-all ${
-              tab === t
-                ? t === "credits"
-                  ? "text-emerald-400 border-b-2 border-emerald-500 bg-emerald-500/5 shadow-[inset_0_-2px_8px_rgba(52,211,153,0.1)]"
-                  : "text-white border-b-2 border-indigo-500 bg-indigo-500/5 shadow-[inset_0_-2px_8px_rgba(99,102,241,0.1)]"
-                : "text-zinc-500 hover:text-zinc-300 bg-black/20"
-            }`}>
-            {t === "sub" ? "订阅套餐" : "积分充值"}
-          </button>
-        ))}
+      <div className="p-2 border-b border-white/[0.05]">
+        <div className="relative flex p-1 bg-black/40 rounded-lg border border-white/[0.06]">
+          {(["sub", "credits"] as const).map((t) => (
+            <button key={t} onClick={() => setTab(t)}
+              className={`relative flex-1 py-3 text-[11px] font-black font-mono uppercase tracking-[0.2em] z-10 transition-colors ${
+                tab === t
+                  ? t === "credits" ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" : "text-[#00E5FF] drop-shadow-[0_0_8px_rgba(0,229,255,0.5)]"
+                  : "text-zinc-500 hover:text-zinc-300"
+              }`}>
+              {t === "sub" ? "订阅套餐" : "积分充值"}
+              {tab === t && (
+                <motion.div
+                  layoutId="checkoutTab"
+                  className={`absolute inset-0 rounded-md -z-10 ${t === "credits" ? "bg-emerald-500/10 border border-emerald-500/20" : "bg-[#00E5FF]/10 border border-[#00E5FF]/20"}`}
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
       </div>
 
       <AnimatePresence mode="wait">
@@ -497,13 +507,24 @@ function CheckoutSidebar({
             {/* Plan Toggle */}
             <div>
               <p className="text-[10px] font-black font-mono uppercase tracking-[0.2em] text-zinc-500 mb-3">套餐</p>
-              <div className="relative flex p-1.5 bg-black rounded-lg border border-white/[0.08]">
-                <div className={`absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] rounded-md transition-all duration-400 ease-out ${isFlagship ? "left-[calc(50%+1.5px)] bg-[#F5A623] shadow-[0_0_15px_rgba(245,166,35,0.4)]" : "left-1.5 bg-indigo-600 shadow-[0_0_15px_rgba(99,102,241,0.4)]"}`} />
+              <div className="grid grid-cols-2 gap-3">
                 {[{ plan: 1, label: "专业", price: proPrice }, { plan: 2, label: "旗舰", price: flagshipPrice }].map(p => (
-                  <button key={p.plan} onClick={() => setSelectedPlan(p.plan)}
-                    className={`flex-1 relative z-10 py-3 flex flex-col items-center gap-1.5 rounded-md transition-colors ${selectedPlan === p.plan ? (p.plan === 2 ? "text-black" : "text-white") : "text-zinc-500 hover:text-zinc-300"}`}>
-                    <span className="text-xs font-black font-mono uppercase tracking-wider">{p.label}</span>
-                    <span className={`text-[10px] font-mono font-bold ${selectedPlan === p.plan ? "opacity-70" : "opacity-40"}`}>${p.price}/月</span>
+                  <button key={p.plan} onClick={() => setSelectedPlan(p.plan as 1|2)}
+                    className={`relative flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300 ${
+                      selectedPlan === p.plan
+                        ? p.plan === 2
+                          ? "border-amber-500/50 bg-amber-500/10 shadow-[inset_0_0_20px_rgba(251,191,36,0.15)] ring-1 ring-amber-500"
+                          : "border-[#00E5FF]/50 bg-[#00E5FF]/10 shadow-[inset_0_0_20px_rgba(0,229,255,0.15)] ring-1 ring-[#00E5FF]"
+                        : "border-white/[0.06] bg-[#0A0D14]/80 hover:border-white/15 hover:bg-white/[0.02]"
+                    }`}>
+                    <span className={`text-[13px] font-black font-mono uppercase tracking-widest ${selectedPlan === p.plan ? (p.plan === 2 ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]" : "text-[#00E5FF] drop-shadow-[0_0_8px_rgba(0,229,255,0.5)]") : "text-zinc-400"}`}>{p.label}</span>
+                    <span className={`mt-1.5 text-[11px] font-mono font-bold ${selectedPlan === p.plan ? (p.plan === 2 ? "text-amber-300/80" : "text-[#00E5FF]/80") : "text-zinc-500"}`}>${p.price}/月</span>
+                    {selectedPlan === p.plan && (
+                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${p.plan === 2 ? "bg-amber-400" : "bg-[#00E5FF]"}`}></span>
+                        <span className={`relative inline-flex rounded-full h-3 w-3 ${p.plan === 2 ? "bg-amber-500 shadow-[0_0_8px_rgba(251,191,36,0.8)]" : "bg-[#00E5FF] shadow-[0_0_8px_rgba(0,229,255,0.8)]"}`}></span>
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -516,9 +537,13 @@ function CheckoutSidebar({
                 {DURATION_OPTS.map(opt => (
                   <button key={opt.m} onClick={() => setSelectedDuration(opt.m)}
                     className={`relative rounded-xl border py-3.5 flex flex-col items-center gap-1 transition-all ${selectedDuration === opt.m ? "bg-white/[0.08] border-white/30 shadow-[inset_0_2px_10px_rgba(255,255,255,0.05)]" : "bg-black/50 border-white/[0.06] hover:border-white/15"}`}>
-                    <span className={`text-[11px] md:text-xs font-black font-mono uppercase tracking-widest ${selectedDuration === opt.m ? "text-white" : "text-zinc-500"}`}>{opt.label}</span>
+                    <span className={`text-[11px] md:text-xs font-black font-mono uppercase tracking-widest ${selectedDuration === opt.m ? "text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]" : "text-zinc-500"}`}>{opt.label}</span>
                     {opt.badge && (
-                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-[2px] bg-red-500/15 border border-red-500/30 text-red-400 text-[9px] font-black rounded-sm whitespace-nowrap shadow-[0_2px_8px_rgba(239,68,68,0.2)]">
+                      <span className={`absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-[2px] border text-[9px] font-black rounded-sm whitespace-nowrap ${
+                        selectedDuration === opt.m 
+                          ? "bg-[#FF1744]/20 border-[#FF1744]/40 text-[#FF1744] shadow-[0_0_10px_rgba(255,23,68,0.4)]"
+                          : "bg-[#FF1744]/10 border-[#FF1744]/20 text-[#FF1744]/70"
+                      }`}>
                         {opt.badge}
                       </span>
                     )}
@@ -561,14 +586,16 @@ function CheckoutSidebar({
               </div>
 
               <button onClick={() => handleCreatePayment("sub")} disabled={creating}
-                className={`group relative w-full rounded-xl h-14 md:h-16 py-4 flex items-center justify-center gap-3 font-mono text-xs md:text-sm font-black uppercase tracking-[0.2em] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${isFlagship
-                  ? "bg-[#F5A623] hover:bg-[#f0a010] text-black shadow-[0_0_25px_rgba(245,166,35,0.25)] hover:shadow-[0_0_40px_rgba(245,166,35,0.5)] scale-100 active:scale-95"
-                  : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_25px_rgba(99,102,241,0.25)] hover:shadow-[0_0_40px_rgba(99,102,241,0.5)] scale-100 active:scale-95"}`}>
+                className={`btn-primary relative w-full h-14 md:h-16 flex items-center justify-center gap-3 font-mono text-xs md:text-sm font-black uppercase tracking-[0.15em] border ${
+                  isFlagship 
+                  ? "bg-gradient-to-r from-amber-600 to-amber-400 border-amber-400/50 shadow-[0_0_25px_rgba(251,191,36,0.3)] hover:shadow-[0_0_40px_rgba(251,191,36,0.6)]" 
+                  : "bg-gradient-to-r from-[#00E5FF] to-fuchsia-600 border-[#00E5FF]/50 shadow-[0_0_25px_rgba(0,229,255,0.3)] hover:shadow-[0_0_40px_rgba(0,229,255,0.6)]"
+                }`}>
                 {creating ? (
-                  <><span className="animate-spin w-5 h-5 border-[3px] border-current border-t-transparent rounded-full" /> 创建中</>
+                  <><span className="animate-spin w-5 h-5 border-[3px] border-white/20 border-t-white rounded-full" /> 终端连线中...</>
                 ) : (
                   <>支付 ${selectedTotal} USDT
-                    <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </>
@@ -576,12 +603,13 @@ function CheckoutSidebar({
               </button>
 
               {error && (
-                <div className="mt-3 bg-red-500/8 border border-red-500/20 p-3 rounded-lg">
-                  <p className="text-[9px] font-mono font-bold text-red-400 text-center">{error}</p>
+                <div className="mt-3 bg-[#FF1744]/10 border border-[#FF1744]/20 p-3 rounded-lg">
+                  <p className="text-[9px] font-mono font-bold text-[#FF1744] text-center">{error}</p>
                 </div>
               )}
               <p className="mt-3 text-[8px] font-mono text-zinc-500 text-center leading-relaxed">
-                到账后自动升级 · 链上不可退款 · 到期后恢复免费等级
+                [SECURE CONNECTION ALIVE | NODE VERIFIED] <br/>
+                到账后自动发放入库 · 链上智能合约结算不可退 · 到期后权限回收
               </p>
             </div>
           </motion.div>
@@ -665,12 +693,12 @@ function CheckoutSidebar({
               </div>
 
               <button onClick={() => handleCreatePayment("credits", selectedCredits)} disabled={creating || !selectedPack}
-                className="group relative w-full rounded-xl h-14 md:h-16 py-4 flex items-center justify-center gap-3 font-mono text-xs md:text-sm font-black uppercase tracking-[0.2em] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_25px_rgba(52,211,153,0.25)] hover:shadow-[0_0_40px_rgba(52,211,153,0.5)] scale-100 active:scale-95">
+                className="btn-primary relative w-full h-14 md:h-16 flex items-center justify-center gap-3 font-mono text-xs md:text-sm font-black uppercase tracking-[0.15em] border bg-gradient-to-r from-emerald-500 to-emerald-400 border-emerald-400/50 shadow-[0_0_25px_rgba(52,211,153,0.3)] hover:shadow-[0_0_40px_rgba(52,211,153,0.6)]">
                 {creating ? (
-                  <><span className="animate-spin w-5 h-5 border-[3px] border-current border-t-transparent rounded-full" /> 创建中</>
+                  <><span className="animate-spin w-5 h-5 border-[3px] border-white/20 border-t-white rounded-full" /> 终端连线中...</>
                 ) : (
                   <>充值 {selectedPack?.credits ?? "--"}
-                    <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </>
@@ -678,12 +706,13 @@ function CheckoutSidebar({
               </button>
 
               {error && (
-                <div className="mt-3 bg-red-500/8 border border-red-500/20 p-3 rounded-lg">
-                  <p className="text-[9px] font-mono font-bold text-red-400 text-center">{error}</p>
+                <div className="mt-3 bg-[#FF1744]/10 border border-[#FF1744]/20 p-3 rounded-lg">
+                  <p className="text-[9px] font-mono font-bold text-[#FF1744] text-center">{error}</p>
                 </div>
               )}
               <p className="mt-3 text-[8px] font-mono text-zinc-500 text-center leading-relaxed">
-                到账后自动到账 · 永久有效 · 用完即止 · 链上不可退款
+                [SECURE CONNECTION ALIVE | NODE VERIFIED] <br/>
+                到账后立刻执行链上空投积分 · 永久有效 · 数据不可逆回滚
               </p>
             </div>
           </motion.div>
@@ -761,7 +790,7 @@ export default function MembershipPage() {
   }, [queryClient, selectedPlan, selectedNetwork, selectedDuration]);
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto text-white selection:bg-indigo-500/30">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto text-white selection:bg-[#00E5FF]/30">
       {/* Header */}
       <div className="mb-8 md:mb-12">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-mono tracking-tighter uppercase mb-3 text-white">会员中心</h1>
