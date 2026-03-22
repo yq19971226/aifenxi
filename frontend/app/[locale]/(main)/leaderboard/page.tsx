@@ -32,12 +32,12 @@ type LeaderboardPeriod = (typeof PERIOD_KEYS)[number];
 type LeaderboardMode = (typeof MODE_KEYS)[number];
 
 const MODE_ICON: Record<string, React.ReactNode> = {
-  intraday: <Clock size={20} className="text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]" />,
+  intraday: <Clock size={20} className="text-[#00E5FF] drop-shadow-[0_0_8px_rgba(0,229,255,0.6)]" />,
   trend: <TrendingUp size={20} className="text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" />,
 };
 const MODE_COLOR: Record<string, string> = {
-  intraday: "text-blue-400 drop-shadow-[0_0_5px_rgba(96,165,250,0.4)]",
-  trend: "text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.4)]",
+  intraday: "text-[#00E5FF] drop-shadow-[0_0_15px_rgba(0,229,255,0.5)] glow-cyan",
+  trend: "text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)] glow-emerald",
 };
 
 /* ── System Accuracy Hero Panel ── */
@@ -56,11 +56,12 @@ function SystemAccuracyHero({
   const overallWr = totalSettled > 0 ? totalWins / totalSettled : 0;
 
   return (
-    <div className="relative border border-white/[0.05] bg-black/40 overflow-hidden shadow-2xl">
+    <div className="relative border border-white/[0.05] bg-[#0a0d14]/90 backdrop-blur-3xl overflow-hidden shadow-2xl">
       <div className="absolute top-0 right-0 w-32 h-[1px] bg-gradient-to-r from-transparent to-indigo-500/50" />
       <div className="absolute bottom-0 left-0 w-32 h-[1px] bg-gradient-to-l from-transparent to-indigo-500/50" />
+      <div className="absolute inset-0 bg-scanline pointer-events-none opacity-40" />
       
-      <div className="px-6 py-5 border-b border-white/[0.05] flex items-center justify-between bg-white/[0.01]">
+      <div className="relative z-10 px-6 py-5 border-b border-white/[0.05] flex items-center justify-between bg-white/[0.01]">
         <div className="flex items-center gap-4">
           <span className="flex h-8 w-8 items-center justify-center bg-indigo-500/10 border border-indigo-500/30 shadow-[0_0_10px_rgba(99,102,241,0.2)]">
             <Target size={16} className="text-indigo-400" />
@@ -82,7 +83,7 @@ function SystemAccuracyHero({
               <div className="absolute inset-x-0 -top-[1px] h-[1px] w-1/2 mx-auto bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="mb-4">{MODE_ICON[m.mode] || <Target size={20} className="text-zinc-500" />}</div>
               <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest font-mono mb-2">{t(`modes.${m.mode}`)}</span>
-              <span className={`text-3xl font-black tracking-tight font-mono ${MODE_COLOR[m.mode] || "text-white"}`}>
+              <span className={`text-3xl md:text-5xl font-black tracking-tighter font-mono ${MODE_COLOR[m.mode] || "text-white"}`}>
                 {(m.win_rate * 100).toFixed(1)}%
               </span>
               <span className="text-[9px] uppercase font-bold text-zinc-400 tracking-[0.2em] font-mono mt-2">{t("accuracy.winRate")}</span>
@@ -199,15 +200,15 @@ export default function LeaderboardPage() {
 
       {/* Filters HUD */}
       <div className="flex items-center gap-6 flex-wrap px-2 border-b border-white/[0.05] pb-2">
-        <div className="flex items-center gap-3">
+        <div className="flex p-1 bg-black/40 rounded-lg border border-white/[0.06]">
           {periods.map((p) => (
-            <TabButton key={p.value} active={period === p.value} label={p.label} onClick={() => handlePeriod(p.value)} />
+            <TabButton key={p.value} active={period === p.value} label={p.label} onClick={() => handlePeriod(p.value)} groupId="period" />
           ))}
         </div>
         <div className="h-4 w-px bg-white/10" />
-        <div className="flex items-center gap-3">
+        <div className="flex p-1 bg-black/40 rounded-lg border border-white/[0.06]">
           {modes.map((m) => (
-            <TabButton key={m.value} active={mode === m.value} label={m.label} onClick={() => handleMode(m.value)} />
+            <TabButton key={m.value} active={mode === m.value} label={m.label} onClick={() => handleMode(m.value)} groupId="mode" />
           ))}
         </div>
       </div>

@@ -142,7 +142,7 @@ function AccountHero({ user, trial }: { user: UserInfo; trial?: FreeTrialStatus 
             <span className="text-[10px] font-mono text-zinc-400 bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.06]">{user.email}</span>
           </div>
           <div className="flex items-end gap-3 md:gap-4">
-            <h2 className={`text-6xl md:text-7xl font-black font-mono tracking-tighter uppercase ${color} drop-shadow-[0_0_20px_currentColor/0.3]`}>
+            <h2 className={`text-6xl md:text-7xl font-black font-mono tracking-tighter uppercase ${color}`}>
               {name}
             </h2>
             <div className="pb-2 md:pb-3 flex flex-col gap-1.5 md:gap-2">
@@ -385,9 +385,9 @@ function CheckoutSidebar({
   const statusMsg = currentPayment ? getPaymentStatusMessage(currentPayment.status, currentPayment.status_reason, isExpired) : "";
 
   const accentGlow = isFlagship
-    ? "shadow-[0_0_25px_rgba(245,166,35,0.15)]"
-    : "shadow-[0_0_25px_rgba(99,102,241,0.15)]";
-  const accentBorder = tab === "credits" ? "border-emerald-500/20" : isFlagship ? "border-[#F5A623]/20" : "border-indigo-500/20";
+    ? "shadow-[0_0_25px_rgba(251,191,36,0.15)]"
+    : "shadow-[0_0_25px_rgba(0,229,255,0.15)]";
+  const accentBorder = tab === "credits" ? "border-emerald-500/20" : isFlagship ? "border-amber-500/20" : "border-[#00E5FF]/20";
 
   // 动态积分包：由后台配置驱动，加载期间使用空占位
   const packsToShow: Array<{ plan: 3|4|5; label: string; credits: string; price: number; desc: string }> =
@@ -401,7 +401,7 @@ function CheckoutSidebar({
   const selectedPack = packsToShow.find(p => p.plan === selectedCredits) ?? packsToShow[0];
 
   return (
-    <div className={`sticky top-24 rounded-2xl bg-[#0a0d14]/80 backdrop-blur-2xl border ${accentBorder} overflow-hidden shadow-2xl`}>
+    <div className={`sticky top-24 rounded-2xl bg-[#0a0d14]/80 backdrop-blur-2xl border ${accentBorder} overflow-hidden ${tab === "credits" ? "shadow-[0_0_25px_rgba(52,211,153,0.12)]" : accentGlow}`}>
       {/* Tab Switch */}
       <div className="p-2 border-b border-white/[0.05]">
         <div className="relative flex p-1 bg-black/40 rounded-lg border border-white/[0.06]">

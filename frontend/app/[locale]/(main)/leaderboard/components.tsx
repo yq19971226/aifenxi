@@ -65,22 +65,31 @@ export function TabButton({
   active,
   label,
   onClick,
+  groupId = "default",
 }: {
   active: boolean;
   label: string;
   onClick: () => void;
+  groupId?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`px-4 py-2 font-mono text-[10px] uppercase tracking-[0.2em] font-black transition-all ${
+      className={`relative px-4 py-2 font-mono text-[10px] uppercase tracking-[0.2em] font-black transition-colors z-10 ${
         active
-          ? "bg-indigo-500/10 text-indigo-400 border-b-2 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
-          : "text-zinc-500 hover:text-white border-b-2 border-transparent hover:border-white/10"
+          ? "text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]"
+          : "text-zinc-500 hover:text-white"
       }`}
     >
       {label}
+      {active && (
+        <motion.div
+          layoutId={`tab-${groupId}`}
+          className="absolute inset-0 bg-indigo-500/10 border border-indigo-500/30 rounded-md -z-10 shadow-[0_0_15px_rgba(99,102,241,0.15)]"
+          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+        />
+      )}
     </button>
   );
 }
@@ -90,7 +99,7 @@ export function SystemReportBar({ report }: { report: SystemReport }) {
   const t = useTranslations("leaderboard");
 
   return (
-    <div className="relative border border-white/[0.05] bg-black/60 shadow-2xl overflow-hidden mt-6 group">
+    <div className="relative border border-white/[0.05] bg-[#0a0d14]/80 backdrop-blur-xl shadow-2xl overflow-hidden mt-6 group">
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/[0.1] to-transparent" />
       <button
         type="button"
@@ -105,8 +114,8 @@ export function SystemReportBar({ report }: { report: SystemReport }) {
             <span className="text-[11px] font-black font-mono text-white tracking-[0.2em] uppercase">{t("comp.systemPerf")}</span>
           </div>
           <div className="flex items-center gap-6">
-            <span className="text-[10px] uppercase font-bold font-mono text-zinc-500 tracking-widest">{t("comp.winRate")} <span className="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">{report.win_rate != null ? `${(report.win_rate * 100).toFixed(1)}%` : "—"}</span></span>
-            <span className="text-[10px] uppercase font-bold font-mono text-zinc-500 tracking-widest hidden sm:inline">{t("comp.profitFactor")} <span className="text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]">{formatPF(report.profit_factor)}</span></span>
+            <span className="text-[10px] uppercase font-bold font-mono text-zinc-500 tracking-widest">{t("comp.winRate")} <span className="text-[#00E5FF] drop-shadow-[0_0_8px_rgba(0,229,255,0.5)]">{report.win_rate != null ? `${(report.win_rate * 100).toFixed(1)}%` : "—"}</span></span>
+            <span className="text-[10px] uppercase font-bold font-mono text-zinc-500 tracking-widest hidden sm:inline">{t("comp.profitFactor")} <span className="text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">{formatPF(report.profit_factor)}</span></span>
           </div>
         </div>
         <ChevronDown
@@ -129,12 +138,12 @@ export function SystemReportBar({ report }: { report: SystemReport }) {
               <StatCell
                 label={t("comp.winRate")}
                 value={report.win_rate != null ? `${(report.win_rate * 100).toFixed(1)}%` : "—"}
-                valueClass="text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]"
+                valueClass="text-[#00E5FF] drop-shadow-[0_0_15px_rgba(0,229,255,0.6)]"
               />
               <StatCell
                 label={t("comp.profitFactor")}
                 value={formatPF(report.profit_factor)}
-                valueClass="text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]"
+                valueClass="text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]"
               />
             </div>
           </motion.div>
@@ -154,22 +163,23 @@ const PodiumCard = ({ entry, rank, t, isMe }: { entry: RankingEntry, rank: numbe
   const pfValue = entry.profit_factor || 0;
   const isHighPF = pfValue >= 2.0 && pfValue < 99;
   
-  const borderColors = isGold ? "border-amber-500/50 hover:border-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.15)]" : 
-                       isSilver ? "border-zinc-300/40 hover:border-zinc-300/80 shadow-[0_0_20px_rgba(212,212,216,0.1)]" : 
-                       "border-orange-700/50 hover:border-orange-500/80 shadow-[0_0_20px_rgba(194,65,12,0.1)]";
+  const borderColors = isGold ? "border-amber-500/50 hover:border-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.15)] ring-1 ring-amber-500/30" : 
+                       isSilver ? "border-[#00E5FF]/40 hover:border-[#00E5FF]/80 shadow-[0_0_20px_rgba(0,229,255,0.15)] ring-1 ring-[#00E5FF]/30" : 
+                       "border-fuchsia-500/40 hover:border-fuchsia-500/80 shadow-[0_0_20px_rgba(217,70,239,0.15)] ring-1 ring-fuchsia-500/30";
   
-  const iconColors = isGold ? "text-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]" : 
-                     isSilver ? "text-zinc-300 drop-shadow-[0_0_8px_rgba(212,212,216,0.8)]" : 
-                     "text-orange-500 drop-shadow-[0_0_8px_rgba(194,65,12,0.8)]";
+  const iconColors = isGold ? "text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]" : 
+                     isSilver ? "text-[#00E5FF] drop-shadow-[0_0_10px_rgba(0,229,255,0.8)]" : 
+                     "text-fuchsia-400 drop-shadow-[0_0_10px_rgba(217,70,239,0.8)]";
 
   const heightClass = isGold ? "md:-mt-6 z-10" : "mt-0 z-0 opacity-90 hover:opacity-100";
   
   return (
-    <div className={`relative bg-black/80 backdrop-blur-md border ${borderColors} p-6 flex flex-col items-center text-center transition-all duration-300 group overflow-hidden ${heightClass} ${isMe ? 'ring-2 ring-indigo-500/50' : ''}`}>
+    <div className={`relative bg-[#0a0d14]/80 backdrop-blur-xl border ${borderColors} p-6 flex flex-col items-center text-center transition-all duration-300 group overflow-hidden ${heightClass} ${isMe ? 'ring-2 ring-indigo-500/50' : ''}`}>
+      <div className="absolute inset-0 bg-scanline pointer-events-none opacity-25" />
       {/* Glow background */}
-      {isGold && <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent pointer-events-none" />}
-      {isSilver && <div className="absolute inset-0 bg-gradient-to-b from-zinc-400/10 to-transparent pointer-events-none" />}
-      {isBronze && <div className="absolute inset-0 bg-gradient-to-b from-orange-600/10 to-transparent pointer-events-none" />}
+      {isGold && <div className="absolute inset-0 bg-gradient-to-b from-amber-500/15 to-transparent pointer-events-none" />}
+      {isSilver && <div className="absolute inset-0 bg-gradient-to-b from-[#00E5FF]/10 to-transparent pointer-events-none" />}
+      {isBronze && <div className="absolute inset-0 bg-gradient-to-b from-fuchsia-500/10 to-transparent pointer-events-none" />}
       
       {/* Decorative corners */}
       <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20" />
@@ -315,13 +325,13 @@ export function RankingTable({
                   return (
                     <tr
                       key={entry.rank}
-                      className={`transition-colors group ${
+                      className={`transition-all duration-300 group ${
                         isMe ? "bg-indigo-500/[0.05]" : "hover:bg-white/[0.02]"
                       }`}
                     >
                       <td className="px-6 py-4 relative">
-                        {isMe && <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500" />}
-                        <span className="text-[11px] font-mono font-black text-zinc-400">{entry.rank}</span>
+                        <div className={`absolute left-0 top-0 bottom-0 w-[2px] opacity-0 group-hover:opacity-100 transition-opacity ${isMe ? "bg-indigo-500 opacity-100" : "bg-[#00E5FF] shadow-[0_0_10px_rgba(0,229,255,0.8)]"}`} />
+                        <span className="text-[11px] font-mono font-black text-zinc-400 group-hover:text-white transition-colors">{entry.rank}</span>
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-xs text-white font-mono font-bold tracking-wider">{entry.anonymous_id}</span>

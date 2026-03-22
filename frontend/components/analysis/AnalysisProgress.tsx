@@ -71,19 +71,22 @@ function StatusIcon({ status }: { status: ProgressStatus | "pending" }) {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 400, damping: 20 }}
-          className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20"
+          className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.3)] border border-emerald-500/30"
         >
-          <Check className="h-3 w-3 text-emerald-400" />
+          <Check className="h-3 w-3 text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.8)]" />
         </motion.div>
       );
     case "running":
       return (
         <motion.div
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-          className="flex h-5 w-5 items-center justify-center"
+          className="relative flex h-5 w-5 items-center justify-center"
         >
-          <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+          <motion.div 
+            animate={{ scale: [1, 1.5, 1], opacity: [0.8, 0, 0.8] }} 
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }} 
+            className="absolute inset-0 rounded-full border border-blue-400/50" 
+          />
+          <Loader2 className="h-3 w-3 animate-spin text-blue-400 drop-shadow-[0_0_5px_rgba(96,165,250,0.8)]" />
         </motion.div>
       );
     case "failed":
@@ -231,9 +234,9 @@ function OrbitalSpinner({ progress }: { progress: number }) {
 
       {/* Center percent */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-lg font-black font-mono text-zinc-300 tabular-nums">
+        <span className="text-xl font-black font-mono text-[#00E5FF] drop-shadow-[0_0_15px_rgba(0,229,255,0.6)] glow-cyan tabular-nums">
           {Math.round(progress)}
-          <span className="text-[10px] text-zinc-500">%</span>
+          <span className="text-[10px] text-[#00E5FF]/80 ml-0.5">%</span>
         </span>
       </div>
     </div>
@@ -360,10 +363,11 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="relative flex flex-col items-center justify-center py-16 overflow-hidden rounded-xl"
+        className="relative flex flex-col items-center justify-center py-16 overflow-hidden rounded-xl border border-white/[0.05] bg-[#0a0d14]/90 backdrop-blur-3xl shadow-2xl"
       >
         {/* Radial glow background */}
         <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-scanline opacity-30" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250px] h-[250px] rounded-full bg-indigo-500/[0.06] blur-[80px]" />
         </div>
 
@@ -395,14 +399,15 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="rounded-xl border border-white/[0.06] overflow-hidden"
+      className="rounded-xl border border-white/[0.06] overflow-hidden bg-[#0a0d14]/90 backdrop-blur-3xl shadow-2xl"
     >
       {/* ── Hero Section: Orbital Spinner + Phase Text ── */}
-      <div className="relative flex flex-col items-center py-8 overflow-hidden bg-white/[0.01]">
+      <div className="relative flex flex-col items-center py-8 overflow-hidden border-b border-white/[0.04] bg-white/[0.01]">
         {/* Radial ambient glow */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-indigo-500/[0.04] blur-[80px]" />
-          <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full bg-emerald-500/[0.03] blur-[60px]" />
+          <div className="absolute inset-0 bg-scanline opacity-30" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-indigo-500/[0.06] blur-[80px]" />
+          <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full bg-[#00E5FF]/[0.03] blur-[60px]" />
         </div>
 
         <div className="relative z-10 flex flex-col items-center">
@@ -489,8 +494,8 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
                       <StatusIcon status={step.status} />
                     </div>
                     {!isLast && (
-                      <div className={`w-px flex-1 min-h-[12px] ${
-                        step.status === "completed" ? "bg-emerald-500/20" : "bg-white/[0.06]"
+                      <div className={`w-[2px] flex-1 min-h-[12px] opacity-80 ${
+                        step.status === "completed" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-white/[0.06]"
                       }`} />
                     )}
                   </div>
@@ -540,15 +545,15 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
             initial={{ opacity: 0, width: 0 }}
             animate={{ opacity: 1, width: "auto" }}
             transition={{ duration: 0.4 }}
-            className="lg:w-[260px] lg:border-l border-t lg:border-t-0 border-white/[0.04] max-h-[220px] overflow-y-auto scrollbar-thin bg-black/20"
+            className="lg:w-[260px] lg:border-l border-t lg:border-t-0 border-emerald-500/20 max-h-[220px] overflow-y-auto scrollbar-thin bg-black/40 shadow-[-10px_0_30px_rgba(16,185,129,0.05)]"
           >
-            <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-white/[0.04] sticky top-0 bg-[#0a0a0c]/90 backdrop-blur-sm z-10">
-              <Terminal size={10} className="text-emerald-500" />
-              <span className="text-[10px] font-bold tracking-wider text-emerald-500/80">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-emerald-500/20 sticky top-0 bg-[#0a0d14]/90 backdrop-blur-md z-10">
+              <Terminal size={10} className="text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.8)]" />
+              <span className="text-[10px] font-bold tracking-widest text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)] font-mono">
                 LIVE FEED
               </span>
               <motion.span
-                className="h-1.5 w-1.5 rounded-full bg-emerald-500 ml-auto"
+                className="h-1.5 w-1.5 rounded-full bg-emerald-400 ml-auto shadow-[0_0_10px_rgba(16,185,129,1)]"
                 animate={{ opacity: [1, 0.3, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               />
