@@ -15,6 +15,8 @@ import { AnalysisProgress } from "@/components/analysis/AnalysisProgress";
 import { AnalysisReport } from "@/components/analysis/AnalysisReport";
 import { useAuth } from "@/lib/auth-context";
 import { effectiveLevel } from "@/lib/utils/membershipLevel";
+import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
+import { MaintenancePlaceholder } from "@/components/layout/MaintenancePlaceholder";
 import { Lock, RefreshCw, Brain, Square } from "lucide-react";
 
 import { DEFAULT_SYMBOL, MODE_CONFIGS } from "./_components/consensus-config";
@@ -33,6 +35,8 @@ export default function ConsensusPage() {
 
   const { user } = useAuth();
   const adminLevel = effectiveLevel(user);
+  const { getState } = useFeatureFlags();
+  const featureState = getState("analysis") ?? "active";
 
   const { data: quota } = useQuery<AnalysisQuotaResponse>({
     queryKey: ["analysis-quota"],
@@ -80,6 +84,10 @@ export default function ConsensusPage() {
   // Which report to display: analysis report (fresh) > consensus cache
   const displayReport = analysisReport;
   const displayConsensus = consensusReport;
+
+  if (featureState !== "active") {
+    return <MaintenancePlaceholder featureName={t("title")} />;
+  }
 
   return (
     <div className="min-h-screen bg-grid relative overflow-hidden">
