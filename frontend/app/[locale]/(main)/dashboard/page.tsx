@@ -166,10 +166,11 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8 md:space-y-12 max-w-[1400px] mx-auto px-4 md:px-8 py-8 md:py-12">
       {/* ── Zone 1: Hero Summary ── */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-background/80 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] backdrop-blur-2xl">
+      <div className="relative overflow-hidden rounded-3xl border border-white/[0.05] bg-[#0a0d14]/90 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] backdrop-blur-3xl">
         <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-scanline opacity-30" />
           <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-[#00E5FF]/[0.05] blur-[100px] -mr-32 -mt-32" />
-          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] rounded-full bg-[#F500FF]/[0.03] blur-[80px] -ml-20 -mb-20" />
+          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] rounded-full bg-indigo-500/[0.04] blur-[80px] -ml-20 -mb-20" />
         </div>
         <div className="relative z-10 p-6 md:p-10">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -189,7 +190,7 @@ export default function DashboardPage() {
           {/* Hero Stats Row (Bento Grid) */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mt-10 md:mt-12">
             {/* Direction counts */}
-            <div className="card-surface p-5 md:p-6 flex flex-col justify-center">
+            <div className="relative p-5 md:p-6 flex flex-col justify-center rounded-2xl border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.04] transition-colors overflow-hidden">
               <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 md:mb-4 flex items-center gap-1.5"><TrendingUp size={14}/>{t("heroMarketDirection")}</span>
               <div className="flex gap-2.5 flex-wrap">
                 {heroStats.long > 0 && (
@@ -211,14 +212,14 @@ export default function DashboardPage() {
             </div>
 
             {/* Accuracy */}
-            <div className="card-surface p-5 md:p-6 flex flex-col justify-center group relative overflow-hidden">
+            <div className="relative p-5 md:p-6 flex flex-col justify-center rounded-2xl border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.04] transition-colors overflow-hidden group">
               <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 md:mb-4 flex items-center gap-1.5">
                 <Target size={14}/>{t("heroAccuracy", { days: 7 })}
               </span>
               {level >= 1 && accuracy ? (
                 accuracy.total > 0 ? (
                 <div className="flex items-baseline gap-2 z-10">
-                  <span className={`text-3xl md:text-4xl lg:text-4xl font-black tracking-tighter ${accuracy.accuracy >= 0.65 ? "text-bull" : accuracy.accuracy >= 0.45 ? "text-warn" : "text-bear"}`}>
+                  <span className={`text-3xl md:text-4xl lg:text-4xl font-black tracking-tighter ${accuracy.accuracy >= 0.65 ? "text-[#00E5FF] drop-shadow-[0_0_15px_rgba(0,229,255,0.6)] glow-cyan" : accuracy.accuracy >= 0.45 ? "text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)] glow-amber" : "text-fuchsia-400 drop-shadow-[0_0_15px_rgba(232,121,249,0.6)] glow-fuchsia"}`}>
                     {(accuracy.accuracy * 100).toFixed(0)}%
                   </span>
                   <span className="text-xs font-mono font-bold text-zinc-500 tracking-widest">{accuracy.hit_count}/{accuracy.total}</span>
@@ -243,16 +244,16 @@ export default function DashboardPage() {
             </div>
 
             {/* New signals count */}
-            <div className="card-surface p-5 md:p-6 flex flex-col justify-center group">
+            <div className="relative p-5 md:p-6 flex flex-col justify-center rounded-2xl border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.04] transition-colors overflow-hidden group">
               <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 md:mb-4 flex items-center gap-1.5"><Activity size={14}/>{t("timeline.title")}</span>
-              <span className="text-3xl md:text-4xl lg:text-4xl font-black text-white tracking-tighter group-hover:text-primary transition-colors drop-shadow-sm flex items-end">
+              <span className="text-3xl md:text-4xl lg:text-4xl font-black text-[#00E5FF] drop-shadow-[0_0_15px_rgba(0,229,255,0.6)] tracking-tighter transition-colors flex items-end">
                 {signals?.total ?? 0}
-                <span className="text-[11px] font-bold font-mono text-zinc-500 ml-2 tracking-widest mb-1.5 uppercase opacity-80">{t("signalsGenerated")}</span>
+                <span className="text-[11px] font-bold font-mono text-[#00E5FF]/80 ml-2 tracking-widest mb-1.5 uppercase opacity-80">{t("signalsGenerated")}</span>
               </span>
             </div>
 
             {/* Last update */}
-            <div className="card-surface p-5 md:p-6 flex flex-col justify-center">
+            <div className="relative p-5 md:p-6 flex flex-col justify-center rounded-2xl border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.04] transition-colors overflow-hidden">
               <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 md:mb-4 flex items-center gap-1.5"><Clock size={14}/>{t("heroLastUpdate")}</span>
               <span className="text-base md:text-lg font-bold text-zinc-200 flex items-center gap-2 tracking-wide">
                 {relativeTime(heroStats.latest, t) || "—"}
@@ -281,20 +282,26 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
         {/* Timeline */}
         <div className="lg:col-span-7">
-          <div className="card h-[500px] flex flex-col">
-            <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between shrink-0">
+          <div className="relative flex flex-col h-[500px] bg-[#0a0d14]/60 backdrop-blur-2xl border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="absolute inset-0 bg-scanline opacity-10 pointer-events-none" />
+            <div className="relative z-10 px-6 py-5 border-b border-white/[0.08] flex items-center justify-between shrink-0 bg-white/[0.01]">
               <div className="flex items-center gap-3">
-                <Zap size={18} className="text-primary drop-shadow-[0_0_8px_rgba(0,229,255,0.6)]" />
-                <span className="text-base font-black text-white tracking-widest uppercase">{t("timeline.title")}</span>
+                <Zap size={16} className="text-[#00E5FF] drop-shadow-[0_0_8px_rgba(0,229,255,0.8)]" />
+                <span className="text-sm font-black font-mono text-white tracking-widest uppercase">{t("timeline.title")}</span>
+              </div>
+              <div className="flex gap-1.5 ml-auto mr-4">
+                 <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                 <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
               </div>
               <Link
                 href={`/${locale}/consensus`}
-                className="text-sm font-medium text-zinc-400 hover:text-white flex items-center gap-1 transition-colors"
+                className="text-xs font-mono font-bold text-[#00E5FF] hover:text-white flex items-center gap-1 transition-colors bg-[#00E5FF]/10 px-3 py-1 rounded"
               >
                 {t("goConsensus")} <ChevronRight size={14} />
               </Link>
             </div>
-            <div className="p-6 md:p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 flex-1">
+            <div className="relative z-10 p-6 md:p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 flex-1">
               {!signals?.signals?.length ? (
                 <div className="flex h-full items-center justify-center text-base text-zinc-500">{t("timeline.empty")}</div>
               ) : (
@@ -310,12 +317,18 @@ export default function DashboardPage() {
 
         {/* Insights */}
         <div className="lg:col-span-5">
-          <div className="card h-[500px] flex flex-col">
-            <div className="px-6 py-5 border-b border-white/5 flex items-center gap-3 shrink-0">
-              <Target size={18} className="text-fuchsia drop-shadow-[0_0_8px_rgba(245,0,255,0.5)]" />
-              <span className="text-base font-black text-white tracking-widest uppercase">{t("insights.title")}</span>
+          <div className="relative flex flex-col h-[500px] bg-[#0a0d14]/60 backdrop-blur-2xl border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="absolute inset-0 bg-scanline opacity-10 pointer-events-none" />
+            <div className="relative z-10 px-6 py-5 border-b border-white/[0.08] flex items-center gap-3 shrink-0 bg-white/[0.01]">
+              <Target size={16} className="text-fuchsia-400 drop-shadow-[0_0_8px_rgba(232,121,249,0.8)]" />
+              <span className="text-sm font-black font-mono text-white tracking-widest uppercase">{t("insights.title")}</span>
+              <div className="flex gap-1.5 ml-auto">
+                 <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                 <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+              </div>
             </div>
-            <div className="p-6 md:p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 flex-1">
+            <div className="relative z-10 p-6 md:p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 flex-1">
               {!insights?.insights?.length ? (
                 <div className="flex h-full items-center justify-center text-base text-zinc-500">{t("insights.empty")}</div>
               ) : (
@@ -354,29 +367,29 @@ function SymbolCard({
   const barColor =
     conf >= 70
       ? isLong
-        ? "bg-bull"
-        : "bg-bear"
+        ? "bg-[#00E5FF] shadow-[0_0_12px_rgba(0,229,255,0.8)]"
+        : "bg-fuchsia-500 shadow-[0_0_12px_rgba(217,70,239,0.8)]"
       : conf >= 50
-        ? "bg-warn"
+        ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]"
         : conf >= 30
-          ? "bg-info"
+          ? "bg-zinc-400"
           : "bg-zinc-600";
 
   const accentBorder = isLong
-    ? "border-l-bull"
+    ? "border-l-[4px] border-l-[#00E5FF] shadow-[-4px_0_15px_rgba(0,229,255,0.15)]"
     : isShort
-      ? "border-l-bear"
-      : "border-l-zinc-600";
+      ? "border-l-[4px] border-l-fuchsia-500 shadow-[-4px_0_15px_rgba(217,70,239,0.15)]"
+      : "border-l-[4px] border-l-zinc-600";
 
   return (
     <Link
       href={`/${locale}/consensus?symbol=${s.symbol}`}
-      className={`card-interactive group relative flex flex-col p-6 md:p-8 overflow-hidden border-l-[4px] ${accentBorder}`}
+      className={`group relative flex flex-col p-6 md:p-8 overflow-hidden rounded-2xl border-y border-r border-white/5 ${accentBorder} bg-[#0a0d14]/60 backdrop-blur-xl hover:border-indigo-500/30 hover:bg-white/[0.02] transition-all duration-300 hover:shadow-[0_0_20px_rgba(99,102,241,0.15)]`}
     >
       {/* Row 1: Symbol + Price + Direction badge */}
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-lg font-black font-mono text-zinc-300 shadow-inner group-hover:text-white transition-colors group-hover:scale-105 group-hover:bg-white/10 group-hover:rotate-3 duration-300">
+          <div className="w-12 h-12 rounded-2xl bg-[#00E5FF]/10 border border-[#00E5FF]/30 flex items-center justify-center text-lg font-black font-mono text-[#00E5FF] shadow-[0_0_15px_rgba(0,229,255,0.2)] group-hover:shadow-[0_0_25px_rgba(0,229,255,0.4)] group-hover:scale-105 group-hover:bg-[#00E5FF]/20 transition-all duration-300">
             {s.symbol.substring(0, 1)}
           </div>
           <div className="flex flex-col gap-1">
@@ -390,12 +403,12 @@ function SymbolCard({
         </div>
         <div className="flex flex-col items-end gap-2">
           <span
-            className={`px-3 py-1.5 rounded-lg text-[11px] font-black font-mono uppercase tracking-widest ${
+            className={`px-3 py-1.5 rounded-lg text-[11px] font-black font-mono uppercase tracking-widest border ${
               isLong
-                ? "bg-bull/15 text-bull shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+                ? "bg-[#00E5FF]/10 text-[#00E5FF] border-[#00E5FF]/20 shadow-[0_0_12px_rgba(0,229,255,0.2)]"
                 : isShort
-                  ? "bg-bear/15 text-bear shadow-[0_0_12px_rgba(239,68,68,0.3)]"
-                  : "bg-white/5 text-zinc-400 border border-white/10"
+                  ? "bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20 shadow-[0_0_12px_rgba(217,70,239,0.2)]"
+                  : "bg-white/5 text-zinc-400 border-white/10"
             }`}
           >
             {isLong && <TrendingUp size={14} className="inline mr-1" strokeWidth={3}/>}
@@ -419,9 +432,10 @@ function SymbolCard({
         </span>
       </div>
 
-      {/* Row 3: Strategy (blurred for free users) */}
+      {/* Row 3: Strategy (encrypted for free users) */}
       {s.direction !== "neutral" && (
-        <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-sm mb-5">
+        <div className="relative mb-5">
+          <div className={`flex flex-wrap items-center gap-x-8 gap-y-4 text-sm ${canSeeStrategy ? "" : "opacity-10 blur-[4px] pointer-events-none select-none"}`}>
           {s.entry_low && s.entry_high && (
             <div className="flex flex-col gap-1">
               <span className="text-[11px] font-bold font-mono text-zinc-500 uppercase tracking-widest">{t("entryRange")}</span>
@@ -452,6 +466,7 @@ function SymbolCard({
               <span className="text-primary font-black font-mono tracking-tight text-base">1:{s.risk_reward_ratio.toFixed(1)}</span>
             </div>
           )}
+          </div>
         </div>
       )}
 
@@ -476,8 +491,15 @@ function SymbolCard({
 
       {/* Free user upgrade hint overlay */}
       {!canSeeStrategy && s.direction !== "neutral" && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-bg-surface/90 backdrop-blur-sm border border-border px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2 shadow-lg">
-          <Lock size={14} /> {t("membership.upgradeHint")}
+        <div className="absolute inset-x-0 bottom-16 top-24 z-20 flex items-center justify-center bg-[#0a0d14]/70 backdrop-blur-md border-y border-indigo-500/30">
+          <div className="absolute inset-0 bg-scanline opacity-20 pointer-events-none" />
+          <div className="relative z-10 flex flex-col items-center gap-2">
+            <Lock size={20} className="text-[#00E5FF] drop-shadow-[0_0_8px_rgba(0,229,255,0.8)]" />
+            <span className="text-[10px] font-black font-mono text-[#00E5FF] uppercase tracking-[0.2em] bg-[#00E5FF]/10 px-3 py-1 border border-[#00E5FF]/30 shadow-[0_0_15px_rgba(0,229,255,0.3)]">
+              [ SYSTEM ENCRYPTED ]
+            </span>
+            <span className="text-[10px] uppercase font-bold text-zinc-400 mt-1 tracking-widest">{t("membership.upgradeHint")}</span>
+          </div>
         </div>
       )}
     </Link>
