@@ -54,7 +54,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <MarqueeBanner />
           </ErrorBoundary>
 
-          <div className="flex min-w-0 flex-1">
+          <div className="flex min-w-0 flex-1 flex-col">
             <main className="min-w-0 flex-1 pb-20 md:pb-0">
               <div className="mx-auto w-full max-w-[1600px] px-4 pt-6 md:px-8">
                 <ErrorBoundary name="DataSourceBanner">
