@@ -47,14 +47,14 @@ def _atr_multipliers(
     vol_ratio = atr / current_price  # e.g. 0.015 = 1.5%
 
     if vol_ratio < 0.01:
-        # 低波动：放宽倍数，避免噪音触发止损
-        return {"entry": 2.0, "stop": 3.0, "targets": [2.0, 4.0, 7.0]}
+        # 低波动：适度止损，TP 推远保证 R:R ≥ 1.5
+        return {"entry": 1.5, "stop": 2.0, "targets": [3.0, 5.0, 8.0]}
     elif vol_ratio > 0.03:
-        # 高波动：收窄倍数，控制单笔风险
-        return {"entry": 1.0, "stop": 1.5, "targets": [1.0, 2.0, 3.5]}
+        # 高波动：收窄止损控制风险，TP 推远保证 R:R ≥ 1.5
+        return {"entry": 0.8, "stop": 1.2, "targets": [1.8, 3.0, 5.0]}
     else:
-        # 正常：止损拓宽至 2.5x ATR，减少噪音触发
-        return {"entry": 1.5, "stop": 2.5, "targets": [1.5, 3.0, 5.0]}
+        # 正常：TP1 ≥ 1.5× 止损距离，保证正期望值
+        return {"entry": 1.0, "stop": 1.5, "targets": [2.5, 4.0, 6.5]}
 
 
 class StrategyResult(BaseModel):
@@ -91,9 +91,9 @@ _MODE_TP_MIN_GAP: dict[str, float] = {
 
 # 回退策略最小幅度（百分比），防止很小的 TP fallback
 _MODE_FALLBACK_TP_PCTS: dict[str, list[float]] = {
-    "scalping": [0.030, 0.060, 0.100],
-    "intraday": [0.040, 0.080, 0.150],
-    "trend":    [0.060, 0.120, 0.200],
+    "scalping": [0.050, 0.090, 0.150],
+    "intraday": [0.060, 0.120, 0.200],
+    "trend":    [0.080, 0.160, 0.250],
 }
 
 
@@ -203,7 +203,7 @@ class StrategyService:
         reward = abs(targets[0] - entry_mid)
 
         rr = round(reward / risk, 2)
-        worth = rr >= 1.5
+        worth = rr >= 2.0
 
         return rr, worth
 
@@ -219,14 +219,14 @@ class StrategyService:
             direction = "long"
             entry_low = round(price * 0.99, 8)
             entry_high = round(price, 8)
-            stop_loss = round(price * 0.95, 8)
-            targets = [round(price * 1.03, 8), round(price * 1.06, 8), round(price * 1.10, 8)]
+            stop_loss = round(price * 0.97, 8)
+            targets = [round(price * 1.05, 8), round(price * 1.10, 8), round(price * 1.18, 8)]
         elif signal == "bearish":
             direction = "short"
             entry_low = round(price, 8)
             entry_high = round(price * 1.01, 8)
-            stop_loss = round(price * 1.05, 8)
-            targets = [round(price * 0.97, 8), round(price * 0.94, 8), round(price * 0.90, 8)]
+            stop_loss = round(price * 1.03, 8)
+            targets = [round(price * 0.95, 8), round(price * 0.90, 8), round(price * 0.82, 8)]
         else:
             direction = "neutral"
             entry_low = round(price * 0.99, 8)
@@ -279,10 +279,10 @@ class StrategyService:
                 stop_loss = price - m["stop"] * atr
             else:
                 entry_low = price * 0.98
-                stop_loss = price * 0.95
+                stop_loss = price * 0.97
             entry_high = price
             targets = above_price[:3] if above_price else [
-                price * 1.03, price * 1.06, price * 1.10,
+                price * 1.05, price * 1.10, price * 1.18,
             ]
         elif report.signal == "bearish":
             direction = "short"
@@ -298,9 +298,9 @@ class StrategyService:
                 stop_loss = price + m["stop"] * atr
             else:
                 entry_high = price * 1.02
-                stop_loss = price * 1.05
+                stop_loss = price * 1.03
             targets = sorted(below_price, reverse=True)[:3] if below_price else [
-                price * 0.97, price * 0.94, price * 0.90,
+                price * 0.95, price * 0.90, price * 0.82,
             ]
         else:
             direction = "neutral"
@@ -393,10 +393,9 @@ class StrategyService:
         # 基础置信度
         confidence = report.consensus_confidence
 
-        # 分歧度衰减：divergence > 30 时乘以衰减因子
-        if report.divergence > 30:
-            decay = max(0.3, 1.0 - report.divergence / 100)
-            confidence = confidence * decay
+        # 分歧度连续衰减：任意分歧度均产生影响（0→1.0, 20→0.8, 70→0.3 下限）
+        decay = max(0.3, 1.0 - report.divergence / 100)
+        confidence = confidence * decay
 
         confidence = round(max(0.0, min(1.0, confidence)), 4)
 
@@ -408,7 +407,8 @@ class StrategyService:
         if is_ranging and regime_support and regime_resistance:
             range_mid = (regime_support + regime_resistance) / 2
             range_height = regime_resistance - regime_support
-            buffer = range_height * 0.1  # 10% 缓冲区
+            _raw_buf = max(range_height * 0.1, atr * 0.5) if use_atr else range_height * 0.1
+            buffer = min(_raw_buf, range_height * 0.3)  # 上限 30%，防止缓冲区溢出区间
 
             # 震荡市场 → 双向区间策略
             if current_price < range_mid:
@@ -484,8 +484,8 @@ class StrategyService:
             logger.warning("build_tp_candidates failed, using ATR fallback: %s", _tpe)
             tp_pool = []
 
-        # TP 池至少需要 2 个候选才算有效（避免单点误判）
-        _has_structural_tp = len(tp_pool) >= 2
+        # TP 池至少需要 1 个候选即用结构性位（减少回退频率）
+        _has_structural_tp = len(tp_pool) >= 1
 
         # 入场区间和止损仍然用 ATR（ATR 适合描述波动幅度，不适合做 TP）
         if direction == "long":
@@ -495,7 +495,7 @@ class StrategyService:
                 stop_loss = current_price - m["stop"] * atr
             else:
                 entry_low = current_price * 0.98
-                stop_loss = current_price * 0.95
+                stop_loss = current_price * 0.97
             entry_high = current_price
 
             if _has_structural_tp:
@@ -507,7 +507,7 @@ class StrategyService:
                     m = _atr_multipliers(atr, current_price)
                     targets = [current_price + t * atr for t in m["targets"]]
                 else:
-                    targets = [current_price * 1.03, current_price * 1.06, current_price * 1.10]
+                    targets = [current_price * 1.05, current_price * 1.10, current_price * 1.18]
 
         elif direction == "short":
             entry_low = current_price
@@ -517,7 +517,7 @@ class StrategyService:
                 stop_loss = current_price + m["stop"] * atr
             else:
                 entry_high = current_price * 1.02
-                stop_loss = current_price * 1.05
+                stop_loss = current_price * 1.03
 
             if _has_structural_tp:
                 # 从候选池选出小于 entry_low 的前 3 个
@@ -528,7 +528,7 @@ class StrategyService:
                     m = _atr_multipliers(atr, current_price)
                     targets = [current_price - t * atr for t in m["targets"]]
                 else:
-                    targets = [current_price * 0.97, current_price * 0.94, current_price * 0.90]
+                    targets = [current_price * 0.95, current_price * 0.90, current_price * 0.82]
 
         else:
             if use_atr:
@@ -555,11 +555,13 @@ class StrategyService:
             market_regime=market_regime, mode=mode,
         )
 
-        # 价格精度优化
+        # 价格精度优化（5 档覆盖 BTC~SHIB）
         def _fmt(val: float) -> float:
-            if val > 1000: return round(val, 1)
-            if val > 1: return round(val, 2)
-            return round(val, 6)
+            if val > 10000: return round(val, 1)
+            if val > 100:   return round(val, 2)
+            if val > 1:     return round(val, 4)
+            if val > 0.01:  return round(val, 6)
+            return round(val, 8)
 
         entry_low = _fmt(entry_low)
         entry_high = _fmt(entry_high)

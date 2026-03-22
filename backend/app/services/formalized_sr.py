@@ -331,10 +331,13 @@ def build_tp_candidates(
                 filtered.append(lvl)
         unique = filtered
 
+    # 最多保留 6 个候选（防止过密噪声），调用方取前 3
+    unique = unique[:6]
+
     if unique:
         logger.debug(
             "build_tp_candidates: direction=%s price=%.4f candidates=%s",
-            direction, current_price, [round(c, 4) for c in unique[:6]],
+            direction, current_price, [round(c, 4) for c in unique],
         )
     else:
         logger.info(
