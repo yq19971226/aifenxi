@@ -144,24 +144,24 @@ function AccountHero({ user, trial }: { user: UserInfo; trial?: FreeTrialStatus 
             <span className="text-[9px] uppercase font-mono tracking-[0.25em] text-zinc-600">当前账号</span>
             <span className="text-[10px] font-mono text-zinc-400 bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.06]">{user.email}</span>
           </div>
-          <div className="flex items-end gap-3">
-            <h2 className={`text-5xl font-black font-mono tracking-tighter uppercase ${color} drop-shadow-[0_0_20px_currentColor/0.3]`}>
+          <div className="flex items-end gap-3 md:gap-4">
+            <h2 className={`text-6xl md:text-7xl font-black font-mono tracking-tighter uppercase ${color} drop-shadow-[0_0_20px_currentColor/0.3]`}>
               {name}
             </h2>
-            <div className="pb-1.5 flex flex-col gap-1">
+            <div className="pb-2 md:pb-3 flex flex-col gap-1.5 md:gap-2">
               {isPremium ? (
                 <>
-                  <span className={`text-[9px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-[3px] border border-current/25 ${color} bg-current/10 w-max`}>
+                  <span className={`text-[11px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-[4px] border border-current/25 ${color} bg-current/10 w-max`}>
                     生效中
                   </span>
                   {daysLeft > 0 && (
-                    <span className={`text-[9px] font-mono ${daysLeft <= 7 ? "text-red-400 animate-pulse" : daysLeft <= 30 ? "text-amber-400" : "text-zinc-600"}`}>
+                    <span className={`text-[11px] font-mono ${daysLeft <= 7 ? "text-red-400 animate-pulse" : daysLeft <= 30 ? "text-amber-400" : "text-zinc-500"} whitespace-nowrap`}>
                       剩余 {daysLeft} 天 · 到期 {expiryStr}
                     </span>
                   )}
                 </>
               ) : (
-                <span className="text-[9px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-[3px] border border-zinc-700/50 text-zinc-600 bg-zinc-700/10 w-max">未开通</span>
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-[4px] border border-zinc-700/50 text-zinc-600 bg-zinc-700/10 w-max">未开通</span>
               )}
             </div>
           </div>
@@ -169,27 +169,27 @@ function AccountHero({ user, trial }: { user: UserInfo; trial?: FreeTrialStatus 
 
         {/* Right: Trial */}
         {!isPremium && trial?.enabled && (
-          <div className="shrink-0 bg-black/40 border border-indigo-500/20 rounded-xl p-5 min-w-[220px]">
-            <p className="text-[9px] font-black font-mono uppercase tracking-[0.2em] text-indigo-400 mb-1 flex items-center gap-2">
+          <div className="shrink-0 bg-black/40 border border-indigo-500/20 rounded-xl p-5 md:p-6 min-w-[240px]">
+            <p className="text-[11px] font-black font-mono uppercase tracking-[0.2em] text-indigo-400 mb-1.5 flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.8)]" />
               欢迎体验包
             </p>
-            <p className="text-[10px] text-zinc-500 font-mono mb-4">
+            <p className="text-xs text-zinc-500 font-mono mb-5">
               {trial.claimed
                 ? trial.remaining > 0 ? `剩余 ${trial.remaining} 次可用` : "体验次数已用完"
                 : `注册赠送 ${trial.total} 次日内博弈分析`}
             </p>
             {!trial.claimed ? (
               <button onClick={handleClaim} disabled={claiming}
-                className="w-full rounded-md bg-indigo-600/20 border border-indigo-500/30 py-2 text-[10px] font-black font-mono uppercase tracking-[0.15em] text-white hover:bg-indigo-600/35 transition-all disabled:opacity-50">
+                className="w-full rounded-md bg-indigo-600/20 border border-indigo-500/30 py-2.5 text-xs font-black font-mono uppercase tracking-[0.15em] text-white hover:bg-indigo-600/35 transition-all shadow-[0_0_15px_rgba(99,102,241,0)] hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] disabled:opacity-50">
                 {claiming ? "领取中..." : "立即领取"}
               </button>
             ) : (
-              <div className={`text-center py-2 rounded-md border text-[10px] font-black font-mono uppercase tracking-[0.15em] ${trial.remaining > 0 ? "border-emerald-500/25 text-emerald-400 bg-emerald-500/8" : "border-zinc-700 text-zinc-600 bg-zinc-800/50"}`}>
+              <div className={`text-center py-2.5 rounded-md border text-xs font-black font-mono uppercase tracking-[0.15em] ${trial.remaining > 0 ? "border-emerald-500/25 text-emerald-400 bg-emerald-500/8" : "border-zinc-700 text-zinc-600 bg-zinc-800/50"}`}>
                 {trial.remaining > 0 ? `✓ 已领取 · ${trial.remaining} 次剩余` : "已全部用完"}
               </div>
             )}
-            {claimErr && <p className="mt-2 text-[9px] text-red-400 font-mono text-center">{claimErr}</p>}
+            {claimErr && <p className="mt-2 text-[11px] text-red-400 font-mono text-center">{claimErr}</p>}
           </div>
         )}
       </div>
@@ -226,35 +226,35 @@ function FeatureTable({ plansData }: { plansData: PlansResponse | undefined }) {
   return (
     <div className="rounded-2xl bg-[#0a0a0a] border border-white/5 overflow-hidden">
       {/* Header */}
-      <div className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_80px_100px_110px] border-b border-white/[0.06] bg-black/30">
-        <div className="px-3 sm:px-6 py-5 text-[9px] font-black font-mono uppercase tracking-[0.25em] text-zinc-600 flex items-center gap-2">
-          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_90px_110px_120px] border-b border-white/[0.06] bg-black/30">
+        <div className="px-4 sm:px-6 py-5 text-[11px] font-black font-mono uppercase tracking-[0.25em] text-zinc-500 flex items-center gap-2">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="square" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
           等级权益对比
         </div>
         {/* Free */}
         <div className="py-5 text-center border-l border-white/[0.04]">
-          <div className="text-[9px] font-black font-mono uppercase tracking-widest text-zinc-500">免费</div>
-          <div className="text-[9px] text-zinc-700 bg-zinc-800/50 inline-block px-2 py-0.5 rounded mt-1">$0 / M</div>
+          <div className="text-[10px] sm:text-[11px] font-black font-mono uppercase tracking-widest text-zinc-500">免费</div>
+          <div className="text-[10px] text-zinc-500 bg-zinc-800/50 inline-block px-2 py-0.5 rounded mt-1.5 font-bold">$0 / M</div>
         </div>
         {/* Pro */}
         <div className="py-5 text-center border-l border-indigo-500/10 bg-indigo-500/[0.03]">
-          <div className="text-[9px] font-black font-mono uppercase tracking-widest text-indigo-400">专业</div>
-          <div className="text-[9px] text-indigo-300/60 bg-indigo-500/10 border border-indigo-500/15 inline-block px-2 py-0.5 rounded mt-1">${proPrice} / M</div>
+          <div className="text-[10px] sm:text-[11px] font-black font-mono uppercase tracking-widest text-indigo-400">专业</div>
+          <div className="text-[10px] text-indigo-300 bg-indigo-500/10 border border-indigo-500/15 inline-block px-2 py-0.5 rounded mt-1.5 font-bold">${proPrice} / M</div>
         </div>
         {/* Flagship */}
         <div className="py-5 text-center border-l border-[#F5A623]/10 bg-[#F5A623]/[0.03]">
-          <div className="text-[9px] font-black font-mono uppercase tracking-widest text-[#F5A623]">旗舰</div>
-          <div className="text-[9px] text-[#F5A623]/60 bg-[#F5A623]/10 border border-[#F5A623]/15 inline-block px-2 py-0.5 rounded mt-1">${flagPrice} / M</div>
+          <div className="text-[10px] sm:text-[11px] font-black font-mono uppercase tracking-widest text-[#F5A623]">旗舰</div>
+          <div className="text-[10px] text-[#F5A623] bg-[#F5A623]/10 border border-[#F5A623]/15 inline-block px-2 py-0.5 rounded mt-1.5 font-bold">${flagPrice} / M</div>
         </div>
       </div>
 
       {/* Body */}
       {Object.entries(sections).map(([section, rows], si) => (
         <div key={section}>
-          <div className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_80px_100px_110px] bg-black/20">
-            <div className="px-3 sm:px-6 py-2 text-[8px] font-black font-mono uppercase tracking-[0.25em] text-zinc-700 col-span-4">
+          <div className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_90px_110px_120px] bg-black/20">
+            <div className="px-4 sm:px-6 py-2.5 text-[10px] font-black font-mono uppercase tracking-[0.2em] text-zinc-600 col-span-4 border-y border-white/[0.02]">
               {section}
             </div>
           </div>
@@ -264,18 +264,18 @@ function FeatureTable({ plansData }: { plansData: PlansResponse | undefined }) {
               initial={{ opacity: 0, x: -4 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: (si * rows.length + fi) * 0.03 }}
-              className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_80px_100px_110px] border-t border-white/[0.03] group hover:bg-white/[0.015] transition-colors"
+              className="grid grid-cols-[minmax(0,1fr)_60px_68px_68px] sm:grid-cols-[1fr_90px_110px_120px] border-t border-white/[0.03] group hover:bg-white/[0.015] transition-colors"
             >
-              <div className="px-3 sm:px-6 py-3.5 text-[10px] sm:text-[11px] text-zinc-400 font-mono tracking-wide group-hover:text-zinc-200 transition-colors uppercase">
+              <div className="px-4 sm:px-6 py-4 text-[11px] sm:text-xs text-zinc-400 font-mono tracking-wide group-hover:text-zinc-200 transition-colors uppercase">
                 {f.name}
               </div>
-              <div className="py-3.5 flex items-center justify-center border-l border-white/[0.03]">
+              <div className="py-4 flex items-center justify-center border-l border-white/[0.03]">
                 <Cell value={f.free} tier="free" />
               </div>
-              <div className="py-3.5 flex items-center justify-center border-l border-indigo-500/[0.07] bg-indigo-500/[0.02]">
+              <div className="py-4 flex items-center justify-center border-l border-indigo-500/[0.07] bg-indigo-500/[0.02]">
                 <Cell value={f.pro} tier="pro" />
               </div>
-              <div className="py-3.5 flex items-center justify-center border-l border-[#F5A623]/[0.07] bg-[#F5A623]/[0.02]">
+              <div className="py-4 flex items-center justify-center border-l border-[#F5A623]/[0.07] bg-[#F5A623]/[0.02]">
                 <Cell value={f.flagship} tier="flagship" />
               </div>
             </motion.div>
@@ -403,12 +403,12 @@ function CheckoutSidebar({
       <div className="flex border-b border-white/[0.05]">
         {(["sub", "credits"] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)}
-            className={`flex-1 py-3.5 text-[9px] font-black font-mono uppercase tracking-[0.2em] transition-all ${
+            className={`flex-1 py-4 text-[11px] font-black font-mono uppercase tracking-[0.2em] transition-all ${
               tab === t
                 ? t === "credits"
-                  ? "text-emerald-400 border-b-2 border-emerald-500 bg-emerald-500/5"
-                  : "text-white border-b-2 border-indigo-500 bg-indigo-500/5"
-                : "text-zinc-600 hover:text-zinc-400"
+                  ? "text-emerald-400 border-b-2 border-emerald-500 bg-emerald-500/5 shadow-[inset_0_-2px_8px_rgba(52,211,153,0.1)]"
+                  : "text-white border-b-2 border-indigo-500 bg-indigo-500/5 shadow-[inset_0_-2px_8px_rgba(99,102,241,0.1)]"
+                : "text-zinc-500 hover:text-zinc-300 bg-black/20"
             }`}>
             {t === "sub" ? "订阅套餐" : "积分充值"}
           </button>
@@ -421,18 +421,18 @@ function CheckoutSidebar({
           <motion.div key="payment" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="p-6 flex flex-col gap-5">
             <div className="flex items-center justify-between border-b border-white/[0.05] pb-4">
               <div>
-                <p className="text-[9px] font-black font-mono uppercase tracking-[0.2em] text-zinc-600 mb-1">支付信息</p>
+                <p className="text-[11px] font-black font-mono uppercase tracking-[0.2em] text-zinc-500 mb-1.5">支付信息</p>
                 <div className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="text-xs font-bold font-mono text-white uppercase">
+                  <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+                  <span className="text-sm font-black font-mono text-white uppercase tracking-wider">
                     {["免费","专业","旗舰","积分包S","积分包M","积分包L"][currentPayment.plan] ?? `套餐${currentPayment.plan}`}
                   </span>
                 </div>
               </div>
               {currentPayment.status === "pending" && !isExpired ? (
                 <div className="text-right">
-                  <p className="text-[8px] text-zinc-600 font-mono uppercase tracking-widest mb-1">剩余时间</p>
-                  <span className="font-mono text-xl font-black text-amber-400">{countdown}</span>
+                  <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest mb-1.5">剩余时间</p>
+                  <span className="font-mono text-2xl font-black text-amber-400 tracking-tighter drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]">{countdown}</span>
                 </div>
               ) : (
                 <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest border ${isExpired && currentPayment.status === "pending" ? "border-zinc-700 text-zinc-500 bg-zinc-800/50" : `${st?.bg} ${st?.text} border-current/25`}`}>
@@ -489,21 +489,21 @@ function CheckoutSidebar({
           </motion.div>
         ) : tab === "sub" ? (
           // ── Subscription Checkout ───────────────────
-          <motion.div key="checkout-sub" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 flex flex-col gap-5">
-            <h3 className="text-[9px] font-black font-mono uppercase tracking-[0.25em] text-zinc-500 border-b border-white/[0.05] pb-4">
+          <motion.div key="checkout-sub" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 md:p-8 flex flex-col gap-6">
+            <h3 className="text-[11px] font-black font-mono uppercase tracking-[0.25em] text-zinc-500 border-b border-white/[0.05] pb-4">
               选择套餐 · 数字货币结算
             </h3>
 
             {/* Plan Toggle */}
             <div>
-              <p className="text-[8px] font-black font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2.5">套餐</p>
-              <div className="relative flex p-1 bg-black rounded-lg border border-white/[0.08]">
-                <div className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-md transition-all duration-400 ease-out ${isFlagship ? "left-[calc(50%)] bg-[#F5A623] shadow-[0_0_12px_rgba(245,166,35,0.35)]" : "left-1 bg-indigo-600 shadow-[0_0_12px_rgba(99,102,241,0.35)]"}`} />
+              <p className="text-[10px] font-black font-mono uppercase tracking-[0.2em] text-zinc-500 mb-3">套餐</p>
+              <div className="relative flex p-1.5 bg-black rounded-lg border border-white/[0.08]">
+                <div className={`absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] rounded-md transition-all duration-400 ease-out ${isFlagship ? "left-[calc(50%+1.5px)] bg-[#F5A623] shadow-[0_0_15px_rgba(245,166,35,0.4)]" : "left-1.5 bg-indigo-600 shadow-[0_0_15px_rgba(99,102,241,0.4)]"}`} />
                 {[{ plan: 1, label: "专业", price: proPrice }, { plan: 2, label: "旗舰", price: flagshipPrice }].map(p => (
                   <button key={p.plan} onClick={() => setSelectedPlan(p.plan)}
-                    className={`flex-1 relative z-10 py-2.5 flex flex-col items-center gap-0.5 rounded-md transition-colors ${selectedPlan === p.plan ? (p.plan === 2 ? "text-black" : "text-white") : "text-zinc-500 hover:text-zinc-300"}`}>
-                    <span className="text-[10px] font-black font-mono uppercase tracking-wider">{p.label}</span>
-                    <span className={`text-[8px] font-mono ${selectedPlan === p.plan ? "opacity-70" : "opacity-40"}`}>${p.price}/月</span>
+                    className={`flex-1 relative z-10 py-3 flex flex-col items-center gap-1.5 rounded-md transition-colors ${selectedPlan === p.plan ? (p.plan === 2 ? "text-black" : "text-white") : "text-zinc-500 hover:text-zinc-300"}`}>
+                    <span className="text-xs font-black font-mono uppercase tracking-wider">{p.label}</span>
+                    <span className={`text-[10px] font-mono font-bold ${selectedPlan === p.plan ? "opacity-70" : "opacity-40"}`}>${p.price}/月</span>
                   </button>
                 ))}
               </div>
@@ -511,14 +511,14 @@ function CheckoutSidebar({
 
             {/* Duration */}
             <div>
-              <p className="text-[8px] font-black font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2.5">计费周期</p>
-              <div className="grid grid-cols-3 gap-2">
+              <p className="text-[10px] font-black font-mono uppercase tracking-[0.2em] text-zinc-500 mb-3">计费周期</p>
+              <div className="grid grid-cols-3 gap-3">
                 {DURATION_OPTS.map(opt => (
                   <button key={opt.m} onClick={() => setSelectedDuration(opt.m)}
-                    className={`relative rounded-md border py-2.5 flex flex-col items-center gap-1 transition-all ${selectedDuration === opt.m ? "bg-white/8 border-white/25 shadow-inner" : "bg-black/50 border-white/[0.06] hover:border-white/12"}`}>
-                    <span className={`text-[10px] font-black font-mono uppercase ${selectedDuration === opt.m ? "text-white" : "text-zinc-500"}`}>{opt.label}</span>
+                    className={`relative rounded-xl border py-3.5 flex flex-col items-center gap-1 transition-all ${selectedDuration === opt.m ? "bg-white/[0.08] border-white/30 shadow-[inset_0_2px_10px_rgba(255,255,255,0.05)]" : "bg-black/50 border-white/[0.06] hover:border-white/15"}`}>
+                    <span className={`text-[11px] md:text-xs font-black font-mono uppercase tracking-widest ${selectedDuration === opt.m ? "text-white" : "text-zinc-500"}`}>{opt.label}</span>
                     {opt.badge && (
-                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-[1px] bg-red-500/15 border border-red-500/25 text-red-400 text-[7px] font-black rounded-sm whitespace-nowrap">
+                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-[2px] bg-red-500/15 border border-red-500/30 text-red-400 text-[9px] font-black rounded-sm whitespace-nowrap shadow-[0_2px_8px_rgba(239,68,68,0.2)]">
                         {opt.badge}
                       </span>
                     )}
@@ -529,11 +529,11 @@ function CheckoutSidebar({
 
             {/* Network */}
             <div>
-              <p className="text-[8px] font-black font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2.5">支付网络 · USDT Only</p>
-              <div className="grid grid-cols-3 gap-2">
+              <p className="text-[10px] font-black font-mono uppercase tracking-[0.2em] text-zinc-500 mb-3">支付网络 · USDT Only</p>
+              <div className="grid grid-cols-3 gap-3">
                 {NETWORKS.map(net => (
                   <button key={net} onClick={() => setSelectedNetwork(net)}
-                    className={`rounded-md border py-2 text-[9px] font-bold font-mono tracking-wider transition-all ${selectedNetwork === net ? "bg-emerald-500/8 border-emerald-500/35 text-emerald-400" : "bg-black/50 border-white/[0.06] text-zinc-600 hover:text-zinc-400 hover:border-white/10"}`}>
+                    className={`rounded-xl border py-3 text-[10px] md:text-[11px] font-bold font-mono tracking-wider transition-all ${selectedNetwork === net ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400 shadow-[inset_0_2px_10px_rgba(16,185,129,0.1)]" : "bg-black/50 border-white/[0.06] text-zinc-500 hover:text-zinc-300 hover:border-white/15"}`}>
                     {net}
                   </button>
                 ))}
@@ -541,19 +541,19 @@ function CheckoutSidebar({
             </div>
 
             {/* Total */}
-            <div className="pt-4 border-t border-white/[0.05]">
-              <div className="flex items-end justify-between mb-4">
+            <div className="pt-6 border-t border-white/[0.05]">
+              <div className="flex items-end justify-between mb-6">
                 <div>
-                  <p className="text-[8px] text-zinc-600 font-mono uppercase tracking-[0.2em] mb-1">应付总计</p>
-                  <p className="text-[9px] text-zinc-500 font-mono">{planLabel} · {DURATION_OPTS.find(x => x.m === selectedDuration)?.label}</p>
+                  <p className="text-[10px] text-zinc-500 font-black font-mono uppercase tracking-[0.25em] mb-1.5">应付总计</p>
+                  <p className="text-[11px] text-zinc-400 font-mono tracking-wide">{planLabel} · {DURATION_OPTS.find(x => x.m === selectedDuration)?.label}</p>
                 </div>
                 <div className="text-right">
-                  <div className="flex items-end gap-1">
-                    <span className="text-lg font-bold font-mono text-white">$</span>
-                    <span className="text-4xl font-black font-mono leading-none tracking-tighter text-white">{selectedTotal}</span>
+                  <div className="flex items-end gap-1.5">
+                    <span className="text-xl md:text-2xl font-bold font-mono text-white mb-1">$</span>
+                    <span className="text-5xl md:text-6xl font-black font-mono leading-none tracking-tighter text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">{selectedTotal}</span>
                   </div>
                   {selectedDuration > 1 && (
-                    <span className="text-[9px] text-emerald-400 font-mono bg-emerald-500/8 px-1.5 py-[1px] rounded mt-1 inline-block">
+                    <span className="text-[10px] text-emerald-400 font-mono font-bold tracking-wider bg-emerald-500/10 px-2.5 py-1 rounded-md mt-2 inline-block shadow-[inset_0_1px_4px_rgba(16,185,129,0.1)]">
                       均 ${(selectedTotal / selectedDuration).toFixed(0)}/月
                     </span>
                   )}
@@ -561,14 +561,14 @@ function CheckoutSidebar({
               </div>
 
               <button onClick={() => handleCreatePayment("sub")} disabled={creating}
-                className={`group relative w-full rounded-lg h-13 py-3.5 flex items-center justify-center gap-2 font-mono text-[11px] font-black uppercase tracking-[0.15em] transition-all disabled:opacity-50 disabled:cursor-not-allowed ${isFlagship
-                  ? "bg-[#F5A623] hover:bg-[#f0a010] text-black shadow-[0_0_20px_rgba(245,166,35,0.2)] hover:shadow-[0_0_30px_rgba(245,166,35,0.4)]"
-                  : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)]"}`}>
+                className={`group relative w-full rounded-xl h-14 md:h-16 py-4 flex items-center justify-center gap-3 font-mono text-xs md:text-sm font-black uppercase tracking-[0.2em] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${isFlagship
+                  ? "bg-[#F5A623] hover:bg-[#f0a010] text-black shadow-[0_0_25px_rgba(245,166,35,0.25)] hover:shadow-[0_0_40px_rgba(245,166,35,0.5)] scale-100 active:scale-95"
+                  : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_25px_rgba(99,102,241,0.25)] hover:shadow-[0_0_40px_rgba(99,102,241,0.5)] scale-100 active:scale-95"}`}>
                 {creating ? (
-                  <><span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" /> 创建中</>
+                  <><span className="animate-spin w-5 h-5 border-[3px] border-current border-t-transparent rounded-full" /> 创建中</>
                 ) : (
                   <>支付 ${selectedTotal} USDT
-                    <svg className="w-4 h-4 transition-transform group-hover:translate-x-1 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </>
@@ -587,52 +587,52 @@ function CheckoutSidebar({
           </motion.div>
         ) : (
           // ── Credits Pack Checkout ────────────────────
-          <motion.div key="checkout-credits" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 flex flex-col gap-5">
-            <h3 className="text-[9px] font-black font-mono uppercase tracking-[0.25em] text-zinc-500 border-b border-white/[0.05] pb-4">
+          <motion.div key="checkout-credits" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 md:p-8 flex flex-col gap-6">
+            <h3 className="text-[11px] font-black font-mono uppercase tracking-[0.25em] text-zinc-500 border-b border-white/[0.05] pb-4">
               积分充值 · 超短线分析次数
             </h3>
 
             {/* Pack Selection */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {packsToShow.length === 0 && (
-                <div className="flex items-center justify-center py-6 text-[10px] font-mono text-zinc-600">
-                  <span className="animate-spin w-3.5 h-3.5 border border-current border-t-transparent rounded-full mr-2" />
+                <div className="flex items-center justify-center py-8 text-xs font-mono text-zinc-500">
+                  <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2" />
                   加载中...
                 </div>
               )}
               {packsToShow.map(pack => (
                 <button key={pack.plan} onClick={() => setSelectedCredits(pack.plan as 3 | 4 | 5)}
-                  className={`relative flex items-center justify-between rounded-xl border p-4 text-left transition-all ${
+                  className={`relative flex items-center justify-between rounded-xl border p-5 text-left transition-all duration-300 ${
                     selectedCredits === pack.plan
-                      ? "border-emerald-500/40 bg-emerald-500/[0.06] shadow-[inset_0_0_20px_rgba(52,211,153,0.05)]"
-                      : "border-white/[0.06] bg-black/30 hover:border-white/[0.12]"
+                      ? "border-emerald-500/50 bg-emerald-500/[0.08] shadow-[inset_0_2px_15px_rgba(52,211,153,0.1)] scale-100"
+                      : "border-white/[0.06] bg-black/30 hover:border-white/[0.15] scale-[0.98] hover:scale-100"
                   }`}>
                   <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={`text-[10px] font-black font-mono uppercase tracking-widest ${
-                        selectedCredits === pack.plan ? "text-emerald-400" : "text-zinc-400"
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className={`text-[11px] font-black font-mono uppercase tracking-widest ${
+                        selectedCredits === pack.plan ? "text-emerald-400" : "text-zinc-500"
                       }`}>{pack.label}</span>
-                      <span className="text-[8px] font-mono text-zinc-700 bg-white/[0.03] border border-white/[0.05] px-1.5 py-[1px] rounded">{pack.desc}</span>
+                      <span className="text-[9px] font-mono text-zinc-600 bg-white/[0.04] border border-white/[0.06] px-1.5 py-[2px] rounded">{pack.desc}</span>
                     </div>
-                    <span className={`text-[11px] font-bold font-mono ${
-                      selectedCredits === pack.plan ? "text-emerald-300" : "text-zinc-500"
+                    <span className={`text-sm tracking-widest font-bold font-mono ${
+                      selectedCredits === pack.plan ? "text-emerald-300" : "text-zinc-400"
                     }`}>{pack.credits} 次</span>
                   </div>
-                  <div className="text-right">
-                    <div className="flex items-end gap-0.5">
-                      <span className={`text-sm font-bold font-mono ${
-                        selectedCredits === pack.plan ? "text-emerald-400" : "text-zinc-500"
+                  <div className="text-right pr-2">
+                    <div className="flex items-end gap-1">
+                      <span className={`text-xl font-bold font-mono mb-0.5 ${
+                        selectedCredits === pack.plan ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" : "text-zinc-600"
                       }`}>$</span>
-                      <span className={`text-2xl font-black font-mono leading-none ${
+                      <span className={`text-4xl font-black font-mono leading-none tracking-tighter ${
                         selectedCredits === pack.plan ? "text-white" : "text-zinc-400"
                       }`}>{pack.price}</span>
                     </div>
-                    <span className="text-[8px] font-mono text-zinc-700">
+                    <span className="text-[10px] font-mono font-bold tracking-widest text-zinc-600 inline-block mt-1">
                       ≈ ${(pack.price / parseInt(pack.credits)).toFixed(2)}/次
                     </span>
                   </div>
                   {selectedCredits === pack.plan && (
-                    <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
+                    <span className="absolute top-2.5 right-2.5 h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
                   )}
                 </button>
               ))}
@@ -640,11 +640,11 @@ function CheckoutSidebar({
 
             {/* Network */}
             <div>
-              <p className="text-[8px] font-black font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2.5">支付网络 · USDT Only</p>
-              <div className="grid grid-cols-3 gap-2">
+              <p className="text-[10px] font-black font-mono uppercase tracking-[0.2em] text-zinc-500 mb-3">支付网络 · USDT Only</p>
+              <div className="grid grid-cols-3 gap-3">
                 {NETWORKS.map(net => (
                   <button key={net} onClick={() => setSelectedNetwork(net)}
-                    className={`rounded-md border py-2 text-[9px] font-bold font-mono tracking-wider transition-all ${selectedNetwork === net ? "bg-emerald-500/8 border-emerald-500/35 text-emerald-400" : "bg-black/50 border-white/[0.06] text-zinc-600 hover:text-zinc-400 hover:border-white/10"}`}>
+                    className={`rounded-xl border py-3 text-[10px] md:text-[11px] font-bold font-mono tracking-wider transition-all ${selectedNetwork === net ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400 shadow-[inset_0_2px_10px_rgba(16,185,129,0.1)]" : "bg-black/50 border-white/[0.06] text-zinc-500 hover:text-zinc-300 hover:border-white/15"}`}>
                     {net}
                   </button>
                 ))}
@@ -652,25 +652,25 @@ function CheckoutSidebar({
             </div>
 
             {/* Total */}
-            <div className="pt-4 border-t border-white/[0.05]">
-              <div className="flex items-end justify-between mb-4">
+            <div className="pt-6 border-t border-white/[0.05]">
+              <div className="flex items-end justify-between mb-6">
                 <div>
-                  <p className="text-[8px] text-zinc-600 font-mono uppercase tracking-[0.2em] mb-1">应付总计</p>
-                  <p className="text-[9px] text-emerald-500/70 font-mono">{selectedPack?.credits ?? "--"} · 一次性 · 永不过期</p>
+                  <p className="text-[10px] text-zinc-500 font-black font-mono uppercase tracking-[0.25em] mb-1.5">应付总计</p>
+                  <p className="text-[11px] text-emerald-500/60 font-mono tracking-wide">{selectedPack?.credits ?? "--"} · 一次性 · 永不过期</p>
                 </div>
-                <div className="flex items-end gap-1">
-                  <span className="text-lg font-bold font-mono text-white">$</span>
-                  <span className="text-4xl font-black font-mono leading-none tracking-tighter text-white">{selectedPack?.price ?? "--"}</span>
+                <div className="flex items-end gap-1.5">
+                  <span className="text-xl md:text-2xl font-bold font-mono text-white mb-1">$</span>
+                  <span className="text-5xl md:text-6xl font-black font-mono leading-none tracking-tighter text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">{selectedPack?.price ?? "--"}</span>
                 </div>
               </div>
 
               <button onClick={() => handleCreatePayment("credits", selectedCredits)} disabled={creating || !selectedPack}
-                className="group relative w-full rounded-lg py-3.5 flex items-center justify-center gap-2 font-mono text-[11px] font-black uppercase tracking-[0.15em] transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(52,211,153,0.15)] hover:shadow-[0_0_30px_rgba(52,211,153,0.3)]">
+                className="group relative w-full rounded-xl h-14 md:h-16 py-4 flex items-center justify-center gap-3 font-mono text-xs md:text-sm font-black uppercase tracking-[0.2em] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_25px_rgba(52,211,153,0.25)] hover:shadow-[0_0_40px_rgba(52,211,153,0.5)] scale-100 active:scale-95">
                 {creating ? (
-                  <><span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" /> 创建中</>
+                  <><span className="animate-spin w-5 h-5 border-[3px] border-current border-t-transparent rounded-full" /> 创建中</>
                 ) : (
                   <>充值 {selectedPack?.credits ?? "--"}
-                    <svg className="w-4 h-4 transition-transform group-hover:translate-x-1 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </>
@@ -763,9 +763,9 @@ export default function MembershipPage() {
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto text-white selection:bg-indigo-500/30">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-black font-mono tracking-widest uppercase mb-2">会员中心</h1>
-        <p className="text-[9px] font-black font-mono uppercase tracking-[0.3em] text-zinc-600">账单与订阅</p>
+      <div className="mb-8 md:mb-12">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-mono tracking-tighter uppercase mb-3 text-white">会员中心</h1>
+        <p className="text-[11px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500">账单与订阅 / Billing & Subscriptions</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

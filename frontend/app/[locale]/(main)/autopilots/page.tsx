@@ -148,16 +148,16 @@ export default function AutopilotsPage() {
   };
 
   return (
-    <div className="flex-1 space-y-8 p-6 lg:p-10 max-w-5xl mx-auto">
+    <div className="flex-1 space-y-10 p-4 md:p-8 lg:p-12 max-w-[1400px] mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col items-start gap-4 border-b border-white/[0.08] pb-6">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-            <Rocket className="text-indigo-400" size={24} />
+      <div className="flex flex-col items-start gap-5 border-b border-white/[0.08] pb-8">
+        <div className="flex items-center gap-4">
+          <div className="p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
+            <Rocket className="text-indigo-400" size={32} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">{t("title")}</h1>
-            <p className="text-sm text-zinc-400 mt-1">{t("subtitle")}</p>
+            <h1 className="text-3xl md:text-4xl font-black font-mono tracking-tighter uppercase text-white mb-1.5">{t("title")}</h1>
+            <p className="text-[11px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500">{t("subtitle")}</p>
           </div>
         </div>
       </div>
@@ -196,7 +196,7 @@ export default function AutopilotsPage() {
       </div>
 
       {/* Step Content Area */}
-      <div className="card p-8 min-h-[400px] border border-white/[0.05] bg-[#09090b]/80 backdrop-blur-xl shadow-2xl relative overflow-hidden">
+      <div className="card p-8 md:p-12 min-h-[440px] border border-white/[0.05] bg-[#09090b]/80 backdrop-blur-xl shadow-2xl relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/img/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-[0.03] z-0" />
         
         <div className="relative z-10 w-full h-full flex flex-col">
@@ -209,11 +209,11 @@ export default function AutopilotsPage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-8"
               >
                 <div>
-                  <h3 className="text-lg font-semibold text-white">{t("step1.title")}</h3>
-                  <p className="text-sm text-zinc-400 mt-1">{t("step1.desc")}</p>
+                  <h3 className="text-2xl md:text-3xl font-black font-mono tracking-tighter uppercase text-white mb-2">{t("step1.title")}</h3>
+                  <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest">{t("step1.desc")}</p>
                 </div>
                 <div className="w-full max-w-sm">
                    <SymbolSelector value={symbol} onChange={setSymbol} />
@@ -235,50 +235,50 @@ export default function AutopilotsPage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-8"
               >
                 <div>
-                  <h3 className="text-lg font-semibold text-white">{t("step2.title")}</h3>
-                  <p className="text-sm text-zinc-400 mt-1">{t("step2.desc")}</p>
+                  <h3 className="text-2xl md:text-3xl font-black font-mono tracking-tighter uppercase text-white mb-2">{t("step2.title")}</h3>
+                  <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest">{t("step2.desc")}</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-2">
                   <div 
                     onClick={() => setEngine("nsed_full")}
-                    className={`cursor-pointer border rounded-xl p-5 transition-all ${
+                    className={`cursor-pointer card-interactive p-6 md:p-8 rounded-2xl transition-all ${
                       engine === "nsed_full" 
-                        ? "border-emerald-500/50 bg-emerald-500/10 shadow-[0_0_20px_rgba(16,185,129,0.1)]" 
-                        : "border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04]"
+                        ? "border-emerald-500/50 bg-emerald-500/5 shadow-[0_0_30px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20" 
+                        : "border-white/[0.08] bg-white/[0.02]"
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className={`p-2 rounded-lg ${engine === "nsed_full" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/5 text-zinc-400"}`}>
-                        <Server size={20} />
+                    <div className="flex items-center justify-between mb-5">
+                      <div className={`p-2.5 rounded-xl ${engine === "nsed_full" ? "bg-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]" : "bg-white/5 text-zinc-400"}`}>
+                        <Server size={24} />
                       </div>
-                      <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-500">{t("step2.nsed.pipeline")}</span>
+                      <span className="text-[11px] uppercase font-black font-mono tracking-[0.2em] text-zinc-500">{t("step2.nsed.pipeline")}</span>
                     </div>
-                    <h4 className={`font-semibold ${engine === "nsed_full" ? "text-emerald-400" : "text-white"}`}>{t("step2.nsed.name")}</h4>
-                    <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
+                    <h4 className={`text-xl font-black font-mono tracking-tighter uppercase mb-2 ${engine === "nsed_full" ? "text-emerald-400" : "text-white"}`}>{t("step2.nsed.name")}</h4>
+                    <p className="text-xs text-zinc-400 leading-relaxed font-medium">
                       {t("step2.nsed.desc")}
                     </p>
                   </div>
 
                   <div 
                     onClick={() => setEngine("scalping_fast")}
-                    className={`cursor-pointer border rounded-xl p-5 transition-all ${
+                    className={`cursor-pointer card-interactive p-6 md:p-8 rounded-2xl transition-all ${
                       engine === "scalping_fast" 
-                        ? "border-amber-500/50 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.1)]" 
-                        : "border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04]"
+                        ? "border-amber-500/50 bg-amber-500/5 shadow-[0_0_30px_rgba(245,158,11,0.15)] ring-1 ring-amber-500/20" 
+                        : "border-white/[0.08] bg-white/[0.02]"
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className={`p-2 rounded-lg ${engine === "scalping_fast" ? "bg-amber-500/20 text-amber-400" : "bg-white/5 text-zinc-400"}`}>
-                        <Zap size={20} />
+                    <div className="flex items-center justify-between mb-5">
+                      <div className={`p-2.5 rounded-xl ${engine === "scalping_fast" ? "bg-amber-500/20 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]" : "bg-white/5 text-zinc-400"}`}>
+                        <Zap size={24} />
                       </div>
-                      <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-500">{t("step2.scalping.pipeline")}</span>
+                      <span className="text-[11px] uppercase font-black font-mono tracking-[0.2em] text-zinc-500">{t("step2.scalping.pipeline")}</span>
                     </div>
-                    <h4 className={`font-semibold ${engine === "scalping_fast" ? "text-amber-400" : "text-white"}`}>{t("step2.scalping.name")}</h4>
-                    <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
+                    <h4 className={`text-xl font-black font-mono tracking-tighter uppercase mb-2 ${engine === "scalping_fast" ? "text-amber-400" : "text-white"}`}>{t("step2.scalping.name")}</h4>
+                    <p className="text-xs text-zinc-400 leading-relaxed font-medium">
                       {t("step2.scalping.desc")}
                     </p>
                   </div>
@@ -294,11 +294,11 @@ export default function AutopilotsPage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-8"
               >
                 <div>
-                  <h3 className="text-lg font-semibold text-white">{t("step3.title")}</h3>
-                  <p className="text-sm text-zinc-400 mt-1">{t("step3.desc")}</p>
+                  <h3 className="text-2xl md:text-3xl font-black font-mono tracking-tighter uppercase text-white mb-2">{t("step3.title")}</h3>
+                  <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest">{t("step3.desc")}</p>
                 </div>
 
                 <div className="space-y-4">
@@ -369,14 +369,14 @@ export default function AutopilotsPage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-8"
               >
-                <div className="text-center py-6">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 mb-4">
-                    <Rocket size={32} className="text-emerald-400" />
+                <div className="text-center py-8">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                    <Rocket size={40} className="text-emerald-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-white tracking-tight">{t("step4.title")}</h3>
-                  <p className="text-sm text-zinc-400 mt-2 max-w-sm mx-auto">
+                  <h3 className="text-3xl font-black font-mono uppercase tracking-tighter text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">{t("step4.title")}</h3>
+                  <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest mt-3 max-w-sm mx-auto">
                     {t("step4.desc")}
                   </p>
                 </div>
@@ -491,10 +491,10 @@ export default function AutopilotsPage() {
       </div>
 
       {/* Active Operations Section */}
-      <div className="pt-8 border-t border-white/[0.08] mt-8">
-        <div className="flex items-center gap-3 mb-6">
-          <ActivitySquare className="text-emerald-400" size={20} />
-          <h2 className="text-xl font-bold text-white tracking-tight">{t("active.title")}</h2>
+      <div className="pt-10 md:pt-14 border-t border-white/[0.08] mt-10 md:mt-14">
+        <div className="flex items-center gap-4 mb-8">
+          <ActivitySquare className="text-emerald-400 drop-shadow-[0_0_12px_rgba(16,185,129,0.8)]" size={28} />
+          <h2 className="text-2xl md:text-3xl font-black font-mono tracking-tighter uppercase text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">{t("active.title")}</h2>
         </div>
         
         {loadingPilots ? (

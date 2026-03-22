@@ -139,15 +139,15 @@ export default function AdversarialPage() {
   const reasoning = (adv?.reasoning as string) || "";
 
   return (
-    <div className="mx-auto max-w-[1000px] px-4 md:px-8 py-8 space-y-6">
+    <div className="mx-auto max-w-[1400px] px-4 md:px-8 py-8 md:py-12 space-y-8">
       {/* ── Header ── */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border-b border-white/[0.08] pb-6">
         <div>
-          <h1 className="flex items-center gap-2 text-xl font-semibold text-white">
-            <Swords size={20} className="text-red-500" />
+          <h1 className="flex items-center gap-3 text-3xl md:text-4xl font-black font-mono tracking-tighter uppercase text-white mb-2">
+            <Swords size={32} className="text-red-500" />
             {t("title")}
           </h1>
-          <p className="text-sm text-zinc-500 mt-1">{t("subtitle")}</p>
+          <p className="text-[11px] font-black font-mono uppercase tracking-[0.3em] text-zinc-500">{t("subtitle")}</p>
         </div>
         <div className="flex items-center gap-3">
           <SymbolSelector value={symbol} onChange={setSymbol} allowedSymbols={["BTCUSDT", "ETHUSDT"]} />
@@ -231,37 +231,38 @@ export default function AdversarialPage() {
 
       {/* ── Data Display ── */}
       {data && adv && (
-        <div className="space-y-5">
+        <div className="space-y-6 md:space-y-8">
           {/* ── Overview Strip ── */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6">
             {/* Signal */}
-            <div className="card p-4">
-              <span className="text-[10px] uppercase tracking-widest text-zinc-500">{t("signal")}</span>
-              <div className="flex items-center gap-2 mt-1">
-                <SignalIcon size={16} className={signalInfo.color} />
-                <span className={`text-base font-semibold ${signalInfo.color}`}>{signalInfo.label}</span>
+            <div className="card p-5 md:p-6 hover:bg-white/[0.02] transition-colors">
+              <span className="text-xs font-black font-mono uppercase tracking-[0.2em] text-zinc-500 mb-2 block">{t("signal")}</span>
+              <div className="flex items-center gap-3 mt-3">
+                <SignalIcon size={24} className={signalInfo.color} />
+                <span className={`text-2xl md:text-3xl xl:text-4xl font-black font-mono tracking-tighter uppercase ${signalInfo.color} drop-shadow-[0_0_12px_currentColor/0.2]`}>{signalInfo.label}</span>
               </div>
             </div>
 
             {/* Confidence */}
-            <div className="card p-4">
-              <span className="text-[10px] uppercase tracking-widest text-zinc-500">{t("confidence")}</span>
-              <p className="text-base font-semibold text-white mt-1">{(confidence * 100).toFixed(0)}%</p>
+            <div className="card p-5 md:p-6 hover:bg-white/[0.02] transition-colors relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/[0.02] rounded-bl-full -z-10" />
+              <span className="text-xs font-black font-mono uppercase tracking-[0.2em] text-zinc-500 mb-2 block">{t("confidence")}</span>
+              <p className="text-3xl md:text-4xl xl:text-5xl font-black font-mono tracking-tighter text-white mt-1 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">{(confidence * 100).toFixed(0)}<span className="text-xl md:text-2xl text-zinc-500">%</span></p>
             </div>
 
             {/* Strategy */}
-            <div className="card p-4">
-              <span className="text-[10px] uppercase tracking-widest text-zinc-500">{t("strategy")}</span>
-              <p className={`text-base font-semibold mt-1 ${strategyInfo.color}`}>{strategyInfo.label}</p>
+            <div className="card p-5 md:p-6 hover:bg-white/[0.02] transition-colors">
+              <span className="text-xs font-black font-mono uppercase tracking-[0.2em] text-zinc-500 mb-2 block">{t("strategy")}</span>
+              <p className={`text-2xl md:text-3xl xl:text-4xl font-black font-mono tracking-tighter uppercase mt-3 ${strategyInfo.color} drop-shadow-[0_0_12px_currentColor/0.2]`}>{strategyInfo.label}</p>
             </div>
 
             {/* Alert Level */}
-            <div className="card p-4">
-              <span className="text-[10px] uppercase tracking-widest text-zinc-500">{t("alertLevel")}</span>
-              <div className="mt-1">
-                <span className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold ${alertColor.bg} ${alertColor.text} border ${alertColor.border}`}>
-                  <Shield size={12} />
-                  {alertLevel === "none" ? "安全" : alertLevel.toUpperCase()}
+            <div className="card p-5 md:p-6 hover:bg-white/[0.02] transition-colors">
+              <span className="text-xs font-black font-mono uppercase tracking-[0.2em] text-zinc-500 mb-2 block">{t("alertLevel")}</span>
+              <div className="mt-3">
+                <span className={`inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-sm md:text-base font-black font-mono uppercase tracking-widest ${alertColor.bg} ${alertColor.text} border ${alertColor.border} shadow-[0_0_15px_currentColor/0.1]`}>
+                  <Shield size={16} />
+                  {alertLevel === "none" ? "安全.SAFE" : alertLevel}
                 </span>
               </div>
             </div>
@@ -269,19 +270,19 @@ export default function AdversarialPage() {
 
           {/* ── Core: AdversarialRenderer (原汁原味) ── */}
           {rawData && (
-            <div className="card p-5">
+            <div className="card p-6 md:p-8">
               <AdversarialRenderer data={rawData as any} />
             </div>
           )}
 
           {/* ── Key Findings ── */}
           {keyFindings.length > 0 && (
-            <div className="card p-5">
-              <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">{t("keyFindings")}</h3>
-              <ul className="space-y-2">
+            <div className="card p-6 md:p-8">
+              <h3 className="text-xs font-black text-zinc-500 font-mono uppercase tracking-[0.2em] mb-5 border-b border-white/[0.05] pb-3">{t("keyFindings")}</h3>
+              <ul className="space-y-3">
                 {keyFindings.map((finding, idx) => (
-                  <li key={idx} className="flex items-start gap-2.5 text-sm text-zinc-300 leading-relaxed">
-                    <span className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${signal === "bullish" ? "bg-emerald-400" : signal === "bearish" ? "bg-red-400" : "bg-zinc-500"}`} />
+                  <li key={idx} className="flex items-start gap-4 text-sm md:text-base font-medium text-zinc-300 leading-relaxed bg-white/[0.01] p-3 rounded-lg border border-white/[0.03]">
+                    <span className={`mt-1.5 h-2 w-2 rounded-full shrink-0 shadow-[0_0_8px_currentColor] ${signal === "bullish" ? "bg-emerald-400 text-emerald-400" : signal === "bearish" ? "bg-red-400 text-red-400" : "bg-zinc-500 text-zinc-500"}`} />
                     {localizeText(finding)}
                   </li>
                 ))}
@@ -291,9 +292,9 @@ export default function AdversarialPage() {
 
           {/* ── Reasoning ── */}
           {reasoning && (
-            <div className="card p-5">
-              <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">{t("reasoning")}</h3>
-              <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">{localizeText(reasoning)}</p>
+            <div className="card p-6 md:p-8">
+              <h3 className="text-xs font-black text-zinc-500 font-mono uppercase tracking-[0.2em] mb-5 border-b border-white/[0.05] pb-3">{t("reasoning")}</h3>
+              <p className="text-sm md:text-base font-medium text-zinc-300 leading-relaxed whitespace-pre-wrap">{localizeText(reasoning)}</p>
             </div>
           )}
 

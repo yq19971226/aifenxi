@@ -21,6 +21,7 @@ import {
   Settings,
   ShieldCheck,
   LogOut,
+  Send,
   type LucideIcon,
 } from "lucide-react";
 import { NotificationBell } from "@/components/announcements/NotificationBell";
@@ -208,13 +209,24 @@ export function TopNav() {
                 );
               })}
 
-              {/* 语言 & 系统 */}
+              {/* 语言 & 系统 & 支持 */}
               <div className="space-y-3 pt-4 border-t border-border">
                 <div className="text-[10px] font-bold font-mono text-zinc-500 uppercase tracking-widest px-2">
                   {t('common.system')}
                 </div>
-                <div className="px-2">
+                <div className="px-2 pb-2 border-b border-border/50">
                   <LanguageSwitcher />
+                </div>
+                <div className="px-2 pt-1">
+                  <a
+                    href="https://t.me/axiom888"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 px-4 py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] text-zinc-300 hover:bg-[#2AABEE]/10 hover:text-[#2AABEE]"
+                  >
+                    <Send size={22} className="shrink-0 text-[#2AABEE]" />
+                    <span className="flex-1">Telegram Support</span>
+                  </a>
                 </div>
               </div>
             </div>

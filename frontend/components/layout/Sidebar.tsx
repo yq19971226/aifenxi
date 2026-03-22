@@ -17,6 +17,7 @@ import {
   ChevronDown,
   LogOut,
   Rocket,
+  Send,
   type LucideIcon,
   Settings,
 } from "lucide-react";
@@ -158,89 +159,115 @@ export function Sidebar() {
 
       {/* Nav Items */}
       <div className="flex-1 overflow-y-auto py-5 px-3 space-y-1.5 scrollbar-thin scrollbar-thumb-bg-elevated">
-        {allItems.map((item) => {
-          if (item.featureFlag && !flags?.[item.featureFlag]) return null;
-          if (!isNavItemVisible(item.href, role)) return null;
+        <div className="space-y-1.5">
+          {allItems.map((item) => {
+            if (item.featureFlag && !flags?.[item.featureFlag]) return null;
+            if (!isNavItemVisible(item.href, role)) return null;
 
-          const isActive = currentPath.startsWith(item.href);
-          const hasChildren = item.children && item.children.length > 0;
-          const isOpen = openSubmenus.includes(item.key);
+            const isActive = currentPath.startsWith(item.href);
+            const hasChildren = item.children && item.children.length > 0;
+            const isOpen = openSubmenus.includes(item.key);
 
-          return (
-            <div key={item.key}>
-              <Link
-                href={hasChildren ? "#" : `/${locale}${item.href}`}
-                onClick={(e) => {
-                  if (hasChildren) {
-                    e.preventDefault();
-                    toggleSubmenu(item.key);
-                  }
-                }}
-                className={cn(
-                  "group flex items-center h-11 px-3.5 rounded-xl transition-all relative font-semibold hover:-translate-y-[1px]",
-                  isActive ? "bg-white/5 text-white shadow-inner" : "text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
-                )}
-              >
-                <item.icon size={20} className={cn("shrink-0 transition-colors", isActive && "text-indigo-400")} />
-                
+            return (
+              <div key={item.key}>
+                <Link
+                  href={hasChildren ? "#" : `/${locale}${item.href}`}
+                  onClick={(e) => {
+                    if (hasChildren) {
+                      e.preventDefault();
+                      toggleSubmenu(item.key);
+                    }
+                  }}
+                  className={cn(
+                    "group flex items-center h-11 px-3.5 rounded-xl transition-all relative font-semibold hover:-translate-y-[1px]",
+                    isActive ? "bg-white/5 text-white shadow-inner" : "text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
+                  )}
+                >
+                  <item.icon size={20} className={cn("shrink-0 transition-colors", isActive && "text-indigo-400")} />
+                  
+                  <AnimatePresence>
+                    {expanded && (
+                      <motion.div
+                        initial={{ opacity: 0, width: 0 }}
+                        animate={{ opacity: 1, width: "auto" }}
+                        exit={{ opacity: 0, width: 0 }}
+                        className="ml-3.5 flex-1 overflow-hidden flex items-center justify-between"
+                      >
+                        <span className="text-sm font-bold tracking-wide whitespace-nowrap">{t(`main.${item.key}`)}</span>
+                        {hasChildren && (
+                          <ChevronDown
+                            size={16}
+                            className={cn("transition-transform", isOpen && "rotate-180")}
+                          />
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  
+                  {/* Active Indicator Line */}
+                  {isActive && !expanded && (
+                    <div className="absolute left-0 top-2.5 bottom-2.5 w-1.5 rounded-r-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
+                  )}
+                </Link>
+
+                {/* Submenu */}
                 <AnimatePresence>
-                  {expanded && (
+                  {expanded && hasChildren && isOpen && (
                     <motion.div
-                      initial={{ opacity: 0, width: 0 }}
-                      animate={{ opacity: 1, width: "auto" }}
-                      exit={{ opacity: 0, width: 0 }}
-                      className="ml-3.5 flex-1 overflow-hidden flex items-center justify-between"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden ml-5 pl-5 border-l-2 border-border mt-1.5 space-y-1"
                     >
-                      <span className="text-sm font-bold tracking-wide whitespace-nowrap">{t(`main.${item.key}`)}</span>
-                      {hasChildren && (
-                        <ChevronDown
-                          size={16}
-                          className={cn("transition-transform", isOpen && "rotate-180")}
-                        />
-                      )}
+                      {item.children!.map((sub) => {
+                        if (sub.featureFlag && !flags?.[sub.featureFlag]) return null;
+                        if (!isNavItemVisible(sub.href, role)) return null;
+                        const isSubActive = currentPath === sub.href;
+                        
+                        return (
+                          <Link
+                            key={sub.key}
+                            href={`/${locale}${sub.href}`}
+                            className={cn(
+                              "block py-2.5 px-3 text-xs font-bold tracking-wide rounded-lg transition-colors",
+                              isSubActive ? "text-indigo-400 bg-indigo-500/10 shadow-inner" : "text-zinc-500 hover:text-zinc-200 hover:bg-bg-surface"
+                            )}
+                          >
+                            {t(getSubLabelKey(item.key, sub.key))}
+                          </Link>
+                        );
+                      })}
                     </motion.div>
                   )}
                 </AnimatePresence>
-                
-                {/* Active Indicator Line */}
-                {isActive && !expanded && (
-                  <div className="absolute left-0 top-2.5 bottom-2.5 w-1.5 rounded-r-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
-                )}
-              </Link>
+              </div>
+            );
+          })}
+        </div>
 
-              {/* Submenu */}
-              <AnimatePresence>
-                {expanded && hasChildren && isOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden ml-5 pl-5 border-l-2 border-border mt-1.5 space-y-1"
-                  >
-                    {item.children!.map((sub) => {
-                      if (sub.featureFlag && !flags?.[sub.featureFlag]) return null;
-                      if (!isNavItemVisible(sub.href, role)) return null;
-                      const isSubActive = currentPath === sub.href;
-                      
-                      return (
-                        <Link
-                          key={sub.key}
-                          href={`/${locale}${sub.href}`}
-                          className={cn(
-                            "block py-2.5 px-3 text-xs font-bold tracking-wide rounded-lg transition-colors",
-                            isSubActive ? "text-indigo-400 bg-indigo-500/10 shadow-inner" : "text-zinc-500 hover:text-zinc-200 hover:bg-bg-surface"
-                          )}
-                        >
-                          {t(getSubLabelKey(item.key, sub.key))}
-                        </Link>
-                      );
-                    })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          );
-        })}
+        {/* External Help - Pins to bottom of scrollable area */}
+        <div className="pt-3 mt-4 border-t border-white/[0.04]">
+          <a
+            href="https://t.me/axiom888"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center h-11 px-3.5 rounded-xl transition-all relative font-semibold text-zinc-500 hover:bg-[#2AABEE]/10 hover:text-[#2AABEE] hover:-translate-y-[1px]"
+          >
+            <Send size={20} className="shrink-0 transition-colors" />
+            <AnimatePresence>
+              {expanded && (
+                <motion.div
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: "auto" }}
+                  exit={{ opacity: 0, width: 0 }}
+                  className="ml-3.5 flex-1 overflow-hidden"
+                >
+                  <span className="text-sm font-bold tracking-wide whitespace-nowrap">Telegram Support</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </a>
+        </div>
       </div>
 
       {/* User Footer */}
