@@ -42,20 +42,27 @@ export function QuotaDisplay({ quota, isLocked, isExhausted, upgradeHint }: Quot
             <span className="text-xs text-zinc-500">{t("remaining")}</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex gap-1">
-              {Array.from({ length: Math.min(5, quota.limit) }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-1.5 w-6 rounded-full ${
-                    i < quota.remaining
-                      ? "bg-indigo-500"
-                      : "bg-white/[0.05]"
-                  }`}
-                />
-              ))}
-            </div>
+            {(() => {
+              // effectiveTotal: bonus 充值后 remaining 可能 > limit（limit=0 时尤其如此）
+              const effectiveTotal = Math.max(quota.limit, quota.remaining);
+              const barCount = Math.min(5, effectiveTotal);
+              return (
+                <div className="flex gap-1">
+                  {barCount > 0 && Array.from({ length: barCount }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`h-1.5 w-6 rounded-full ${
+                        i < quota.remaining
+                          ? "bg-indigo-500"
+                          : "bg-white/[0.05]"
+                      }`}
+                    />
+                  ))}
+                </div>
+              );
+            })()}
             <span className="text-xs text-zinc-400 font-mono ml-2">
-              {quota.remaining} / {quota.limit}
+              {quota.remaining}{quota.limit > 0 ? ` / ${quota.limit}` : ""}
             </span>
           </div>
         </div>

@@ -478,9 +478,7 @@ class ConfigService:
             )
 
     # 配置 key → 独立 Redis 缓存 key 的映射（这些独立缓存由各 API 端点自行管理）
-    _EXTRA_CACHE_KEYS: dict[str, list[str]] = {
-        "analysis_maintenance_enabled": ["analysis:maintenance_enabled"],
-    }
+    _EXTRA_CACHE_KEYS: dict[str, list[str]] = {}
 
     async def _clear_cache(self, key: str) -> None:
         """清除指定配置的 Redis 缓存。包括独立端点缓存。"""

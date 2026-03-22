@@ -104,6 +104,7 @@
       "maintenanceAll": "维护"
     },
     "features": {
+      "analysis": "综合分析",
       "adversarial": "AI对抗推演",
       "leaderboard": "排行榜",
       "task": "任务中心",
@@ -520,6 +521,10 @@
       "hidden": "隐藏"
     },
     "features": {
+      "analysis": {
+        "label": "综合分析",
+        "desc": "AI 智能体多维度综合分析引擎"
+      },
       "adversarial": {
         "label": "AI对抗推演",
         "desc": "/adversarial — AI对抗推演系统"

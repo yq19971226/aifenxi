@@ -32,6 +32,7 @@ FEATURE_FLAG_CONFIG_MAP: dict[str, str] = {
     "push": "push_feature_enabled",
     "alerts": "alerts_feature_enabled",
     "online_count": "online_count_feature_enabled",
+    "analysis": "analysis_feature_enabled",
 }
 
 

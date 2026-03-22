@@ -105,6 +105,7 @@
       "maintenanceAll": "Maintenance"
     },
     "features": {
+      "analysis": "Analysis Engine",
       "playbook": "Playbook Sim",
       "leaderboard": "Leaderboard",
       "task": "Task Center",
@@ -584,6 +585,10 @@
       "hidden": "Hidden"
     },
     "features": {
+      "analysis": {
+        "label": "Analysis Engine",
+        "desc": "AI agent multi-dimensional analysis engine"
+      },
       "playbook": {
         "label": "Playbook Sim",
         "desc": "/playbook-sim — AI adversarial playbook simulation"

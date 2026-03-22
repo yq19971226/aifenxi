@@ -58,20 +58,15 @@ async def get_analysis_quota(
     level = 2 if user.is_admin else user.membership_level
     try:
         quotas = await quota_svc.get_all_quotas(UUID(user.id), level)
-        # ── 读取维护模式开关 ──
+        # ── 读取维护模式开关（统一功能开关） ──
         maintenance = False
         try:
-            from app.core.redis import get_redis_pool
-            _redis = get_redis_pool()
-            _maint = await _redis.get("analysis:maintenance_enabled")
-            if _maint is None:
-                from app.core.database import AsyncSessionLocal
-                from app.services.config_service import ConfigService
-                async with AsyncSessionLocal() as session:
-                    svc = ConfigService(session)
-                    _maint = await svc.get_config("analysis_maintenance_enabled", "false")
-                await _redis.setex("analysis:maintenance_enabled", 300, _maint)
-            maintenance = (_maint.lower() == "true")
+            from app.core.database import AsyncSessionLocal
+            from app.services.config_service import ConfigService
+            async with AsyncSessionLocal() as session:
+                svc = ConfigService(session)
+                _state = await svc.get_config("analysis_feature_enabled", "active")
+            maintenance = _state.strip().lower() == "maintenance"
         except Exception:
             pass
         return AnalysisQuotaResponse(quotas=quotas, level=level, maintenance=maintenance)

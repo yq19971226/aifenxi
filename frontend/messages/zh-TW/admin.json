@@ -104,6 +104,7 @@
       "maintenanceAll": "維護"
     },
     "features": {
+      "analysis": "綜合分析",
       "adversarial": "AI對抗推演",
       "leaderboard": "排行榜",
       "task": "任務中心",
@@ -520,6 +521,10 @@
       "hidden": "隱藏"
     },
     "features": {
+      "analysis": {
+        "label": "綜合分析",
+        "desc": "AI 智能體多維度綜合分析引擎"
+      },
       "adversarial": {
         "label": "AI對抗推演",
         "desc": "/adversarial — AI 對抗推演系統"
