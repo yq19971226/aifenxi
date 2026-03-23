@@ -30,8 +30,8 @@ interface ShareCardProps {
 // ── Helpers ──────────────────────────────────────────────────
 
 const THEME_COLORS = {
-  bullish: { primary: "#34d399", bg: "rgba(16, 185, 129, 0.05)", emoji: "📈", dirEmoji: "🟢", headerBg: "linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.05) 100%)", glow: "0 0 40px rgba(16,185,129,0.15)" },
-  bearish: { primary: "#f87171", bg: "rgba(239, 68, 68, 0.05)", emoji: "📉", dirEmoji: "🔴", headerBg: "linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.05) 100%)", glow: "0 0 40px rgba(239,68,68,0.15)" },
+  bullish: { primary: "#34d399", bg: "rgba(16, 185, 129, 0.05)", emoji: "📈", dirEmoji: "🟢", headerBg: "linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.05) 100%)", glow: "0 0 60px rgba(16,185,129,0.12)" },
+  bearish: { primary: "#f87171", bg: "rgba(239, 68, 68, 0.05)", emoji: "📉", dirEmoji: "🔴", headerBg: "linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(239, 68, 68, 0.05) 100%)", glow: "0 0 60px rgba(239,68,68,0.12)" },
   neutral: { primary: "#a1a1aa", bg: "rgba(255, 255, 255, 0.02)", emoji: "⏸️", dirEmoji: "⚪", headerBg: "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%)", glow: "none" },
 } as const;
 
@@ -55,14 +55,16 @@ function agentConsensus(sections: AnalysisReport["sections"]) {
   return { total: agents.length, ...counts };
 }
 
+// ── Inline Styles ────────────────────────────────────────────
+
 const S = {
   card: { width: 420, background: "#09090b", borderRadius: 20, overflow: "hidden" as const, fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: "#e4e4e7", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255,255,255,0.08)", position: "relative" as const },
   gridBg: { position: "absolute" as const, inset: 0, backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)", backgroundSize: "20px 20px", pointerEvents: "none" as const },
-  sectionBox: (borderColor: string, bg: string) => ({ position: "relative" as const, zIndex: 10, margin: "0 24px", border: "1px solid rgba(255,255,255,0.06)", borderLeft: `3px solid ${borderColor}`, borderRadius: 12, padding: "16px 20px", marginBottom: 16, background: bg, backdropFilter: "blur(10px)" }),
-  row: { display: "flex" as const, justifyContent: "space-between" as const, alignItems: "center" as const, padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" },
-  rowLast: { display: "flex" as const, justifyContent: "space-between" as const, alignItems: "center" as const, padding: "8px 0" },
-  label: { fontSize: 13, color: "#a1a1aa", fontWeight: 500 as const, letterSpacing: "0.01em" },
-  value: { fontSize: 13, fontWeight: 700 as const, color: "#ffffff", textAlign: "right" as const },
+  sectionBox: (borderColor: string, bg: string) => ({ position: "relative" as const, zIndex: 10, margin: "0 20px", border: "1px solid rgba(255,255,255,0.06)", borderLeft: `3px solid ${borderColor}`, borderRadius: 12, padding: "14px 16px", marginBottom: 12, background: bg, backdropFilter: "blur(10px)" }),
+  row: { display: "flex" as const, justifyContent: "space-between" as const, alignItems: "center" as const, padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" },
+  rowLast: { display: "flex" as const, justifyContent: "space-between" as const, alignItems: "center" as const, padding: "6px 0" },
+  label: { fontSize: 12, color: "#a1a1aa", fontWeight: 500 as const, letterSpacing: "0.01em" },
+  value: { fontSize: 12, fontWeight: 700 as const, color: "#ffffff", textAlign: "right" as const },
 };
 
 // ── ShareCard ────────────────────────────────────────────────
@@ -86,9 +88,6 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
         : "neutral";
     const tc = getThemeColors(displaySignal);
     const consensus = agentConsensus(report.sections);
-    const subtitle = consensus.total > 0
-      ? `${consensus.total} ${t("agentsConsensus")} | ${modeLabel(report.mode)}`
-      : modeLabel(report.mode);
     const reasoning = strategy?.reasoning || "";
     const isLlmDegraded = strategy ? !strategy.is_fallback && isFallbackReasoning(reasoning) : false;
 
@@ -101,26 +100,11 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
 
     // ── Translated helpers ────────────────────────────────────
     const dirLabel = displayDirection === "long" ? t("bullish") : displayDirection === "short" ? t("bearish") : t("neutral");
-    const themeLabel = displaySignal === "bullish" ? t("bullish") : displaySignal === "bearish" ? t("bearish") : t("neutral");
 
     const regimeText = (() => {
       if (!report.market_regime) return "—";
       const regime = report.market_regime;
-      const label = regime === "ranging" ? t("ranging") : regime === "volatile" ? t("volatile") : regime === "trending" ? t("trending") : regime;
-      return `${label} 🔍`;
-    })();
-
-    const validUntilText = validUntil ? `${validUntil} ⏰` : "—";
-
-    const consensusSummary = (() => {
-      const ranked = [
-        { key: "bullish", label: t("bullishLabel").replace(/^📈\s*/, ""), count: consensus.bullish },
-        { key: "bearish", label: t("bearishLabel").replace(/^📉\s*/, ""), count: consensus.bearish },
-        { key: "neutral", label: t("neutralLabel").replace(/^⏸️\s*/, ""), count: consensus.neutral },
-      ].sort((a, b) => b.count - a.count);
-      if (ranked[0].count === 0) return t("noTendency");
-      if (ranked[1] && ranked[0].count === ranked[1].count) return t("splitView");
-      return t("majorityOf").replace("{count}", String(ranked[0].count)).replace("{label}", ranked[0].label);
+      return regime === "ranging" ? t("ranging") : regime === "volatile" ? t("volatile") : regime === "trending" ? t("trending") : regime;
     })();
 
     // ── Confluence tags ───────────────────────────────────────
@@ -141,207 +125,225 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
       (tag) => ALL_TAG_MAP[tag] ?? null
     ).filter(Boolean) as Array<{ label: string; color: string; bg: string }>;
 
+    // ── Consensus bar segments ────────────────────────────────
+    const consensusTotal = consensus.total || 1;
+    const bullPct = Math.round((consensus.bullish / consensusTotal) * 100);
+    const bearPct = Math.round((consensus.bearish / consensusTotal) * 100);
+    const neutPct = 100 - bullPct - bearPct;
+
     return (
       <div ref={ref} style={{...S.card, boxShadow: tc.glow}}>
         <div style={S.gridBg} />
-        {/* ── Header ── */}
-        <div style={{ background: tc.headerBg, padding: "28px 24px 24px", textAlign: "center" as const, position: "relative", zIndex: 10, borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-          <div style={{ fontSize: 24, fontWeight: 800, color: "#ffffff", letterSpacing: "0.04em", textTransform: "uppercase" }}>
-            {tc.emoji} {report.symbol} {displayDirection !== "neutral" ? themeLabel : t("neutral")} {tc.emoji}
+
+        {/* ── Header: 大字信号 + 置信度 ── */}
+        <div style={{ background: tc.headerBg, padding: "24px 20px 20px", position: "relative", zIndex: 10, borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+          {/* 顶部：币种 + 模式 */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <span style={{ fontSize: 18, fontWeight: 800, color: "#ffffff", letterSpacing: "0.03em" }}>
+              {report.symbol}
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 600, color: "#a1a1aa", background: "rgba(255,255,255,0.06)", padding: "3px 10px", borderRadius: 6, letterSpacing: "0.04em" }}>
+              {modeLabel(report.mode)}
+            </span>
           </div>
-          <div style={{ fontSize: 13, color: tc.primary, marginTop: 8, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase" }}>
-            {subtitle}
+
+          {/* 中间：方向大字 + 置信度 */}
+          <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
+            <span style={{ fontSize: 28, fontWeight: 900, color: tc.primary, letterSpacing: "0.02em" }}>
+              {tc.dirEmoji} {dirLabel}
+            </span>
+            <span style={{ fontSize: 22, fontWeight: 800, color: "#fbbf24", fontFamily: "monospace" }}>
+              {Math.round(report.confidence * 100)}%
+            </span>
           </div>
+
+          {/* 市场状态 + 时间 */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+            <span style={{ fontSize: 11, color: "#a1a1aa" }}>
+              {t("regimeDetection")}：{regimeText}
+            </span>
+            <span style={{ fontSize: 11, color: "#71717a", fontFamily: "monospace" }}>
+              {timeStr}
+            </span>
+          </div>
+
+          {/* 共振/风险标签 */}
+          {confluenceTags.length > 0 && (
+            <div style={{ paddingTop: 10, display: "flex", gap: 5, flexWrap: "wrap" as const }}>
+              {confluenceTags.map((tag, i) => (
+                <span key={i} style={{
+                  fontSize: 10, fontWeight: 700,
+                  color: tag.color, background: tag.bg,
+                  borderRadius: 5, padding: "2px 8px",
+                  border: `1px solid ${tag.color}33`,
+                }}>{tag.label}</span>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div style={{ padding: "16px 0 0", position: "relative", zIndex: 10 }}>
-          {/* ── Section 1: Signal Overview ── */}
-          <div style={S.sectionBox(tc.primary, "rgba(255,255,255,0.02)")}>
-            <div style={S.row}>
-              <span style={S.label}>{t("tradingPair")}</span>
-              <span style={{ ...S.value, color: "#ffffff", fontSize: 16 }}>{report.symbol}</span>
-            </div>
-            <div style={S.row}>
-              <span style={S.label}>{t("direction")}</span>
-              <span style={{ ...S.value, color: tc.primary, fontSize: 15, fontWeight: 800, letterSpacing: "0.05em" }}>
-                {tc.dirEmoji} {dirLabel}
-              </span>
-            </div>
-            <div style={S.row}>
-              <span style={S.label}>{t("aiConfidence")}</span>
-              <span style={{ ...S.value, color: "#fbbf24", fontFamily: 'monospace', fontSize: 15 }}>
-                {Math.round(report.confidence * 100)}%
-              </span>
-            </div>
-            <div style={S.rowLast}>
-              <span style={S.label}>{t("analysisMode")}</span>
-              <span style={S.value}>{modeLabel(report.mode)}</span>
-            </div>
-            {/* ── Confluence & Risk Tags ── */}
-            {confluenceTags.length > 0 && (
-              <div style={{ paddingTop: 10, display: "flex", gap: 6, flexWrap: "wrap" as const }}>
-                {confluenceTags.map((tag, i) => (
-                  <span key={i} style={{
-                    fontSize: 11, fontWeight: 700,
-                    color: tag.color, background: tag.bg,
-                    borderRadius: 6, padding: "3px 10px",
-                    border: `1px solid ${tag.color}33`,
-                    letterSpacing: "0.01em",
-                  }}>{tag.label}</span>
-                ))}
-              </div>
-            )}
-          </div>
+        <div style={{ padding: "12px 0 0", position: "relative", zIndex: 10 }}>
 
-          {/* ── Section 2: Strategy Summary ── */}
+          {/* ── Section 1: 策略点位（紧凑 2 列网格） ── */}
           {report.strategy && isLlmDegraded ? (
             <div style={S.sectionBox("#f59e0b", "rgba(245,158,11,0.05)")}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#fbbf24", marginBottom: 4 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#fbbf24", marginBottom: 4 }}>
                 {t("strategyAnomaly")}
               </div>
-              <div style={{ fontSize: 12, color: "#a1a1aa", lineHeight: 1.6 }}>
+              <div style={{ fontSize: 11, color: "#a1a1aa", lineHeight: 1.6 }}>
                 {t("strategyAnomalyDesc")}
               </div>
             </div>
           ) : report.strategy && displayDirection !== "neutral" && (
             <div style={S.sectionBox("#818cf8", "rgba(99,102,241,0.03)")}>
-              <div style={S.row}>
-                <span style={S.label}>{t("strategyTier")}</span>
-                <span style={{...S.value, color: "#c7d2fe", fontSize: 12}}>{report.strategy.is_fallback ? "HFT 估算策略" : "NSED 标准策略"}</span>
+              {/* 策略头 */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", letterSpacing: "0.04em" }}>
+                  {report.strategy.is_fallback ? "HFT 估算策略" : "NSED 标准策略"}
+                </span>
+                {(report.strategy.risk_reward_ratio ?? 0) > 0 && (
+                  <span style={{ fontSize: 12, fontWeight: 800, color: "#a78bfa", fontFamily: "monospace" }}>
+                    R:R 1:{(report.strategy.risk_reward_ratio ?? 0).toFixed(1)}
+                  </span>
+                )}
               </div>
+
+              {/* 2 列网格: 入场/止损/目标 */}
               {(report.strategy.entry_low != null || report.strategy.entry_high != null || report.strategy.stop_loss != null || (report.strategy.targets && report.strategy.targets.length > 0)) ? (
-                <>
-              {(report.strategy.entry_low != null || report.strategy.entry_high != null) && (
-                <div style={S.row}>
-                  <span style={S.label}>{t("entryRange")}</span>
-                  <span style={{ ...S.value, fontFamily: 'monospace', fontSize: 14, color: "#60a5fa" }}>
-                    {report.strategy.entry_low != null ? report.strategy.entry_low.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false }) : "—"}
-                    {" - "}
-                    {report.strategy.entry_high != null ? report.strategy.entry_high.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false }) : "—"}
-                  </span>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 12px" }}>
+                  {/* 入场区间 */}
+                  {(report.strategy.entry_low != null || report.strategy.entry_high != null) && (
+                    <div>
+                      <div style={{ fontSize: 10, color: "#71717a", marginBottom: 2 }}>{t("entryRange")}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#60a5fa", fontFamily: "monospace" }}>
+                        {report.strategy.entry_low != null ? report.strategy.entry_low.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false }) : "—"}
+                        {" ~ "}
+                        {report.strategy.entry_high != null ? report.strategy.entry_high.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false }) : "—"}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 止损 */}
+                  {report.strategy.stop_loss != null && (
+                    <div>
+                      <div style={{ fontSize: 10, color: "#71717a", marginBottom: 2 }}>{t("stopLoss")}</div>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: "#f87171", fontFamily: "monospace" }}>
+                        {report.strategy.stop_loss.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 目标价 */}
+                  {report.strategy.targets && report.strategy.targets.length > 0 && (
+                    <div style={{ gridColumn: "1 / -1" }}>
+                      <div style={{ fontSize: 10, color: "#71717a", marginBottom: 2 }}>{t("target")}</div>
+                      <div style={{ display: "flex", gap: 12 }}>
+                        {report.strategy.targets.slice(0, 3).map((tgt, i) => (
+                          <span key={i} style={{ fontSize: 13, fontWeight: 800, color: "#34d399", fontFamily: "monospace" }}>
+                            T{i + 1}: {tgt.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false })}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-              {report.strategy.stop_loss != null && (
-                <div style={S.row}>
-                  <span style={S.label}>{t("stopLoss")}</span>
-                  <span style={{ ...S.value, color: "#f87171", fontWeight: 800, fontFamily: 'monospace', fontSize: 14 }}>
-                    {report.strategy.stop_loss.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false })}
-                  </span>
-                </div>
-              )}
-              {report.strategy.targets && report.strategy.targets.length > 0 && (
-                <div style={S.row}>
-                  <span style={S.label}>{t("target")}</span>
-                  <span style={{ ...S.value, color: "#34d399", fontWeight: 800, fontFamily: 'monospace', fontSize: 14 }}>
-                    {report.strategy.targets.slice(0, 3).map((tgt, i) => `T${i + 1}:${tgt.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false })}`).join("  ")}
-                  </span>
-                </div>
-              )}
-                </>
               ) : (
-                <div style={S.row}>
-                  <span style={S.label}>{t("entryStopTarget")}</span>
-                  <span style={{ ...S.value, color: "#71717a", fontSize: 12 }}>{t("noKeyLevels")}</span>
-                </div>
+                <div style={{ fontSize: 11, color: "#71717a" }}>{t("noKeyLevels")}</div>
               )}
-              {(report.strategy.risk_reward_ratio ?? 0) > 0 && (
-                <div style={S.row}>
-                  <span style={S.label}>{t("rrRatio")}</span>
-                  <span style={{ ...S.value, color: "#a78bfa", fontWeight: 800, fontFamily: 'monospace', fontSize: 14 }}>
-                    1 : {(report.strategy.risk_reward_ratio ?? 0).toFixed(2)}
+
+              {/* 底部：动量 + 有效期 */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, paddingTop: 8, borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+                <span style={{ fontSize: 11, color: "#a1a1aa" }}>
+                  {t("momentumVerify")}：
+                  <span style={{ color: report.strategy.is_worth_taking ? "#34d399" : "#f87171", fontWeight: 700 }}>
+                    {report.strategy.is_worth_taking ? t("momentumOk") : t("momentumWeak")}
                   </span>
-                </div>
-              )}
-              <div style={S.row}>
-                <span style={S.label}>{t("strategyScore")}</span>
-                <span style={{...S.value, fontFamily: 'monospace', color: "#fbbf24"}}>
-                  {typeof report.strategy.confidence === "number"
-                    ? `${Math.round(report.strategy.confidence * 100)}%`
-                    : "—"}
                 </span>
-              </div>
-              <div style={S.row}>
-                <span style={S.label}>{t("momentumVerify")}</span>
-                <span style={S.value}>
-                  {report.strategy.is_worth_taking ? t("momentumOk") : t("momentumWeak")}
-                </span>
-              </div>
-              <div style={S.row}>
-                <span style={S.label}>{t("regimeDetection")}</span>
-                <span style={S.value}>{regimeText}</span>
-              </div>
-              <div style={S.rowLast}>
-                <span style={S.label}>{t("expiry")}</span>
-                <span style={{...S.value, color: "#a1a1aa", fontSize: 12}}>{validUntilText}</span>
+                {validUntil && (
+                  <span style={{ fontSize: 10, color: "#71717a" }}>
+                    ⏰ {validUntil}
+                  </span>
+                )}
               </div>
             </div>
           )}
 
-          {/* ── Section 3: AI Consensus ── */}
+          {/* ── Section 2: AI 共识 — 进度条可视化 ── */}
           {consensus.total > 0 && (
             <div style={S.sectionBox("#f59e0b", "rgba(245,158,11,0.03)")}>
-              <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 700, color: "#fbbf24", marginBottom: 12 }}>
-                {t("consensusTitle")}
+              <div style={{ fontSize: 11, letterSpacing: "0.04em", fontWeight: 700, color: "#fbbf24", marginBottom: 10 }}>
+                {t("consensusTitle")} · {consensus.total} {t("agentsConsensus")}
               </div>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" as const }}>
+
+              {/* 共识进度条 */}
+              <div style={{ display: "flex", height: 8, borderRadius: 4, overflow: "hidden", background: "rgba(255,255,255,0.06)" }}>
                 {consensus.bullish > 0 && (
-                  <span style={{ fontSize: 12, fontWeight: 700, color: "#34d399", background: "rgba(16,185,129,0.1)", borderRadius: 6, padding: "4px 12px", border: "1px solid rgba(16,185,129,0.2)" }}>
-                    {t("bullishLabel")} {consensus.bullish}
-                  </span>
-                )}
-                {consensus.bearish > 0 && (
-                  <span style={{ fontSize: 12, fontWeight: 700, color: "#f87171", background: "rgba(239,68,68,0.1)", borderRadius: 6, padding: "4px 12px", border: "1px solid rgba(239,68,68,0.2)" }}>
-                    {t("bearishLabel")} {consensus.bearish}
-                  </span>
+                  <div style={{ width: `${bullPct}%`, background: "#34d399", transition: "width 0.3s" }} />
                 )}
                 {consensus.neutral > 0 && (
-                  <span style={{ fontSize: 12, fontWeight: 700, color: "#a1a1aa", background: "rgba(255,255,255,0.05)", borderRadius: 6, padding: "4px 12px", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <div style={{ width: `${neutPct}%`, background: "#71717a", transition: "width 0.3s" }} />
+                )}
+                {consensus.bearish > 0 && (
+                  <div style={{ width: `${bearPct}%`, background: "#f87171", transition: "width 0.3s" }} />
+                )}
+              </div>
+
+              {/* 共识标签 */}
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399" }}>
+                  {t("bullishLabel")} {consensus.bullish}
+                </span>
+                {consensus.neutral > 0 && (
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#a1a1aa" }}>
                     {t("neutralLabel")} {consensus.neutral}
                   </span>
                 )}
-              </div>
-              <div style={{ marginTop: 12, fontSize: 12, color: "#a1a1aa" }}>
-                {t("agentsCompleted").replace("{count}", String(consensus.total))}
-                <br />
-                <span style={{ color: "#d4d4d8", fontWeight: 600 }}>{consensusSummary}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#f87171" }}>
+                  {t("bearishLabel")} {consensus.bearish}
+                </span>
               </div>
             </div>
           )}
 
-          {/* ── Scalping warning ── */}
+          {/* ── Scalping 提示 ── */}
           {report.mode === "scalping" && (
-            <div style={{ margin: "0 24px 16px", background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.2)", borderLeft: "3px solid #f59e0b", borderRadius: 12, padding: "12px 16px", position: "relative", zIndex: 10 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#fbbf24", marginBottom: 4 }}>
+            <div style={{ margin: "0 20px 12px", background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.2)", borderLeft: "3px solid #f59e0b", borderRadius: 12, padding: "10px 14px", position: "relative", zIndex: 10 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#fbbf24", marginBottom: 3 }}>
                 {t("scalpingTitle")}
               </div>
-              <div style={{ fontSize: 11, color: "#a1a1aa", lineHeight: 1.6 }}>
+              <div style={{ fontSize: 10, color: "#a1a1aa", lineHeight: 1.6 }}>
                 {t("scalpingDesc")}
               </div>
             </div>
           )}
 
-          {/* ── Disclaimer ── */}
-          <div style={{ margin: "0 24px 16px", background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.1)", borderRadius: 12, padding: "12px 16px", position: "relative", zIndex: 10 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#71717a", marginBottom: 4 }}>
-              {t("disclaimerTitle")}
-            </div>
-            <div style={{ fontSize: 11, color: "#71717a", lineHeight: 1.6 }}>
-              {t("disclaimerDesc")}
+          {/* ── 免责声明（单行精简） ── */}
+          <div style={{ margin: "0 20px 12px", padding: "8px 14px", position: "relative", zIndex: 10, borderTop: "1px dashed rgba(255,255,255,0.06)" }}>
+            <div style={{ fontSize: 10, color: "#52525b", lineHeight: 1.5 }}>
+              ⚠️ {t("disclaimerDesc")}
             </div>
           </div>
         </div>
 
-        {/* ── Brand footer ── */}
-        <div style={{ background: "rgba(0,0,0,0.4)", borderTop: "1px solid rgba(255,255,255,0.05)", padding: "12px 24px", textAlign: "center" as const, fontSize: 11, color: "#71717a", position: "relative", zIndex: 10 }}>
-          <span>Powered by </span>
-          <span style={{ fontWeight: 800, color: "#d4d4d8", letterSpacing: "0.05em" }}>{cfg.brandName}™</span>
-          {cfg.brandLevel >= 2 && cfg.domain && (
-            <span> | {cfg.domain}</span>
-          )}
-          {cfg.brandLevel >= 3 && cfg.description && (
-            <span> · {cfg.description}</span>
-          )}
-          <div style={{ fontSize: 11, color: "#71717a", marginTop: 4, fontFamily: 'monospace' }}>{timeStr}</div>
+        {/* ── Brand footer: Google 搜索引导 ── */}
+        <div style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%)", borderTop: "1px solid rgba(255,255,255,0.05)", padding: "14px 20px 16px", textAlign: "center" as const, position: "relative", zIndex: 10 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: "#d4d4d8", letterSpacing: "0.06em" }}>
+            {cfg.brandName}™ · 洞察分析
+          </div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 8 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+            </svg>
+            <span style={{ fontSize: 12, color: "#a1a1aa", fontWeight: 500 }}>
+              搜索
+            </span>
+            <span style={{ fontSize: 12, color: "#e4e4e7", fontWeight: 700, background: "rgba(255,255,255,0.06)", padding: "2px 10px", borderRadius: 4, border: "1px solid rgba(255,255,255,0.1)" }}>
+              AXIOM 洞察分析
+            </span>
+          </div>
         </div>
       </div>
     );
