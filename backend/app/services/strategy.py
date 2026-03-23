@@ -25,18 +25,46 @@ logger = logging.getLogger(__name__)
 _CACHE_TTL_SECONDS = 900  # 15 分钟
 
 
-# ── ATR 自适应倍数 ──────────────────────────────────────────
+# ── ATR 自适应倍数（模式感知）───────────────────────────────
+
+# 模式特化 ATR 倍数覆盖表
+# scalping: 目标更近（3h超时），止损偏紧
+# intraday: 适中目标（8h超时），止损适度放宽降低噪音止损
+# trend:    保持原有宽幅目标（96h超时），充分容忍波动
+_MODE_ATR_OVERRIDES: dict[str, dict[str, dict]] = {
+    "scalping": {
+        "low":    {"entry": 1.2, "stop": 1.5, "targets": [2.0, 3.5, 5.5]},
+        "normal": {"entry": 0.8, "stop": 1.0, "targets": [1.5, 2.5, 3.5]},
+        "high":   {"entry": 0.6, "stop": 0.8, "targets": [1.2, 2.0, 3.0]},
+    },
+    "intraday": {
+        "low":    {"entry": 1.2, "stop": 2.0, "targets": [2.0, 3.5, 5.5]},
+        "normal": {"entry": 0.8, "stop": 1.8, "targets": [1.5, 2.5, 4.0]},
+        "high":   {"entry": 0.6, "stop": 1.5, "targets": [1.2, 2.0, 3.5]},
+    },
+    "trend": {
+        "low":    {"entry": 1.5, "stop": 2.0, "targets": [3.0, 5.0, 8.0]},
+        "normal": {"entry": 1.0, "stop": 1.5, "targets": [2.5, 4.0, 6.5]},
+        "high":   {"entry": 0.8, "stop": 1.2, "targets": [1.8, 3.0, 5.0]},
+    },
+}
 
 def _atr_multipliers(
     atr: float,
     current_price: float,
+    mode: str = "trend",
 ) -> dict[str, float | list[float]]:
-    """根据 ATR/Price 波动率比率返回自适应倍数。
+    """根据 ATR/Price 波动率 + 分析模式返回自适应倍数。
 
     volatility_regime:
-        < 1.0% → 低波动（窄幅震荡，需要更宽的倍数避免噪音触发）
+        < 1.0% → 低波动（窄幅震荡）
         1.0%-3.0% → 正常
-        > 3.0% → 高波动（需要更窄的倍数控制单笔风险）
+        > 3.0% → 高波动
+
+    mode:
+        scalping: 目标近、止损紧（3h超时）
+        intraday: 目标适中、止损宽（8h超时，降低噪音止损）
+        trend: 目标远、止损标准（96h超时）
 
     Returns:
         {"entry": float, "stop": float, "targets": [float, float, float]}
@@ -47,14 +75,14 @@ def _atr_multipliers(
     vol_ratio = atr / current_price  # e.g. 0.015 = 1.5%
 
     if vol_ratio < 0.01:
-        # 低波动：适度止损，TP 推远保证 R:R ≥ 1.5
-        return {"entry": 1.5, "stop": 2.0, "targets": [3.0, 5.0, 8.0]}
+        vol_regime = "low"
     elif vol_ratio > 0.03:
-        # 高波动：收窄止损控制风险，TP 推远保证 R:R ≥ 1.5
-        return {"entry": 0.8, "stop": 1.2, "targets": [1.8, 3.0, 5.0]}
+        vol_regime = "high"
     else:
-        # 正常：TP1 ≥ 1.5× 止损距离，保证正期望值
-        return {"entry": 1.0, "stop": 1.5, "targets": [2.5, 4.0, 6.5]}
+        vol_regime = "normal"
+
+    mode_overrides = _MODE_ATR_OVERRIDES.get(mode, _MODE_ATR_OVERRIDES["trend"])
+    return mode_overrides[vol_regime]
 
 
 class StrategyResult(BaseModel):
@@ -85,7 +113,7 @@ class StrategyResult(BaseModel):
 # 短线濒动幅小（TP 间距 0.5%）；日内需要日内波段级别的深度（>1.5%）；趋势模式应对应天级/周级波动幅（>3%）
 _MODE_TP_MIN_GAP: dict[str, float] = {
     "scalping": 0.005,   # 0.5%
-    "intraday": 0.015,   # 1.5%
+    "intraday": 0.010,   # 1.0%（从 1.5% 降低，8h 内 1.5% 间距过大导致目标不可达）
     "trend":    0.030,   # 3.0%
 }
 
@@ -490,7 +518,7 @@ class StrategyService:
         # 入场区间和止损仍然用 ATR（ATR 适合描述波动幅度，不适合做 TP）
         if direction == "long":
             if use_atr:
-                m = _atr_multipliers(atr, current_price)
+                m = _atr_multipliers(atr, current_price, mode=mode)
                 entry_low = current_price - m["entry"] * atr
                 stop_loss = current_price - m["stop"] * atr
             else:
@@ -504,7 +532,7 @@ class StrategyService:
             else:
                 _tp_source = "atr_fallback"
                 if use_atr:
-                    m = _atr_multipliers(atr, current_price)
+                    m = _atr_multipliers(atr, current_price, mode=mode)
                     targets = [current_price + t * atr for t in m["targets"]]
                 else:
                     targets = [current_price * 1.05, current_price * 1.10, current_price * 1.18]
@@ -512,7 +540,7 @@ class StrategyService:
         elif direction == "short":
             entry_low = current_price
             if use_atr:
-                m = _atr_multipliers(atr, current_price)
+                m = _atr_multipliers(atr, current_price, mode=mode)
                 entry_high = current_price + m["entry"] * atr
                 stop_loss = current_price + m["stop"] * atr
             else:
@@ -525,7 +553,7 @@ class StrategyService:
             else:
                 _tp_source = "atr_fallback"
                 if use_atr:
-                    m = _atr_multipliers(atr, current_price)
+                    m = _atr_multipliers(atr, current_price, mode=mode)
                     targets = [current_price - t * atr for t in m["targets"]]
                 else:
                     targets = [current_price * 0.95, current_price * 0.90, current_price * 0.82]

@@ -1566,6 +1566,21 @@ class AnalysisOrchestrator:
         )
         confidence = confidence * trial_penalty
 
+        # ── 4h bias 锚定 — 中期方向参考 ──────────────────────
+        # 日内信号容易被 15m 噪音主导，用 4h EMA3 vs EMA7 锚定方向
+        # 逆 4h 方向惩罚 30%，顺方向加成 10%
+        _4h_bias = _extract_weekly_bias(market_data.klines_4h)  # 复用 EMA bias 函数
+        if _4h_bias and signal != "neutral":
+            if (_4h_bias == "bullish" and signal == "bearish") or \
+               (_4h_bias == "bearish" and signal == "bullish"):
+                confidence *= 0.70  # 逆 4h 趋势，惩罚 30%
+                logger.info(
+                    "4h bias 锚定: signal=%s 逆 4h_bias=%s, confidence 惩罚 30%%",
+                    signal, _4h_bias,
+                )
+            elif _4h_bias == signal:
+                confidence = min(confidence * 1.10, 1.0)  # 顺 4h 趋势，加成 10%
+
         # ── 操盘阶段 → 信号置信度修正 ──────────────────────
         # 阶段与信号方向一致时适当提升，相悖时降权，真正让 Phase 参与决策
         _phase_val = current_phase.value if current_phase else None
