@@ -26,11 +26,12 @@ _WEIGHTS = {
     "volume_ratio": 0.5,  # 量比
 }
 
-_SIGNAL_THRESHOLD = 2.0      # |score| > 2.0 才出信号
-_CONFIDENCE_MIN = 0.35       # 最低置信度门槛
+_SIGNAL_THRESHOLD = 3.0      # |score| > 3.0 才出信号（需至少 2 个维度共振）
+_CONFIDENCE_MIN = 0.45       # 最低置信度门槛（过滤弱信号）
 _MAX_RAW_SCORE = 8.0         # 评分归一化上限
-_MTF_PENALTY = 0.5           # 多周期不一致时的惩罚系数
+_MTF_PENALTY = 0.3           # 多周期不一致时的惩罚系数（严厉惩罚）
 _MTF_BOOST = 1.2             # 三周期一致时的加成系数
+_1H_COUNTER_PENALTY = 0.4    # 1h 趋势反向时的额外惩罚
 
 
 @dataclass
@@ -296,6 +297,11 @@ def compute_scalping_signal(
         trend_1h = "bullish" if price > avg_1h else "bearish"
         signal_5m = "bullish" if raw_score > 0 else "bearish"
 
+        # 1h 趋势反向 → 额外惩罚（scalping 逆 1h 做单假信号极多）
+        if signal_5m != trend_1h:
+            mtf_factor *= _1H_COUNTER_PENALTY
+            findings.append(f"1h 趋势({trend_1h})与信号反向，严厉降权")
+
         # 三周期一致 → 加成
         if klines_15m and len(klines_15m) >= 5:
             avg_15m = sum(k.close for k in klines_15m[-5:]) / 5
@@ -379,7 +385,7 @@ def compute_scalping_levels(
     """
     from app.services.strategy import _atr_multipliers
 
-    m = _atr_multipliers(atr, price)
+    m = _atr_multipliers(atr, price, mode="scalping")
     level_sources: dict[str, str] = {}  # 记录各点位的数据来源
 
     if direction == "bullish":

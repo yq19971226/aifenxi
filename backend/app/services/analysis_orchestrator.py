@@ -1181,6 +1181,17 @@ class AnalysisOrchestrator:
                 )
                 if vpd.confidence_modifier != 1.0:
                     final_confidence *= vpd.confidence_modifier
+
+                # ── VPD 强背离 → 强制信号降级为 neutral ──
+                # scalping 信号源单一，VPD 14 因子检测到强背离时应直接拦截
+                if final_signal != "neutral" and vpd.score < -0.4:
+                    logger.info(
+                        "scalping VPD 强背离拦截: signal=%s vpd_score=%.3f → neutral",
+                        final_signal, vpd.score,
+                    )
+                    final_signal = "neutral"
+                    final_confidence = 0.0
+
                 vpd_data = {
                     "评分": f"{vpd.score:+.3f}",
                     "等级": vpd.grade,
@@ -1211,6 +1222,18 @@ class AnalysisOrchestrator:
                     pass
         except Exception as exc:
             logger.warning("量价背离V2检测失败: %s", exc)
+
+        # ── 震荡市信号抑制（scalping 在 ranging 市场假突破极多）──
+        _regime_val = _regime_effective or _regime_original
+        if _regime_val == "ranging" and final_signal != "neutral":
+            final_confidence *= 0.75  # 震荡市置信度衰减 25%
+            if final_confidence < 0.45:
+                logger.info(
+                    "scalping 震荡市抑制: signal=%s conf=%.3f → neutral",
+                    final_signal, final_confidence,
+                )
+                final_signal = "neutral"
+                final_confidence = 0.0
 
         return AnalysisReport(
             symbol=symbol,
