@@ -1,8 +1,10 @@
 """任务中心 API 路由 — 用户端 + 运营后台。"""
 
 import logging
+import uuid
+from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,7 +22,7 @@ logger = logging.getLogger(__name__)
 class SubmitTaskRequest(BaseModel):
     template_id: str = Field(..., description="任务模板 ID")
     post_url: str = Field(..., min_length=10, description="帖子链接")
-    screenshot_url: str = Field(..., min_length=10, description="浏览量截图地址")
+    screenshot_url: str = Field(..., min_length=5, description="截图路径或链接")
 
 
 class TemplateCreateRequest(BaseModel):
@@ -93,6 +95,48 @@ async def generate_promo_materials(
     """生成推广素材。"""
     await _ensure_task_enabled()
     return await generate_promo(session)
+
+
+_UPLOAD_DIR = Path("uploads/task_proofs")
+_MAX_SIZE = 5 * 1024 * 1024  # 5 MB
+_ALLOWED_TYPES = {"image/png", "image/jpeg", "image/webp"}
+
+
+@user_router.post("/upload-proof")
+async def upload_proof(
+    file: UploadFile = File(...),
+    user: UserInfo = Depends(get_current_user),
+):
+    """上传浏览量截图，返回文件路径。"""
+    await _ensure_task_enabled()
+
+    # 校验类型
+    content_type = file.content_type or ""
+    if content_type not in _ALLOWED_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"不支持的文件类型: {content_type}，仅支持 PNG/JPG/WebP",
+        )
+
+    # 读取并校验大小
+    data = await file.read()
+    if len(data) > _MAX_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="文件大小不能超过 5MB",
+        )
+
+    # 生成唯一文件名
+    ext = content_type.split("/")[-1].replace("jpeg", "jpg")
+    filename = f"{uuid.uuid4().hex}.{ext}"
+    _UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    filepath = _UPLOAD_DIR / filename
+
+    # 写入文件
+    filepath.write_bytes(data)
+    logger.info("proof_uploaded: user=%s file=%s size=%d", user.user_id, filename, len(data))
+
+    return {"screenshot_url": f"/uploads/task_proofs/{filename}"}
 
 
 @user_router.post("/submit")

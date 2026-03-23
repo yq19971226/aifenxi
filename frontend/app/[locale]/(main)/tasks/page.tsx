@@ -66,6 +66,8 @@ export default function TasksPage() {
   const [step2Done, setStep2Done] = useState(false); // Indicates generation is done
   const [postUrl, setPostUrl] = useState("");
   const [ssUrl, setSsUrl] = useState("");
+  const [ssFile, setSsFile] = useState<File | null>(null);
+  const [ssPreview, setSsPreview] = useState<string | null>(null);
   const [copied, setCopied] = useState<number | null>(null);
 
   const statusMeta = {
@@ -85,8 +87,20 @@ export default function TasksPage() {
     onSuccess: () => { 
       qc.invalidateQueries({ queryKey: ["task-home"] }); 
       setPostUrl(""); setSsUrl(""); setSelTpl(""); setStep2Done(false);
+      setSsFile(null); setSsPreview(null);
     },
   });
+  const uploadMut = useMutation({ mutationFn: tasksApi.uploadProof });
+
+  const handleFileSelect = (file: File) => {
+    setSsFile(file);
+    setSsPreview(URL.createObjectURL(file));
+    setSsUrl(""); // reset previous url
+    // auto upload
+    uploadMut.mutate(file, {
+      onSuccess: (res) => setSsUrl(res.screenshot_url),
+    });
+  };
 
   const copyText = (text: string, idx: number) => { 
     navigator.clipboard.writeText(text); 
@@ -211,7 +225,7 @@ export default function TasksPage() {
                             <span className="text-[10px] font-black font-mono text-emerald-400 uppercase tracking-[0.1em] bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
                               +{tpl.reward_amount} {MODE_LABELS[tpl.reward_mode] ?? tpl.reward_mode}
                             </span>
-                            <span className="text-[9px] font-bold font-mono text-zinc-400 uppercase tracking-[0.2em]">≥{tpl.min_views} Views</span>
+                            <span className="text-[9px] font-bold font-mono text-zinc-400 uppercase tracking-[0.2em]">≥{tpl.min_views} 浏览量</span>
                           </div>
                         </button>
                       ))}
@@ -271,7 +285,32 @@ export default function TasksPage() {
                         </div>
                         <div>
                           <label className="mb-2 flex items-center gap-2 text-[10px] font-bold font-mono text-zinc-400 uppercase tracking-[0.2em]"><ImageIcon size={12} className="text-zinc-500" />{t('today.screenshotUrl')}</label>
-                          <input type="url" value={ssUrl} onChange={e => setSsUrl(e.target.value)} placeholder={t('today.screenshotPlaceholder')} className={inputCls} />
+                          <div
+                            onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('border-indigo-500/50', 'bg-indigo-500/5'); }}
+                            onDragLeave={e => { e.currentTarget.classList.remove('border-indigo-500/50', 'bg-indigo-500/5'); }}
+                            onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('border-indigo-500/50', 'bg-indigo-500/5'); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('image/')) handleFileSelect(f); }}
+                            className="relative border border-dashed border-white/[0.15] bg-white/[0.02] p-6 text-center cursor-pointer hover:border-indigo-500/30 transition-colors"
+                            onClick={() => document.getElementById('ss-file-input')?.click()}
+                          >
+                            <input id="ss-file-input" type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); }} />
+                            {ssPreview ? (
+                              <div className="space-y-3">
+                                <img src={ssPreview} alt="截图预览" className="max-h-40 mx-auto object-contain border border-white/10" />
+                                <div className="flex items-center justify-center gap-2">
+                                  {uploadMut.isPending && <span className="text-[10px] font-mono text-amber-400 animate-pulse">{t('today.uploadingScreenshot')}</span>}
+                                  {ssUrl && <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1"><CheckCircle2 size={10} />{t('today.uploadSuccess')}</span>}
+                                  {uploadMut.isError && <span className="text-[10px] font-mono text-red-400">{(uploadMut.error as Error).message}</span>}
+                                </div>
+                                <p className="text-[9px] font-mono text-zinc-500">{ssFile?.name} · {ssFile ? (ssFile.size / 1024).toFixed(0) : 0}KB</p>
+                              </div>
+                            ) : (
+                              <div className="py-4">
+                                <Upload size={24} className="mx-auto text-zinc-500 mb-3" />
+                                <p className="text-[11px] font-mono text-zinc-400">{t('today.screenshotPlaceholder')}</p>
+                                <p className="text-[9px] font-mono text-zinc-600 mt-1">PNG / JPG / WebP · ≤ 5MB</p>
+                              </div>
+                            )}
+                          </div>
                         </div>
                         <button onClick={() => submitMut.mutate({ template_id: selTpl, post_url: postUrl, screenshot_url: ssUrl })} disabled={!postUrl || !ssUrl || submitMut.isPending}
                           className="flex w-full items-center justify-center gap-3 mt-8 relative overflow-hidden bg-indigo-600 py-4 text-[12px] font-black font-mono uppercase tracking-[0.3em] text-white hover:bg-indigo-500 disabled:opacity-30 disabled:hover:bg-indigo-600 transition-all shadow-[0_0_20px_rgba(99,102,241,0.4)] group">

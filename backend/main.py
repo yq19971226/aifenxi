@@ -314,6 +314,15 @@ app.include_router(leaderboard_public_router)
 app.include_router(defense_public_router)
 app.include_router(autopilots_router)
 
+# 静态文件服务：任务截图上传等
+import os
+from pathlib import Path as _Path
+from fastapi.staticfiles import StaticFiles
+
+_uploads_dir = _Path("uploads")
+_uploads_dir.mkdir(exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(_uploads_dir)), name="uploads")
+
 
 @app.get("/health", tags=["system"])
 async def health() -> dict[str, str]:

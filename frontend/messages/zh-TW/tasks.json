@@ -26,8 +26,10 @@
     "copy": "複製",
     "copied": "已複製",
     "postUrl": "帖子連結",
-    "screenshotUrl": "瀏覽量截圖連結",
-    "screenshotPlaceholder": "截圖上傳後的圖片連結",
+    "screenshotUrl": "瀏覽量截圖",
+    "screenshotPlaceholder": "點擊選擇或拖拽截圖到此處",
+    "uploadingScreenshot": "上傳中...",
+    "uploadSuccess": "上傳成功",
     "submit": "提交審核",
     "submitting": "提交中...",
     "submitSuccess": "提交成功，等待審核"

@@ -26,8 +26,10 @@
     "copy": "Copy",
     "copied": "Copied",
     "postUrl": "Post URL",
-    "screenshotUrl": "View Count Screenshot URL",
-    "screenshotPlaceholder": "Image URL after uploading screenshot",
+    "screenshotUrl": "View Count Screenshot",
+    "screenshotPlaceholder": "Click to select or drag screenshot here",
+    "uploadingScreenshot": "Uploading...",
+    "uploadSuccess": "Upload successful",
     "submit": "Submit for Review",
     "submitting": "Submitting...",
     "submitSuccess": "Submitted successfully, pending review"

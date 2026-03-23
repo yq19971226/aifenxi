@@ -101,6 +101,16 @@ export const tasksApi = {
     const res = await authFetch(`${API_BASE}/api/tasks/my-bonus`);
     return handleApiResponse(res, "请求失败");
   },
+
+  async uploadProof(file: File): Promise<{ screenshot_url: string }> {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await authFetch(`${API_BASE}/api/tasks/upload-proof`, {
+      method: "POST",
+      body: formData,
+    });
+    return handleApiResponse(res, "上传失败");
+  },
 };
 
 // ── Admin API ────────────────────────────────────────────────
