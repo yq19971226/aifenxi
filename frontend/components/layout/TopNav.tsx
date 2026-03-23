@@ -225,7 +225,7 @@ export function TopNav() {
                     className="flex items-center gap-4 px-4 py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] text-zinc-300 hover:bg-[#2AABEE]/10 hover:text-[#2AABEE]"
                   >
                     <Send size={22} className="shrink-0 text-[#2AABEE]" />
-                    <span className="flex-1">Telegram Support</span>
+                    <span className="flex-1">Telegram 客服</span>
                   </a>
                 </div>
               </div>

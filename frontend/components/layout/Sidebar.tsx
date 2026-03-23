@@ -262,7 +262,7 @@ export function Sidebar() {
                   exit={{ opacity: 0, width: 0 }}
                   className="ml-3.5 flex-1 overflow-hidden"
                 >
-                  <span className="text-sm font-bold tracking-wide whitespace-nowrap">Telegram Support</span>
+                  <span className="text-sm font-bold tracking-wide whitespace-nowrap">Telegram 客服</span>
                 </motion.div>
               )}
             </AnimatePresence>
