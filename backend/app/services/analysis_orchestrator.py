@@ -1495,23 +1495,32 @@ class AnalysisOrchestrator:
             for aid in intraday_agg_ids
         ]
 
-        # --- 量价背离检测 V2（多因子）— 前置到聚合之前，参与信号决策 ---
+        # --- 量价背离检测 V2（多因子）— 两阶段后置验证 ---
+        # 阶段 1：先用 6 个 Agent 做初步聚合，得到方向参考
+        _pre_signal, _pre_conf = _intraday_aggregate(
+            intraday_agg_reports,
+            intraday_agg_ids,
+            regime=regime_val,
+            prev_signal=None,  # 初步聚合不用迟滞，避免锁定
+        )
+
+        # 阶段 2：将初步方向传给 VPD 做验证性检测（而非传 neutral）
         vpd = None
         try:
             from app.services.volume_price_divergence_v2 import detect_volume_price_divergence_v2
             vpd_klines = market_data.klines_1h or market_data.klines_4h or market_data.klines_15m
             if vpd_klines and len(vpd_klines) >= 25:
                 vpd = await detect_volume_price_divergence_v2(
-                    vpd_klines, "neutral",  # 前置检测，此时还没有聚合信号
+                    vpd_klines, _pre_signal,  # 传入初步聚合方向，验证而非盲猜
                     indicators=market_data.indicators,
                     derivatives=market_data.derivatives,
                     coinglass=market_data.coinglass,
                     onchain=market_data.onchain,
                 )
         except Exception as exc:
-            logger.warning("量价背离V2前置检测失败: %s", exc)
+            logger.warning("量价背离V2后置验证失败: %s", exc)
 
-        # ── VPD 作为虚拟 agent 参与信号聚合（确定性锚定）──
+        # ── VPD 作为虚拟 agent 参与最终聚合（确定性锚定）──
         if vpd is not None and vpd.data_completeness >= 0.5:
             # 将 VPD 评分转换为 AgentReport 格式
             if vpd.score > 0.15:
@@ -1558,6 +1567,7 @@ class AnalysisOrchestrator:
         except Exception:
             pass
 
+        # 最终聚合（包含 VPD 虚拟 Agent + 迟滞锚定）
         signal, confidence = _intraday_aggregate(
             intraday_agg_reports,
             intraday_agg_ids,
@@ -1565,6 +1575,15 @@ class AnalysisOrchestrator:
             prev_signal=_prev_signal,
         )
         confidence = confidence * trial_penalty
+
+        # ── VPD confidence_modifier 直接修正（与趋势模式对齐）──
+        # 除了参与聚合，VPD 的置信度修正也直接作用
+        if vpd is not None and vpd.confidence_modifier != 1.0:
+            confidence *= vpd.confidence_modifier
+            logger.info(
+                "VPD 置信度修正: modifier=%.2f, signal=%s, vpd_grade=%s",
+                vpd.confidence_modifier, signal, vpd.grade,
+            )
 
         # ── 4h bias 锚定 — 中期方向参考 ──────────────────────
         # 日内信号容易被 15m 噪音主导，用 4h EMA3 vs EMA7 锚定方向
