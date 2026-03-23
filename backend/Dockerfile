@@ -21,6 +21,9 @@ COPY --from=builder /install /usr/local
 COPY --chown=omnimind:omnimind app/api/leaderboard.py app/api/
 COPY --chown=omnimind:omnimind . .
 
+# 预建上传目录（非 root 用户需要提前创建）
+RUN mkdir -p /app/uploads/task_proofs && chown -R omnimind:omnimind /app/uploads
+
 USER omnimind
 
 EXPOSE 8000

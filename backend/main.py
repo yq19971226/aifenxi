@@ -320,8 +320,13 @@ from pathlib import Path as _Path
 from fastapi.staticfiles import StaticFiles
 
 _uploads_dir = _Path("uploads")
-_uploads_dir.mkdir(exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=str(_uploads_dir)), name="uploads")
+try:
+    _uploads_dir.mkdir(exist_ok=True)
+except PermissionError:
+    import logging
+    logging.getLogger(__name__).warning("uploads 目录创建失败（权限不足），请确保 Dockerfile 已预建")
+if _uploads_dir.is_dir():
+    app.mount("/uploads", StaticFiles(directory=str(_uploads_dir)), name="uploads")
 
 
 @app.get("/health", tags=["system"])
