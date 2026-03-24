@@ -56,6 +56,7 @@ from app.api.dashboard_overview import router as dashboard_overview_router
 from app.api.leaderboard import router as leaderboard_router
 from app.api.leaderboard_public import router as leaderboard_public_router
 from app.api.autopilots import router as autopilots_router
+from app.api.event_contracts import router as event_contracts_router
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.redis import init_redis, close_redis
@@ -313,6 +314,7 @@ app.include_router(leaderboard_router)
 app.include_router(leaderboard_public_router)
 app.include_router(defense_public_router)
 app.include_router(autopilots_router)
+app.include_router(event_contracts_router)
 
 # 静态文件服务：任务截图上传等
 import os

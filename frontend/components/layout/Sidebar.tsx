@@ -18,6 +18,7 @@ import {
   LogOut,
   Rocket,
   Send,
+  Zap,
   type LucideIcon,
   Settings,
 } from "lucide-react";
@@ -47,6 +48,7 @@ const navItems: NavItem[] = [
   { key: "consensus", href: "/consensus", icon: Brain, minRole: "user" },
   { key: "adversarial", href: "/adversarial", icon: Shield, minRole: "user", featureFlag: "adversarial" },
   { key: "autopilots", href: "/autopilots", icon: Rocket, minRole: "user" },
+  { key: "event_contracts", href: "/event-contracts", icon: Zap, minRole: "user" },
   { key: "leaderboard", href: "/leaderboard", icon: TrendingUp, minRole: "user", featureFlag: "leaderboard" },
   { key: "alerts", href: "/alerts", icon: Shield, minRole: "user", featureFlag: "alerts" },
   {
@@ -82,7 +84,6 @@ const adminNavItem: NavItem = {
     { key: "monitor", href: "/admin/monitor" },
 
     { key: "task_review", href: "/admin/task-review" },
-    { key: "task_templates", href: "/admin/task-templates" },
     { key: "withdrawals", href: "/admin/withdrawals" },
     { key: "partner_stats", href: "/admin/partner-stats" },
   ],
