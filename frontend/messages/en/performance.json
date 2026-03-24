@@ -64,6 +64,7 @@
     "totalStrategies": "Strategies",
     "settled": "Settled",
     "profitLossRatio": "Risk/Reward",
+    "sharpeRatio": "Sharpe Ratio",
     "avgProfit": "Avg Profit",
     "avgLoss": "Avg Loss",
     "upgradeToUnlock": "Upgrade to unlock"

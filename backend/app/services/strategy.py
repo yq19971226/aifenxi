@@ -38,9 +38,9 @@ _MODE_ATR_OVERRIDES: dict[str, dict[str, dict]] = {
         "high":   {"entry": 0.6, "stop": 0.8, "targets": [1.2, 2.0, 3.0]},
     },
     "intraday": {
-        "low":    {"entry": 1.2, "stop": 2.0, "targets": [2.0, 3.5, 5.5]},
-        "normal": {"entry": 0.8, "stop": 1.8, "targets": [1.5, 2.5, 4.0]},
-        "high":   {"entry": 0.6, "stop": 1.5, "targets": [1.2, 2.0, 3.5]},
+        "low":    {"entry": 1.2, "stop": 2.5, "targets": [3.0, 5.0, 8.0]},
+        "normal": {"entry": 0.8, "stop": 2.0, "targets": [2.5, 4.0, 6.5]},
+        "high":   {"entry": 0.6, "stop": 1.8, "targets": [2.0, 3.5, 5.5]},
     },
     "trend": {
         "low":    {"entry": 1.5, "stop": 2.0, "targets": [3.0, 5.0, 8.0]},
@@ -113,14 +113,14 @@ class StrategyResult(BaseModel):
 # 短线濒动幅小（TP 间距 0.5%）；日内需要日内波段级别的深度（>1.5%）；趋势模式应对应天级/周级波动幅（>3%）
 _MODE_TP_MIN_GAP: dict[str, float] = {
     "scalping": 0.005,   # 0.5%
-    "intraday": 0.010,   # 1.0%（从 1.5% 降低，8h 内 1.5% 间距过大导致目标不可达）
+    "intraday": 0.008,   # 0.8%（从 1.0% 降低，增加结构性 TP 候选保留率）
     "trend":    0.030,   # 3.0%
 }
 
 # 回退策略最小幅度（百分比），防止很小的 TP fallback
 _MODE_FALLBACK_TP_PCTS: dict[str, list[float]] = {
     "scalping": [0.050, 0.090, 0.150],
-    "intraday": [0.060, 0.120, 0.200],
+    "intraday": [0.080, 0.150, 0.250],
     "trend":    [0.080, 0.160, 0.250],
 }
 
@@ -231,7 +231,7 @@ class StrategyService:
         reward = abs(targets[0] - entry_mid)
 
         rr = round(reward / risk, 2)
-        worth = rr >= 2.0
+        worth = rr >= 1.5
 
         return rr, worth
 

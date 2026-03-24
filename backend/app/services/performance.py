@@ -251,6 +251,21 @@ class PerformanceTracker:
         _cf = count_filter
         _af = avg_filter
 
+        # Sharpe ratio: PostgreSQL 支持 STDDEV, SQLite 不支持
+        if is_sqlite:
+            _sharpe_sql = "0 AS sharpe_ratio"
+        else:
+            _avg_settled = _af('pnl_pct', "status != 'pending'")
+            _sharpe_sql = (
+                "ROUND(CAST("
+                "COALESCE("
+                f"CAST({_avg_settled} AS FLOAT)"
+                " / NULLIF(STDDEV(CASE WHEN status != 'pending' THEN pnl_pct END), 0),"
+                " 0"
+                ") AS NUMERIC"
+                "), 4) AS sharpe_ratio"
+            )
+
         result = await self._session.execute(
             text(f"""
                 SELECT
@@ -271,7 +286,8 @@ class PerformanceTracker:
                         {_af('pnl_pct', 'pnl_pct > 0')}
                         / NULLIF(ABS({_af('pnl_pct', 'pnl_pct <= 0')}), 0),
                         0
-                    )                                                      AS profit_loss_ratio
+                    )                                                      AS profit_loss_ratio,
+                    {_sharpe_sql}
                 FROM strategy_snapshots
                 WHERE {where_clause}
             """),
@@ -289,6 +305,7 @@ class PerformanceTracker:
             avg_profit_pct=round(float(row["avg_profit_pct"] or 0), 4) if row else 0.0,
             avg_loss_pct=round(float(row["avg_loss_pct"] or 0), 4) if row else 0.0,
             profit_loss_ratio=round(float(row["profit_loss_ratio"] or 0), 4) if row else 0.0,
+            sharpe_ratio=round(float(row["sharpe_ratio"] or 0), 4) if row else 0.0,
             by_agent=by_agent,
         )
 

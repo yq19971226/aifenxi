@@ -27,6 +27,7 @@ const DEFAULT_STATS: PerformanceStats = {
   avg_profit_pct: 0,
   avg_loss_pct: 0,
   profit_loss_ratio: 0,
+  sharpe_ratio: 0,
   by_agent: {},
 };
 

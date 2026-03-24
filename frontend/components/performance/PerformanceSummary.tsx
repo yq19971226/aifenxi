@@ -86,6 +86,13 @@ export function PerformanceSummary({ stats, membershipLevel }: PerformanceSummar
       lockedLabel: t("upgradeToUnlock"),
     },
     {
+      label: t("sharpeRatio"),
+      value: formatNumber(stats.sharpe_ratio, 2),
+      colorClass: stats.sharpe_ratio >= 1.0 ? "text-emerald-400" : stats.sharpe_ratio >= 0 ? "text-amber-400" : "text-red-400",
+      locked: isFree,
+      lockedLabel: t("upgradeToUnlock"),
+    },
+    {
       label: t("avgProfit"),
       value: `+${formatPercent(stats.avg_profit_pct, 2)}`,
       colorClass: "text-emerald-400",

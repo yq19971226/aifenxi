@@ -12,6 +12,7 @@ export interface PerformanceStats {
   avg_profit_pct: number;
   avg_loss_pct: number;
   profit_loss_ratio: number;
+  sharpe_ratio: number;
   by_agent: Record<string, number>;
 }
 

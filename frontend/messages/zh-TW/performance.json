@@ -64,6 +64,7 @@
     "totalStrategies": "總策略數",
     "settled": "已結算",
     "profitLossRatio": "盈虧比",
+    "sharpeRatio": "夏普比率",
     "avgProfit": "平均盈利",
     "avgLoss": "平均虧損",
     "upgradeToUnlock": "升級解鎖"

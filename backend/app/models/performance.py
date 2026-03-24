@@ -68,4 +68,5 @@ class PerformanceStats(BaseModel):
     avg_profit_pct: float
     avg_loss_pct: float
     profit_loss_ratio: float
+    sharpe_ratio: float = 0.0
     by_agent: dict[str, float]
