@@ -7,6 +7,8 @@ import {
   TrendingUp,
   TrendingDown,
   Pause,
+  Play,
+  Square,
   Activity,
   BarChart3,
   Clock,
@@ -15,11 +17,15 @@ import {
   Signal,
   ShieldCheck,
   Flame,
+  RefreshCw,
 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 import {
   fetchEventLive,
   fetchEventHistory,
   fetchEventStats,
+  startPredictor,
+  stopPredictor,
   type EventLiveSignal,
   type EventHistoryRecord,
   type EventStatsResponse,
@@ -43,6 +49,8 @@ const itemVariants = {
 
 // ── 页面组件 ──────────────────────────────────────────────
 export default function EventContractsPanel() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
   const [live, setLive] = useState<EventLiveSignal | null>(null);
   const [history, setHistory] = useState<EventHistoryRecord[]>([]);
   const [stats, setStats] = useState<EventStatsResponse | null>(null);
@@ -51,6 +59,40 @@ export default function EventContractsPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Admin state
+  const [selectedSymbol, setSelectedSymbol] = useState("ETHUSDT");
+  const [actionLoading, setActionLoading] = useState(false);
+  const [toast, setToast] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+
+  const showToast = useCallback((type: "ok" | "err", msg: string) => {
+    setToast({ type, msg });
+    setTimeout(() => setToast(null), 3000);
+  }, []);
+
+  const handleStart = useCallback(async () => {
+    setActionLoading(true);
+    try {
+      await startPredictor(selectedSymbol);
+      showToast("ok", `预测器已启动 (${selectedSymbol})`);
+    } catch (e: any) {
+      showToast("err", e.message || "启动失败");
+    } finally {
+      setActionLoading(false);
+    }
+  }, [selectedSymbol, showToast]);
+
+  const handleStop = useCallback(async () => {
+    setActionLoading(true);
+    try {
+      await stopPredictor();
+      showToast("ok", "预测器已停止");
+    } catch (e: any) {
+      showToast("err", e.message || "停止失败");
+    } finally {
+      setActionLoading(false);
+    }
+  }, [showToast]);
 
   const pollLive = useCallback(async () => {
     try {
@@ -95,6 +137,8 @@ export default function EventContractsPanel() {
     loadData(p);
   };
 
+  const isOnline = live?.status === "online";
+
   return (
     <motion.div
       variants={containerVariants}
@@ -102,6 +146,24 @@ export default function EventContractsPanel() {
       animate="visible"
       className="space-y-6"
     >
+      {/* ── Toast ── */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className={`fixed top-4 right-4 z-50 px-4 py-2.5 rounded-lg border text-sm font-mono font-bold shadow-2xl backdrop-blur-xl ${
+              toast.type === "ok"
+                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                : "bg-red-500/10 border-red-500/30 text-red-400"
+            }`}
+          >
+            {toast.msg}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── Header ── */}
       <motion.div variants={itemVariants} className="relative overflow-hidden rounded-xl border border-white/[0.06] bg-[#0a0d14]/90 backdrop-blur-3xl p-6 lg:p-8">
         <div className="absolute inset-0 bg-scanline opacity-[0.03] pointer-events-none" />
@@ -142,6 +204,41 @@ export default function EventContractsPanel() {
             </span>
           </div>
         </div>
+
+        {/* ── Admin Controls ── */}
+        {isAdmin && (
+          <div className="relative z-10 mt-5 pt-5 border-t border-white/[0.06] flex items-center gap-3 flex-wrap">
+            <span className="text-[9px] font-mono font-black text-amber-400 uppercase tracking-[0.2em] mr-1">ADMIN</span>
+            <select
+              value={selectedSymbol}
+              onChange={(e) => setSelectedSymbol(e.target.value)}
+              className="bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-1.5 text-xs font-mono text-zinc-300 focus:outline-none focus:border-[#00E5FF]/40 transition-colors"
+            >
+              {["ETHUSDT", "BTCUSDT", "BNBUSDT", "SOLUSDT", "DOGEUSDT"].map((s) => (
+                <option key={s} value={s} className="bg-[#0a0d14] text-zinc-300">{s}</option>
+              ))}
+            </select>
+            {isOnline ? (
+              <button
+                onClick={handleStop}
+                disabled={actionLoading}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-mono font-bold bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 disabled:opacity-40 transition-all"
+              >
+                {actionLoading ? <RefreshCw size={12} className="animate-spin" /> : <Square size={12} />}
+                停止预测器
+              </button>
+            ) : (
+              <button
+                onClick={handleStart}
+                disabled={actionLoading}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-mono font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-40 transition-all"
+              >
+                {actionLoading ? <RefreshCw size={12} className="animate-spin" /> : <Play size={12} />}
+                启动预测器
+              </button>
+            )}
+          </div>
+        )}
       </motion.div>
 
       {error && (
@@ -153,7 +250,7 @@ export default function EventContractsPanel() {
 
       {/* ── Live Signal Panel ── */}
       <motion.div variants={itemVariants}>
-        <LiveSignalPanel live={live} />
+        <LiveSignalPanel live={live} isAdmin={isAdmin} onStart={handleStart} actionLoading={actionLoading} />
       </motion.div>
 
       {/* ── Stats ── */}
@@ -179,7 +276,7 @@ export default function EventContractsPanel() {
 
 // ── 实时信号面板 ──────────────────────────────────────────
 
-function LiveSignalPanel({ live }: { live: EventLiveSignal | null }) {
+function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: EventLiveSignal | null; isAdmin: boolean; onStart: () => void; actionLoading: boolean }) {
   if (!live || live.status !== "online") {
     return (
       <div className="relative rounded-xl border border-white/[0.06] bg-[#0a0d14]/90 backdrop-blur-3xl p-12 text-center overflow-hidden">
@@ -190,6 +287,16 @@ function LiveSignalPanel({ live }: { live: EventLiveSignal | null }) {
           <p className="text-zinc-500 font-mono text-sm">
             {live?.status === "warming_up" ? "数据预热中，请等待约 30 秒..." : "预测器当前未运行"}
           </p>
+          {isAdmin && !live?.status?.includes("warming") && (
+            <button
+              onClick={onStart}
+              disabled={actionLoading}
+              className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-mono font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(52,211,153,0.2)] disabled:opacity-40 transition-all"
+            >
+              {actionLoading ? <RefreshCw size={14} className="animate-spin" /> : <Play size={14} />}
+              点击启动预测器
+            </button>
+          )}
         </div>
       </div>
     );
