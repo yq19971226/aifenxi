@@ -61,6 +61,9 @@ class EventPredictor:
         # 从 DB 恢复 round_num（修复 #4）
         await self._restore_round_num()
 
+        # 恢复重启前遗留的 pending 记录（标记为 expired）
+        await self._recover_pending_on_startup()
+
         # 启动 WebSocket 聚合器（后台）
         self._aggregator_task = asyncio.create_task(self._aggregator.start())
 
@@ -415,6 +418,36 @@ class EventPredictor:
                 break
             except Exception as exc:
                 logger.warning("pending_cleanup_error", extra={"error": str(exc)})
+
+    async def _recover_pending_on_startup(self) -> None:
+        """启动时清理上一次运行遗留的 pending 记录。
+
+        服务器重建/重启后，之前未结算的 pending 记录无法再正常结算
+        （因为已错过到期时间窗口），直接标记为 expired。
+        """
+        try:
+            from app.core.database import AsyncSessionLocal
+            from sqlalchemy import text
+
+            async with AsyncSessionLocal() as session:
+                result = await session.execute(
+                    text("""
+                        UPDATE event_predictions
+                        SET status = 'expired', result = 'restart'
+                        WHERE symbol = :symbol AND status = 'pending'
+                    """),
+                    {"symbol": self.symbol},
+                )
+                if result.rowcount and result.rowcount > 0:
+                    await session.commit()
+                    logger.warning(
+                        "Recovered %d orphaned pending predictions from previous session",
+                        result.rowcount,
+                    )
+                else:
+                    logger.info("No orphaned pending predictions found")
+        except Exception as exc:
+            logger.warning("recover_pending_on_startup_error", extra={"error": str(exc)})
 
 
 # ── 数据库建表 ──────────────────────────────────────────────

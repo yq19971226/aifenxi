@@ -223,8 +223,30 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     except Exception as exc:
         import logging
         logging.getLogger(__name__).warning("系统机器人启动失败: %s", exc)
+    # 事件合约预测器 — 自动启动（服务器重启后自动恢复）
+    try:
+        from app.services.config_service import get_config_value
+        event_pred_enabled = (await get_config_value("event_predictor_enabled", "true")).lower().strip()
+        if event_pred_enabled in ("true", "1", "on"):
+            from app.services.event_predictor import start_predictor
+            app.state._event_predictor = await start_predictor("ETHUSDT")
+            import logging
+            logging.getLogger(__name__).info("EventPredictor 自动启动成功")
+        else:
+            import logging
+            logging.getLogger(__name__).info("EventPredictor 已通过配置禁用")
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning("EventPredictor 自动启动失败: %s", exc)
     yield
     # shutdown
+    # 事件合约预测器 — 自动停止
+    if hasattr(app.state, "_event_predictor") and app.state._event_predictor:
+        try:
+            from app.services.event_predictor import stop_predictor
+            await stop_predictor()
+        except Exception:
+            pass
     if hasattr(app.state, "_system_bot_task"):
         app.state._system_bot_task.cancel()
     if hasattr(app.state, "_factor_tracking_task"):
