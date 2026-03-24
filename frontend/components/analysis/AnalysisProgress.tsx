@@ -258,23 +258,23 @@ interface DataLine {
 
 const _DATA_FEED_POOL: { icon: typeof Zap; color: string; label: string; valueFn: () => string }[] = [
   { icon: BarChart3, color: "text-indigo-400", label: "RSI(14)", valueFn: () => (35 + Math.random() * 30).toFixed(1) },
-  { icon: BarChart3, color: "text-indigo-400", label: "MACD Hist", valueFn: () => (Math.random() > 0.5 ? "+" : "-") + (Math.random() * 200).toFixed(0) },
-  { icon: BarChart3, color: "text-indigo-400", label: "BB Width", valueFn: () => (Math.random() * 5 + 1).toFixed(2) + "%" },
-  { icon: Activity, color: "text-cyan-400", label: "Bid Depth", valueFn: () => "$" + (Math.random() * 50 + 10).toFixed(1) + "M" },
-  { icon: Activity, color: "text-cyan-400", label: "Ask Depth", valueFn: () => "$" + (Math.random() * 50 + 10).toFixed(1) + "M" },
-  { icon: Activity, color: "text-cyan-400", label: "Spread", valueFn: () => (Math.random() * 0.05).toFixed(4) + "%" },
-  { icon: Link, color: "text-purple-400", label: "Exchange Netflow", valueFn: () => (Math.random() > 0.5 ? "+" : "-") + (Math.random() * 3000 + 100).toFixed(0) + " BTC" },
+  { icon: BarChart3, color: "text-indigo-400", label: "MACD 柱", valueFn: () => (Math.random() > 0.5 ? "+" : "-") + (Math.random() * 200).toFixed(0) },
+  { icon: BarChart3, color: "text-indigo-400", label: "布林带宽", valueFn: () => (Math.random() * 5 + 1).toFixed(2) + "%" },
+  { icon: Activity, color: "text-cyan-400", label: "买盘深度", valueFn: () => "$" + (Math.random() * 50 + 10).toFixed(1) + "M" },
+  { icon: Activity, color: "text-cyan-400", label: "卖盘深度", valueFn: () => "$" + (Math.random() * 50 + 10).toFixed(1) + "M" },
+  { icon: Activity, color: "text-cyan-400", label: "价差", valueFn: () => (Math.random() * 0.05).toFixed(4) + "%" },
+  { icon: Link, color: "text-purple-400", label: "交易所净流入", valueFn: () => (Math.random() > 0.5 ? "+" : "-") + (Math.random() * 3000 + 100).toFixed(0) + " BTC" },
   { icon: Link, color: "text-purple-400", label: "MVRV-Z", valueFn: () => (Math.random() * 4 - 1).toFixed(2) },
   { icon: Link, color: "text-purple-400", label: "SOPR", valueFn: () => (0.95 + Math.random() * 0.1).toFixed(4) },
-  { icon: Shield, color: "text-orange-400", label: "F&G Index", valueFn: () => Math.floor(Math.random() * 40 + 20).toString() },
-  { icon: Shield, color: "text-orange-400", label: "Funding Rate", valueFn: () => (Math.random() > 0.5 ? "+" : "-") + (Math.random() * 0.03).toFixed(4) + "%" },
-  { icon: Shield, color: "text-orange-400", label: "L/S Ratio", valueFn: () => (0.8 + Math.random() * 0.4).toFixed(3) },
-  { icon: Newspaper, color: "text-sky-400", label: "Sentiment", valueFn: () => ["Positive", "Negative", "Neutral"][Math.floor(Math.random() * 3)] },
-  { icon: Newspaper, color: "text-sky-400", label: "News Count", valueFn: () => Math.floor(Math.random() * 20 + 3).toString() },
-  { icon: Brain, color: "text-amber-400", label: "Social Heat", valueFn: () => (Math.random() > 0.5 ? "↑" : "↓") + (Math.random() * 50).toFixed(0) + "%" },
-  { icon: Database, color: "text-blue-400", label: "Klines", valueFn: () => Math.floor(Math.random() * 200 + 100).toString() },
-  { icon: Zap, color: "text-emerald-400", label: "Confidence", valueFn: () => (Math.random() * 0.4 + 0.5).toFixed(2) },
-  { icon: Swords, color: "text-orange-400", label: "Adversarial", valueFn: () => ["Gaming", "Trap Detection", "Defense Eval"][Math.floor(Math.random() * 3)] },
+  { icon: Shield, color: "text-orange-400", label: "恐贪指数", valueFn: () => Math.floor(Math.random() * 40 + 20).toString() },
+  { icon: Shield, color: "text-orange-400", label: "资金费率", valueFn: () => (Math.random() > 0.5 ? "+" : "-") + (Math.random() * 0.03).toFixed(4) + "%" },
+  { icon: Shield, color: "text-orange-400", label: "多空比", valueFn: () => (0.8 + Math.random() * 0.4).toFixed(3) },
+  { icon: Newspaper, color: "text-sky-400", label: "市场情绪", valueFn: () => ["积极", "消极", "中性"][Math.floor(Math.random() * 3)] },
+  { icon: Newspaper, color: "text-sky-400", label: "新闻数量", valueFn: () => Math.floor(Math.random() * 20 + 3).toString() },
+  { icon: Brain, color: "text-amber-400", label: "社交热度", valueFn: () => (Math.random() > 0.5 ? "↑" : "↓") + (Math.random() * 50).toFixed(0) + "%" },
+  { icon: Database, color: "text-blue-400", label: "K线数", valueFn: () => Math.floor(Math.random() * 200 + 100).toString() },
+  { icon: Zap, color: "text-emerald-400", label: "置信度", valueFn: () => (Math.random() * 0.4 + 0.5).toFixed(2) },
+  { icon: Swords, color: "text-orange-400", label: "对抗推演", valueFn: () => ["博弈中", "陷阱侦测", "防御评估"][Math.floor(Math.random() * 3)] },
 ];
 
 function useDataTicker(steps: ProgressEvent[]) {
@@ -550,7 +550,7 @@ export function AnalysisProgress({ steps, startTime }: AnalysisProgressProps) {
             <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-emerald-500/20 sticky top-0 bg-[#0a0d14]/90 backdrop-blur-md z-10">
               <Terminal size={10} className="text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.8)]" />
               <span className="text-[10px] font-bold tracking-widest text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)] font-mono">
-                LIVE FEED
+                实时数据
               </span>
               <motion.span
                 className="h-1.5 w-1.5 rounded-full bg-emerald-400 ml-auto shadow-[0_0_10px_rgba(16,185,129,1)]"

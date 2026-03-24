@@ -127,18 +127,18 @@ function WatchlistItem({ item }: { item: SymbolOverview }) {
         </div>
         <div>
           <div className="text-sm font-black tracking-tight text-zinc-200 group-hover:text-white transition-colors">{symbol.replace("USDT", "")}</div>
-          <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-0.5">PERP</div>
+          <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-0.5">永续</div>
         </div>
       </div>
       <div className="text-right">
         <div className="text-sm font-mono font-bold text-white tracking-tight">{priceStr}</div>
         <div className={`flex items-center justify-end gap-1 mt-1 text-[10px] font-mono font-bold tracking-widest ${changeClass}`}>
           {isLong ? (
-            <><TrendingUp size={12} strokeWidth={3} /> BULL</>
+            <><TrendingUp size={12} strokeWidth={3} /> 看涨</>
           ) : isShort ? (
-            <><TrendingDown size={12} strokeWidth={3} /> BEAR</>
+            <><TrendingDown size={12} strokeWidth={3} /> 看跌</>
           ) : (
-             <><Minus size={12} strokeWidth={3} /> NEUTRAL</>
+             <><Minus size={12} strokeWidth={3} /> 观望</>
           )}
         </div>
       </div>

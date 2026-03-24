@@ -97,13 +97,13 @@
   "sidebar": {
     "systemStatus": "系统状态",
     "nsedEngine": "Axiom 共识协议",
-    "online": "NODE ONLINE",
-    "dataFeed": "DATA FEED",
+    "online": "节点在线",
+    "dataFeed": "数据源",
     "connected": "同步中",
     "partial": "部分同步",
     "degraded": "降级运行",
     "activeAgents": "智能体蜂群",
-    "agentsCount": "11/11 ACTIVE",
+    "agentsCount": "11/11 活跃",
     "networkLatency": "链路延迟",
     "latencyMs": "12ms",
     "marketPulse": "市场脉冲"

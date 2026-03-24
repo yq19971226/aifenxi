@@ -144,7 +144,7 @@ export function GridStrategyCard({ report }: Props) {
             </div>
             
             <p className="text-sm font-medium text-white tracking-wide mb-2 z-10">{t("flagshipOnly")}</p>
-            <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.2em] mb-6 z-10">Exclusive Quant Institutional Tools</p>
+            <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.2em] mb-6 z-10">机构级量化专属工具</p>
             
             <a
               href="/settings/membership"
