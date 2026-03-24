@@ -196,7 +196,7 @@ export default function EventContractsPanel() {
             <div className="flex items-center gap-2 mb-3">
               <Zap size={14} className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
               <span className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]">
-                Event Contract Predictor
+                事件合约预测引擎
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
@@ -221,7 +221,7 @@ export default function EventContractsPanel() {
             <span className={`text-[10px] font-mono font-bold uppercase tracking-widest ${
               live?.status === "online" ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "text-zinc-500"
             }`}>
-              {live?.status === "online" ? "LIVE" : live?.status === "warming_up" ? "WARMING UP" : "OFFLINE"}
+              {live?.status === "online" ? "运行中" : live?.status === "warming_up" ? "预热中" : "离线"}
             </span>
           </div>
         </div>
@@ -468,7 +468,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
                       : "text-zinc-400 border-white/10 bg-white/[0.03]"
                   }`}
                 >
-                  {s}
+                  {s.replace(/bullish/gi, "看涨").replace(/bearish/gi, "看跌")}
                 </motion.span>
               ))}
             </div>
