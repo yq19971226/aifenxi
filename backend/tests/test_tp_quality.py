@@ -203,3 +203,135 @@ class TestRRSafetyNet:
         assert result.targets[0] < 1950.0, \
             f"ATR 回退应产生远目标, 但 TP1={result.targets[0]}"
         assert result.risk_reward_ratio >= 1.0
+
+
+# ── 4. 趋势共识门槛 ──────────────────────────────────────────────
+
+
+class TestTrendConsensusGate:
+    """趋势模式共识参数收紧测试。"""
+
+    def test_trend_needs_3_agree(self):
+        """趋势模式 2/4 模型一致 → 应输出 neutral。"""
+        from app.consensus.engine import _weighted_aggregate, ModelVote
+
+        votes = [
+            ModelVote(model_key="m1", signal="bullish", confidence=0.8, reasoning="up"),
+            ModelVote(model_key="m2", signal="bullish", confidence=0.7, reasoning="up"),
+            ModelVote(model_key="m3", signal="bearish", confidence=0.8, reasoning="down"),
+            ModelVote(model_key="m4", signal="bearish", confidence=0.7, reasoning="down"),
+        ]
+        weights = {"m1": 0.25, "m2": 0.25, "m3": 0.25, "m4": 0.25}
+
+        # 使用趋势默认: min_agreement=3, signal_threshold=0.40, min_confidence=0.55
+        signal, conf = _weighted_aggregate(
+            votes, weights,
+            signal_threshold=0.40,
+            min_agreement=3,
+            min_confidence=0.55,
+        )
+        assert signal == "neutral", f"2-2 分裂应输出 neutral，但得到 {signal}"
+
+    def test_trend_3_agree_passes(self):
+        """趋势模式 3/4 模型一致 → 应输出方向信号。"""
+        from app.consensus.engine import _weighted_aggregate, ModelVote
+
+        votes = [
+            ModelVote(model_key="m1", signal="bullish", confidence=0.8, reasoning="up"),
+            ModelVote(model_key="m2", signal="bullish", confidence=0.7, reasoning="up"),
+            ModelVote(model_key="m3", signal="bullish", confidence=0.7, reasoning="up"),
+            ModelVote(model_key="m4", signal="bearish", confidence=0.5, reasoning="down"),
+        ]
+        weights = {"m1": 0.25, "m2": 0.25, "m3": 0.25, "m4": 0.25}
+
+        signal, conf = _weighted_aggregate(
+            votes, weights,
+            signal_threshold=0.40,
+            min_agreement=3,
+            min_confidence=0.55,
+        )
+        assert signal == "bullish", f"3/4 一致应输出 bullish，但得到 {signal}"
+
+    def test_trend_flip_ratio_high(self):
+        """趋势模式迟滞：弱反转不够翻转 → neutral（既不维持也不翻转）。"""
+        from app.consensus.engine import _weighted_aggregate, ModelVote
+
+        # 之前 bullish，现在 3/4 bearish 但分数不够强翻转
+        votes = [
+            ModelVote(model_key="m1", signal="bearish", confidence=0.60, reasoning="down"),
+            ModelVote(model_key="m2", signal="bearish", confidence=0.60, reasoning="down"),
+            ModelVote(model_key="m3", signal="bearish", confidence=0.60, reasoning="down"),
+            ModelVote(model_key="m4", signal="bullish", confidence=0.60, reasoning="up"),
+        ]
+        weights = {"m1": 0.25, "m2": 0.25, "m3": 0.25, "m4": 0.25}
+
+        # score = -0.30, flip_threshold = 0.34
+        # |-0.30| < 0.34 → 翻不了; score < 0 → 也维持不了 bullish → neutral
+        signal, _ = _weighted_aggregate(
+            votes, weights,
+            signal_threshold=0.40, min_agreement=3, min_confidence=0.55,
+            flip_ratio=0.85, prev_signal="bullish",
+        )
+        assert signal == "neutral", \
+            f"弱反转信号既不该翻转也不该维持，应输出 neutral，但得到 {signal}"
+
+    def test_trend_hysteresis_maintains(self):
+        """趋势模式迟滞：弱 bullish 信号应维持原方向（不需达到完整阈值）。"""
+        from app.consensus.engine import _weighted_aggregate, ModelVote
+
+        # 之前 bullish，现在仍有微弱 bullish 倾向
+        votes = [
+            ModelVote(model_key="m1", signal="bullish", confidence=0.60, reasoning="up"),
+            ModelVote(model_key="m2", signal="bullish", confidence=0.60, reasoning="up"),
+            ModelVote(model_key="m3", signal="neutral", confidence=0.60, reasoning="flat"),
+            ModelVote(model_key="m4", signal="neutral", confidence=0.60, reasoning="flat"),
+        ]
+        weights = {"m1": 0.25, "m2": 0.25, "m3": 0.25, "m4": 0.25}
+
+        # score = 2*(1)*0.60*0.25 + 2*(0)*0.60*0.25 = 0.30
+        # 常规模式下 0.30 < signal_threshold(0.40) → neutral
+        # 但有 prev_signal=bullish，维持只需 score > 0 && bullish_count >= 1 → bullish
+        signal, _ = _weighted_aggregate(
+            votes, weights,
+            signal_threshold=0.40, min_agreement=3, min_confidence=0.55,
+            flip_ratio=0.85, prev_signal="bullish",
+        )
+        assert signal == "bullish", \
+            f"迟滞应维持原方向（score=0.30>0 + prev=bullish），但得到 {signal}"
+
+    def test_trend_strong_reversal_flips(self):
+        """趋势模式强反转信号应能翻转方向。"""
+        from app.consensus.engine import _weighted_aggregate, ModelVote
+
+        # 之前 bullish，现在 4/4 高置信度说 bearish
+        votes = [
+            ModelVote(model_key="m1", signal="bearish", confidence=0.85, reasoning="down"),
+            ModelVote(model_key="m2", signal="bearish", confidence=0.80, reasoning="down"),
+            ModelVote(model_key="m3", signal="bearish", confidence=0.75, reasoning="down"),
+            ModelVote(model_key="m4", signal="bearish", confidence=0.70, reasoning="down"),
+        ]
+        weights = {"m1": 0.25, "m2": 0.25, "m3": 0.25, "m4": 0.25}
+
+        # 加权分 = (-1)*(0.85+0.80+0.75+0.70)*0.25 = -0.775
+        # flip_threshold = 0.40 * 0.85 = 0.34
+        # |-0.775| > 0.34 + bearish_count=4 >= 3 → 应翻转
+        signal, _ = _weighted_aggregate(
+            votes, weights,
+            signal_threshold=0.40,
+            min_agreement=3,
+            min_confidence=0.55,
+            flip_ratio=0.85,
+            prev_signal="bullish",
+        )
+        assert signal == "bearish", \
+            f"强反转信号应翻转方向，但得到 {signal}"
+
+    def test_trend_mode_defaults_correct(self):
+        """验证 _MODE_CONSENSUS_DEFAULTS 趋势模式参数正确。"""
+        from app.consensus.engine import _MODE_CONSENSUS_DEFAULTS
+
+        trend = _MODE_CONSENSUS_DEFAULTS["trend"]
+        assert trend["min_agreement"] == 3
+        assert trend["signal_threshold"] == 0.40
+        assert trend["min_confidence"] == 0.55
+        assert trend["flip_ratio"] == 0.85

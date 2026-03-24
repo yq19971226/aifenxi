@@ -2202,7 +2202,7 @@ class AnalysisOrchestrator:
 
         # (2) NSED divergence gate
         if consensus_report is not None and trend_status != "blocked":
-            if consensus_report.divergence > 90:
+            if consensus_report.divergence > 60:
                 trend_status = "blocked"
                 trend_blocked_reason = "consensus_divergence_high"
                 logger.warning(
@@ -2210,7 +2210,7 @@ class AnalysisOrchestrator:
                     extra={"symbol": symbol,
                            "divergence": consensus_report.divergence},
                 )
-            elif consensus_report.divergence > 80:
+            elif consensus_report.divergence > 40:
                 gate_confidence_mod *= 0.8
                 if trend_status == "actionable":
                     trend_status = "degraded"
@@ -2275,20 +2275,57 @@ class AnalysisOrchestrator:
 
         # (3 续) 1w bias vs consensus signal — 信号已知后才能比对
         if weekly_bias is not None and signal != "neutral" and weekly_bias != signal:
-            gate_confidence_mod *= 0.75
-            if trend_status == "actionable":
-                trend_status = "degraded"
-                trend_blocked_reason = "weekly_bias_conflict"
-            logger.info(
-                "trend_weekly_bias_conflict",
+            trend_status = "blocked"
+            trend_blocked_reason = "weekly_bias_conflict"
+            logger.warning(
+                "trend_weekly_bias_blocked",
                 extra={"symbol": symbol, "signal": signal,
                        "weekly_bias": weekly_bias},
             )
             sections.append(ReportSection(
-                title="周线偏差预警",
+                title="周线偏差阻断",
                 data={"weekly_bias": weekly_bias, "consensus_signal": signal},
-                summary=f"周线趋势 {weekly_bias} 与共识信号 {signal} 冲突，置信度已降权",
+                summary=f"周线趋势 {weekly_bias} 与共识信号 {signal} 冲突，趋势策略阻断",
             ))
+            # 被阻断后立即返回 neutral
+            sections.append(ReportSection(
+                title="闸门阻断",
+                data={
+                    "gate_status": "blocked",
+                    "blocked_reason": trend_blocked_reason,
+                    "defense_level": defense_level,
+                    "divergence": consensus_report.divergence if consensus_report else None,
+                },
+                summary=f"趋势闸门阻断: {trend_blocked_reason}",
+            ))
+            return AnalysisReport(
+                symbol=symbol,
+                mode=AnalysisMode.TREND,
+                timestamp=datetime.now(timezone.utc),
+                signal="neutral",
+                confidence=0.0,
+                sections=sections,
+                strategy=None,
+                status="blocked",
+                blocked_reason=trend_blocked_reason,
+                market_regime=regime_info.regime.value if regime_info else None,
+                regime_suggestion=regime_info.suggestion if regime_info else None,
+                regime_support=regime_info.support if regime_info else None,
+                regime_resistance=regime_info.resistance if regime_info else None,
+            )
+
+        # (4) 少数派数量检查 — ≥2 个模型不同意共识方向则大幅降权
+        if consensus_report is not None and signal != "neutral":
+            _minority_count = len(consensus_report.minority_warnings)
+            if _minority_count >= 2:
+                gate_confidence_mod *= 0.6
+                if trend_status == "actionable":
+                    trend_status = "degraded"
+                    trend_blocked_reason = "too_many_minorities"
+                logger.info(
+                    "trend_minority_gate_degraded",
+                    extra={"symbol": symbol, "minority_count": _minority_count},
+                )
 
         # 应用闸门置信度修正
         confidence = confidence * gate_confidence_mod

@@ -414,11 +414,11 @@ async def _enrich_sentiment(market_data: MarketData) -> MarketData:
 
 
 # ── 模式相关默认参数 ─────────────────────────────────────────────────
-# 短线要求至少 2 个智能体方向一致；日内/趋势大周期信号稀少，降为 1 个即可出方向。
+# 短线 2/4 即可；趋势大周期要求 3/4 模型方向一致 + 更高置信度门槛。
 _MODE_CONSENSUS_DEFAULTS: dict[str, dict] = {
-    "scalping":  {"min_agreement": 2, "signal_threshold": 0.35, "min_confidence": 0.50},
-    "intraday":  {"min_agreement": 1, "signal_threshold": 0.25, "min_confidence": 0.40},
-    "trend":     {"min_agreement": 2, "signal_threshold": 0.20, "min_confidence": 0.35},
+    "scalping":  {"min_agreement": 2, "signal_threshold": 0.35, "min_confidence": 0.50, "flip_ratio": 0.6},
+    "intraday":  {"min_agreement": 1, "signal_threshold": 0.25, "min_confidence": 0.40, "flip_ratio": 0.6},
+    "trend":     {"min_agreement": 3, "signal_threshold": 0.40, "min_confidence": 0.55, "flip_ratio": 0.85},
 }
 
 
@@ -468,12 +468,15 @@ async def run_nsed(market_data: MarketData, mode: str = "scalping") -> Consensus
             f"consensus_min_confidence_{mode}",
             await get_config_value("consensus_min_confidence", str(_mode_defaults["min_confidence"]))
         ))
-        _flip_ratio = float(await get_config_value("consensus_flip_ratio", "0.6"))
+        _flip_ratio = float(await get_config_value(
+            f"consensus_flip_ratio_{mode}",
+            await get_config_value("consensus_flip_ratio", str(_mode_defaults.get("flip_ratio", 0.6)))
+        ))
     except Exception:
         _sig_thr = _mode_defaults["signal_threshold"]
         _min_agr = _mode_defaults["min_agreement"]
         _min_conf = _mode_defaults["min_confidence"]
-        _flip_ratio = 0.6
+        _flip_ratio = _mode_defaults.get("flip_ratio", 0.6)
 
     logger.info(
         "Consensus params for mode=%s: min_agreement=%d signal_threshold=%.2f min_confidence=%.2f",
@@ -531,10 +534,11 @@ async def run_nsed(market_data: MarketData, mode: str = "scalping") -> Consensus
         },
     )
 
-    # 缓存到 Redis（TTL 30分钟，过长会导致用户总看到旧信号）
+    # 缓存到 Redis — 趋势模式 4h（保证迟滞锚定连续性），其他 30min
+    _cache_ttl = 14400 if mode == "trend" else 1800
     try:
         cache_key = f"consensus:latest:{market_data.symbol}"
-        await set_with_ttl(cache_key, report.model_dump(mode="json"), ttl_seconds=1800)
+        await set_with_ttl(cache_key, report.model_dump(mode="json"), ttl_seconds=_cache_ttl)
     except Exception as exc:
         logger.error("Failed to cache consensus report", extra={"error": str(exc)})
 
