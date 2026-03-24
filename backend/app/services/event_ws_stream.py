@@ -38,8 +38,8 @@ class EventStreamAggregator:
         self._running = False
 
         # ── 滚动窗口缓存 ──
-        self._trades: deque[dict] = deque()          # {ts, price, qty, side}
-        self._large_orders: deque[dict] = deque()    # {ts, usd, side}
+        self._trades: deque[dict] = deque(maxlen=50000)       # {ts, price, qty, side}
+        self._large_orders: deque[dict] = deque(maxlen=5000)  # {ts, usd, side}
 
         # ── 订单簿最新快照 ──
         self._bids_total: float = 0.0
@@ -136,7 +136,9 @@ class EventStreamAggregator:
                     event = payload.get("e", "")
                     if event == "aggTrade":
                         self._on_agg_trade(payload)
-                    elif event == "depthUpdate":
+                    elif event == "depthUpdate" or "lastUpdateId" in payload:
+                        # depth20@100ms 部分深度快照没有 "e" 字段，
+                        # 但有 "lastUpdateId" 字段
                         self._on_depth(payload)
                     elif event == "kline":
                         self._on_kline(payload)
