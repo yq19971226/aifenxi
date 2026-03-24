@@ -94,38 +94,59 @@ export default function EventContractsPanel() {
     }
   }, [showToast]);
 
+  // 用 ref 记录上次数据的 JSON，只在数据实际变化时才 setState，避免无意义 re-render
+  const prevLiveJson = useRef("");
+  const prevHistJson = useRef("");
+  const prevStatsJson = useRef("");
+  const initialLoaded = useRef(false);
+
   const pollLive = useCallback(async () => {
     try {
       const data = await fetchEventLive();
-      setLive(data);
+      const json = JSON.stringify(data);
+      if (json !== prevLiveJson.current) {
+        prevLiveJson.current = json;
+        setLive(data);
+      }
       setError(null);
     } catch (e: any) {
       setError(e.message || "获取实时信号失败");
     }
   }, []);
 
-  const loadData = useCallback(async (p = 1) => {
-    setLoading(true);
+  // silent=true 时后台静默刷新，不触发 loading 状态
+  const loadData = useCallback(async (p = 1, silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const [histData, statsData] = await Promise.all([
         fetchEventHistory("ETHUSDT", p, 20),
         fetchEventStats("ETHUSDT"),
       ]);
-      setHistory(histData.records);
-      setHistoryTotal(histData.total);
-      setStats(statsData);
+      const hJson = JSON.stringify(histData.records);
+      const sJson = JSON.stringify(statsData);
+      if (hJson !== prevHistJson.current) {
+        prevHistJson.current = hJson;
+        setHistory(histData.records);
+        setHistoryTotal(histData.total);
+      }
+      if (sJson !== prevStatsJson.current) {
+        prevStatsJson.current = sJson;
+        setStats(statsData);
+      }
     } catch (e: any) {
-      setError(e.message);
+      if (!silent) setError(e.message);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
+    // 首次加载：显示 loading 状态
     pollLive();
-    loadData(1);
+    loadData(1, false).then(() => { initialLoaded.current = true; });
+    // 后续轮询：静默更新，不闪烁
     timerRef.current = setInterval(pollLive, POLL_INTERVAL);
-    const histTimer = setInterval(() => loadData(page), 30000);
+    const histTimer = setInterval(() => loadData(page, true), 30000);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       clearInterval(histTimer);
