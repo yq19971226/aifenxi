@@ -472,7 +472,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
                       : "text-zinc-400 border-white/10 bg-white/[0.03]"
                   }`}
                 >
-                  {s}
+                  {s.replace(/bullish/gi, t("live.bullish")).replace(/bearish/gi, t("live.bearish"))}
                 </motion.span>
               ))}
             </div>
