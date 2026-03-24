@@ -455,22 +455,23 @@ async def run_nsed(market_data: MarketData, mode: str = "scalping") -> Consensus
     _mode_defaults = _MODE_CONSENSUS_DEFAULTS.get(mode, _MODE_CONSENSUS_DEFAULTS["scalping"])
     try:
         from app.services.config_service import get_config_value
-        # 优先读 mode-specific 配置，不存在则读全局配置，再退到模式默认值
+        # 优先读 per-mode 配置 key（如 consensus_signal_threshold_trend），
+        # 不存在则直接用 _mode_defaults（不再经过全局 key，防止全局值覆盖模式默认值）。
         _sig_thr = float(await get_config_value(
             f"consensus_signal_threshold_{mode}",
-            await get_config_value("consensus_signal_threshold", str(_mode_defaults["signal_threshold"]))
+            str(_mode_defaults["signal_threshold"]),
         ))
         _min_agr = int(await get_config_value(
             f"consensus_min_agreement_{mode}",
-            await get_config_value("consensus_min_agreement", str(_mode_defaults["min_agreement"]))
+            str(_mode_defaults["min_agreement"]),
         ))
         _min_conf = float(await get_config_value(
             f"consensus_min_confidence_{mode}",
-            await get_config_value("consensus_min_confidence", str(_mode_defaults["min_confidence"]))
+            str(_mode_defaults["min_confidence"]),
         ))
         _flip_ratio = float(await get_config_value(
             f"consensus_flip_ratio_{mode}",
-            await get_config_value("consensus_flip_ratio", str(_mode_defaults.get("flip_ratio", 0.6)))
+            str(_mode_defaults.get("flip_ratio", 0.6)),
         ))
     except Exception:
         _sig_thr = _mode_defaults["signal_threshold"]
