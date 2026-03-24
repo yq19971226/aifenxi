@@ -32,7 +32,7 @@ import {
 } from "@/lib/api/event-contracts";
 
 // ── 常量 ──────────────────────────────────────────────────
-const POLL_INTERVAL = 2000;
+const POLL_INTERVAL = 10000;
 
 // ── 容器动画 ──────────────────────────────────────────────
 const containerVariants = {
@@ -316,7 +316,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
     : { text: "text-zinc-400", glow: "", bar: "bg-zinc-500", bg: "bg-zinc-500/[0.04]", border: "border-zinc-500/20" };
 
   const DirIcon = isUp ? TrendingUp : isDown ? TrendingDown : Pause;
-  const dirLabel = isUp ? "看涨 BULLISH" : isDown ? "看跌 BEARISH" : "观望 NEUTRAL";
+  const dirLabel = isUp ? "看涨" : isDown ? "看跌" : "观望";
 
   return (
     <div className="relative rounded-xl border border-white/[0.06] bg-[#0a0d14]/90 backdrop-blur-3xl overflow-hidden">
@@ -344,7 +344,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
             <div>
               <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
                 <span className="w-1 h-3 bg-amber-500 rounded-full" />
-                PREDICTION
+                预测方向
               </p>
               <div className="flex items-center gap-3">
                 <motion.div
@@ -366,7 +366,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
             <div>
               <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
                 <span className="w-1 h-3 bg-fuchsia-500 rounded-full" />
-                CURRENT PRICE
+                当前价格
               </p>
               <p className="text-3xl font-black font-mono text-white tabular-nums tracking-tight">
                 <span className="text-fuchsia-400/60 text-lg mr-0.5">$</span>
@@ -378,7 +378,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
             <div>
               <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
                 <span className="w-1 h-3 bg-indigo-500 rounded-full" />
-                SIGNAL STRENGTH
+                信号强度
               </p>
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-2.5 rounded-full bg-white/[0.04] overflow-hidden border border-white/[0.06]">
@@ -400,7 +400,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
           <div className="space-y-1">
             <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5">
               <Signal size={10} className="text-[#00E5FF]" />
-              PRIMARY · 订单流
+              主要指标 · 订单流
             </p>
             <MetricRow label="买/卖比 (30s)" value={metrics?.buy_sell_ratio_30s} format={(v) => v.toFixed(2)} bullish={v => v > 1.3} bearish={v => v < 0.77} />
             <MetricRow label="订单簿失衡" value={metrics?.orderbook_imbalance} format={(v) => `${(v * 100).toFixed(1)}%`} bullish={v => v > 0.2} bearish={v => v < -0.2} />
@@ -412,7 +412,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
           <div className="space-y-1">
             <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5">
               <BarChart3 size={10} className="text-amber-400" />
-              SECONDARY · 技术指标
+              次要指标 · 技术分析
             </p>
             <MetricRow label="RSI(14)" value={metrics?.rsi_1m} format={(v) => v.toFixed(1)} bullish={v => v > 55} bearish={v => v < 45} />
             <MetricRow label="EMA5 vs EMA10" value={metrics?.ema5_vs_ema10} format={(v) => v.toFixed(4)} bullish={v => v > 0} bearish={v => v < 0} />
@@ -430,7 +430,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
           >
             <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5">
               <Flame size={10} className="text-orange-400" />
-              TRIGGERED SIGNALS
+              触发信号
             </p>
             <div className="flex flex-wrap gap-2">
               {pred.signals.map((s, i) => (
@@ -455,7 +455,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
         )}
 
         <p className="text-[9px] font-mono text-zinc-600 mt-4 tabular-nums">
-          LAST UPDATE: {live.updated_at ? new Date(live.updated_at).toLocaleTimeString() : "—"}
+          最后更新: {live.updated_at ? new Date(live.updated_at).toLocaleTimeString() : "—"}
         </p>
       </div>
     </div>
@@ -512,10 +512,10 @@ function MetricRow({
 
 function StatsPanel({ stats }: { stats: EventStatsResponse }) {
   const periods = [
-    { key: "today" as const, label: "TODAY", icon: Clock },
-    { key: "7d" as const, label: "7 DAYS", icon: Activity },
-    { key: "30d" as const, label: "30 DAYS", icon: BarChart3 },
-    { key: "all_time" as const, label: "ALL TIME", icon: Zap },
+    { key: "today" as const, label: "今日", icon: Clock },
+    { key: "7d" as const, label: "近7天", icon: Activity },
+    { key: "30d" as const, label: "近30天", icon: BarChart3 },
+    { key: "all_time" as const, label: "全部", icon: Zap },
   ];
 
   return (
@@ -553,16 +553,16 @@ function StatsPanel({ stats }: { stats: EventStatsResponse }) {
               <div className="mt-3 space-y-0.5">
                 <p className="text-[10px] font-mono text-zinc-500">
                   <span className="text-emerald-400">{d.wins}</span>
-                  <span className="text-zinc-600 mx-1">WIN</span>
+                  <span className="text-zinc-600 mx-1">胜</span>
                   <span className="text-zinc-600">/</span>
                   <span className="text-red-400 ml-1">{d.losses}</span>
-                  <span className="text-zinc-600 mx-1">LOSE</span>
+                  <span className="text-zinc-600 mx-1">负</span>
                   <span className="text-zinc-600">·</span>
                   <span className="text-zinc-500 ml-1">{d.skipped}</span>
-                  <span className="text-zinc-600 ml-1">SKIP</span>
+                  <span className="text-zinc-600 ml-1">跳过</span>
                 </p>
                 <p className="text-[9px] font-mono text-zinc-700">
-                  TOTAL {d.total} ROUNDS
+                  共 {d.total} 轮
                 </p>
               </div>
             </div>
@@ -605,10 +605,10 @@ function HistoryTable({
           </div>
           <h2 className="text-[10px] font-black font-mono text-zinc-400 uppercase tracking-[0.3em] flex items-center gap-2">
             <span className="w-0.5 h-3 bg-fuchsia-500 rounded-full" />
-            PREDICTION HISTORY
+            预测历史
           </h2>
         </div>
-        <span className="text-[9px] font-mono text-zinc-600 tabular-nums">{total} RECORDS</span>
+        <span className="text-[9px] font-mono text-zinc-600 tabular-nums">共 {total} 条</span>
       </div>
 
       <div className="relative z-10 overflow-x-auto">
@@ -616,12 +616,12 @@ function HistoryTable({
           <thead>
             <tr className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.15em] border-b border-white/[0.04]">
               <th className="px-4 py-3">#</th>
-              <th className="px-4 py-3">DIR</th>
-              <th className="px-4 py-3">STR</th>
-              <th className="px-4 py-3">ENTRY</th>
-              <th className="px-4 py-3">SETTLE</th>
-              <th className="px-4 py-3">RESULT</th>
-              <th className="px-4 py-3">TIME</th>
+              <th className="px-4 py-3">方向</th>
+              <th className="px-4 py-3">强度</th>
+              <th className="px-4 py-3">入场价</th>
+              <th className="px-4 py-3">结算价</th>
+              <th className="px-4 py-3">结果</th>
+              <th className="px-4 py-3">时间</th>
             </tr>
           </thead>
           <tbody>
@@ -629,14 +629,14 @@ function HistoryTable({
               <tr>
                 <td colSpan={7} className="px-4 py-12 text-center text-zinc-600 font-mono text-sm">
                   <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                    LOADING...
+                    加载中...
                   </motion.span>
                 </td>
               </tr>
             ) : records.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-12 text-center text-zinc-600 font-mono text-sm">
-                  NO PREDICTIONS YET
+                  暂无预测记录
                 </td>
               </tr>
             ) : (
@@ -662,10 +662,10 @@ function HistoryTable({
                             : "text-red-400 drop-shadow-[0_0_6px_rgba(248,113,113,0.4)]"
                         }`}>
                           {r.direction === "up" ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                          {r.direction.toUpperCase()}
+                          {r.direction === "up" ? "涨" : "跌"}
                         </span>
                       ) : (
-                        <span className="text-[11px] font-mono text-zinc-600">SKIP</span>
+                        <span className="text-[11px] font-mono text-zinc-600">跳过</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-[11px] font-mono text-zinc-400 tabular-nums">
@@ -701,7 +701,7 @@ function HistoryTable({
             disabled={page <= 1}
             className="flex items-center gap-1 px-3 py-1.5 text-[10px] font-mono font-bold text-zinc-400 border border-white/[0.08] rounded-lg hover:bg-white/[0.04] hover:border-[#00E5FF]/20 hover:text-[#00E5FF] disabled:opacity-20 transition-all"
           >
-            <ChevronLeft size={12} /> PREV
+            <ChevronLeft size={12} /> 上一页
           </button>
           <span className="text-[10px] font-mono font-bold text-zinc-500 tabular-nums">
             {page} / {totalPages}
@@ -711,7 +711,7 @@ function HistoryTable({
             disabled={page >= totalPages}
             className="flex items-center gap-1 px-3 py-1.5 text-[10px] font-mono font-bold text-zinc-400 border border-white/[0.08] rounded-lg hover:bg-white/[0.04] hover:border-[#00E5FF]/20 hover:text-[#00E5FF] disabled:opacity-20 transition-all"
           >
-            NEXT <ChevronRight size={12} />
+            下一页 <ChevronRight size={12} />
           </button>
         </div>
       )}
@@ -725,14 +725,14 @@ function ResultBadge({ result, status }: { result: string | null; status: string
   if (result === "win") {
     return (
       <span className="text-[9px] font-mono font-black text-[#00E5FF] px-2 py-0.5 rounded-md bg-[#00E5FF]/[0.08] border border-[#00E5FF]/20 drop-shadow-[0_0_6px_rgba(0,229,255,0.3)] tracking-widest">
-        ✓ WIN
+        ✓ 胜
       </span>
     );
   }
   if (result === "lose") {
     return (
       <span className="text-[9px] font-mono font-black text-red-400 px-2 py-0.5 rounded-md bg-red-500/[0.08] border border-red-500/20 drop-shadow-[0_0_6px_rgba(248,113,113,0.3)] tracking-widest">
-        ✗ LOSE
+        ✗ 负
       </span>
     );
   }
@@ -743,13 +743,13 @@ function ResultBadge({ result, status }: { result: string | null; status: string
         transition={{ duration: 2, repeat: Infinity }}
         className="text-[9px] font-mono font-black text-amber-400 px-2 py-0.5 rounded-md bg-amber-500/[0.08] border border-amber-500/20 tracking-widest"
       >
-        ⏳ WAIT
+        ⏳ 等待中
       </motion.span>
     );
   }
   return (
     <span className="text-[9px] font-mono font-bold text-zinc-600 px-2 py-0.5 rounded-md bg-white/[0.02] border border-white/[0.06] tracking-widest">
-      ⏸ SKIP
+      ⏸ 跳过
     </span>
   );
 }
