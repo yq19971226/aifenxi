@@ -116,23 +116,51 @@ async def _get_latest_strategy(session: AsyncSession) -> dict:
         result = await session.execute(
             text(
                 """
-                SELECT symbol, direction, entry_price, current_price,
-                       target_price, gain_pct, verified_at
+                SELECT symbol, direction, entry_low, entry_high,
+                       stop_loss, targets, confidence, created_at
                 FROM strategies
-                WHERE verified_at IS NOT NULL
-                ORDER BY verified_at DESC
+                WHERE direction != 'neutral'
+                ORDER BY created_at DESC
                 LIMIT 1
                 """
             )
         )
         row = result.mappings().first()
         if row:
+            # 入场价 = entry_low 和 entry_high 的中位
+            entry_low = float(row["entry_low"] or 0)
+            entry_high = float(row["entry_high"] or 0)
+            entry_mid = (entry_low + entry_high) / 2 if entry_low and entry_high else entry_low or entry_high
+
+            # 目标价 = targets 数组的第一个元素
+            targets_raw = row["targets"]
+            targets = json.loads(targets_raw) if isinstance(targets_raw, str) else (targets_raw or [])
+            target_price = targets[0] if targets else 0
+
+            # 收益率 = (目标价 - 入场价) / 入场价 * 100
+            if entry_mid > 0 and target_price > 0:
+                direction_str = row["direction"]
+                if direction_str == "long":
+                    gain_pct = round((target_price - entry_mid) / entry_mid * 100, 2)
+                else:
+                    gain_pct = round((entry_mid - target_price) / entry_mid * 100, 2)
+            else:
+                gain_pct = 0
+
+            # 价格格式化
+            def _fmt_price(val: float) -> str:
+                if val > 10000: return f"{val:.1f}"
+                if val > 100:   return f"{val:.2f}"
+                if val > 1:     return f"{val:.4f}"
+                if val > 0.01:  return f"{val:.6f}"
+                return f"{val:.8f}"
+
             data = {
                 "symbol": row["symbol"],
                 "direction": "做多" if row["direction"] == "long" else "做空",
-                "entry_price": str(row["entry_price"]),
-                "target_price": str(row["target_price"]),
-                "gain_pct": str(round(float(row["gain_pct"] or 0), 2)),
+                "entry_price": _fmt_price(entry_mid) if entry_mid > 0 else "-",
+                "target_price": _fmt_price(target_price) if target_price > 0 else "-",
+                "gain_pct": str(gain_pct),
                 "verified": True,
             }
             # 缓存 10 分钟
