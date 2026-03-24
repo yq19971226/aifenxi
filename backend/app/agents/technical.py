@@ -58,13 +58,48 @@ def _format_klines(klines: list, label: str, count: int = 5) -> str:
     return f"{label}: {summary}"
 
 
+# 模式 → 主分析周期约束（让 LLM 聚焦正确的时间框架）
+_MODE_FOCUS_INSTRUCTIONS: dict[str, str] = {
+    "scalping": (
+        "\n⚠️ 当前为【超短线(Scalping)】模式。"
+        "请以 5m/15m 级别动能为主，1h 作为方向参考。"
+        "忽略 4h/1d 的大周期结构，只关注短期价格动能和即时方向。"
+    ),
+    "intraday": (
+        "\n⚠️ 当前为【日内(Intraday)】模式。"
+        "请以 1h/4h 级别趋势结构为主判断今日方向。"
+        "5m/15m 的短期波动属于噪音，不应影响你的方向判断。"
+        "重点关注 4h 级别 EMA 排列和 MACD 趋势。"
+    ),
+    "trend": (
+        "\n⚠️ 当前为【趋势(Trend)】模式。"
+        "请以 1d/1w 级别的结构性趋势为主，判断未来数天到数周的方向。"
+        "日内波动和 1h 以下周期的震荡属于噪音，不应动摇你的判断。"
+        "重点关注 1d 级别 EMA 均线排列、周线趋势结构。"
+    ),
+}
+
+# 模式 → K 线展示优先顺序（重点周期排前面，给 LLM 更多 attention）
+_MODE_KLINE_ORDER: dict[str, list[str]] = {
+    "scalping":  ["5m", "15m", "1h", "4h", "1d", "1w"],
+    "intraday":  ["4h", "1h", "1d", "15m", "5m", "1w"],
+    "trend":     ["1d", "1w", "4h", "1h", "15m", "5m"],
+}
+
+
 def _build_user_prompt(data: MarketData) -> str:
-    """从 MarketData 构建多周期用户 prompt。"""
+    """从 MarketData 构建多周期用户 prompt（模式感知）。"""
     ind = data.indicators
+    mode = data.analysis_mode or "scalping"
     parts: list[str] = [
         f"交易对: {data.symbol}",
         f"当前价格: {data.current_price}",
     ]
+
+    # 模式约束指令（优先于数据，让 LLM 先建立分析框架）
+    focus = _MODE_FOCUS_INSTRUCTIONS.get(mode)
+    if focus:
+        parts.append(focus)
 
     # 技术指标
     if ind:
@@ -97,17 +132,18 @@ def _build_user_prompt(data: MarketData) -> str:
             parts.append("\n--- 量价指标 ---")
             parts.extend(vp_parts)
 
-    # 多周期K线摘要（仅展示当前输入中实际可用的周期，避免无关模式误判）
+    # 多周期K线摘要（按模式优先级排列，重点周期排前面）
     parts.append("\n--- 多周期K线 ---")
-    kline_sections = [
-        ("5m", data.klines_5m),
-        ("15m", data.klines_15m),
-        ("1h", data.klines_1h),
-        ("4h", data.klines_4h),
-        ("1d", data.klines_1d),
-        ("1w", data.klines_1w),
-    ]
-    available_sections = [(label, klines) for label, klines in kline_sections if klines]
+    kline_map = {
+        "5m": data.klines_5m,
+        "15m": data.klines_15m,
+        "1h": data.klines_1h,
+        "4h": data.klines_4h,
+        "1d": data.klines_1d,
+        "1w": data.klines_1w,
+    }
+    order = _MODE_KLINE_ORDER.get(mode, _MODE_KLINE_ORDER["scalping"])
+    available_sections = [(label, kline_map[label]) for label in order if kline_map.get(label)]
     if available_sections:
         for label, klines in available_sections:
             parts.append(_format_klines(klines, f"{label} K线"))

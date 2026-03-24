@@ -169,3 +169,4 @@ class MarketData(BaseModel):
     coinglass: Optional[CoinGlassData] = None
     coingecko: Optional[CoinGeckoData] = None
     locale: str = "zh-CN"
+    analysis_mode: str = ""  # "scalping" | "intraday" | "trend"

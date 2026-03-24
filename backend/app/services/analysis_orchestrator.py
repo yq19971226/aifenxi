@@ -519,6 +519,7 @@ class AnalysisOrchestrator:
         # ── 1. 采集 run_local_context ────────────────────────────
         market_data = await self._collect_market_data(symbol, mode)
         market_data.locale = locale
+        market_data.analysis_mode = mode.value
 
         # ── 2. 数据质量快照 ──────────────────────────────────────
         dq_snapshot = await self._build_data_quality_snapshot(market_data, contract)
@@ -1527,14 +1528,14 @@ class AnalysisOrchestrator:
             prev_signal=None,  # 初步聚合不用迟滞，避免锁定
         )
 
-        # 阶段 2：将初步方向传给 VPD 做验证性检测（而非传 neutral）
+        # 阶段 2：VPD 独立判断（不传入 pre_signal，避免验证偏差放大初步聚合错误）
         vpd = None
         try:
             from app.services.volume_price_divergence_v2 import detect_volume_price_divergence_v2
             vpd_klines = market_data.klines_1h or market_data.klines_4h or market_data.klines_15m
             if vpd_klines and len(vpd_klines) >= 25:
                 vpd = await detect_volume_price_divergence_v2(
-                    vpd_klines, _pre_signal,  # 传入初步聚合方向，验证而非盲猜
+                    vpd_klines, "neutral",  # 独立判断，不受 pre_signal 引导
                     indicators=market_data.indicators,
                     derivatives=market_data.derivatives,
                     coinglass=market_data.coinglass,

@@ -275,8 +275,9 @@ def _intraday_aggregate(
 
     # ── 迟滞逻辑 ──
     # 震荡市使用更高阈值（更难给方向信号，倾向 neutral/观望）
-    standard_threshold = 0.50 if regime == "ranging" else 0.30
-    flip_threshold = 0.35 if regime == "ranging" else 0.15
+    # P3 优化：非震荡市降低出方向阈值、提高翻转阈值（减少来回跳动）
+    standard_threshold = 0.50 if regime == "ranging" else 0.25
+    flip_threshold = 0.35 if regime == "ranging" else 0.30
 
     if prev_signal == "bullish":
         if avg_score < -flip_threshold:

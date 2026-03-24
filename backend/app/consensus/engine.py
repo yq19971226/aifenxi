@@ -418,7 +418,7 @@ async def _enrich_sentiment(market_data: MarketData) -> MarketData:
 _MODE_CONSENSUS_DEFAULTS: dict[str, dict] = {
     "scalping":  {"min_agreement": 2, "signal_threshold": 0.35, "min_confidence": 0.50},
     "intraday":  {"min_agreement": 1, "signal_threshold": 0.25, "min_confidence": 0.40},
-    "trend":     {"min_agreement": 1, "signal_threshold": 0.20, "min_confidence": 0.35},
+    "trend":     {"min_agreement": 2, "signal_threshold": 0.20, "min_confidence": 0.35},
 }
 
 

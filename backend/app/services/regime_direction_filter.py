@@ -1,9 +1,9 @@
 """市场方向一致性过滤器 — 逆势信号置信度惩罚。
 
-只在 market_regime = "trending" 时生效：
-  - 用 EMA 斜率推断大周期趋势方向（bullish / bearish / neutral）
-  - 若信号方向与趋势方向相反 → confidence × COUNTER_TREND_PENALTY
-  - ranging / volatile 市场允许双向操作，不施加惩罚
+P5 优化：扩展到 ranging 市场
+  - trending: confidence × 0.65（逆势惩罚）
+  - ranging:  confidence × 0.50（震荡市假突破更多，惩罚更重）
+  - volatile: 不惩罚（高波动允许双向操作）
 
 设计原则：
   - 纯函数，无 I/O，无 async，100% 可单元测试
@@ -24,12 +24,15 @@ logger = logging.getLogger(__name__)
 
 # ── 参数常量 ───────────────────────────────────────────────────
 
-COUNTER_TREND_PENALTY = 0.65   # 逆势置信度乘数（保留 65%）
+# 按 regime 定义逆势惩罚系数（未列出的 regime 不惩罚）
+COUNTER_TREND_PENALTIES: dict[str, float] = {
+    "trending": 0.65,    # 保留 65%
+    "ranging":  0.50,    # 震荡市假突破多，惩罚更重（保留 50%）
+}
+
 EMA_PERIOD = 20                 # 均线窗口（根数）
 MIN_KLINES = EMA_PERIOD * 2 + 1  # 最少需要的 K 线数量
 MIN_SLOPE_PCT = 0.005           # ±0.5%，低于此认为趋势不明确
-
-TRENDING_REGIME = "trending"
 
 
 # ── 内部工具函数 ──────────────────────────────────────────────
@@ -91,8 +94,10 @@ def apply_regime_direction_filter(
         # neutral 信号无方向，不做处理
         return report
 
-    # 只对趋势市场施加过滤
-    if report.market_regime != TRENDING_REGIME:
+    # 查找当前 regime 的惩罚系数，不在表中则跳过（如 volatile）
+    regime = report.market_regime or ""
+    penalty = COUNTER_TREND_PENALTIES.get(regime)
+    if penalty is None:
         return report
 
     # 优先用 1h K 线，回退到 15m
@@ -120,13 +125,14 @@ def apply_regime_direction_filter(
     if not is_counter_trend:
         return report
 
-    new_confidence = round(report.confidence * COUNTER_TREND_PENALTY, 4)
+    new_confidence = round(report.confidence * penalty, 4)
     logger.info(
         "regime_direction_filter: counter-trend penalty | signal=%s trend=%s "
-        "regime=%s conf %.3f→%.3f",
+        "regime=%s penalty=%.2f conf %.3f→%.3f",
         signal,
         trend_dir,
-        report.market_regime,
+        regime,
+        penalty,
         report.confidence,
         new_confidence,
     )
@@ -135,3 +141,4 @@ def apply_regime_direction_filter(
         "confidence": new_confidence,
         "regime_direction_penalized": True,
     })
+
