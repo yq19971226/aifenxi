@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { Trophy, Target, TrendingUp, Clock, AlertCircle } from "lucide-react";
+import { Trophy, Target, TrendingUp, Clock, AlertCircle, Zap } from "lucide-react";
 import type {
   RankingsResponse,
   SystemReport,
@@ -58,10 +58,12 @@ function winRatePct(wins: number, losses: number, wr?: number): string {
 }
 
 const MODE_ICON: Record<string, React.ReactNode> = {
+  scalping: <Zap size={20} className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />,
   intraday: <Clock size={20} className="text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]" />,
   trend: <TrendingUp size={20} className="text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" />,
 };
 const MODE_COLOR: Record<string, string> = {
+  scalping: "text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.4)]",
   intraday: "text-blue-400 drop-shadow-[0_0_5px_rgba(96,165,250,0.4)]",
   trend: "text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.4)]",
 };

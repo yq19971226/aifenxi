@@ -13,6 +13,7 @@
   },
   "modes": {
     "all": "All",
+    "scalping": "Scalping",
     "intraday": "Intraday",
     "trend": "Trend"
   },
@@ -137,6 +138,7 @@
     "expired": "Expired"
   },
   "modeLabels": {
+    "scalping": "Scalping",
     "intraday": "Intraday",
     "trend": "Trend"
   },

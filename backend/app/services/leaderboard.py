@@ -288,7 +288,7 @@ class LeaderboardService:
         period_cutoff = self._period_to_cutoff(period)
         _settled = count_filter("status != 'pending'")
         _wins = count_filter("pnl_pct > 0")
-        _losses = count_filter("pnl_pct <= 0 AND status != 'pending'")
+        _losses = count_filter("pnl_pct < 0 AND status != 'pending'")
         _avg = avg_filter("pnl_pct", "status != 'pending'")
         sql = f"""
             SELECT
@@ -306,7 +306,7 @@ class LeaderboardService:
                 ROUND(CAST({_avg} AS NUMERIC), 4) AS avg_pnl
             FROM strategy_snapshots
             WHERE created_at > {period_cutoff}
-              AND analysis_mode IN ('intraday', 'trend')
+              AND analysis_mode IN ('scalping', 'intraday', 'trend')
             GROUP BY analysis_mode
             ORDER BY analysis_mode
         """
@@ -344,7 +344,7 @@ class LeaderboardService:
         _pending = count_filter("status = 'pending'")
         _settled = count_filter("status != 'pending'")
         _wins = count_filter("pnl_pct > 0")
-        _losses = count_filter("pnl_pct <= 0 AND status != 'pending'")
+        _losses = count_filter("pnl_pct < 0 AND status != 'pending'")
         _avg = avg_filter("pnl_pct", "status != 'pending'")
         _profit = sum_filter("pnl_pct", "pnl_pct > 0")
         _loss = sum_filter("pnl_pct", "pnl_pct < 0")

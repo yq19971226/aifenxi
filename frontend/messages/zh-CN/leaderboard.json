@@ -13,6 +13,7 @@
   },
   "modes": {
     "all": "全部",
+    "scalping": "超短线",
     "intraday": "日内",
     "trend": "趋势"
   },
@@ -137,6 +138,7 @@
     "expired": "已过期"
   },
   "modeLabels": {
+    "scalping": "超短线",
     "intraday": "日内",
     "trend": "趋势"
   },
