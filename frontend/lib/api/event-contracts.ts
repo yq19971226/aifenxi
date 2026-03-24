@@ -99,3 +99,30 @@ export async function fetchEventStats(
   );
   return handleApiResponse(res, "获取统计数据失败");
 }
+
+// ── Admin API ────────────────────────────────────────────────
+
+export interface EventPredictorStatus {
+  running: boolean;
+  symbol?: string;
+  aggregator_running?: boolean;
+  current_metrics?: Record<string, unknown>;
+}
+
+export async function fetchPredictorStatus(): Promise<EventPredictorStatus> {
+  const res = await authFetch(`${API_BASE}/api/event-contracts/status`);
+  return handleApiResponse(res, "获取预测器状态失败");
+}
+
+export async function startPredictor(symbol = "ETHUSDT"): Promise<{ status: string; symbol: string }> {
+  const res = await authFetch(
+    `${API_BASE}/api/event-contracts/start?symbol=${encodeURIComponent(symbol)}`,
+    { method: "POST" }
+  );
+  return handleApiResponse(res, "启动预测器失败");
+}
+
+export async function stopPredictor(): Promise<{ status: string }> {
+  const res = await authFetch(`${API_BASE}/api/event-contracts/stop`, { method: "POST" });
+  return handleApiResponse(res, "停止预测器失败");
+}

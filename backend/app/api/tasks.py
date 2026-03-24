@@ -20,37 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 class SubmitTaskRequest(BaseModel):
-    template_id: str = Field(..., description="任务模板 ID")
     post_url: str = Field(..., min_length=10, description="帖子链接")
     screenshot_url: str = Field(..., min_length=5, description="截图路径或链接")
-
-
-class TemplateCreateRequest(BaseModel):
-    title: str = Field(..., min_length=1, max_length=200)
-    platform: str = Field(..., min_length=1, max_length=30)
-    icon: str | None = None
-    description: str | None = None
-    rules: str | None = None
-    reward_mode: str = Field(default="scalping")
-    reward_amount: int = Field(default=5, ge=1)
-    min_views: int = Field(default=200, ge=0)
-    verify_window_hours: int = Field(default=72, ge=1)
-    sort_order: int = Field(default=0)
-    is_active: bool = Field(default=True)
-
-
-class TemplateUpdateRequest(BaseModel):
-    title: str | None = None
-    platform: str | None = None
-    icon: str | None = None
-    description: str | None = None
-    rules: str | None = None
-    reward_mode: str | None = None
-    reward_amount: int | None = None
-    min_views: int | None = None
-    verify_window_hours: int | None = None
-    sort_order: int | None = None
-    is_active: bool | None = None
 
 
 class ReviewRejectRequest(BaseModel):
@@ -150,7 +121,7 @@ async def submit_task(
     try:
         return await task_service.submit_task(
             session, user.user_id,
-            body.template_id, body.post_url, body.screenshot_url,
+            body.post_url, body.screenshot_url,
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -179,55 +150,6 @@ async def get_my_bonus(
 # ── 运营后台路由 ──────────────────────────────────────────────
 
 admin_router = APIRouter(prefix="/api/admin/tasks", tags=["admin-tasks"])
-
-
-@admin_router.get("/templates")
-async def list_templates(
-    admin: UserInfo = Depends(require_admin),
-    session: AsyncSession = Depends(get_db),
-):
-    """任务模板列表。"""
-    await _ensure_task_enabled()
-    return await task_service.list_templates(session)
-
-
-@admin_router.post("/templates")
-async def create_template(
-    body: TemplateCreateRequest,
-    admin: UserInfo = Depends(require_admin),
-    session: AsyncSession = Depends(get_db),
-):
-    """创建任务模板。"""
-    await _ensure_task_enabled()
-    return await task_service.create_template(session, body.model_dump())
-
-
-@admin_router.put("/templates/{template_id}")
-async def update_template(
-    template_id: str,
-    body: TemplateUpdateRequest,
-    admin: UserInfo = Depends(require_admin),
-    session: AsyncSession = Depends(get_db),
-):
-    """更新任务模板。"""
-    await _ensure_task_enabled()
-    data = {k: v for k, v in body.model_dump().items() if v is not None}
-    if not data:
-        raise HTTPException(status_code=400, detail="无更新字段")
-    await task_service.update_template(session, template_id, data)
-    return {"message": "更新成功"}
-
-
-@admin_router.delete("/templates/{template_id}")
-async def delete_template(
-    template_id: str,
-    admin: UserInfo = Depends(require_admin),
-    session: AsyncSession = Depends(get_db),
-):
-    """停用任务模板。"""
-    await _ensure_task_enabled()
-    await task_service.delete_template(session, template_id)
-    return {"message": "已停用"}
 
 
 @admin_router.get("/submissions")

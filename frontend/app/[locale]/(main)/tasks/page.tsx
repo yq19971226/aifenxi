@@ -5,11 +5,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/layout/PageTransition";
-import { tasksApi, type TaskTemplate, type TaskSubmission } from "@/lib/api/tasks";
+import { tasksApi, type TaskSubmission } from "@/lib/api/tasks";
 import {
   Gift, Upload, CheckCircle2, Clock, XCircle, Copy,
   ExternalLink, Sparkles, History, Image as ImageIcon,
-  ArrowRight, AlertCircle, ChevronRight
+  AlertCircle, ChevronRight
 } from "lucide-react";
 import PromoCard from "@/components/tasks/PromoCard";
 import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
@@ -61,9 +61,8 @@ export default function TasksPage() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("today");
   
-  // Step State
-  const [selTpl, setSelTpl] = useState("");
-  const [step2Done, setStep2Done] = useState(false); // Indicates generation is done
+  // Step State (simplified: no template selection)
+  const [step1Done, setStep1Done] = useState(false); // generation done
   const [postUrl, setPostUrl] = useState("");
   const [ssUrl, setSsUrl] = useState("");
   const [ssFile, setSsFile] = useState<File | null>(null);
@@ -79,14 +78,14 @@ export default function TasksPage() {
   const { data: home, isLoading, isError } = useQuery({ queryKey: ["task-home"], queryFn: tasksApi.getHome });
   const { data: promo, mutate: genPromo, isPending: promoLoading } = useMutation({ 
     mutationFn: tasksApi.generatePromo,
-    onSuccess: () => setStep2Done(true)
+    onSuccess: () => setStep1Done(true)
   });
   const { data: hist = [] } = useQuery({ queryKey: ["task-history"], queryFn: () => tasksApi.getMySubmissions(), enabled: tab === "history" });
   const submitMut = useMutation({
     mutationFn: tasksApi.submit,
     onSuccess: () => { 
       qc.invalidateQueries({ queryKey: ["task-home"] }); 
-      setPostUrl(""); setSsUrl(""); setSelTpl(""); setStep2Done(false);
+      setPostUrl(""); setSsUrl(""); setStep1Done(false);
       setSsFile(null); setSsPreview(null);
     },
   });
@@ -116,7 +115,7 @@ export default function TasksPage() {
 
   const canSubmit = home?.can_submit ?? false;
   const todaySub = home?.today_submission;
-  const templates = home?.templates ?? [];
+  const taskConfig = home?.task_config;
   const bonus = home?.bonus_credits ?? {};
   
   const inputCls = "w-full bg-white/[0.02] border border-white/[0.1] px-4 py-3.5 text-xs font-mono text-zinc-300 placeholder:text-zinc-400 focus:border-indigo-500/50 focus:bg-indigo-500/10 focus:outline-none transition-all shadow-inner";
@@ -147,6 +146,16 @@ export default function TasksPage() {
             ))}
           </div>
         </div>
+
+        {/* Reward Info Banner */}
+        {taskConfig && canSubmit && (
+          <div className="flex items-center gap-4 border border-emerald-500/20 bg-emerald-500/5 px-6 py-4">
+            <Gift size={18} className="text-emerald-400 shrink-0" />
+            <p className="text-[11px] font-bold font-mono text-emerald-300 uppercase tracking-[0.15em]">
+              {t('today.rewardInfo', { amount: taskConfig.reward_amount, mode: MODE_LABELS[taskConfig.reward_mode] ?? taskConfig.reward_mode })}
+            </p>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="flex gap-2 border-b border-white/[0.05] w-full mt-8 mb-8">
@@ -183,7 +192,7 @@ export default function TasksPage() {
                       </div>
                     </div>
                     
-                    <p className="text-sm text-zinc-300 font-sans font-medium tracking-wide leading-relaxed">{t('today.submitted', { task: todaySub.template_title })}</p>
+                    <p className="text-sm text-zinc-300 font-sans font-medium tracking-wide leading-relaxed">{t('today.submitted', { task: t('dailyTask') })}</p>
                     
                     <div className="mt-8 flex flex-wrap gap-4">
                       {todaySub.status === "approved" && (
@@ -202,40 +211,14 @@ export default function TasksPage() {
                 ); 
               })()}
 
-              {/* Task Workflow Timeline */}
+              {/* Task Workflow Timeline (2 Steps: Generate → Submit) */}
               {canSubmit && (
                 <div className="pt-4">
                   
-                  {/* STEP 1: Select Template */}
-                  <StepContainer step={1} title={t('today.step1')} isActive={!selTpl} isDone={!!selTpl}>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      {templates.map((tpl: TaskTemplate) => (
-                        <button key={tpl.id} onClick={() => { setSelTpl(tpl.id); setStep2Done(false); }} className={`group relative border p-6 text-left transition-all duration-300 overflow-hidden ${selTpl === tpl.id ? "border-indigo-500 bg-indigo-500/5 shadow-[0_0_30px_rgba(99,102,241,0.1)]" : "border-white/[0.05] bg-black/40 hover:border-indigo-500/30 hover:bg-white/[0.02]"}`}>
-                          <div className={`absolute top-0 right-0 p-2 font-mono text-[8px] transition-opacity ${selTpl === tpl.id ? 'opacity-100 text-indigo-400' : 'opacity-20 group-hover:opacity-60'}`}>TPL_{tpl.id.slice(0,4)}</div>
-                          {selTpl === tpl.id && <div className="absolute top-4 right-4"><span className="flex h-2 w-2 relative"><span className="animate-ping absolute inline-flex h-full w-full bg-indigo-400 opacity-75"/><span className="relative inline-flex h-2 w-2 bg-indigo-500 shadow-[0_0_5px_rgba(99,102,241,0.8)]"/></span></div>}
-                          
-                          <div className="flex items-center gap-4 mb-4">
-                            <span className={`flex items-center justify-center w-10 h-10 border border-white/[0.05] bg-white/[0.02] text-xl transition-all ${selTpl === tpl.id ? 'grayscale-0 scale-110 border-indigo-500/20 shadow-[0_0_10px_rgba(99,102,241,0.2)]' : 'grayscale group-hover:grayscale-0'}`}>{tpl.icon || "📱"}</span>
-                            <span className={`font-bold font-mono tracking-widest text-xs uppercase ${selTpl === tpl.id ? "text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" : "text-zinc-400 group-hover:text-white"}`}>{tpl.title}</span>
-                          </div>
-                          
-                          <p className="text-xs font-sans text-zinc-400 leading-relaxed mb-6 min-h-[40px]">{tpl.description}</p>
-                          
-                          <div className="flex items-center justify-between pt-4 border-t border-white/[0.05]">
-                            <span className="text-[10px] font-black font-mono text-emerald-400 uppercase tracking-[0.1em] bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
-                              +{tpl.reward_amount} {MODE_LABELS[tpl.reward_mode] ?? tpl.reward_mode}
-                            </span>
-                            <span className="text-[9px] font-bold font-mono text-zinc-400 uppercase tracking-[0.2em]">≥{tpl.min_views} 浏览量</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </StepContainer>
-
-                  {/* STEP 2: Generate Content */}
-                  <StepContainer step={2} title={t('today.step2')} isActive={!!selTpl && !step2Done} isDone={step2Done}>
+                  {/* STEP 1: Generate Content */}
+                  <StepContainer step={1} title={t('today.step2')} isActive={!step1Done} isDone={step1Done}>
                     <div className="bg-black/40 border border-white/[0.05] p-6 lg:p-8">
-                      {!step2Done ? (
+                      {!step1Done ? (
                         <div className="flex flex-col items-center justify-center py-8">
                           <p className="text-sm font-sans text-zinc-400 mb-8 text-center max-w-sm leading-relaxed">{t('today.step2Desc')}</p>
                           <button onClick={() => genPromo()} disabled={promoLoading} className="relative overflow-hidden group flex items-center gap-3 border border-indigo-500/50 bg-indigo-500/10 px-8 py-4 text-[11px] font-black font-mono text-indigo-400 uppercase tracking-[0.2em] hover:bg-indigo-500 hover:text-white hover:border-indigo-400 disabled:opacity-40 transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)]">
@@ -274,8 +257,8 @@ export default function TasksPage() {
                     </div>
                   </StepContainer>
 
-                  {/* STEP 3: Submit PoW */}
-                  <StepContainer step={3} title={t('today.step3')} isActive={step2Done} isDone={false} isLast={true}>
+                  {/* STEP 2: Submit PoW */}
+                  <StepContainer step={2} title={t('today.step3')} isActive={step1Done} isDone={false} isLast={true}>
                     <div className="bg-black/40 border border-white/[0.05] p-6 lg:p-8">
                        <p className="text-xs text-zinc-400 font-sans mb-8">{t('today.step3Desc')}</p>
                        <div className="space-y-6">
@@ -312,7 +295,7 @@ export default function TasksPage() {
                             )}
                           </div>
                         </div>
-                        <button onClick={() => submitMut.mutate({ template_id: selTpl, post_url: postUrl, screenshot_url: ssUrl })} disabled={!postUrl || !ssUrl || submitMut.isPending}
+                        <button onClick={() => submitMut.mutate({ post_url: postUrl, screenshot_url: ssUrl })} disabled={!postUrl || !ssUrl || submitMut.isPending}
                           className="flex w-full items-center justify-center gap-3 mt-8 relative overflow-hidden bg-indigo-600 py-4 text-[12px] font-black font-mono uppercase tracking-[0.3em] text-white hover:bg-indigo-500 disabled:opacity-30 disabled:hover:bg-indigo-600 transition-all shadow-[0_0_20px_rgba(99,102,241,0.4)] group">
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
                           <Upload size={16} className={submitMut.isPending ? "animate-bounce" : ""} />

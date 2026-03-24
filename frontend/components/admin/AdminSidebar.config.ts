@@ -10,11 +10,11 @@ import {
   Bell,
   CreditCard,
   ClipboardCheck,
-  ListChecks,
   Wallet,
   GraduationCap,
   Server,
   FileText,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -56,7 +56,6 @@ export const ADMIN_MENU_GROUPS: AdminMenuGroup[] = [
     items: [
       { labelKey: "announcements", href: "/admin/announcements", icon: Bell },
       { labelKey: "taskReview", href: "/admin/task-review", icon: ClipboardCheck, badgeKey: "taskReview", badgeColor: "amber" },
-      { labelKey: "taskTemplates", href: "/admin/task-templates", icon: ListChecks },
     ],
   },
   // ── 系统配置 ──────────────────────────────
@@ -74,6 +73,7 @@ export const ADMIN_MENU_GROUPS: AdminMenuGroup[] = [
     labelKey: "intelligence",
     items: [
       { labelKey: "learning", href: "/admin/learning", icon: GraduationCap, frequency: "high" },
+      { labelKey: "eventContracts", href: "/admin/event-contracts", icon: Zap, frequency: "high" },
       { labelKey: "datasources", href: "/admin/datasources", icon: Database },
       { labelKey: "logs", href: "/admin/system/logs", icon: FileText },
       { labelKey: "systemMgmt", href: "/admin/system", icon: Server },

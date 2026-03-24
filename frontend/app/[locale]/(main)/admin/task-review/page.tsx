@@ -168,10 +168,6 @@ export default function TaskReviewPage() {
                         <ImageIcon size={12} className="opacity-70" /> {t("taskReview.viewScreenshot")}
                       </a>
                       <span className="flex items-center gap-1.5">
-                        <span className="w-1 h-3 bg-zinc-600 block"></span>
-                        {t("taskReview.minViews")}: <span className="text-zinc-300">≥{s.min_views}</span>
-                      </span>
-                      <span className="flex items-center gap-1.5">
                         <span className="w-1 h-3 bg-emerald-500/50 block"></span>
                         {t("taskReview.reward")}: <span className="text-emerald-400">+{s.reward_amount} {s.reward_mode}</span>
                       </span>

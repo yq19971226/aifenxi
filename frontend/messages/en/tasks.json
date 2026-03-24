@@ -1,6 +1,7 @@
 {
   "title": "Task Center",
   "subtitle": "Complete promotion tasks to earn free premium analysis credits",
+  "dailyTask": "Daily Promotion Task",
   "tabs": {
     "today": "Today",
     "history": "History"
@@ -11,12 +12,12 @@
     "rejected": "Rejected"
   },
   "today": {
-    "submitted": "Submitted \"{task}\" task today",
+    "submitted": "Submitted \"{task}\" today",
     "rewardGranted": "Reward granted: +{amount} {mode}",
+    "rewardInfo": "Complete task to earn +{amount} {mode} credits",
     "rejected": "Rejection reason: {reason}",
-    "step1": "Select Task Type",
     "step2": "Generate Promo Materials",
-    "step2Desc": "Task template selected. Axiom V5 engine will generate a premium analysis poster with tracking code and promo copy for your social sharing.",
+    "step2Desc": "Axiom V5 engine will generate a premium analysis poster with tracking code and promo copy for your social sharing.",
     "step3": "Submit for Review",
     "step3Desc": "Paste your public post URL and a screenshot link showing view counts below. Verification will be processed by the distributed engine after a short delay.",
     "generate": "Generate Copy",

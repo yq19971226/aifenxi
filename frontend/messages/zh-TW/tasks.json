@@ -1,6 +1,7 @@
 {
   "title": "任務中心",
   "subtitle": "完成推廣任務，獲取免費高級分析次數",
+  "dailyTask": "每日推廣任務",
   "tabs": {
     "today": "今日任務",
     "history": "提交歷史"
@@ -11,12 +12,12 @@
     "rejected": "已駁回"
   },
   "today": {
-    "submitted": "今日已提交「{task}」任務",
+    "submitted": "今日已提交「{task}」",
     "rewardGranted": "獎勵已到賬: +{amount} 次 {mode}",
+    "rewardInfo": "完成任務可獲得 +{amount} 次 {mode} 獎勵",
     "rejected": "駁回原因: {reason}",
-    "step1": "選擇任務類型",
     "step2": "生成推廣素材",
-    "step2Desc": "任務模板已選定。Axiom V5 引擎將為您單獨生成帶有追蹤碼的高級分析海報與文案用於社交分享。",
+    "step2Desc": "Axiom V5 引擎將為您生成帶有追蹤碼的高級分析海報與文案用於社交分享。",
     "step3": "提交審核",
     "step3Desc": "請將您的公開推文連結以及包含瀏覽量的頁面截圖連結填入下方。審核將由分布式引擎在一定延遲後驗證。",
     "generate": "生成文案",

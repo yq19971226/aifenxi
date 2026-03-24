@@ -5,26 +5,13 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
 // ── Types ────────────────────────────────────────────────────
 
-export interface TaskTemplate {
-  id: string;
-  title: string;
-  platform: string;
-  icon: string | null;
-  description: string | null;
-  rules: string | null;
+export interface TaskConfig {
   reward_mode: string;
   reward_amount: number;
-  min_views: number;
-  verify_window_hours: number;
-  sort_order?: number;
-  is_active?: boolean;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export interface TaskSubmission {
   id: string;
-  template_id?: string;
   template_title: string;
   post_url?: string;
   screenshot_url?: string;
@@ -38,11 +25,10 @@ export interface TaskSubmission {
   // admin fields
   user_id?: string;
   email?: string;
-  min_views?: number;
 }
 
 export interface TaskHome {
-  templates: TaskTemplate[];
+  task_config: TaskConfig;
   today_submission: TaskSubmission | null;
   can_submit: boolean;
   bonus_credits: Record<string, number>;
@@ -78,7 +64,6 @@ export const tasksApi = {
   },
 
   async submit(data: {
-    template_id: string;
     post_url: string;
     screenshot_url: string;
   }) {
@@ -116,36 +101,6 @@ export const tasksApi = {
 // ── Admin API ────────────────────────────────────────────────
 
 export const adminTasksApi = {
-  async listTemplates(): Promise<TaskTemplate[]> {
-    const res = await authFetch(`${API_BASE}/api/admin/tasks/templates`);
-    return handleApiResponse(res, "请求失败");
-  },
-
-  async createTemplate(data: Partial<TaskTemplate>) {
-    const res = await authFetch(`${API_BASE}/api/admin/tasks/templates`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    return handleApiResponse(res, "请求失败");
-  },
-
-  async updateTemplate(id: string, data: Partial<TaskTemplate>) {
-    const res = await authFetch(`${API_BASE}/api/admin/tasks/templates/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    return handleApiResponse(res, "请求失败");
-  },
-
-  async deleteTemplate(id: string) {
-    const res = await authFetch(`${API_BASE}/api/admin/tasks/templates/${id}`, {
-      method: "DELETE",
-    });
-    return handleApiResponse(res, "请求失败");
-  },
-
   async listSubmissions(status?: string): Promise<TaskSubmission[]> {
     const params = status ? `?status=${status}` : "";
     const res = await authFetch(

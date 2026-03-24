@@ -1,4 +1,4 @@
-"""任务中心核心服务 — 模板管理、提交、审核、奖励发放。"""
+"""任务中心核心服务 — 统一每日推广任务、提交、审核、奖励发放。"""
 
 import logging
 from datetime import datetime, timezone
@@ -22,17 +22,23 @@ async def check_task_enabled() -> bool:
     return enabled.lower() in ("true", "active")
 
 
+# ── 奖励配置（从 system_configs 读取） ────────────────────────
+
+
+async def _get_reward_config() -> dict:
+    """从 system_configs 获取全局奖励配置。"""
+    reward_mode = await get_config_value("task_reward_mode", "scalping")
+    reward_amount = int(await get_config_value("task_reward_amount", "5"))
+    return {"reward_mode": reward_mode, "reward_amount": reward_amount}
+
+
 # ── 用户端：任务首页 ──────────────────────────────────────────
 
 
 async def get_task_home(session: AsyncSession, user_id: str) -> dict:
-    """任务中心首页数据：可用任务 + 今日提交状态 + 奖励余额。"""
-    # 可用任务模板
-    try:
-        templates = await _get_active_templates(session)
-    except Exception as exc:
-        logger.error("_get_active_templates failed: %s", exc)
-        templates = []
+    """任务中心首页数据：奖励配置 + 今日提交状态 + 奖励余额。"""
+    # 奖励配置
+    task_config = await _get_reward_config()
 
     # 今日提交状态
     try:
@@ -45,58 +51,26 @@ async def get_task_home(session: AsyncSession, user_id: str) -> dict:
     bonus = await _get_bonus_balances(user_id)
 
     return {
-        "templates": templates,
+        "task_config": task_config,
         "today_submission": today_submission,
         "can_submit": today_submission is None,
         "bonus_credits": bonus,
     }
 
 
-async def _get_active_templates(session: AsyncSession) -> list[dict]:
-    """获取所有启用的任务模板。"""
-    result = await session.execute(
-        text(
-            """
-            SELECT id, title, platform, icon, description, rules,
-                   reward_mode, reward_amount, min_views, verify_window_hours
-            FROM task_templates
-            WHERE is_active = true
-            ORDER BY sort_order ASC, created_at DESC
-            """
-        )
-    )
-    rows = result.mappings().all()
-    return [
-        {
-            "id": str(r["id"]),
-            "title": r["title"],
-            "platform": r["platform"],
-            "icon": r["icon"],
-            "description": r["description"],
-            "rules": r["rules"],
-            "reward_mode": r["reward_mode"],
-            "reward_amount": r["reward_amount"],
-            "min_views": r["min_views"],
-            "verify_window_hours": r["verify_window_hours"],
-        }
-        for r in rows
-    ]
-
-
 async def _get_today_submission(session: AsyncSession, user_id: str) -> dict | None:
     """获取用户今日的提交记录（UTC 日期）。"""
     today = datetime.now(timezone.utc).date().isoformat()
+    reward_cfg = await _get_reward_config()
     result = await session.execute(
         text(
             """
-            SELECT s.id, s.template_id, s.post_url, s.screenshot_url,
-                   s.status, s.reject_reason, s.reward_granted, s.submitted_at,
-                   t.title AS template_title, t.reward_mode, t.reward_amount
-            FROM task_submissions s
-            JOIN task_templates t ON t.id = s.template_id
-            WHERE s.user_id = :uid
-              AND DATE(s.submitted_at) = :today
-            ORDER BY s.submitted_at DESC
+            SELECT id, post_url, screenshot_url,
+                   status, reject_reason, reward_granted, submitted_at
+            FROM task_submissions
+            WHERE user_id = :uid
+              AND DATE(submitted_at) = :today
+            ORDER BY submitted_at DESC
             LIMIT 1
             """
         ),
@@ -107,14 +81,12 @@ async def _get_today_submission(session: AsyncSession, user_id: str) -> dict | N
         return None
     return {
         "id": str(row["id"]),
-        "template_id": str(row["template_id"]),
-        "template_title": row["template_title"],
         "post_url": row["post_url"],
         "status": row["status"],
         "reject_reason": row["reject_reason"],
         "reward_granted": row["reward_granted"],
-        "reward_mode": row["reward_mode"],
-        "reward_amount": row["reward_amount"],
+        "reward_mode": reward_cfg["reward_mode"],
+        "reward_amount": reward_cfg["reward_amount"],
         "submitted_at": row["submitted_at"].isoformat(),
     }
 
@@ -140,7 +112,6 @@ async def _get_bonus_balances(user_id: str) -> dict:
 async def submit_task(
     session: AsyncSession,
     user_id: str,
-    template_id: str,
     post_url: str,
     screenshot_url: str,
 ) -> dict:
@@ -158,28 +129,16 @@ async def submit_task(
     if existing:
         raise ValueError("今日已提交过任务，明天再来吧")
 
-    # 验证模板存在且启用
-    tmpl = await session.execute(
-        text("SELECT id, is_active FROM task_templates WHERE id = :tid"),
-        {"tid": template_id},
-    )
-    tmpl_row = tmpl.mappings().first()
-    if not tmpl_row:
-        raise ValueError("任务模板不存在")
-    if not tmpl_row["is_active"]:
-        raise ValueError("该任务已下架")
-
-    # 创建提交记录
+    # 创建提交记录（不再需要 template_id）
     result = await insert_returning(
         session,
         """
-        INSERT INTO task_submissions (user_id, template_id, post_url, screenshot_url, status)
-        VALUES (:uid, :tid, :post_url, :screenshot_url, 'pending')
+        INSERT INTO task_submissions (user_id, post_url, screenshot_url, status)
+        VALUES (:uid, :post_url, :screenshot_url, 'pending')
         RETURNING id, submitted_at
         """,
         {
             "uid": user_id,
-            "tid": template_id,
             "post_url": post_url.strip(),
             "screenshot_url": screenshot_url.strip(),
         },
@@ -191,7 +150,7 @@ async def submit_task(
     # 设置 Redis 标记（48h TTL）
     await redis.set(submitted_key, "1", ex=48 * 3600)
 
-    logger.info("task_submitted: user=%s, template=%s", user_id, template_id)
+    logger.info("task_submitted: user=%s", user_id)
 
     return {
         "id": str(row["id"]),
@@ -208,16 +167,15 @@ async def get_my_submissions(
     session: AsyncSession, user_id: str, limit: int = 30
 ) -> list[dict]:
     """获取用户的提交历史。"""
+    reward_cfg = await _get_reward_config()
     result = await session.execute(
         text(
             """
-            SELECT s.id, s.template_id, s.post_url, s.status, s.reject_reason,
-                   s.reward_granted, s.submitted_at, s.reviewed_at,
-                   t.title AS template_title, t.reward_mode, t.reward_amount
-            FROM task_submissions s
-            JOIN task_templates t ON t.id = s.template_id
-            WHERE s.user_id = :uid
-            ORDER BY s.submitted_at DESC
+            SELECT id, post_url, status, reject_reason,
+                   reward_granted, submitted_at, reviewed_at
+            FROM task_submissions
+            WHERE user_id = :uid
+            ORDER BY submitted_at DESC
             LIMIT :lim
             """
         ),
@@ -227,12 +185,12 @@ async def get_my_submissions(
     return [
         {
             "id": str(r["id"]),
-            "template_title": r["template_title"],
+            "template_title": "每日推广任务",
             "status": r["status"],
             "reject_reason": r["reject_reason"],
             "reward_granted": r["reward_granted"],
-            "reward_mode": r["reward_mode"],
-            "reward_amount": r["reward_amount"],
+            "reward_mode": reward_cfg["reward_mode"],
+            "reward_amount": reward_cfg["reward_amount"],
             "submitted_at": r["submitted_at"].isoformat(),
             "reviewed_at": r["reviewed_at"].isoformat() if r["reviewed_at"] else None,
         }
@@ -247,6 +205,7 @@ async def get_pending_submissions(
     session: AsyncSession, status_filter: str | None = None, limit: int = 50
 ) -> list[dict]:
     """获取待审核/所有提交列表（后台用）。"""
+    reward_cfg = await _get_reward_config()
     where = "WHERE 1=1"
     params: dict = {"lim": limit}
     if status_filter:
@@ -256,13 +215,11 @@ async def get_pending_submissions(
     result = await session.execute(
         text(
             f"""
-            SELECT s.id, s.user_id, s.template_id, s.post_url, s.screenshot_url,
+            SELECT s.id, s.user_id, s.post_url, s.screenshot_url,
                    s.status, s.reject_reason, s.reward_granted,
                    s.submitted_at, s.reviewed_at, s.reviewed_by,
-                   t.title AS template_title, t.min_views, t.reward_mode, t.reward_amount,
                    u.email
             FROM task_submissions s
-            JOIN task_templates t ON t.id = s.template_id
             JOIN users u ON u.id = s.user_id
             {where}
             ORDER BY s.submitted_at DESC
@@ -277,15 +234,14 @@ async def get_pending_submissions(
             "id": str(r["id"]),
             "user_id": str(r["user_id"]),
             "email": r["email"],
-            "template_title": r["template_title"],
+            "template_title": "每日推广任务",
             "post_url": r["post_url"],
             "screenshot_url": r["screenshot_url"],
-            "min_views": r["min_views"],
             "status": r["status"],
             "reject_reason": r["reject_reason"],
             "reward_granted": r["reward_granted"],
-            "reward_mode": r["reward_mode"],
-            "reward_amount": r["reward_amount"],
+            "reward_mode": reward_cfg["reward_mode"],
+            "reward_amount": reward_cfg["reward_amount"],
             "submitted_at": r["submitted_at"].isoformat(),
             "reviewed_at": r["reviewed_at"].isoformat() if r["reviewed_at"] else None,
         }
@@ -300,11 +256,9 @@ async def approve_submission(
     result = await session.execute(
         text(
             """
-            SELECT s.id, s.user_id, s.status, s.reward_granted,
-                   t.reward_mode, t.reward_amount
-            FROM task_submissions s
-            JOIN task_templates t ON t.id = s.template_id
-            WHERE s.id = :sid
+            SELECT id, user_id, status, reward_granted
+            FROM task_submissions
+            WHERE id = :sid
             """
         ),
         {"sid": submission_id},
@@ -318,8 +272,11 @@ async def approve_submission(
         raise ValueError("奖励已发放，请勿重复操作")
 
     user_id = str(row["user_id"])
-    reward_mode = row["reward_mode"]
-    reward_amount = row["reward_amount"]
+
+    # 从 system_configs 读取奖励参数
+    reward_cfg = await _get_reward_config()
+    reward_mode = reward_cfg["reward_mode"]
+    reward_amount = reward_cfg["reward_amount"]
 
     # 更新提交状态
     await session.execute(
@@ -390,88 +347,6 @@ async def reject_submission(
     await session.flush()
 
     logger.info("task_rejected: submission=%s, reason=%s", submission_id, reason)
-
-
-# ── 运营后台：模板 CRUD ──────────────────────────────────────
-
-
-async def create_template(session: AsyncSession, data: dict) -> dict:
-    """创建任务模板。"""
-    result = await insert_returning(
-        session,
-        """
-        INSERT INTO task_templates
-            (title, platform, icon, description, rules,
-             reward_mode, reward_amount, min_views, verify_window_hours,
-             sort_order, is_active)
-        VALUES
-            (:title, :platform, :icon, :description, :rules,
-             :reward_mode, :reward_amount, :min_views, :verify_window_hours,
-             :sort_order, :is_active)
-        RETURNING id, created_at
-        """,
-        data,
-        table="task_templates",
-    )
-    row = result.mappings().first()
-    await session.flush()
-    return {"id": str(row["id"]), "created_at": row["created_at"].isoformat()}
-
-
-async def update_template(session: AsyncSession, template_id: str, data: dict) -> None:
-    """更新任务模板。"""
-    set_clauses = ", ".join(f"{k} = :{k}" for k in data)
-    data["tid"] = template_id
-    data["now"] = datetime.now(timezone.utc)
-    await session.execute(
-        text(f"UPDATE task_templates SET {set_clauses}, updated_at = :now WHERE id = :tid"),
-        data,
-    )
-    await session.flush()
-
-
-async def delete_template(session: AsyncSession, template_id: str) -> None:
-    """软删除（停用）任务模板。"""
-    await session.execute(
-        text(f"UPDATE task_templates SET is_active = false, updated_at = {now_func()} WHERE id = :tid"),
-        {"tid": template_id},
-    )
-    await session.flush()
-
-
-async def list_templates(session: AsyncSession) -> list[dict]:
-    """获取所有任务模板（包括已停用，后台用）。"""
-    result = await session.execute(
-        text(
-            """
-            SELECT id, title, platform, icon, description, rules,
-                   reward_mode, reward_amount, min_views, verify_window_hours,
-                   sort_order, is_active, created_at, updated_at
-            FROM task_templates
-            ORDER BY sort_order ASC, created_at DESC
-            """
-        )
-    )
-    rows = result.mappings().all()
-    return [
-        {
-            "id": str(r["id"]),
-            "title": r["title"],
-            "platform": r["platform"],
-            "icon": r["icon"],
-            "description": r["description"],
-            "rules": r["rules"],
-            "reward_mode": r["reward_mode"],
-            "reward_amount": r["reward_amount"],
-            "min_views": r["min_views"],
-            "verify_window_hours": r["verify_window_hours"],
-            "sort_order": r["sort_order"],
-            "is_active": r["is_active"],
-            "created_at": r["created_at"].isoformat(),
-            "updated_at": r["updated_at"].isoformat(),
-        }
-        for r in rows
-    ]
 
 
 # ── 统计 ─────────────────────────────────────────────────────

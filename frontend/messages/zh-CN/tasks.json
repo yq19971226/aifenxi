@@ -1,6 +1,7 @@
 {
   "title": "任务中心",
   "subtitle": "完成推广任务，获取免费高级分析次数",
+  "dailyTask": "每日推广任务",
   "tabs": {
     "today": "今日任务",
     "history": "提交历史"
@@ -11,12 +12,12 @@
     "rejected": "已驳回"
   },
   "today": {
-    "submitted": "今日已提交「{task}」任务",
+    "submitted": "今日已提交「{task}」",
     "rewardGranted": "奖励已到账: +{amount} 次 {mode}",
+    "rewardInfo": "完成任务可获得 +{amount} 次 {mode} 奖励",
     "rejected": "驳回原因: {reason}",
-    "step1": "选择任务类型",
     "step2": "生成推广素材",
-    "step2Desc": "任务模板已选定。Axiom V5 引擎将为您单独生成带有追踪码的高级分析海报与文案用于社交分享。",
+    "step2Desc": "Axiom V5 引擎将为您生成带有追踪码的高级分析海报与文案用于社交分享。",
     "step3": "提交审核",
     "step3Desc": "请将您的公开推文链接以及包含浏览量的页面截图链接填入下方。审核将由分布式引擎在一定延迟后验证。",
     "generate": "生成文案",
