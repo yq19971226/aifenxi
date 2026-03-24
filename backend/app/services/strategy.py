@@ -182,16 +182,30 @@ class StrategyService:
             entry_high = entry_mid + min_entry_width / 2
 
         # P2-D: 止盈位最小间距（按模式）
-        targets = StrategyService._space_targets(targets, mode=mode)
+        targets = StrategyService._space_targets(targets, mode=mode, entry_price=entry_mid)
 
         return entry_low, entry_high, stop_loss, targets
 
     @staticmethod
-    def _space_targets(targets: list[float], mode: str = "scalping") -> list[float]:
-        """确保止盈位之间有足够间距（按模式：短线0.5%，日内1.5%，趋势3%）。"""
+    def _space_targets(targets: list[float], mode: str = "scalping", entry_price: float | None = None) -> list[float]:
+        """确保止盈位之间有足够间距（按模式：短线0.5%，日内0.8%，趋势3%）。
+
+        entry_price: 入场中位价。如提供，TP1 必须距入场至少 min_gap_pct。
+        """
         min_gap_pct = _MODE_TP_MIN_GAP.get(mode, 0.005)
         if not targets:
             return targets
+
+        # 新增：TP1 必须距入场价至少 min_gap_pct
+        if entry_price and entry_price > 0:
+            first = targets[0]
+            dist = abs(first - entry_price) / max(abs(entry_price), 1e-8)
+            if dist < min_gap_pct:
+                if first >= entry_price:
+                    targets[0] = entry_price * (1 + min_gap_pct)
+                else:
+                    targets[0] = entry_price * (1 - min_gap_pct)
+
         spaced = [targets[0]]
         for tp in targets[1:]:
             if abs(tp - spaced[-1]) / max(abs(spaced[-1]), 1e-8) >= min_gap_pct:
@@ -529,7 +543,18 @@ class StrategyService:
             if _has_structural_tp:
                 # 从候选池选出大于 entry_high 的前 3 个
                 targets = [t for t in tp_pool if t > entry_high][:3]
-            else:
+                # R:R 安全网：预估 R:R，若太差则回退 ATR
+                if targets and use_atr:
+                    _pre_risk = abs(current_price - stop_loss)
+                    _pre_reward = abs(targets[0] - current_price)
+                    _pre_rr = _pre_reward / max(_pre_risk, 1e-8)
+                    if _pre_rr < 1.0:
+                        logger.info(
+                            "Structural TP R:R=%.2f < 1.0, falling back to ATR for direction=long mode=%s",
+                            _pre_rr, mode,
+                        )
+                        _has_structural_tp = False
+            if not _has_structural_tp:
                 _tp_source = "atr_fallback"
                 if use_atr:
                     m = _atr_multipliers(atr, current_price, mode=mode)
@@ -550,7 +575,18 @@ class StrategyService:
             if _has_structural_tp:
                 # 从候选池选出小于 entry_low 的前 3 个
                 targets = [t for t in tp_pool if t < entry_low][:3]
-            else:
+                # R:R 安全网：预估 R:R，若太差则回退 ATR
+                if targets and use_atr:
+                    _pre_risk = abs(stop_loss - current_price)
+                    _pre_reward = abs(current_price - targets[0])
+                    _pre_rr = _pre_reward / max(_pre_risk, 1e-8)
+                    if _pre_rr < 1.0:
+                        logger.info(
+                            "Structural TP R:R=%.2f < 1.0, falling back to ATR for direction=short mode=%s",
+                            _pre_rr, mode,
+                        )
+                        _has_structural_tp = False
+            if not _has_structural_tp:
                 _tp_source = "atr_fallback"
                 if use_atr:
                     m = _atr_multipliers(atr, current_price, mode=mode)

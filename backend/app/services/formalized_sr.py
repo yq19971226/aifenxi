@@ -169,6 +169,14 @@ def cross_validate_sr(
 #   4. BB Upper（做多）/ BB Lower（做空）
 # ATR 只用于候选不足时的 spacing floor，不产生目标值本身。
 
+# 模式感知最小距离：候选位必须距当前价至少 N% 才有效
+# 防止过于贴近入场价的无意义目标位进入池
+_MODE_MIN_PCT_FROM_PRICE: dict[str, float] = {
+    "scalping": 0.003,   # 0.3%
+    "intraday": 0.005,   # 0.5%
+    "trend":    0.015,   # 1.5%
+}
+
 _SWING_LOOKBACK_BARS: dict[str, int] = {
     "scalping": 20,   # 20 根 15m = 5h
     "intraday": 30,   # 30 根 1h = 30h
@@ -181,7 +189,7 @@ def _find_swing_levels(
     direction: str,
     current_price: float,
     lookback: int,
-    min_pct_from_price: float = 0.002,
+    min_pct_from_price: float = 0.003,
 ) -> list[float]:
     """从最近 lookback 根 K 线提取 swing high（做多阻力）或 swing low（做空支撑）。
 
@@ -245,6 +253,11 @@ def build_tp_candidates(
     if direction == "neutral" or current_price <= 0:
         return []
 
+    # 模式感知最小距离
+    min_pct = _MODE_MIN_PCT_FROM_PRICE.get(mode, 0.003)
+    min_above = current_price * (1 + min_pct)
+    min_below = current_price * (1 - min_pct)
+
     candidates: list[float] = []
 
     # ── 1. Pivot Point ────────────────────────────────────────
@@ -264,20 +277,23 @@ def build_tp_candidates(
                     # 做多：Pivot 上方的阻力位是 TP 候选
                     for key in ("r1", "r2"):
                         lvl = pp[key]
-                        if lvl > current_price * 1.001:
+                        if lvl > min_above:
                             candidates.append(round(lvl, 8))
                 else:
                     # 做空：Pivot 下方的支撑位是 TP 候选
                     for key in ("s1", "s2"):
                         lvl = pp[key]
-                        if 0 < lvl < current_price * 0.999:
+                        if 0 < lvl < min_below:
                             candidates.append(round(lvl, 8))
         except Exception as exc:
             logger.debug("Pivot point calc skipped: %s", exc)
 
     # ── 2. Swing High / Low ───────────────────────────────────
     lookback = _SWING_LOOKBACK_BARS.get(mode, 20)
-    swing_levels = _find_swing_levels(klines, direction, current_price, lookback)
+    swing_levels = _find_swing_levels(
+        klines, direction, current_price, lookback,
+        min_pct_from_price=min_pct,
+    )
     candidates.extend(swing_levels)
 
     # ── 3. EMA 动态位 ─────────────────────────────────────────
@@ -287,9 +303,9 @@ def build_tp_candidates(
             if val is None:
                 continue
             ema_val = float(val)
-            if direction == "long" and ema_val > current_price * 1.001:
+            if direction == "long" and ema_val > min_above:
                 candidates.append(round(ema_val, 8))
-            elif direction == "short" and ema_val < current_price * 0.999:
+            elif direction == "short" and ema_val < min_below:
                 candidates.append(round(ema_val, 8))
 
     # ── 4. BB Upper / Lower ───────────────────────────────────
@@ -298,13 +314,13 @@ def build_tp_candidates(
             bb_u = indicators.get("bb_upper")
             if bb_u is not None:
                 bb_u = float(bb_u)
-                if bb_u > current_price * 1.001:
+                if bb_u > min_above:
                     candidates.append(round(bb_u, 8))
         else:
             bb_l = indicators.get("bb_lower")
             if bb_l is not None:
                 bb_l = float(bb_l)
-                if bb_l < current_price * 0.999:
+                if bb_l < min_below:
                     candidates.append(round(bb_l, 8))
 
     # ── 去重、过滤、排序 ──────────────────────────────────────
