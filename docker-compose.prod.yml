@@ -14,7 +14,7 @@ services:
         -c effective_cache_size=768MB
         -c work_mem=16MB
         -c maintenance_work_mem=128MB
-        -c max_connections=100
+        -c max_connections=200
         -c log_min_duration_statement=1000
     deploy:
       resources:
@@ -79,7 +79,7 @@ services:
     command: >
       celery -A workers.celery_app worker
         --loglevel=warning
-        --concurrency=8
+        --concurrency=4
         --max-tasks-per-child=1000
         --without-heartbeat
     deploy:
