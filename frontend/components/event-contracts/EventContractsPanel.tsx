@@ -20,6 +20,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { useTranslations } from "next-intl";
 import {
   fetchEventLive,
   fetchEventHistory,
@@ -50,6 +51,7 @@ const itemVariants = {
 // ── 页面组件 ──────────────────────────────────────────────
 export default function EventContractsPanel() {
   const { user } = useAuth();
+  const t = useTranslations("eventContracts");
   const isAdmin = user?.role === "admin";
   const [live, setLive] = useState<EventLiveSignal | null>(null);
   const [history, setHistory] = useState<EventHistoryRecord[]>([]);
@@ -74,25 +76,25 @@ export default function EventContractsPanel() {
     setActionLoading(true);
     try {
       await startPredictor(selectedSymbol);
-      showToast("ok", `预测器已启动 (${selectedSymbol})`);
+      showToast("ok", `${t("admin.predictorStarted")} (${selectedSymbol})`);
     } catch (e: any) {
-      showToast("err", e.message || "启动失败");
+      showToast("err", e.message || t("admin.startFailed"));
     } finally {
       setActionLoading(false);
     }
-  }, [selectedSymbol, showToast]);
+  }, [selectedSymbol, showToast, t]);
 
   const handleStop = useCallback(async () => {
     setActionLoading(true);
     try {
       await stopPredictor();
-      showToast("ok", "预测器已停止");
+      showToast("ok", t("admin.predictorStopped"));
     } catch (e: any) {
-      showToast("err", e.message || "停止失败");
+      showToast("err", e.message || t("admin.stopFailed"));
     } finally {
       setActionLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   // 用 ref 记录上次数据的 JSON，只在数据实际变化时才 setState，避免无意义 re-render
   const prevLiveJson = useRef("");
@@ -110,7 +112,7 @@ export default function EventContractsPanel() {
       }
       setError(null);
     } catch (e: any) {
-      setError(e.message || "获取实时信号失败");
+      setError(e.message || "Failed to fetch live signal");
     }
   }, []);
 
@@ -196,14 +198,14 @@ export default function EventContractsPanel() {
             <div className="flex items-center gap-2 mb-3">
               <Zap size={14} className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
               <span className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]">
-                事件合约预测引擎
+                {t("subtitle")}
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              事件合约预测
+              {t("title")}
             </h1>
             <p className="text-zinc-500 text-sm font-mono mt-1 max-w-lg">
-              10 分钟事件合约 · 订单流 + 技术指标规则引擎 · 自动预测 & 结算
+              {t("description")}
             </p>
           </div>
 
@@ -221,7 +223,7 @@ export default function EventContractsPanel() {
             <span className={`text-[10px] font-mono font-bold uppercase tracking-widest ${
               live?.status === "online" ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "text-zinc-500"
             }`}>
-              {live?.status === "online" ? "运行中" : live?.status === "warming_up" ? "预热中" : "离线"}
+              {live?.status === "online" ? t("status.online") : live?.status === "warming_up" ? t("status.warmingUp") : t("status.offline")}
             </span>
           </div>
         </div>
@@ -246,7 +248,7 @@ export default function EventContractsPanel() {
                 className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-mono font-bold bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 disabled:opacity-40 transition-all"
               >
                 {actionLoading ? <RefreshCw size={12} className="animate-spin" /> : <Square size={12} />}
-                停止预测器
+                {t("admin.stopPredictor")}
               </button>
             ) : (
               <button
@@ -255,7 +257,7 @@ export default function EventContractsPanel() {
                 className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-mono font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-40 transition-all"
               >
                 {actionLoading ? <RefreshCw size={12} className="animate-spin" /> : <Play size={12} />}
-                启动预测器
+                {t("admin.startPredictor")}
               </button>
             )}
           </div>
@@ -298,6 +300,8 @@ export default function EventContractsPanel() {
 // ── 实时信号面板 ──────────────────────────────────────────
 
 function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: EventLiveSignal | null; isAdmin: boolean; onStart: () => void; actionLoading: boolean }) {
+  const t = useTranslations("eventContracts");
+
   if (!live || live.status !== "online") {
     return (
       <div className="relative rounded-xl border border-white/[0.06] bg-[#0a0d14]/90 backdrop-blur-3xl p-12 text-center overflow-hidden">
@@ -306,7 +310,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
         <div className="relative z-10">
           <Pause size={32} className="mx-auto text-zinc-600 mb-3" />
           <p className="text-zinc-500 font-mono text-sm">
-            {live?.status === "warming_up" ? "数据预热中，请等待约 30 秒..." : "预测器当前未运行"}
+            {live?.status === "warming_up" ? t("offline.warmingUp") : t("offline.notRunning")}
           </p>
           {isAdmin && !live?.status?.includes("warming") && (
             <button
@@ -315,7 +319,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
               className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-mono font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(52,211,153,0.2)] disabled:opacity-40 transition-all"
             >
               {actionLoading ? <RefreshCw size={14} className="animate-spin" /> : <Play size={14} />}
-              点击启动预测器
+              {t("offline.clickToStart")}
             </button>
           )}
         </div>
@@ -337,7 +341,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
     : { text: "text-zinc-400", glow: "", bar: "bg-zinc-500", bg: "bg-zinc-500/[0.04]", border: "border-zinc-500/20" };
 
   const DirIcon = isUp ? TrendingUp : isDown ? TrendingDown : Pause;
-  const dirLabel = isUp ? "看涨" : isDown ? "看跌" : "观望";
+  const dirLabel = isUp ? t("live.bullish") : isDown ? t("live.bearish") : t("live.watching");
 
   return (
     <div className="relative rounded-xl border border-white/[0.06] bg-[#0a0d14]/90 backdrop-blur-3xl overflow-hidden">
@@ -365,7 +369,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
             <div>
               <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
                 <span className="w-1 h-3 bg-amber-500 rounded-full" />
-                预测方向
+                {t("live.predictionDirection")}
               </p>
               <div className="flex items-center gap-3">
                 <motion.div
@@ -387,7 +391,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
             <div>
               <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
                 <span className="w-1 h-3 bg-fuchsia-500 rounded-full" />
-                当前价格
+                {t("live.currentPrice")}
               </p>
               <p className="text-3xl font-black font-mono text-white tabular-nums tracking-tight">
                 <span className="text-fuchsia-400/60 text-lg mr-0.5">$</span>
@@ -399,7 +403,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
             <div>
               <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
                 <span className="w-1 h-3 bg-indigo-500 rounded-full" />
-                信号强度
+                {t("live.signalStrength")}
               </p>
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-2.5 rounded-full bg-white/[0.04] overflow-hidden border border-white/[0.06]">
@@ -421,23 +425,23 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
           <div className="space-y-1">
             <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5">
               <Signal size={10} className="text-[#00E5FF]" />
-              主要指标 · 订单流
+              {t("live.primarySignals")}
             </p>
-            <MetricRow label="买/卖比 (30s)" value={metrics?.buy_sell_ratio_30s} format={(v) => v.toFixed(2)} bullish={v => v > 1.3} bearish={v => v < 0.77} />
-            <MetricRow label="订单簿失衡" value={metrics?.orderbook_imbalance} format={(v) => `${(v * 100).toFixed(1)}%`} bullish={v => v > 0.2} bearish={v => v < -0.2} />
-            <MetricRow label="大单净流向" value={metrics?.large_order_flow} format={(v) => `$${Math.abs(v).toLocaleString()}`} bullish={v => v > 0} bearish={v => v < 0} prefix={metrics?.large_order_flow && metrics.large_order_flow > 0 ? "+" : ""} />
-            <MetricRow label="成交笔数" value={metrics?.trade_count_30s} format={(v) => v.toString()} />
+            <MetricRow label={t("live.buySellRatio")} value={metrics?.buy_sell_ratio_30s} format={(v) => v.toFixed(2)} bullish={v => v > 1.3} bearish={v => v < 0.77} />
+            <MetricRow label={t("live.orderbookImbalance")} value={metrics?.orderbook_imbalance} format={(v) => `${(v * 100).toFixed(1)}%`} bullish={v => v > 0.2} bearish={v => v < -0.2} />
+            <MetricRow label={t("live.largeOrderFlow")} value={metrics?.large_order_flow} format={(v) => `$${Math.abs(v).toLocaleString()}`} bullish={v => v > 0} bearish={v => v < 0} prefix={metrics?.large_order_flow && metrics.large_order_flow > 0 ? "+" : ""} />
+            <MetricRow label={t("live.tradeCount")} value={metrics?.trade_count_30s} format={(v) => v.toString()} />
           </div>
 
           {/* Right: Secondary signals */}
           <div className="space-y-1">
             <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5">
               <BarChart3 size={10} className="text-amber-400" />
-              次要指标 · 技术分析
+              {t("live.secondarySignals")}
             </p>
             <MetricRow label="RSI(14)" value={metrics?.rsi_1m} format={(v) => v.toFixed(1)} bullish={v => v > 55} bearish={v => v < 45} />
-            <MetricRow label="EMA5 vs EMA10" value={metrics?.ema5_vs_ema10} format={(v) => v.toFixed(4)} bullish={v => v > 0} bearish={v => v < 0} />
-            <MetricRow label="成交量比" value={metrics?.volume_ratio} format={(v) => `${v.toFixed(2)}x`} bullish={v => v > 1.5} />
+            <MetricRow label={t("live.ema5VsEma10")} value={metrics?.ema5_vs_ema10} format={(v) => v.toFixed(4)} bullish={v => v > 0} bearish={v => v < 0} />
+            <MetricRow label={t("live.volumeRatio")} value={metrics?.volume_ratio} format={(v) => `${v.toFixed(2)}x`} bullish={v => v > 1.5} />
           </div>
         </div>
 
@@ -451,7 +455,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
           >
             <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5">
               <Flame size={10} className="text-orange-400" />
-              触发信号
+              {t("live.triggeredSignals")}
             </p>
             <div className="flex flex-wrap gap-2">
               {pred.signals.map((s, i) => (
@@ -468,7 +472,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
                       : "text-zinc-400 border-white/10 bg-white/[0.03]"
                   }`}
                 >
-                  {s.replace(/bullish/gi, "看涨").replace(/bearish/gi, "看跌")}
+                  {s}
                 </motion.span>
               ))}
             </div>
@@ -476,7 +480,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
         )}
 
         <p className="text-[9px] font-mono text-zinc-600 mt-4 tabular-nums">
-          最后更新: {live.updated_at ? new Date(live.updated_at).toLocaleTimeString() : "—"}
+          {t("live.lastUpdated")}: {live.updated_at ? new Date(live.updated_at).toLocaleTimeString() : "—"}
         </p>
       </div>
     </div>
@@ -532,11 +536,13 @@ function MetricRow({
 // ── 统计面板 ─────────────────────────────────────────────
 
 function StatsPanel({ stats }: { stats: EventStatsResponse }) {
+  const t = useTranslations("eventContracts");
+
   const periods = [
-    { key: "today" as const, label: "今日", icon: Clock },
-    { key: "7d" as const, label: "近7天", icon: Activity },
-    { key: "30d" as const, label: "近30天", icon: BarChart3 },
-    { key: "all_time" as const, label: "全部", icon: Zap },
+    { key: "today" as const, label: t("stats.today"), icon: Clock },
+    { key: "7d" as const, label: t("stats.7d"), icon: Activity },
+    { key: "30d" as const, label: t("stats.30d"), icon: BarChart3 },
+    { key: "all_time" as const, label: t("stats.allTime"), icon: Zap },
   ];
 
   return (
@@ -574,16 +580,16 @@ function StatsPanel({ stats }: { stats: EventStatsResponse }) {
               <div className="mt-3 space-y-0.5">
                 <p className="text-[10px] font-mono text-zinc-500">
                   <span className="text-emerald-400">{d.wins}</span>
-                  <span className="text-zinc-600 mx-1">胜</span>
+                  <span className="text-zinc-600 mx-1">{t("stats.wins")}</span>
                   <span className="text-zinc-600">/</span>
                   <span className="text-red-400 ml-1">{d.losses}</span>
-                  <span className="text-zinc-600 mx-1">负</span>
+                  <span className="text-zinc-600 mx-1">{t("stats.losses")}</span>
                   <span className="text-zinc-600">·</span>
                   <span className="text-zinc-500 ml-1">{d.skipped}</span>
-                  <span className="text-zinc-600 ml-1">跳过</span>
+                  <span className="text-zinc-600 ml-1">{t("stats.skipped")}</span>
                 </p>
                 <p className="text-[9px] font-mono text-zinc-700">
-                  共 {d.total} 轮
+                  {t("stats.totalRounds", { count: d.total })}
                 </p>
               </div>
             </div>
@@ -609,6 +615,7 @@ function HistoryTable({
   onPageChange: (p: number) => void;
   loading: boolean;
 }) {
+  const t = useTranslations("eventContracts");
   const totalPages = Math.ceil(total / 20);
 
   return (
@@ -626,23 +633,23 @@ function HistoryTable({
           </div>
           <h2 className="text-[10px] font-black font-mono text-zinc-400 uppercase tracking-[0.3em] flex items-center gap-2">
             <span className="w-0.5 h-3 bg-fuchsia-500 rounded-full" />
-            预测历史
+            {t("history.title")}
           </h2>
         </div>
-        <span className="text-[9px] font-mono text-zinc-600 tabular-nums">共 {total} 条</span>
+        <span className="text-[9px] font-mono text-zinc-600 tabular-nums">{t("history.totalRecords", { count: total })}</span>
       </div>
 
       <div className="relative z-10 overflow-x-auto">
         <table className="w-full text-left">
           <thead>
             <tr className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.15em] border-b border-white/[0.04]">
-              <th className="px-4 py-3">#</th>
-              <th className="px-4 py-3">方向</th>
-              <th className="px-4 py-3">强度</th>
-              <th className="px-4 py-3">入场价</th>
-              <th className="px-4 py-3">结算价</th>
-              <th className="px-4 py-3">结果</th>
-              <th className="px-4 py-3">时间</th>
+              <th className="px-4 py-3">{t("history.round")}</th>
+              <th className="px-4 py-3">{t("history.direction")}</th>
+              <th className="px-4 py-3">{t("history.strength")}</th>
+              <th className="px-4 py-3">{t("history.entryPrice")}</th>
+              <th className="px-4 py-3">{t("history.settlePrice")}</th>
+              <th className="px-4 py-3">{t("history.result")}</th>
+              <th className="px-4 py-3">{t("history.time")}</th>
             </tr>
           </thead>
           <tbody>
@@ -650,14 +657,14 @@ function HistoryTable({
               <tr>
                 <td colSpan={7} className="px-4 py-12 text-center text-zinc-600 font-mono text-sm">
                   <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                    加载中...
+                    {t("history.loading")}
                   </motion.span>
                 </td>
               </tr>
             ) : records.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-12 text-center text-zinc-600 font-mono text-sm">
-                  暂无预测记录
+                  {t("history.noRecords")}
                 </td>
               </tr>
             ) : (
@@ -683,10 +690,10 @@ function HistoryTable({
                             : "text-red-400 drop-shadow-[0_0_6px_rgba(248,113,113,0.4)]"
                         }`}>
                           {r.direction === "up" ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                          {r.direction === "up" ? "涨" : "跌"}
+                          {r.direction === "up" ? t("directions.up") : t("directions.down")}
                         </span>
                       ) : (
-                        <span className="text-[11px] font-mono text-zinc-600">跳过</span>
+                        <span className="text-[11px] font-mono text-zinc-600">{t("directions.skip")}</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-[11px] font-mono text-zinc-400 tabular-nums">
@@ -722,7 +729,7 @@ function HistoryTable({
             disabled={page <= 1}
             className="flex items-center gap-1 px-3 py-1.5 text-[10px] font-mono font-bold text-zinc-400 border border-white/[0.08] rounded-lg hover:bg-white/[0.04] hover:border-[#00E5FF]/20 hover:text-[#00E5FF] disabled:opacity-20 transition-all"
           >
-            <ChevronLeft size={12} /> 上一页
+            <ChevronLeft size={12} /> {t("history.prevPage")}
           </button>
           <span className="text-[10px] font-mono font-bold text-zinc-500 tabular-nums">
             {page} / {totalPages}
@@ -732,7 +739,7 @@ function HistoryTable({
             disabled={page >= totalPages}
             className="flex items-center gap-1 px-3 py-1.5 text-[10px] font-mono font-bold text-zinc-400 border border-white/[0.08] rounded-lg hover:bg-white/[0.04] hover:border-[#00E5FF]/20 hover:text-[#00E5FF] disabled:opacity-20 transition-all"
           >
-            下一页 <ChevronRight size={12} />
+            {t("history.nextPage")} <ChevronRight size={12} />
           </button>
         </div>
       )}
@@ -743,17 +750,26 @@ function HistoryTable({
 // ── Result Badge ─────────────────────────────────────────
 
 function ResultBadge({ result, status }: { result: string | null; status: string }) {
+  const t = useTranslations("eventContracts");
+
   if (result === "win") {
     return (
       <span className="text-[9px] font-mono font-black text-[#00E5FF] px-2 py-0.5 rounded-md bg-[#00E5FF]/[0.08] border border-[#00E5FF]/20 drop-shadow-[0_0_6px_rgba(0,229,255,0.3)] tracking-widest">
-        ✓ 胜
+        {t("results.win")}
       </span>
     );
   }
   if (result === "lose") {
     return (
       <span className="text-[9px] font-mono font-black text-red-400 px-2 py-0.5 rounded-md bg-red-500/[0.08] border border-red-500/20 drop-shadow-[0_0_6px_rgba(248,113,113,0.3)] tracking-widest">
-        ✗ 负
+        {t("results.lose")}
+      </span>
+    );
+  }
+  if (result === "draw") {
+    return (
+      <span className="text-[9px] font-mono font-black text-amber-300 px-2 py-0.5 rounded-md bg-amber-500/[0.08] border border-amber-500/20 tracking-widest">
+        {t("results.draw")}
       </span>
     );
   }
@@ -764,13 +780,13 @@ function ResultBadge({ result, status }: { result: string | null; status: string
         transition={{ duration: 2, repeat: Infinity }}
         className="text-[9px] font-mono font-black text-amber-400 px-2 py-0.5 rounded-md bg-amber-500/[0.08] border border-amber-500/20 tracking-widest"
       >
-        ⏳ 等待中
+        {t("results.pending")}
       </motion.span>
     );
   }
   return (
     <span className="text-[9px] font-mono font-bold text-zinc-600 px-2 py-0.5 rounded-md bg-white/[0.02] border border-white/[0.06] tracking-widest">
-      ⏸ 跳过
+      {t("results.skipped")}
     </span>
   );
 }

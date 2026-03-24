@@ -18,7 +18,7 @@ async function loadMessages(locale: string): Promise<Record<string, any>> {
     'common', 'nav', 'dashboard', 'consensus', 'analysis', 'login',
     'alerts', 'performance', 'settings', 'onchain', 'errors', 'metadata',
     'adversarial', 'tasks', 'partner', 'leaderboard', 'backtest', 'announcements', 'landing', 'guide', 'admin',
-    'autopilots', 'position', 'grid',
+    'autopilots', 'position', 'grid', 'eventContracts',
   ];
   for (const ns of namespaces) {
     try {

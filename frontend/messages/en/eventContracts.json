@@ -1,0 +1,78 @@
+{
+  "title": "Event Contract Prediction",
+  "subtitle": "Event Contract Prediction Engine",
+  "description": "10-min Event Contracts · Order Flow + Technical Indicators Rule Engine · Auto Predict & Settle",
+  "status": {
+    "online": "Running",
+    "warmingUp": "Warming Up",
+    "offline": "Offline"
+  },
+  "admin": {
+    "stopPredictor": "Stop Predictor",
+    "startPredictor": "Start Predictor",
+    "predictorStarted": "Predictor started",
+    "predictorStopped": "Predictor stopped",
+    "startFailed": "Start failed",
+    "stopFailed": "Stop failed"
+  },
+  "live": {
+    "predictionDirection": "Prediction Direction",
+    "currentPrice": "Current Price",
+    "signalStrength": "Signal Strength",
+    "primarySignals": "Primary Signals · Order Flow",
+    "secondarySignals": "Secondary Signals · Technicals",
+    "triggeredSignals": "Triggered Signals",
+    "lastUpdated": "Last Updated",
+    "buySellRatio": "Buy/Sell Ratio (30s)",
+    "orderbookImbalance": "Orderbook Imbalance",
+    "largeOrderFlow": "Large Order Flow",
+    "tradeCount": "Trade Count",
+    "ema5VsEma10": "EMA5 vs EMA10",
+    "volumeRatio": "Volume Ratio",
+    "bullish": "Bullish",
+    "bearish": "Bearish",
+    "watching": "Watching"
+  },
+  "directions": {
+    "up": "UP",
+    "down": "DOWN",
+    "skip": "Skip"
+  },
+  "offline": {
+    "warmingUp": "Data warming up, please wait ~30s...",
+    "notRunning": "Predictor not running",
+    "clickToStart": "Click to Start Predictor"
+  },
+  "stats": {
+    "today": "Today",
+    "7d": "Last 7D",
+    "30d": "Last 30D",
+    "allTime": "All Time",
+    "wins": "W",
+    "losses": "L",
+    "skipped": "Skip",
+    "totalRounds": "Total {count} rounds"
+  },
+  "history": {
+    "title": "Prediction History",
+    "totalRecords": "Total {count}",
+    "round": "#",
+    "direction": "Direction",
+    "strength": "Strength",
+    "entryPrice": "Entry",
+    "settlePrice": "Settle",
+    "result": "Result",
+    "time": "Time",
+    "loading": "Loading...",
+    "noRecords": "No prediction records yet",
+    "prevPage": "Prev",
+    "nextPage": "Next"
+  },
+  "results": {
+    "win": "✓ WIN",
+    "lose": "✗ LOSE",
+    "pending": "⏳ Pending",
+    "skipped": "⏸ Skip",
+    "draw": "DRAW"
+  }
+}
