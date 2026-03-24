@@ -69,7 +69,7 @@ function AnnouncementCard({
   onAction,
 }: AnnouncementCardProps) {
   return (
-    <div className="overflow-hidden rounded-lg border border-white/[0.08] bg-[#121217]/95 shadow-modal backdrop-blur-xl">
+    <div className="flex flex-col overflow-hidden rounded-lg border border-white/[0.08] bg-[#121217]/95 shadow-modal backdrop-blur-xl">
       <div className="border-b border-white/[0.06] px-4 py-3 md:px-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -103,7 +103,7 @@ function AnnouncementCard({
         </div>
       </div>
 
-      <div className="px-4 py-4 md:px-5">
+      <div className="px-4 py-4 md:px-5 overflow-y-auto max-h-[50vh]">
         <div className="whitespace-pre-wrap text-sm leading-6 text-zinc-300">
           {announcement.content_md}
         </div>
@@ -325,7 +325,7 @@ export function AnnouncementRuntime() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 px-4 py-6 backdrop-blur-md"
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 px-4 py-6 overflow-y-auto backdrop-blur-md"
             onClick={() => {
               const active = activeModal || banners[0];
               if (active && !active.strong_ack_required) {
@@ -338,7 +338,7 @@ export function AnnouncementRuntime() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
-              className="w-full max-w-xl shadow-[0_0_50px_rgba(0,0,0,0.8)] rounded-2xl border border-white/[0.08]"
+              className="w-full max-w-xl max-h-[85vh] flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.8)] rounded-2xl border border-white/[0.08]"
               onClick={(event) => event.stopPropagation()}
             >
               <AnnouncementCard
