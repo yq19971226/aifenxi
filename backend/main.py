@@ -224,14 +224,21 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         import logging
         logging.getLogger(__name__).warning("系统机器人启动失败: %s", exc)
     # 事件合约预测器 — 自动启动（服务器重启后自动恢复）
+    # 注意：uvicorn --workers N 会启动 N 个进程，每个都执行 lifespan；
+    # start_predictor 内部使用 Redis 锁确保只有一个 Worker 启动预测器
     try:
         from app.services.config_service import get_config_value
         event_pred_enabled = (await get_config_value("event_predictor_enabled", "true")).lower().strip()
         if event_pred_enabled in ("true", "1", "on"):
             from app.services.event_predictor import start_predictor
-            app.state._event_predictor = await start_predictor("ETHUSDT")
-            import logging
-            logging.getLogger(__name__).info("EventPredictor 自动启动成功")
+            predictor = await start_predictor("ETHUSDT")
+            if predictor:
+                app.state._event_predictor = predictor
+                import logging
+                logging.getLogger(__name__).info("EventPredictor 自动启动成功（本 Worker 获得锁）")
+            else:
+                import logging
+                logging.getLogger(__name__).info("EventPredictor 已由其他 Worker 启动，本 Worker 跳过")
         else:
             import logging
             logging.getLogger(__name__).info("EventPredictor 已通过配置禁用")

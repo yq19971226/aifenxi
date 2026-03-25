@@ -508,6 +508,78 @@ async def _ensure_tables() -> None:
         logger.info("event_predictions and event_stats tables ensured")
 
 
+# ── Redis 分布式锁（防多 Worker 重复启动）───────────────────
+
+_LOCK_KEY = "event_predictor:lock"
+_LOCK_TTL = 60          # 锁有效期 60 秒
+_LOCK_RENEW_INTERVAL = 30  # 每 30 秒续约一次
+_lock_id: str | None = None  # 当前进程的锁 ID
+_lock_renew_task: asyncio.Task | None = None
+
+
+async def _acquire_lock() -> bool:
+    """尝试获取 Redis 分布式锁。成功返回 True。"""
+    global _lock_id
+    try:
+        import uuid
+        from app.core.redis import get_redis_pool
+        r = get_redis_pool()
+        _lock_id = str(uuid.uuid4())
+        acquired = await r.set(_LOCK_KEY, _lock_id, nx=True, ex=_LOCK_TTL)
+        if acquired:
+            logger.info("Acquired event_predictor lock: %s", _lock_id)
+            return True
+        existing = await r.get(_LOCK_KEY)
+        logger.info("event_predictor lock held by another worker: %s", existing)
+        return False
+    except Exception as exc:
+        logger.warning("acquire_lock_error: %s", exc)
+        return False
+
+
+async def _release_lock() -> None:
+    """释放 Redis 分布式锁。"""
+    global _lock_id, _lock_renew_task
+    if _lock_renew_task:
+        _lock_renew_task.cancel()
+        _lock_renew_task = None
+    if not _lock_id:
+        return
+    try:
+        from app.core.redis import get_redis_pool
+        r = get_redis_pool()
+        # 只释放自己持有的锁
+        current = await r.get(_LOCK_KEY)
+        if current == _lock_id:
+            await r.delete(_LOCK_KEY)
+            logger.info("Released event_predictor lock: %s", _lock_id)
+    except Exception as exc:
+        logger.warning("release_lock_error: %s", exc)
+    finally:
+        _lock_id = None
+
+
+async def _lock_renew_loop() -> None:
+    """后台续约锁，防止长时间运行后锁过期被其他 Worker 抢走。"""
+    while True:
+        try:
+            await asyncio.sleep(_LOCK_RENEW_INTERVAL)
+            if not _lock_id:
+                break
+            from app.core.redis import get_redis_pool
+            r = get_redis_pool()
+            current = await r.get(_LOCK_KEY)
+            if current == _lock_id:
+                await r.expire(_LOCK_KEY, _LOCK_TTL)
+            else:
+                logger.warning("Lock lost! Another worker took it: %s", current)
+                break
+        except asyncio.CancelledError:
+            break
+        except Exception as exc:
+            logger.warning("lock_renew_error: %s", exc)
+
+
 # ── 模块级接口 ──────────────────────────────────────────────
 
 def get_predictor() -> EventPredictor | None:
@@ -515,9 +587,19 @@ def get_predictor() -> EventPredictor | None:
 
 
 async def start_predictor(symbol: str = "ETHUSDT") -> EventPredictor:
-    global _predictor_instance
+    """启动预测器。使用 Redis 锁确保多 Worker 环境只有一个实例运行。"""
+    global _predictor_instance, _lock_renew_task
     if _predictor_instance and _predictor_instance.running:
         return _predictor_instance
+
+    # 获取分布式锁
+    if not await _acquire_lock():
+        logger.info("EventPredictor skipped: another worker holds the lock")
+        return None  # type: ignore[return-value]
+
+    # 启动锁续约
+    _lock_renew_task = asyncio.create_task(_lock_renew_loop())
+
     _predictor_instance = EventPredictor(symbol)
     await _predictor_instance.start()
     return _predictor_instance
@@ -528,3 +610,4 @@ async def stop_predictor() -> None:
     if _predictor_instance:
         await _predictor_instance.stop()
         _predictor_instance = None
+    await _release_lock()
