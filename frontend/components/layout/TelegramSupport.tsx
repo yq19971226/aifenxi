@@ -105,11 +105,11 @@ export function TelegramSupport() {
       animate={{ x: posRef.current.x, y: posRef.current.y, opacity: 1, scale: 1 }}
       transition={{ opacity: { duration: 0.3 }, scale: { duration: 0.3 } }}
       style={{ position: "fixed", top: 0, left: 0, zIndex: 100, touchAction: "none" }}
-      className="hidden md:flex flex-col items-end gap-2 group cursor-grab active:cursor-grabbing"
+      className="flex flex-col items-end gap-2 group cursor-grab active:cursor-grabbing"
     >
       {/* 提示气泡 (Hover 时显示，拖拽时隐藏) */}
       {!isDragging && (
-        <div className="opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 bg-white/[0.06] backdrop-blur-md border border-white/[0.1] text-zinc-300 text-xs px-3 py-1.5 rounded-lg shadow-lg pointer-events-none whitespace-nowrap">
+        <div className="hidden md:block opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 bg-white/[0.06] backdrop-blur-md border border-white/[0.1] text-zinc-300 text-xs px-3 py-1.5 rounded-lg shadow-lg pointer-events-none whitespace-nowrap">
           联系 Telegram 客服 @axiom888
         </div>
       )}
