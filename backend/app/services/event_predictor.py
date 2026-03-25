@@ -17,6 +17,11 @@ from typing import Any
 from app.services.event_ws_stream import EventStreamAggregator
 from app.services.event_rule_engine import evaluate, SignalResult
 
+# ── Redis 状态 key（多 Worker 共享）──────────────────────────
+_REDIS_STATE_KEY = "event_predictor:state"   # 实时信号 + 指标
+_REDIS_STATUS_KEY = "event_predictor:status"  # running / stopped
+_REDIS_STATE_TTL = 30  # 30 秒过期（5 秒刷新一次）
+
 logger = logging.getLogger(__name__)
 
 _ROUND_DURATION = 600       # 10 分钟一轮
@@ -40,6 +45,7 @@ class EventPredictor:
         self._task: asyncio.Task | None = None
         self._aggregator_task: asyncio.Task | None = None
         self._pending_cleanup_task: asyncio.Task | None = None
+        self._redis_publish_task: asyncio.Task | None = None
 
     @property
     def running(self) -> bool:
@@ -73,6 +79,12 @@ class EventPredictor:
         # 启动 pending 清理任务（修复 #12）
         self._pending_cleanup_task = asyncio.create_task(self._pending_cleanup_loop())
 
+        # 启动 Redis 状态发布循环（多 Worker 共享）
+        self._redis_publish_task = asyncio.create_task(self._redis_state_publish_loop())
+
+        # 写入 running 状态到 Redis
+        await self._set_redis_status("running")
+
         logger.info("EventPredictor started", extra={"symbol": self.symbol, "resume_round": self._current_round})
 
     async def stop(self) -> None:
@@ -84,7 +96,82 @@ class EventPredictor:
             self._task.cancel()
         if self._pending_cleanup_task:
             self._pending_cleanup_task.cancel()
+        if self._redis_publish_task:
+            self._redis_publish_task.cancel()
+        # 清除 Redis 状态
+        await self._set_redis_status("stopped")
+        await self._clear_redis_state()
         logger.info("EventPredictor stopped", extra={"symbol": self.symbol})
+
+    async def _redis_state_publish_loop(self) -> None:
+        """每 5 秒将实时信号 + 指标快照发布到 Redis，供其他 Worker 读取。"""
+        while self._running:
+            try:
+                await asyncio.sleep(5)
+                if not self._running:
+                    break
+                metrics = self._aggregator.metrics
+                if not metrics or not metrics.get("current_price"):
+                    # 数据还没准备好，写一个 warming_up 状态
+                    state = {
+                        "status": "warming_up",
+                        "symbol": self.symbol,
+                        "message": "数据采集中，请稍候",
+                    }
+                else:
+                    result = evaluate(metrics)
+                    state = {
+                        "status": "online",
+                        "symbol": metrics.get("symbol"),
+                        "current_price": metrics.get("current_price"),
+                        "prediction": result.to_dict(),
+                        "metrics": {
+                            "buy_sell_ratio_30s": metrics.get("buy_sell_ratio_30s"),
+                            "orderbook_imbalance": metrics.get("orderbook_imbalance"),
+                            "large_order_flow": metrics.get("large_order_flow"),
+                            "rsi_1m": metrics.get("rsi_1m"),
+                            "ema5_vs_ema10": metrics.get("ema5_vs_ema10"),
+                            "volume_ratio": metrics.get("volume_ratio"),
+                            "trade_count_30s": metrics.get("trade_count_30s"),
+                        },
+                        "updated_at": metrics.get("updated_at"),
+                    }
+                import json
+                from app.core.redis import get_redis_pool
+                r = get_redis_pool()
+                await r.setex(
+                    _REDIS_STATE_KEY,
+                    _REDIS_STATE_TTL,
+                    json.dumps(state, default=str),
+                )
+            except asyncio.CancelledError:
+                break
+            except Exception as exc:
+                logger.warning("redis_state_publish_error: %s", exc)
+
+    async def _set_redis_status(self, status: str) -> None:
+        """写入预测器运行状态到 Redis。"""
+        try:
+            import json
+            from app.core.redis import get_redis_pool
+            r = get_redis_pool()
+            data = json.dumps({
+                "running": status == "running",
+                "symbol": self.symbol,
+                "status": status,
+            })
+            await r.setex(_REDIS_STATUS_KEY, 120, data)  # 2 分钟 TTL
+        except Exception as exc:
+            logger.warning("set_redis_status_error: %s", exc)
+
+    async def _clear_redis_state(self) -> None:
+        """清除 Redis 中的实时状态。"""
+        try:
+            from app.core.redis import get_redis_pool
+            r = get_redis_pool()
+            await r.delete(_REDIS_STATE_KEY)
+        except Exception as exc:
+            logger.warning("clear_redis_state_error: %s", exc)
 
     async def _prediction_loop(self) -> None:
         """每轮预测循环。"""
@@ -611,3 +698,31 @@ async def stop_predictor() -> None:
         await _predictor_instance.stop()
         _predictor_instance = None
     await _release_lock()
+
+
+async def get_live_signal_from_redis() -> dict | None:
+    """从 Redis 读取预测器实时信号（任意 Worker 可调用）。"""
+    try:
+        import json
+        from app.core.redis import get_redis_pool
+        r = get_redis_pool()
+        raw = await r.get(_REDIS_STATE_KEY)
+        if raw:
+            return json.loads(raw)
+    except Exception as exc:
+        logger.warning("get_live_signal_from_redis_error: %s", exc)
+    return None
+
+
+async def get_predictor_status_from_redis() -> dict:
+    """从 Redis 读取预测器运行状态（任意 Worker 可调用）。"""
+    try:
+        import json
+        from app.core.redis import get_redis_pool
+        r = get_redis_pool()
+        raw = await r.get(_REDIS_STATUS_KEY)
+        if raw:
+            return json.loads(raw)
+    except Exception as exc:
+        logger.warning("get_predictor_status_from_redis_error: %s", exc)
+    return {"running": False, "status": "unknown"}

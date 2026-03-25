@@ -26,7 +26,18 @@ router = APIRouter(prefix="/api/event-contracts", tags=["event-contracts"])
 async def get_live_signal(
     _user: UserInfo = Depends(get_current_user),
 ) -> dict:
-    """获取当前实时信号 + 指标快照。"""
+    """获取当前实时信号 + 指标快照。
+
+    优先从 Redis 读取（支持多 Worker 架构），
+    回退到本进程的 predictor 实例。
+    """
+    # 优先从 Redis 读取（任意 Worker 都能响应）
+    from app.services.event_predictor import get_live_signal_from_redis
+    state = await get_live_signal_from_redis()
+    if state:
+        return state
+
+    # Redis 无数据 → 尝试本进程的 predictor（单 Worker 回退）
     from app.services.event_predictor import get_predictor
     from app.services.event_rule_engine import evaluate
 
@@ -38,7 +49,6 @@ async def get_live_signal(
     if not metrics or not metrics.get("current_price"):
         return {"status": "warming_up", "message": "数据采集中，请稍候"}
 
-    # 实时评估
     result = evaluate(metrics)
     return {
         "status": "online",
@@ -239,8 +249,20 @@ async def stop_predictor_endpoint(
 async def get_predictor_status(
     _admin: UserInfo = Depends(require_admin),
 ) -> dict:
-    """获取预测器运行状态（管理员）。"""
-    from app.services.event_predictor import get_predictor
+    """获取预测器运行状态（管理员）。优先从 Redis 读取。"""
+    from app.services.event_predictor import get_predictor_status_from_redis, get_predictor
+
+    # 优先从 Redis 读（任意 Worker 可响应）
+    redis_status = await get_predictor_status_from_redis()
+    if redis_status.get("running"):
+        # 如果本进程有 predictor 实例，补充 aggregator 信息
+        predictor = get_predictor()
+        if predictor and predictor.running:
+            redis_status["aggregator_running"] = predictor.aggregator.running
+            redis_status["current_metrics"] = predictor.aggregator.metrics or {}
+        return redis_status
+
+    # Redis 无状态 → 回退本进程
     predictor = get_predictor()
     if not predictor:
         return {"running": False}
