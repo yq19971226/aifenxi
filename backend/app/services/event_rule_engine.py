@@ -125,9 +125,9 @@ def evaluate(metrics: dict[str, Any]) -> SignalResult:
             bearish_secondary += 0.5
         signals.append(f"volume_ratio={vol_ratio:.2f}>1.5 → momentum confirm")
 
-    # ── 决策（修复 #14 — 矛盾信号降权） ──
-    # 多方判定
-    if bullish_primary >= 2 and bullish_secondary >= 1:
+    # ── 决策（修复 #14 — 矛盾信号降权，阈值调优） ──
+    # 多方判定（主信号 ≥ 1 且辅助 ≥ 0.5 即可出预测）
+    if bullish_primary >= 1 and bullish_secondary >= 0.5:
         strength = min(1.0, (bullish_primary / 3 * 0.7) + (bullish_secondary / 1.5 * 0.3))
         # 矛盾检测：对侧存在主信号时降权
         if bearish_primary >= 1:
@@ -135,8 +135,8 @@ def evaluate(metrics: dict[str, Any]) -> SignalResult:
             signals.append(f"⚠ conflict: bearish_primary={bearish_primary}, strength reduced 20%")
         return SignalResult("up", strength, bullish_primary, bullish_secondary, signals)
 
-    # 空方判定
-    if bearish_primary >= 2 and bearish_secondary >= 1:
+    # 空方判定（主信号 ≥ 1 且辅助 ≥ 0.5 即可出预测）
+    if bearish_primary >= 1 and bearish_secondary >= 0.5:
         strength = min(1.0, (bearish_primary / 3 * 0.7) + (bearish_secondary / 1.5 * 0.3))
         # 矛盾检测：对侧存在主信号时降权
         if bullish_primary >= 1:

@@ -60,27 +60,24 @@ class EventPredictor:
         if self._running:
             return
         self._running = True
-        print(f"[PREDICTOR] start() called, symbol={self.symbol}", flush=True)
+        logger.info("EventPredictor start() called, symbol=%s", self.symbol)
 
         # 确保数据库表存在（失败不阻止启动）
         try:
             await _ensure_tables()
         except Exception as exc:
-            print(f"[PREDICTOR] ensure_tables_error (non-fatal): {exc}", flush=True)
             logger.error("ensure_tables_error (non-fatal): %s", exc)
 
         # 从 DB 恢复 round_num（失败不阻止启动）
         try:
             await self._restore_round_num()
         except Exception as exc:
-            print(f"[PREDICTOR] restore_round_num_error (non-fatal): {exc}", flush=True)
             logger.error("restore_round_num_error (non-fatal): %s", exc)
 
         # 恢复重启前遗留的 pending 记录（失败不阻止启动）
         try:
             await self._recover_pending_on_startup()
         except Exception as exc:
-            print(f"[PREDICTOR] recover_pending_error (non-fatal): {exc}", flush=True)
             logger.error("recover_pending_error (non-fatal): %s", exc)
 
         # 启动 WebSocket 聚合器（后台）
@@ -88,7 +85,6 @@ class EventPredictor:
 
         # 启动预测循环
         self._task = asyncio.create_task(self._prediction_loop())
-        print(f"[PREDICTOR] _prediction_loop task created: {self._task}", flush=True)
 
         # 启动 pending 清理任务（修复 #12）
         self._pending_cleanup_task = asyncio.create_task(self._pending_cleanup_loop())
@@ -99,7 +95,6 @@ class EventPredictor:
         # 写入 running 状态到 Redis
         await self._set_redis_status("running")
 
-        print(f"[PREDICTOR] start() complete, all tasks created", flush=True)
         logger.info("EventPredictor started", extra={"symbol": self.symbol, "resume_round": self._current_round})
 
     async def stop(self) -> None:
@@ -191,22 +186,18 @@ class EventPredictor:
 
     async def _prediction_loop(self) -> None:
         """每轮预测循环。"""
-        print("[PREDICTOR] _prediction_loop entered, warm-up 30s...", flush=True)
-        logger.warning("[PREDICTOR] prediction_loop started, warm-up 30s...")
+        logger.warning("prediction_loop started, warm-up 30s...")
         await asyncio.sleep(30)
-        print("[PREDICTOR] warm-up done, entering round loop", flush=True)
-        logger.warning("[PREDICTOR] warm-up done, entering round loop")
+        logger.warning("warm-up done, entering round loop")
 
         while self._running:
             try:
                 await self._run_one_round()
             except asyncio.CancelledError:
-                print("[PREDICTOR] prediction_loop cancelled", flush=True)
                 break
             except Exception as exc:
                 import traceback
                 tb = traceback.format_exc()
-                print(f"[PREDICTOR] prediction_round_error: {exc}\n{tb}", flush=True)
                 logger.error(
                     "prediction_round_error",
                     extra={"error": str(exc), "traceback": tb},
@@ -234,9 +225,7 @@ class EventPredictor:
         # 获取当前指标快照
         metrics = self._aggregator.metrics
         has_price = bool(metrics and metrics.get("current_price"))
-        print(f"[PREDICTOR] Round {self._current_round}: metrics={bool(metrics)}, has_price={has_price}", flush=True)
         if not has_price:
-            print(f"[PREDICTOR] Round {self._current_round}: NO METRICS, recording skip", flush=True)
             logger.warning("[PREDICTOR] Round %d: no metrics available, skipping", self._current_round)
             ok = await self._record_prediction(
                 round_num=self._current_round,
@@ -263,7 +252,6 @@ class EventPredictor:
         predict_time = datetime.now(timezone.utc)
         entry_price = metrics["current_price"]
 
-        print(f"[PREDICTOR] Round {self._current_round}: direction={result.direction}, strength={result.strength:.2f}", flush=True)
         if result.direction is None:
             # 信号不足，跳过
             logger.warning(
@@ -300,7 +288,6 @@ class EventPredictor:
                 signals_detail={**result.to_dict(), "metrics_snapshot": metrics},
                 status="pending",
             )
-            print(f"[PREDICTOR] Round {self._current_round}: pending record_ok={ok}", flush=True)
 
         # 等待到期
         remaining_to_expire = (expire_time - datetime.now(timezone.utc)).total_seconds()
@@ -329,7 +316,6 @@ class EventPredictor:
         status: str,
     ) -> bool:
         """写入预测记录到数据库。返回 True 表示成功（修复 #13）。"""
-        print(f"[PREDICTOR] _record_prediction called: round={round_num}, dir={direction}, status={status}", flush=True)
         try:
             from app.core.database import AsyncSessionLocal
             from sqlalchemy import text
@@ -357,11 +343,8 @@ class EventPredictor:
                     },
                 )
                 await session.commit()
-            print(f"[PREDICTOR] _record_prediction SUCCESS: round={round_num}", flush=True)
             return True
         except Exception as exc:
-            import traceback
-            print(f"[PREDICTOR] _record_prediction FAILED: round={round_num}, error={exc}\n{traceback.format_exc()}", flush=True)
             logger.error("record_prediction_error", extra={"error": str(exc), "round": round_num})
             return False
 
@@ -429,25 +412,29 @@ class EventPredictor:
                             "id": pred["id"],
                         },
                     )
+                    await session.commit()  # 先提交预测结算（关键数据）
 
-                    # 更新日统计（修复 #3 — draw 计入 total 但不计入 wins/losses）
-                    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-                    await session.execute(
-                        text("""
-                            INSERT INTO event_stats (symbol, date, total, wins, losses, skipped)
-                            VALUES (:symbol, :date, 1,
-                                    CASE WHEN :result = 'win' THEN 1 ELSE 0 END,
-                                    CASE WHEN :result = 'lose' THEN 1 ELSE 0 END,
-                                    0)
-                            ON CONFLICT (symbol, date)
-                            DO UPDATE SET
-                                total = event_stats.total + 1,
-                                wins = event_stats.wins + CASE WHEN :result = 'win' THEN 1 ELSE 0 END,
-                                losses = event_stats.losses + CASE WHEN :result = 'lose' THEN 1 ELSE 0 END
-                        """),
-                        {"symbol": self.symbol, "date": today, "result": result},
-                    )
-                    await session.commit()
+                    # 更新日统计（独立 commit，失败不回滚结算）
+                    try:
+                        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+                        await session.execute(
+                            text("""
+                                INSERT INTO event_stats (symbol, date, total, wins, losses, skipped)
+                                VALUES (:symbol, :date, 1,
+                                        CASE WHEN :result = 'win' THEN 1 ELSE 0 END,
+                                        CASE WHEN :result = 'lose' THEN 1 ELSE 0 END,
+                                        0)
+                                ON CONFLICT (symbol, date)
+                                DO UPDATE SET
+                                    total = event_stats.total + 1,
+                                    wins = event_stats.wins + CASE WHEN :result = 'win' THEN 1 ELSE 0 END,
+                                    losses = event_stats.losses + CASE WHEN :result = 'lose' THEN 1 ELSE 0 END
+                            """),
+                            {"symbol": self.symbol, "date": today, "result": result},
+                        )
+                        await session.commit()
+                    except Exception as stats_exc:
+                        logger.warning("stats_update_failed (prediction already settled): %s", stats_exc)
 
                     logger.info(
                         "Round %d settled: %s (predicted=%s, entry=%.2f, settle=%.2f, diff=%.4f%%)",
@@ -685,6 +672,7 @@ async def _release_lock() -> None:
 
 async def _lock_renew_loop() -> None:
     """后台续约锁，防止长时间运行后锁过期被其他 Worker 抢走。"""
+    global _predictor_instance
     while True:
         try:
             await asyncio.sleep(_LOCK_RENEW_INTERVAL)
@@ -696,7 +684,11 @@ async def _lock_renew_loop() -> None:
             if current == _lock_id:
                 await r.expire(_LOCK_KEY, _LOCK_TTL)
             else:
-                logger.warning("Lock lost! Another worker took it: %s", current)
+                logger.error("Lock lost! Another worker took it: %s. Stopping predictor.", current)
+                # 主动停止预测器，防止双实例运行
+                if _predictor_instance and _predictor_instance.running:
+                    asyncio.create_task(_predictor_instance.stop())
+                    _predictor_instance = None
                 break
         except asyncio.CancelledError:
             break
@@ -713,14 +705,13 @@ def get_predictor() -> EventPredictor | None:
 async def start_predictor(symbol: str = "ETHUSDT") -> EventPredictor:
     """启动预测器。使用 Redis 锁确保多 Worker 环境只有一个实例运行。"""
     global _predictor_instance, _lock_renew_task
-    print(f"[PREDICTOR] start_predictor called, symbol={symbol}", flush=True)
+    logger.info("start_predictor called, symbol=%s", symbol)
     if _predictor_instance and _predictor_instance.running:
-        print("[PREDICTOR] already running, returning existing instance", flush=True)
         return _predictor_instance
 
     # 获取分布式锁
     lock_acquired = await _acquire_lock()
-    print(f"[PREDICTOR] lock acquired: {lock_acquired}", flush=True)
+    logger.info("lock acquired: %s", lock_acquired)
     if not lock_acquired:
         logger.info("EventPredictor skipped: another worker holds the lock")
         return None  # type: ignore[return-value]
@@ -730,7 +721,7 @@ async def start_predictor(symbol: str = "ETHUSDT") -> EventPredictor:
 
     _predictor_instance = EventPredictor(symbol)
     await _predictor_instance.start()
-    print(f"[PREDICTOR] predictor started successfully", flush=True)
+    logger.info("predictor started successfully")
     return _predictor_instance
 
 

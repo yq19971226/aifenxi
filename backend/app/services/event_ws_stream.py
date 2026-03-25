@@ -46,8 +46,8 @@ class EventStreamAggregator:
         self._asks_total: float = 0.0
 
         # ── 1 分钟 K 线 ──
-        self._kline_closes: deque[float] = deque(maxlen=20)
-        self._kline_volumes: deque[float] = deque(maxlen=20)
+        self._kline_closes: deque[float] = deque(maxlen=50)
+        self._kline_volumes: deque[float] = deque(maxlen=50)
         self._current_kline_volume: float = 0.0
         self._current_price: float = 0.0
 
@@ -113,7 +113,9 @@ class EventStreamAggregator:
             sock.set_proxy(proxy_type, parsed.hostname, parsed.port)
             from urllib.parse import urlparse as _up
             ws_parsed = _up(url)
-            sock.connect((ws_parsed.hostname, ws_parsed.port or 443))
+            # 使用 run_in_executor 避免阻塞事件循环
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(None, sock.connect, (ws_parsed.hostname, ws_parsed.port or 443))
             sock.settimeout(None)
             import ssl as _ssl
             ssl_ctx = _ssl.create_default_context()
