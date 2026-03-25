@@ -28,7 +28,8 @@ _ROUND_DURATION = 600       # 10 分钟一轮
 _DECISION_DELAY = 75        # 开局等待 75 秒后决策
 _SETTLE_BUFFER = 15         # 到期后等 15 秒再结算（价格确认）
 _SETTLE_RETRY_MAX = 3       # 结算失败最大重试次数
-_LARGE_ORDER_MIN_DIFF = 50000  # 大单净差最小阈值（USDT）
+_SETTLE_NOISE_PCT = 0.0003  # 结算噪音过滤：<0.03% 视为平局
+_MACRO_CONFIDENCE_THRESHOLD = 0.85  # 宏观事件置信度低于此值时提高信号要求
 
 # ── 全局状态 ──
 _predictor_instance: EventPredictor | None = None
@@ -201,15 +202,14 @@ class EventPredictor:
                 await asyncio.sleep(30)
 
     async def _run_one_round(self) -> None:
-        """执行单轮预测。"""
+        """执行单轮预测（v2 — 含宏观事件过滤 + 信号分层）。"""
         self._current_round += 1
         round_start = datetime.now(timezone.utc)
         expire_time = round_start + timedelta(seconds=_ROUND_DURATION)
         self._round_expire_time = expire_time
         self._round_predict_time = None  # 尚未出信号
 
-        print(f"[PREDICTOR] Round {self._current_round} started", flush=True)
-        logger.warning(
+        logger.info(
             "[PREDICTOR] Round %d started (will decide at +%ds, expire at +%ds)",
             self._current_round, _DECISION_DELAY, _ROUND_DURATION,
         )
@@ -235,15 +235,16 @@ class EventPredictor:
                 signals_detail={"reason": "no_metrics"},
                 status="skipped",
             )
-            print(f"[PREDICTOR] Round {self._current_round}: skip record_ok={ok}", flush=True)
-            # skipped 也写入 event_stats（修复 #3）
+            logger.debug("Round %d: skip (no_metrics) record_ok=%s", self._current_round, ok)
             if ok:
                 await self._record_skipped_stat()
-            # 等待本轮结束
             remaining = (expire_time - datetime.now(timezone.utc)).total_seconds()
             if remaining > 0:
                 await asyncio.sleep(remaining)
             return
+
+        # ── 宏观事件过滤 ──
+        macro_modifier = await self._get_macro_confidence_modifier()
 
         # 调用规则引擎
         result = evaluate(metrics)
@@ -251,11 +252,32 @@ class EventPredictor:
         self._round_predict_time = predict_time
         entry_price = metrics["current_price"]
 
+        # 宏观事件期间：如果信号 tier 不够 strong，降级为跳过
+        if macro_modifier < _MACRO_CONFIDENCE_THRESHOLD and result.direction is not None:
+            if result.tier != "strong":
+                logger.warning(
+                    "[PREDICTOR] Round %d: macro event detected (modifier=%.2f), "
+                    "downgrading %s tier=%s to skip",
+                    self._current_round, macro_modifier, result.direction, result.tier,
+                )
+                result.signals.append(
+                    f"⚠ macro_filter: modifier={macro_modifier:.2f}<{_MACRO_CONFIDENCE_THRESHOLD}, "
+                    f"tier={result.tier} downgraded to skip"
+                )
+                result = SignalResult(
+                    direction=None,
+                    strength=result.strength * macro_modifier,
+                    primary_score=result.primary_score,
+                    secondary_score=result.secondary_score,
+                    signals=result.signals,
+                    tier=None,
+                )
+
         if result.direction is None:
             # 信号不足，跳过
-            logger.warning(
-                "[PREDICTOR] Round %d: signal insufficient, skipping (primary=%.1f, secondary=%.1f)",
-                self._current_round, result.primary_score, result.secondary_score,
+            logger.info(
+                "[PREDICTOR] Round %d: skipped (primary=%.1f, secondary=%.1f, tier=%s)",
+                self._current_round, result.primary_score, result.secondary_score, result.tier,
             )
             ok = await self._record_prediction(
                 round_num=self._current_round,
@@ -267,14 +289,13 @@ class EventPredictor:
                 signals_detail=result.to_dict(),
                 status="skipped",
             )
-            print(f"[PREDICTOR] Round {self._current_round}: skip record_ok={ok}", flush=True)
-            # skipped 也写入 event_stats（修复 #3）
+            logger.debug("Round %d: skip record_ok=%s", self._current_round, ok)
             if ok:
                 await self._record_skipped_stat()
         else:
             logger.warning(
-                "[PREDICTOR] Round %d: predicted %s (strength=%.2f, primary=%.1f, secondary=%.1f)",
-                self._current_round, result.direction, result.strength,
+                "[PREDICTOR] Round %d: predicted %s tier=%s (strength=%.2f, primary=%.1f, secondary=%.1f)",
+                self._current_round, result.direction, result.tier, result.strength,
                 result.primary_score, result.secondary_score,
             )
             ok = await self._record_prediction(
@@ -293,13 +314,13 @@ class EventPredictor:
         if remaining_to_expire > 0:
             await asyncio.sleep(remaining_to_expire)
 
-        # 到期瞬间拍快照（修复 #1 — 结算价必须是到期时刻的价格）
+        # 到期瞬间拍快照
         expire_snapshot_price = self._aggregator.metrics.get("current_price", 0.0)
 
         # 等待缓冲
         await asyncio.sleep(_SETTLE_BUFFER)
 
-        # 自动结算（使用快照价格）
+        # 自动结算
         if result.direction is not None:
             await self._settle_round(self._current_round, expire_time, expire_snapshot_price)
 
@@ -386,8 +407,9 @@ class EventPredictor:
                     direction = pred["direction"]
                     entry_price = float(pred["entry_price"])
 
-                    # 判定胜负（修复 #2 — 平局不计入胜负）
-                    if settle_price == entry_price:
+                    # 判定胜负（v2 — 噪音过滤：<0.03% 变动视为平局）
+                    price_change_pct = abs(settle_price - entry_price) / entry_price if entry_price else 0
+                    if price_change_pct < _SETTLE_NOISE_PCT:
                         result = "draw"
                     elif direction == "up":
                         result = "win" if settle_price > entry_price else "lose"
@@ -450,6 +472,34 @@ class EventPredictor:
                 )
                 if attempt < _SETTLE_RETRY_MAX:
                     await asyncio.sleep(5)  # 等 5 秒重试
+
+    async def _get_macro_confidence_modifier(self) -> float:
+        """从宏观事件检测器获取置信度调整因子。
+
+        返回 1.0 = 无重大宏观事件；< 0.85 = 有高影响事件。
+        """
+        try:
+            from app.core.redis import get_redis_pool
+            import json
+            r = get_redis_pool()
+            # 尝试从 Redis 缓存读取最近的新闻
+            raw = await r.get("news:latest_items")
+            if not raw:
+                return 1.0
+            news_items = json.loads(raw)
+            if not news_items:
+                return 1.0
+            from app.services.macro_event_detector import detect_macro_events
+            macro_result = detect_macro_events(news_items)
+            if macro_result.events:
+                logger.info(
+                    "Macro events detected: %s (modifier=%.2f)",
+                    macro_result.warning, macro_result.confidence_modifier,
+                )
+            return macro_result.confidence_modifier
+        except Exception as exc:
+            logger.debug("macro_confidence_check_error (non-fatal): %s", exc)
+            return 1.0  # 出错时不阻止预测
 
     async def _restore_round_num(self) -> None:
         """从 DB 恢复 round_num，避免重启后编号重复（修复 #4）。"""
