@@ -14,9 +14,7 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
-  Signal,
   ShieldCheck,
-  Flame,
   RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
@@ -328,7 +326,6 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
   }
 
   const pred = live.prediction;
-  const metrics = live.metrics;
   const isUp = pred?.direction === "up";
   const isDown = pred?.direction === "down";
   const strengthPct = ((pred?.strength || 0) * 100).toFixed(0);
@@ -361,125 +358,62 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
       />
 
       <div className="relative z-10 p-6 lg:p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Centered direction + price + strength */}
+        <div className="flex flex-col items-center text-center space-y-6 max-w-md mx-auto">
 
-          {/* Left: Direction + Price */}
-          <div className="space-y-5">
-            {/* Direction */}
-            <div>
-              <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
-                <span className="w-1 h-3 bg-amber-500 rounded-full" />
-                {t("live.predictionDirection")}
+          {/* Direction */}
+          <div>
+            <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-3 flex items-center justify-center gap-1.5">
+              <span className="w-1 h-3 bg-amber-500 rounded-full" />
+              {t("live.predictionDirection")}
+            </p>
+            <div className="flex items-center justify-center gap-4">
+              <motion.div
+                className={`p-3 rounded-xl ${neonColor.bg} border ${neonColor.border}`}
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <DirIcon size={32} className={`${neonColor.text} ${neonColor.glow}`} />
+              </motion.div>
+              <p className={`text-3xl font-black font-mono tracking-tight ${neonColor.text} ${neonColor.glow}`}>
+                {dirLabel}
               </p>
-              <div className="flex items-center gap-3">
+            </div>
+          </div>
+
+          {/* Price */}
+          <div>
+            <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2">
+              {t("live.currentPrice")}
+            </p>
+            <p className="text-4xl font-black font-mono text-white tabular-nums tracking-tight">
+              <span className="text-fuchsia-400/60 text-xl mr-0.5">$</span>
+              {live.current_price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </p>
+          </div>
+
+          {/* Strength bar */}
+          <div className="w-full">
+            <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2">
+              {t("live.signalStrength")}
+            </p>
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-3 rounded-full bg-white/[0.04] overflow-hidden border border-white/[0.06]">
                 <motion.div
-                  className={`p-2.5 rounded-lg ${neonColor.bg} border ${neonColor.border}`}
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <DirIcon size={24} className={`${neonColor.text} ${neonColor.glow}`} />
-                </motion.div>
-                <div>
-                  <p className={`text-xl font-black font-mono tracking-tight ${neonColor.text} ${neonColor.glow}`}>
-                    {dirLabel}
-                  </p>
-                </div>
+                  className={`h-full rounded-full ${neonColor.bar} shadow-[0_0_12px_rgba(0,229,255,0.3)]`}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${strengthPct}%` }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                />
               </div>
+              <span className={`text-sm font-black font-mono tabular-nums ${neonColor.text} ${neonColor.glow}`}>
+                {strengthPct}%
+              </span>
             </div>
-
-            {/* Price */}
-            <div>
-              <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
-                <span className="w-1 h-3 bg-fuchsia-500 rounded-full" />
-                {t("live.currentPrice")}
-              </p>
-              <p className="text-3xl font-black font-mono text-white tabular-nums tracking-tight">
-                <span className="text-fuchsia-400/60 text-lg mr-0.5">$</span>
-                {live.current_price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-              </p>
-            </div>
-
-            {/* Strength bar */}
-            <div>
-              <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
-                <span className="w-1 h-3 bg-indigo-500 rounded-full" />
-                {t("live.signalStrength")}
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-2.5 rounded-full bg-white/[0.04] overflow-hidden border border-white/[0.06]">
-                  <motion.div
-                    className={`h-full rounded-full ${neonColor.bar} shadow-[0_0_12px_rgba(0,229,255,0.3)]`}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${strengthPct}%` }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                  />
-                </div>
-                <span className={`text-sm font-black font-mono tabular-nums ${neonColor.text} ${neonColor.glow}`}>
-                  {strengthPct}%
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Middle: Primary signals */}
-          <div className="space-y-1">
-            <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5">
-              <Signal size={10} className="text-[#00E5FF]" />
-              {t("live.primarySignals")}
-            </p>
-            <MetricRow label={t("live.buySellRatio")} value={metrics?.buy_sell_ratio_30s} format={(v) => v.toFixed(2)} bullish={v => v > 1.3} bearish={v => v < 0.77} />
-            <MetricRow label={t("live.orderbookImbalance")} value={metrics?.orderbook_imbalance} format={(v) => `${(v * 100).toFixed(1)}%`} bullish={v => v > 0.2} bearish={v => v < -0.2} />
-            <MetricRow label={t("live.largeOrderFlow")} value={metrics?.large_order_flow} format={(v) => `$${Math.abs(v).toLocaleString()}`} bullish={v => v > 0} bearish={v => v < 0} prefix={metrics?.large_order_flow && metrics.large_order_flow > 0 ? "+" : ""} />
-            <MetricRow label={t("live.tradeCount")} value={metrics?.trade_count_30s} format={(v) => v.toString()} />
-          </div>
-
-          {/* Right: Secondary signals */}
-          <div className="space-y-1">
-            <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5">
-              <BarChart3 size={10} className="text-amber-400" />
-              {t("live.secondarySignals")}
-            </p>
-            <MetricRow label="RSI(14)" value={metrics?.rsi_1m} format={(v) => v.toFixed(1)} bullish={v => v > 55} bearish={v => v < 45} />
-            <MetricRow label={t("live.ema5VsEma10")} value={metrics?.ema5_vs_ema10} format={(v) => v.toFixed(4)} bullish={v => v > 0} bearish={v => v < 0} />
-            <MetricRow label={t("live.volumeRatio")} value={metrics?.volume_ratio} format={(v) => `${v.toFixed(2)}x`} bullish={v => v > 1.5} />
           </div>
         </div>
 
-        {/* Triggered Signals */}
-        {pred?.signals && pred.signals.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mt-6 pt-5 border-t border-white/[0.05]"
-          >
-            <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5">
-              <Flame size={10} className="text-orange-400" />
-              {t("live.triggeredSignals")}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {pred.signals.map((s, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.05 }}
-                  className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-md border ${
-                    s.includes("bullish")
-                      ? "text-[#00E5FF] border-[#00E5FF]/20 bg-[#00E5FF]/[0.08] drop-shadow-[0_0_6px_rgba(0,229,255,0.3)]"
-                      : s.includes("bearish")
-                      ? "text-red-400 border-red-500/20 bg-red-500/[0.08] drop-shadow-[0_0_6px_rgba(248,113,113,0.3)]"
-                      : "text-zinc-400 border-white/10 bg-white/[0.03]"
-                  }`}
-                >
-                  {s.replace(/bullish/gi, t("live.bullish")).replace(/bearish/gi, t("live.bearish"))}
-                </motion.span>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        <p className="text-[9px] font-mono text-zinc-600 mt-4 tabular-nums">
+        <p className="text-[9px] font-mono text-zinc-600 mt-6 text-center tabular-nums">
           {t("live.lastUpdated")}: {live.updated_at ? new Date(live.updated_at).toLocaleTimeString() : "—"}
         </p>
       </div>
@@ -487,51 +421,6 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
   );
 }
 
-// ── 指标行 ───────────────────────────────────────────────
-
-function MetricRow({
-  label,
-  value,
-  format,
-  bullish,
-  bearish,
-  prefix = "",
-}: {
-  label: string;
-  value: number | null | undefined;
-  format: (v: number) => string;
-  bullish?: (v: number) => boolean;
-  bearish?: (v: number) => boolean;
-  prefix?: string;
-}) {
-  if (value === null || value === undefined) {
-    return (
-      <div className="flex justify-between items-center py-2 px-3 rounded-lg hover:bg-white/[0.02] transition-colors group">
-        <span className="text-[11px] font-mono text-zinc-500">{label}</span>
-        <span className="text-[11px] font-mono text-zinc-700">—</span>
-      </div>
-    );
-  }
-
-  const isBull = bullish?.(value);
-  const isBear = bearish?.(value);
-  const color = isBull
-    ? "text-[#00E5FF] drop-shadow-[0_0_8px_rgba(0,229,255,0.4)]"
-    : isBear
-    ? "text-red-400 drop-shadow-[0_0_8px_rgba(248,113,113,0.4)]"
-    : "text-zinc-300";
-
-  return (
-    <div className="flex justify-between items-center py-2 px-3 rounded-lg hover:bg-white/[0.02] transition-colors group border-l-2 border-transparent hover:border-[#00E5FF]/40">
-      <span className="text-[11px] font-mono text-zinc-500 group-hover:text-zinc-400 transition-colors">{label}</span>
-      <span className={`text-[13px] font-mono font-black tabular-nums ${color}`}>
-        {prefix}{format(value)}
-        {isBull && <TrendingUp size={10} className="inline ml-1 text-[#00E5FF]" />}
-        {isBear && <TrendingDown size={10} className="inline ml-1 text-red-400" />}
-      </span>
-    </div>
-  );
-}
 
 // ── 统计面板 ─────────────────────────────────────────────
 

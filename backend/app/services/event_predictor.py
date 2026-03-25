@@ -135,15 +135,6 @@ class EventPredictor:
                         "symbol": metrics.get("symbol"),
                         "current_price": metrics.get("current_price"),
                         "prediction": result.to_dict(),
-                        "metrics": {
-                            "buy_sell_ratio_30s": metrics.get("buy_sell_ratio_30s"),
-                            "orderbook_imbalance": metrics.get("orderbook_imbalance"),
-                            "large_order_flow": metrics.get("large_order_flow"),
-                            "rsi_1m": metrics.get("rsi_1m"),
-                            "ema5_vs_ema10": metrics.get("ema5_vs_ema10"),
-                            "volume_ratio": metrics.get("volume_ratio"),
-                            "trade_count_30s": metrics.get("trade_count_30s"),
-                        },
                         "updated_at": metrics.get("updated_at"),
                     }
                 import json

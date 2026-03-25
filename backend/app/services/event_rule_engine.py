@@ -1,17 +1,17 @@
 """事件合约规则引擎 — 基于订单流 + 1 分钟指标的方向预测。
 
 主信号（订单流，权重 70%）：
-  - 30 秒买卖比 > 1.3   → +1（看涨）/ < 0.77 → +1（看跌）
-  - 订单簿失衡 > 20%    → +1
-  - 大单净流向 > ±50K    → +1
+  - 30 秒买卖比 > 1.5   → +1（看涨）/ < 0.67 → +1（看跌）
+  - 订单簿失衡 > 25%    → +1
+  - 大单净流向 > ±100K   → +1
 
 辅助信号（1 分钟指标，权重 30%）：
-  - RSI(14) > 55 / < 45 → +0.5
+  - RSI(14) > 60 / < 40 → +0.5
   - EMA5 > EMA10        → +0.5
   - 成交量比 > 1.5      → +0.5
 
 决策：主信号 ≥ 2 且 辅助 ≥ 1 → 出预测，否则跳过。
-       如果对侧主信号 ≥ 1，strength 降权 20%（矛盾惩罚）。
+       如果对侧主信号 ≥ 1 → 直接跳过（方向矛盾不预测）。
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ from typing import Any, Literal
 logger = logging.getLogger(__name__)
 
 # 大单净差最小阈值（USDT），低于此值视为噪音不触发信号
-_LARGE_ORDER_MIN_THRESHOLD = 50_000
+_LARGE_ORDER_MIN_THRESHOLD = 100_000
 
 
 class SignalResult:
@@ -69,21 +69,21 @@ def evaluate(metrics: dict[str, Any]) -> SignalResult:
 
     # ── 主信号 1: 买卖比 ──
     bsr = metrics.get("buy_sell_ratio_30s", 1.0)
-    if bsr > 1.3:
+    if bsr > 1.5:
         bullish_primary += 1
-        signals.append(f"buy_sell_ratio={bsr:.2f}>1.3 → bullish")
-    elif bsr < 0.77:  # 1/1.3 ≈ 0.77
+        signals.append(f"buy_sell_ratio={bsr:.2f}>1.5 → bullish")
+    elif bsr < 0.67:  # 1/1.5 ≈ 0.67
         bearish_primary += 1
-        signals.append(f"buy_sell_ratio={bsr:.2f}<0.77 → bearish")
+        signals.append(f"buy_sell_ratio={bsr:.2f}<0.67 → bearish")
 
     # ── 主信号 2: 订单簿失衡 ──
     obi = metrics.get("orderbook_imbalance", 0.0)
-    if obi > 0.20:
+    if obi > 0.25:
         bullish_primary += 1
-        signals.append(f"orderbook_imbalance={obi:.2%}>20% → bullish")
-    elif obi < -0.20:
+        signals.append(f"orderbook_imbalance={obi:.2%}>25% → bullish")
+    elif obi < -0.25:
         bearish_primary += 1
-        signals.append(f"orderbook_imbalance={obi:.2%}<-20% → bearish")
+        signals.append(f"orderbook_imbalance={obi:.2%}<-25% → bearish")
 
     # ── 主信号 3: 大单净方向（修复 #15 — 需超过最小阈值） ──
     lof = metrics.get("large_order_flow", 0.0)
@@ -99,12 +99,12 @@ def evaluate(metrics: dict[str, Any]) -> SignalResult:
     # ── 辅助信号 1: RSI ──
     rsi = metrics.get("rsi_1m")
     if rsi is not None:
-        if rsi > 55:
+        if rsi > 60:
             bullish_secondary += 0.5
-            signals.append(f"rsi_1m={rsi:.1f}>55 → bullish")
-        elif rsi < 45:
+            signals.append(f"rsi_1m={rsi:.1f}>60 → bullish")
+        elif rsi < 40:
             bearish_secondary += 0.5
-            signals.append(f"rsi_1m={rsi:.1f}<45 → bearish")
+            signals.append(f"rsi_1m={rsi:.1f}<40 → bearish")
 
     # ── 辅助信号 2: EMA 趋势 ──
     ema_diff = metrics.get("ema5_vs_ema10", 0.0)
@@ -125,24 +125,24 @@ def evaluate(metrics: dict[str, Any]) -> SignalResult:
             bearish_secondary += 0.5
         signals.append(f"volume_ratio={vol_ratio:.2f}>1.5 → momentum confirm")
 
-    # ── 决策（修复 #14 — 矛盾信号降权，阈值调优） ──
-    # 多方判定（主信号 ≥ 1 且辅助 ≥ 0.5 即可出预测）
-    if bullish_primary >= 1 and bullish_secondary >= 0.5:
-        strength = min(1.0, (bullish_primary / 3 * 0.7) + (bullish_secondary / 1.5 * 0.3))
-        # 矛盾检测：对侧存在主信号时降权
+    # ── 决策（收紧阈值 — 主信号 ≥ 2 + 辅助 ≥ 1，矛盾直接跳过） ──
+    # 多方判定
+    if bullish_primary >= 2 and bullish_secondary >= 1.0:
+        # 矛盾检测：对侧存在主信号时直接跳过（方向不明确不预测）
         if bearish_primary >= 1:
-            strength *= 0.8
-            signals.append(f"⚠ conflict: bearish_primary={bearish_primary}, strength reduced 20%")
-        return SignalResult("up", strength, bullish_primary, bullish_secondary, signals)
+            signals.append(f"⚠ conflict: bearish_primary={bearish_primary}, skipping prediction")
+        else:
+            strength = min(1.0, (bullish_primary / 3 * 0.7) + (bullish_secondary / 1.5 * 0.3))
+            return SignalResult("up", strength, bullish_primary, bullish_secondary, signals)
 
-    # 空方判定（主信号 ≥ 1 且辅助 ≥ 0.5 即可出预测）
-    if bearish_primary >= 1 and bearish_secondary >= 0.5:
-        strength = min(1.0, (bearish_primary / 3 * 0.7) + (bearish_secondary / 1.5 * 0.3))
-        # 矛盾检测：对侧存在主信号时降权
+    # 空方判定
+    if bearish_primary >= 2 and bearish_secondary >= 1.0:
+        # 矛盾检测：对侧存在主信号时直接跳过
         if bullish_primary >= 1:
-            strength *= 0.8
-            signals.append(f"⚠ conflict: bullish_primary={bullish_primary}, strength reduced 20%")
-        return SignalResult("down", strength, bearish_primary, bearish_secondary, signals)
+            signals.append(f"⚠ conflict: bullish_primary={bullish_primary}, skipping prediction")
+        else:
+            strength = min(1.0, (bearish_primary / 3 * 0.7) + (bearish_secondary / 1.5 * 0.3))
+            return SignalResult("down", strength, bearish_primary, bearish_secondary, signals)
 
     # 信号不足 → 跳过
     total = max(bullish_primary + bullish_secondary, bearish_primary + bearish_secondary)

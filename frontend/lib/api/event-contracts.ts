@@ -13,23 +13,12 @@ export interface EventPrediction {
   signals: string[];
 }
 
-export interface EventMetrics {
-  buy_sell_ratio_30s: number;
-  orderbook_imbalance: number;
-  large_order_flow: number;
-  rsi_1m: number | null;
-  ema5_vs_ema10: number;
-  volume_ratio: number;
-  trade_count_30s: number;
-}
-
 export interface EventLiveSignal {
   status: "online" | "offline" | "warming_up";
   message?: string;
   symbol?: string;
   current_price?: number;
   prediction?: EventPrediction;
-  metrics?: EventMetrics;
   updated_at?: string;
 }
 
