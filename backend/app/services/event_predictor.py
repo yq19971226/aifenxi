@@ -61,14 +61,23 @@ class EventPredictor:
             return
         self._running = True
 
-        # 确保数据库表存在
-        await _ensure_tables()
+        # 确保数据库表存在（失败不阻止启动）
+        try:
+            await _ensure_tables()
+        except Exception as exc:
+            logger.error("ensure_tables_error (non-fatal): %s", exc)
 
-        # 从 DB 恢复 round_num（修复 #4）
-        await self._restore_round_num()
+        # 从 DB 恢复 round_num（失败不阻止启动）
+        try:
+            await self._restore_round_num()
+        except Exception as exc:
+            logger.error("restore_round_num_error (non-fatal): %s", exc)
 
-        # 恢复重启前遗留的 pending 记录（标记为 expired）
-        await self._recover_pending_on_startup()
+        # 恢复重启前遗留的 pending 记录（失败不阻止启动）
+        try:
+            await self._recover_pending_on_startup()
+        except Exception as exc:
+            logger.error("recover_pending_error (non-fatal): %s", exc)
 
         # 启动 WebSocket 聚合器（后台）
         self._aggregator_task = asyncio.create_task(self._aggregator.start())
