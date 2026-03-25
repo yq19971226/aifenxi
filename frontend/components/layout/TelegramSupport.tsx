@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
+import { motion, PanInfo } from "framer-motion";
 import { Send } from "lucide-react";
 
 const STORAGE_KEY = "tg-support-pos";
@@ -44,9 +44,12 @@ export function TelegramSupport() {
   // 初始化位置
   useEffect(() => {
     const saved = loadPosition();
+    // 移动端底部导航 64px + safe-area，桌面端无底部导航
+    const isMobile = window.innerWidth < 768;
+    const bottomOffset = isMobile ? 160 : 100;
     const defaultPos = {
       x: window.innerWidth - BUTTON_SIZE - 24,
-      y: window.innerHeight - BUTTON_SIZE - 100,
+      y: window.innerHeight - BUTTON_SIZE - bottomOffset,
     };
     const pos = saved ? clamp(saved.x, saved.y) : defaultPos;
     posRef.current = pos;
