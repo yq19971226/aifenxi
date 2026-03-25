@@ -42,6 +42,8 @@ class EventPredictor:
         self._aggregator = EventStreamAggregator(symbol)
         self._running = False
         self._current_round: int = 0
+        self._round_expire_time: datetime | None = None
+        self._round_predict_time: datetime | None = None
         self._task: asyncio.Task | None = None
         self._aggregator_task: asyncio.Task | None = None
         self._pending_cleanup_task: asyncio.Task | None = None
@@ -136,6 +138,9 @@ class EventPredictor:
                         "current_price": metrics.get("current_price"),
                         "prediction": result.to_dict(),
                         "updated_at": metrics.get("updated_at"),
+                        "round_num": self._current_round,
+                        "round_expire_time": self._round_expire_time.isoformat() if self._round_expire_time else None,
+                        "round_predict_time": self._round_predict_time.isoformat() if self._round_predict_time else None,
                     }
                 import json
                 from app.core.redis import get_redis_pool
@@ -200,6 +205,8 @@ class EventPredictor:
         self._current_round += 1
         round_start = datetime.now(timezone.utc)
         expire_time = round_start + timedelta(seconds=_ROUND_DURATION)
+        self._round_expire_time = expire_time
+        self._round_predict_time = None  # 尚未出信号
 
         print(f"[PREDICTOR] Round {self._current_round} started", flush=True)
         logger.warning(
@@ -241,6 +248,7 @@ class EventPredictor:
         # 调用规则引擎
         result = evaluate(metrics)
         predict_time = datetime.now(timezone.utc)
+        self._round_predict_time = predict_time
         entry_price = metrics["current_price"]
 
         if result.direction is None:

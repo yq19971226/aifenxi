@@ -56,6 +56,9 @@ async def get_live_signal(
         "current_price": metrics.get("current_price"),
         "prediction": result.to_dict(),
         "updated_at": metrics.get("updated_at"),
+        "round_num": predictor._current_round,
+        "round_expire_time": predictor._round_expire_time.isoformat() if predictor._round_expire_time else None,
+        "round_predict_time": predictor._round_predict_time.isoformat() if predictor._round_predict_time else None,
     }
 
 

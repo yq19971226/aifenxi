@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Zap,
@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useTranslations } from "next-intl";
+import { useBinancePrice } from "@/lib/hooks/useBinancePrice";
 import {
   fetchEventLive,
   fetchEventHistory,
@@ -59,6 +60,9 @@ export default function EventContractsPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 币安 WebSocket 实时价格（< 1s 延迟）
+  const { price: wsPrice, connected: wsConnected } = useBinancePrice("ethusdt");
 
   // Admin state
   const [selectedSymbol, setSelectedSymbol] = useState("ETHUSDT");
@@ -271,7 +275,7 @@ export default function EventContractsPanel() {
 
       {/* ── Live Signal Panel ── */}
       <motion.div variants={itemVariants}>
-        <LiveSignalPanel live={live} isAdmin={isAdmin} onStart={handleStart} actionLoading={actionLoading} />
+        <LiveSignalPanel live={live} isAdmin={isAdmin} onStart={handleStart} actionLoading={actionLoading} wsPrice={wsPrice} wsConnected={wsConnected} />
       </motion.div>
 
       {/* ── Stats ── */}
@@ -295,10 +299,41 @@ export default function EventContractsPanel() {
   );
 }
 
+// ── 倒计时 Hook ───────────────────────────────────────────
+
+function useCountdown(expireTimeIso: string | undefined) {
+  const [remaining, setRemaining] = useState<number>(0);
+
+  useEffect(() => {
+    if (!expireTimeIso) { setRemaining(0); return; }
+    const target = new Date(expireTimeIso).getTime();
+
+    function tick() {
+      const diff = Math.max(0, Math.floor((target - Date.now()) / 1000));
+      setRemaining(diff);
+    }
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [expireTimeIso]);
+
+  const mm = String(Math.floor(remaining / 60)).padStart(2, "0");
+  const ss = String(remaining % 60).padStart(2, "0");
+  return { remaining, display: `${mm}:${ss}` };
+}
+
 // ── 实时信号面板 ──────────────────────────────────────────
 
-function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: EventLiveSignal | null; isAdmin: boolean; onStart: () => void; actionLoading: boolean }) {
+function LiveSignalPanel({ live, isAdmin, onStart, actionLoading, wsPrice, wsConnected }: {
+  live: EventLiveSignal | null;
+  isAdmin: boolean;
+  onStart: () => void;
+  actionLoading: boolean;
+  wsPrice: number | null;
+  wsConnected: boolean;
+}) {
   const t = useTranslations("eventContracts");
+  const countdown = useCountdown(live?.round_expire_time);
 
   if (!live || live.status !== "online") {
     return (
@@ -330,6 +365,9 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
   const isDown = pred?.direction === "down";
   const strengthPct = ((pred?.strength || 0) * 100).toFixed(0);
 
+  // 优先使用 WebSocket 实时价格，回退到轮询价格
+  const displayPrice = wsPrice ?? live.current_price;
+
   // Neon color scheme per direction
   const neonColor = isUp
     ? { text: "text-[#00E5FF]", glow: "drop-shadow-[0_0_15px_rgba(0,229,255,0.6)]", bar: "bg-[#00E5FF]", bg: "bg-[#00E5FF]/[0.04]", border: "border-[#00E5FF]/20" }
@@ -358,7 +396,7 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
       />
 
       <div className="relative z-10 p-6 lg:p-8">
-        {/* Centered direction + price + strength */}
+        {/* Centered direction + price + countdown + strength */}
         <div className="flex flex-col items-center text-center space-y-6 max-w-md mx-auto">
 
           {/* Direction */}
@@ -381,16 +419,41 @@ function LiveSignalPanel({ live, isAdmin, onStart, actionLoading }: { live: Even
             </div>
           </div>
 
-          {/* Price */}
+          {/* Price — real-time via Binance WebSocket */}
           <div>
-            <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2">
+            <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2 flex items-center justify-center gap-2">
               {t("live.currentPrice")}
+              {wsConnected && (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[8px] font-black">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  {t("live.realtime")}
+                </span>
+              )}
             </p>
             <p className="text-4xl font-black font-mono text-white tabular-nums tracking-tight">
               <span className="text-fuchsia-400/60 text-xl mr-0.5">$</span>
-              {live.current_price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              {displayPrice?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </p>
           </div>
+
+          {/* Round countdown */}
+          {live.round_expire_time && (
+            <div>
+              <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2 flex items-center justify-center gap-1.5">
+                <Clock size={10} className="text-zinc-500" />
+                {t("live.roundExpiry")}
+              </p>
+              <p className={`text-2xl font-black font-mono tabular-nums tracking-tight ${
+                countdown.remaining <= 0
+                  ? "text-zinc-500"
+                  : countdown.remaining <= 60
+                  ? "text-red-400 drop-shadow-[0_0_12px_rgba(248,113,113,0.5)]  animate-pulse"
+                  : "text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.4)]"
+              }`}>
+                {countdown.remaining <= 0 ? t("live.expired") : countdown.display}
+              </p>
+            </div>
+          )}
 
           {/* Strength bar */}
           <div className="w-full">

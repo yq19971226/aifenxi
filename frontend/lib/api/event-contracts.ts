@@ -20,6 +20,9 @@ export interface EventLiveSignal {
   current_price?: number;
   prediction?: EventPrediction;
   updated_at?: string;
+  round_num?: number;
+  round_expire_time?: string;
+  round_predict_time?: string;
 }
 
 export interface EventHistoryRecord {

@@ -31,7 +31,10 @@
     "volumeRatio": "成交量比",
     "bullish": "看涨",
     "bearish": "看跌",
-    "watching": "观望"
+    "watching": "观望",
+    "roundExpiry": "本輪到期",
+    "expired": "已到期",
+    "realtime": "即時"
   },
   "directions": {
     "up": "看涨",

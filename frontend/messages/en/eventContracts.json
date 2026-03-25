@@ -31,7 +31,10 @@
     "volumeRatio": "Volume Ratio",
     "bullish": "Bullish",
     "bearish": "Bearish",
-    "watching": "Watching"
+    "watching": "Watching",
+    "roundExpiry": "Round Expiry",
+    "expired": "Expired",
+    "realtime": "LIVE"
   },
   "directions": {
     "up": "UP",
