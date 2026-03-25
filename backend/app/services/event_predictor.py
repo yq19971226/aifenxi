@@ -233,7 +233,10 @@ class EventPredictor:
 
         # 获取当前指标快照
         metrics = self._aggregator.metrics
-        if not metrics or not metrics.get("current_price"):
+        has_price = bool(metrics and metrics.get("current_price"))
+        print(f"[PREDICTOR] Round {self._current_round}: metrics={bool(metrics)}, has_price={has_price}", flush=True)
+        if not has_price:
+            print(f"[PREDICTOR] Round {self._current_round}: NO METRICS, recording skip", flush=True)
             logger.warning("[PREDICTOR] Round %d: no metrics available, skipping", self._current_round)
             ok = await self._record_prediction(
                 round_num=self._current_round,
@@ -245,6 +248,7 @@ class EventPredictor:
                 signals_detail={"reason": "no_metrics"},
                 status="skipped",
             )
+            print(f"[PREDICTOR] Round {self._current_round}: skip record_ok={ok}", flush=True)
             # skipped 也写入 event_stats（修复 #3）
             if ok:
                 await self._record_skipped_stat()
@@ -259,6 +263,7 @@ class EventPredictor:
         predict_time = datetime.now(timezone.utc)
         entry_price = metrics["current_price"]
 
+        print(f"[PREDICTOR] Round {self._current_round}: direction={result.direction}, strength={result.strength:.2f}", flush=True)
         if result.direction is None:
             # 信号不足，跳过
             logger.warning(
@@ -275,6 +280,7 @@ class EventPredictor:
                 signals_detail=result.to_dict(),
                 status="skipped",
             )
+            print(f"[PREDICTOR] Round {self._current_round}: skip record_ok={ok}", flush=True)
             # skipped 也写入 event_stats（修复 #3）
             if ok:
                 await self._record_skipped_stat()
@@ -284,7 +290,7 @@ class EventPredictor:
                 self._current_round, result.direction, result.strength,
                 result.primary_score, result.secondary_score,
             )
-            await self._record_prediction(
+            ok = await self._record_prediction(
                 round_num=self._current_round,
                 direction=result.direction,
                 strength=result.strength,
@@ -294,6 +300,7 @@ class EventPredictor:
                 signals_detail={**result.to_dict(), "metrics_snapshot": metrics},
                 status="pending",
             )
+            print(f"[PREDICTOR] Round {self._current_round}: pending record_ok={ok}", flush=True)
 
         # 等待到期
         remaining_to_expire = (expire_time - datetime.now(timezone.utc)).total_seconds()
@@ -322,6 +329,7 @@ class EventPredictor:
         status: str,
     ) -> bool:
         """写入预测记录到数据库。返回 True 表示成功（修复 #13）。"""
+        print(f"[PREDICTOR] _record_prediction called: round={round_num}, dir={direction}, status={status}", flush=True)
         try:
             from app.core.database import AsyncSessionLocal
             from sqlalchemy import text
@@ -349,8 +357,11 @@ class EventPredictor:
                     },
                 )
                 await session.commit()
+            print(f"[PREDICTOR] _record_prediction SUCCESS: round={round_num}", flush=True)
             return True
         except Exception as exc:
+            import traceback
+            print(f"[PREDICTOR] _record_prediction FAILED: round={round_num}, error={exc}\n{traceback.format_exc()}", flush=True)
             logger.error("record_prediction_error", extra={"error": str(exc), "round": round_num})
             return False
 
