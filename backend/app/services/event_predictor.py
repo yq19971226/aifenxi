@@ -60,23 +60,27 @@ class EventPredictor:
         if self._running:
             return
         self._running = True
+        print(f"[PREDICTOR] start() called, symbol={self.symbol}", flush=True)
 
         # 确保数据库表存在（失败不阻止启动）
         try:
             await _ensure_tables()
         except Exception as exc:
+            print(f"[PREDICTOR] ensure_tables_error (non-fatal): {exc}", flush=True)
             logger.error("ensure_tables_error (non-fatal): %s", exc)
 
         # 从 DB 恢复 round_num（失败不阻止启动）
         try:
             await self._restore_round_num()
         except Exception as exc:
+            print(f"[PREDICTOR] restore_round_num_error (non-fatal): {exc}", flush=True)
             logger.error("restore_round_num_error (non-fatal): %s", exc)
 
         # 恢复重启前遗留的 pending 记录（失败不阻止启动）
         try:
             await self._recover_pending_on_startup()
         except Exception as exc:
+            print(f"[PREDICTOR] recover_pending_error (non-fatal): {exc}", flush=True)
             logger.error("recover_pending_error (non-fatal): %s", exc)
 
         # 启动 WebSocket 聚合器（后台）
@@ -84,6 +88,7 @@ class EventPredictor:
 
         # 启动预测循环
         self._task = asyncio.create_task(self._prediction_loop())
+        print(f"[PREDICTOR] _prediction_loop task created: {self._task}", flush=True)
 
         # 启动 pending 清理任务（修复 #12）
         self._pending_cleanup_task = asyncio.create_task(self._pending_cleanup_loop())
@@ -94,6 +99,7 @@ class EventPredictor:
         # 写入 running 状态到 Redis
         await self._set_redis_status("running")
 
+        print(f"[PREDICTOR] start() complete, all tasks created", flush=True)
         logger.info("EventPredictor started", extra={"symbol": self.symbol, "resume_round": self._current_round})
 
     async def stop(self) -> None:
@@ -185,21 +191,25 @@ class EventPredictor:
 
     async def _prediction_loop(self) -> None:
         """每轮预测循环。"""
-        # 等待聚合器有数据（至少 30 秒）
+        print("[PREDICTOR] _prediction_loop entered, warm-up 30s...", flush=True)
         logger.warning("[PREDICTOR] prediction_loop started, warm-up 30s...")
         await asyncio.sleep(30)
+        print("[PREDICTOR] warm-up done, entering round loop", flush=True)
         logger.warning("[PREDICTOR] warm-up done, entering round loop")
 
         while self._running:
             try:
                 await self._run_one_round()
             except asyncio.CancelledError:
+                print("[PREDICTOR] prediction_loop cancelled", flush=True)
                 break
             except Exception as exc:
                 import traceback
+                tb = traceback.format_exc()
+                print(f"[PREDICTOR] prediction_round_error: {exc}\n{tb}", flush=True)
                 logger.error(
                     "prediction_round_error",
-                    extra={"error": str(exc), "traceback": traceback.format_exc()},
+                    extra={"error": str(exc), "traceback": tb},
                 )
                 await asyncio.sleep(30)
 
@@ -209,6 +219,7 @@ class EventPredictor:
         round_start = datetime.now(timezone.utc)
         expire_time = round_start + timedelta(seconds=_ROUND_DURATION)
 
+        print(f"[PREDICTOR] Round {self._current_round} started", flush=True)
         logger.warning(
             "[PREDICTOR] Round %d started (will decide at +%ds, expire at +%ds)",
             self._current_round, _DECISION_DELAY, _ROUND_DURATION,
@@ -691,11 +702,15 @@ def get_predictor() -> EventPredictor | None:
 async def start_predictor(symbol: str = "ETHUSDT") -> EventPredictor:
     """启动预测器。使用 Redis 锁确保多 Worker 环境只有一个实例运行。"""
     global _predictor_instance, _lock_renew_task
+    print(f"[PREDICTOR] start_predictor called, symbol={symbol}", flush=True)
     if _predictor_instance and _predictor_instance.running:
+        print("[PREDICTOR] already running, returning existing instance", flush=True)
         return _predictor_instance
 
     # 获取分布式锁
-    if not await _acquire_lock():
+    lock_acquired = await _acquire_lock()
+    print(f"[PREDICTOR] lock acquired: {lock_acquired}", flush=True)
+    if not lock_acquired:
         logger.info("EventPredictor skipped: another worker holds the lock")
         return None  # type: ignore[return-value]
 
@@ -704,6 +719,7 @@ async def start_predictor(symbol: str = "ETHUSDT") -> EventPredictor:
 
     _predictor_instance = EventPredictor(symbol)
     await _predictor_instance.start()
+    print(f"[PREDICTOR] predictor started successfully", flush=True)
     return _predictor_instance
 
 

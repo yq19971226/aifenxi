@@ -227,22 +227,30 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # 注意：uvicorn --workers N 会启动 N 个进程，每个都执行 lifespan；
     # start_predictor 内部使用 Redis 锁确保只有一个 Worker 启动预测器
     try:
+        print("[LIFESPAN] checking event_predictor_enabled config...", flush=True)
         from app.services.config_service import get_config_value
         event_pred_enabled = (await get_config_value("event_predictor_enabled", "true")).lower().strip()
+        print(f"[LIFESPAN] event_predictor_enabled = '{event_pred_enabled}'", flush=True)
         if event_pred_enabled in ("true", "1", "on"):
             from app.services.event_predictor import start_predictor
+            print("[LIFESPAN] calling start_predictor('ETHUSDT')...", flush=True)
             predictor = await start_predictor("ETHUSDT")
             if predictor:
                 app.state._event_predictor = predictor
+                print("[LIFESPAN] EventPredictor got lock and started", flush=True)
                 import logging
                 logging.getLogger(__name__).info("EventPredictor 自动启动成功（本 Worker 获得锁）")
             else:
+                print("[LIFESPAN] EventPredictor skipped (another worker holds lock)", flush=True)
                 import logging
                 logging.getLogger(__name__).info("EventPredictor 已由其他 Worker 启动，本 Worker 跳过")
         else:
+            print(f"[LIFESPAN] EventPredictor disabled by config: '{event_pred_enabled}'", flush=True)
             import logging
             logging.getLogger(__name__).info("EventPredictor 已通过配置禁用")
     except Exception as exc:
+        import traceback
+        print(f"[LIFESPAN] EventPredictor startup FAILED: {exc}\n{traceback.format_exc()}", flush=True)
         import logging
         logging.getLogger(__name__).warning("EventPredictor 自动启动失败: %s", exc)
     yield
