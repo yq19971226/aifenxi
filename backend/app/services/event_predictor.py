@@ -351,8 +351,8 @@ class EventPredictor:
                         "strength": strength,
                         "signals_detail": json.dumps(signals_detail),
                         "entry_price": entry_price,
-                        "predict_time": predict_time.isoformat(),
-                        "expire_time": expire_time.isoformat(),
+                        "predict_time": predict_time,
+                        "expire_time": expire_time,
                         "status": status,
                     },
                 )
@@ -425,7 +425,7 @@ class EventPredictor:
                         {
                             "settle_price": settle_price,
                             "result": result,
-                            "settled_at": datetime.now(timezone.utc).isoformat(),
+                            "settled_at": datetime.now(timezone.utc),
                             "id": pred["id"],
                         },
                     )
@@ -530,7 +530,7 @@ class EventPredictor:
                         """),
                         {
                             "symbol": self.symbol,
-                            "cutoff": (datetime.now(timezone.utc) - timedelta(minutes=20)).isoformat(),
+                            "cutoff": datetime.now(timezone.utc) - timedelta(minutes=20),
                         },
                     )
                     if result.rowcount and result.rowcount > 0:
