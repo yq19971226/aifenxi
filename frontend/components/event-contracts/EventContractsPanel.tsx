@@ -438,12 +438,13 @@ function StatsPanel({ stats }: { stats: EventStatsResponse }) {
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       {periods.map(({ key, label, icon: Icon }, idx) => {
         const d = stats[key];
+        const rate = d.win_rate ?? 0;
         const hasData = d.decided > 0;
         const rateColor = !hasData
-          ? "text-zinc-600"
-          : d.win_rate >= 60
+          ? "text-zinc-400"
+          : rate >= 60
           ? "text-[#00E5FF] drop-shadow-[0_0_15px_rgba(0,229,255,0.6)] glow-cyan"
-          : d.win_rate >= 50
+          : rate >= 50
           ? "text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)]"
           : "text-red-400 drop-shadow-[0_0_12px_rgba(248,113,113,0.5)]";
 
@@ -459,25 +460,25 @@ function StatsPanel({ stats }: { stats: EventStatsResponse }) {
             <div className="absolute top-0 right-0 w-[80px] h-[80px] rounded-full bg-[#00E5FF]/[0.03] blur-[40px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
 
             <div className="relative z-10">
-              <div className="flex items-center gap-1.5 mb-4">
-                <Icon size={10} className="text-zinc-500" />
-                <p className="text-[9px] font-mono font-black text-zinc-500 uppercase tracking-[0.2em]">{label}</p>
+              <div className="flex items-center gap-2 mb-4">
+                <Icon size={12} className="text-zinc-400" />
+                <p className="text-xs font-mono font-black text-zinc-400 uppercase tracking-[0.15em]">{label}</p>
               </div>
               <p className={`text-3xl font-black font-mono tabular-nums ${rateColor}`}>
-                {hasData ? `${d.win_rate}%` : "—"}
+                {rate}%
               </p>
-              <div className="mt-3 space-y-0.5">
-                <p className="text-[10px] font-mono text-zinc-500">
-                  <span className="text-emerald-400">{d.wins}</span>
-                  <span className="text-zinc-600 mx-1">{t("stats.wins")}</span>
-                  <span className="text-zinc-600">/</span>
-                  <span className="text-red-400 ml-1">{d.losses}</span>
-                  <span className="text-zinc-600 mx-1">{t("stats.losses")}</span>
-                  <span className="text-zinc-600">·</span>
-                  <span className="text-zinc-500 ml-1">{d.skipped}</span>
-                  <span className="text-zinc-600 ml-1">{t("stats.skipped")}</span>
+              <div className="mt-3 space-y-1">
+                <p className="text-xs font-mono text-zinc-400">
+                  <span className="text-emerald-400 font-bold">{d.wins}</span>
+                  <span className="text-zinc-400 mx-1">{t("stats.wins")}</span>
+                  <span className="text-zinc-500">/</span>
+                  <span className="text-red-400 font-bold ml-1">{d.losses}</span>
+                  <span className="text-zinc-400 mx-1">{t("stats.losses")}</span>
+                  <span className="text-zinc-500">·</span>
+                  <span className="text-zinc-400 font-bold ml-1">{d.skipped}</span>
+                  <span className="text-zinc-400 ml-1">{t("stats.skipped")}</span>
                 </p>
-                <p className="text-[9px] font-mono text-zinc-700">
+                <p className="text-[11px] font-mono text-zinc-500">
                   {t("stats.totalRounds", { count: d.total })}
                 </p>
               </div>
