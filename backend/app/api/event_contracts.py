@@ -132,36 +132,41 @@ async def get_stats(
     _user: UserInfo = Depends(get_current_user),
     symbol: str = "ETHUSDT",
 ) -> dict:
-    """获取胜率统计（今日 / 7日 / 30日 / 总计）。"""
+    """获取胜率统计（今日 / 7日 / 30日 / 总计）。
+
+    直接从 event_predictions 表实时聚合，保证数据一致性。
+    """
     from app.core.database import AsyncSessionLocal
     from app.core.sql_compat import now_minus_interval_literal
     from sqlalchemy import text
 
+    # 聚合 SQL — 直接从 event_predictions 表按条件聚合
+    _agg_cols = """
+        COUNT(*) as total,
+        SUM(CASE WHEN result = 'win' THEN 1 ELSE 0 END) as wins,
+        SUM(CASE WHEN result = 'lose' THEN 1 ELSE 0 END) as losses,
+        SUM(CASE WHEN status = 'skipped' THEN 1 ELSE 0 END) as skipped
+    """
+
     async with AsyncSessionLocal() as session:
         # 今日
         today_row = await session.execute(
-            text("""
-                SELECT COALESCE(SUM(total), 0) as total,
-                       COALESCE(SUM(wins), 0) as wins,
-                       COALESCE(SUM(losses), 0) as losses,
-                       COALESCE(SUM(skipped), 0) as skipped
-                FROM event_stats
-                WHERE symbol = :symbol AND date = CURRENT_DATE
+            text(f"""
+                SELECT {_agg_cols}
+                FROM event_predictions
+                WHERE symbol = :symbol AND DATE(created_at) = CURRENT_DATE
             """),
             {"symbol": symbol},
         )
         today = dict(today_row.mappings().first() or {})
 
-        # 7日（修复 #16 — 使用兼容语法）
+        # 7日
         _7d_cutoff = now_minus_interval_literal(7, "days")
         week_row = await session.execute(
             text(f"""
-                SELECT COALESCE(SUM(total), 0) as total,
-                       COALESCE(SUM(wins), 0) as wins,
-                       COALESCE(SUM(losses), 0) as losses,
-                       COALESCE(SUM(skipped), 0) as skipped
-                FROM event_stats
-                WHERE symbol = :symbol AND date >= {_7d_cutoff}
+                SELECT {_agg_cols}
+                FROM event_predictions
+                WHERE symbol = :symbol AND created_at >= {_7d_cutoff}
             """),
             {"symbol": symbol},
         )
@@ -171,12 +176,9 @@ async def get_stats(
         _30d_cutoff = now_minus_interval_literal(30, "days")
         month_row = await session.execute(
             text(f"""
-                SELECT COALESCE(SUM(total), 0) as total,
-                       COALESCE(SUM(wins), 0) as wins,
-                       COALESCE(SUM(losses), 0) as losses,
-                       COALESCE(SUM(skipped), 0) as skipped
-                FROM event_stats
-                WHERE symbol = :symbol AND date >= {_30d_cutoff}
+                SELECT {_agg_cols}
+                FROM event_predictions
+                WHERE symbol = :symbol AND created_at >= {_30d_cutoff}
             """),
             {"symbol": symbol},
         )
@@ -184,12 +186,9 @@ async def get_stats(
 
         # 总计
         all_row = await session.execute(
-            text("""
-                SELECT COALESCE(SUM(total), 0) as total,
-                       COALESCE(SUM(wins), 0) as wins,
-                       COALESCE(SUM(losses), 0) as losses,
-                       COALESCE(SUM(skipped), 0) as skipped
-                FROM event_stats
+            text(f"""
+                SELECT {_agg_cols}
+                FROM event_predictions
                 WHERE symbol = :symbol
             """),
             {"symbol": symbol},
@@ -197,11 +196,14 @@ async def get_stats(
         all_time = dict(all_row.mappings().first() or {})
 
     def _add_rate(d: dict) -> dict:
-        decided = d.get("wins", 0) + d.get("losses", 0)
-        d["win_rate"] = round(d["wins"] / decided * 100, 1) if decided > 0 else 0.0
+        wins = d.get("wins", 0) or 0
+        losses = d.get("losses", 0) or 0
+        decided = wins + losses
+        d["wins"] = wins
+        d["losses"] = losses
+        d["win_rate"] = round(wins / decided * 100, 1) if decided > 0 else 0.0
         d["decided"] = decided
-        # draws = total - wins - losses - skipped（平局数）
-        d["draws"] = max(0, d.get("total", 0) - d.get("wins", 0) - d.get("losses", 0) - d.get("skipped", 0))
+        d["draws"] = max(0, (d.get("total", 0) or 0) - wins - losses - (d.get("skipped", 0) or 0))
         return d
 
     return {
