@@ -57,12 +57,19 @@ async def sync_order_route(
     session: AsyncSession = Depends(get_db),
 ) -> dict[str, str]:
     try:
-        await reconcile_payment_status(session, payment_id)
-        return {"status": "ok"}
+        info = await reconcile_payment_status(session, payment_id)
+        return {"status": "ok", "payment_status": info.status}
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
     except RuntimeError as exc:
-        raise HTTPException(status_code=502, detail=str(exc))
+        logger.warning(
+            "sync_order_route gateway error: payment_id=%s, admin=%s, error=%s",
+            payment_id, user.user_id, exc,
+        )
+        raise HTTPException(
+            status_code=502,
+            detail=str(exc),
+        )
     except Exception as exc:
-        logger.error("sync_order_route error: %s", exc)
-        raise HTTPException(status_code=500, detail="同步订单状态失败")
+        logger.error("sync_order_route error: payment_id=%s, error=%s", payment_id, exc)
+        raise HTTPException(status_code=500, detail="同步订单状态失败，请稍后重试")

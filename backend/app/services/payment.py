@@ -895,34 +895,69 @@ async def reconcile_payment_status(
     payment_id: str,
     user_id: str | None = None,
 ) -> PaymentInfo:
+    """向 Oxapay 查询支付状态并同步到本地数据库。
+
+    内置 3 次重试（指数退避），容忍上游短暂不可用。
+    """
     existing = await _get_payment_row(session, payment_id, user_id=user_id)
     if existing is None:
         raise ValueError("支付订单不存在")
 
-    try:
-        from app.services.config_service import get_config_value
+    from app.services.config_service import get_config_value
 
-        merchant_key = await get_config_value("oxapay_merchant_key")
-        if not merchant_key:
-            raise RuntimeError("未配置支付网关密钥")
+    merchant_key = await get_config_value("oxapay_merchant_key")
+    if not merchant_key:
+        raise RuntimeError("未配置支付网关密钥")
 
-        provider_response = await asyncio.wait_for(
-            _call_oxapay_inquiry(payment_id, merchant_key=merchant_key),
-            timeout=API_TIMEOUT_SECONDS,
+    max_retries = 3
+    last_exc: Exception | None = None
+    provider_response: dict | None = None
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            provider_response = await asyncio.wait_for(
+                _call_oxapay_inquiry(payment_id, merchant_key=merchant_key),
+                timeout=API_TIMEOUT_SECONDS,
+            )
+            break  # 成功，退出重试
+        except asyncio.TimeoutError:
+            last_exc = RuntimeError("支付状态查询超时")
+            logger.warning(
+                "Oxapay status query timeout (attempt %d/%d): payment_id=%s",
+                attempt, max_retries, payment_id,
+            )
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code == 404:
+                raise ValueError("支付订单不存在")
+            last_exc = exc
+            logger.warning(
+                "Oxapay status query HTTP %d (attempt %d/%d): payment_id=%s",
+                exc.response.status_code, attempt, max_retries, payment_id,
+            )
+        except (httpx.ConnectError, httpx.ReadTimeout, httpx.ConnectTimeout) as exc:
+            last_exc = exc
+            logger.warning(
+                "Oxapay network error (attempt %d/%d): payment_id=%s, error=%s",
+                attempt, max_retries, payment_id, exc,
+            )
+        except RuntimeError:
+            raise
+        except Exception as exc:
+            last_exc = exc
+            logger.warning(
+                "Oxapay status query error (attempt %d/%d): payment_id=%s, error=%s",
+                attempt, max_retries, payment_id, exc,
+            )
+
+        if attempt < max_retries:
+            await asyncio.sleep(1.0 * attempt)  # 指数退避: 1s, 2s
+
+    if provider_response is None:
+        logger.error(
+            "Oxapay status query failed after %d retries: payment_id=%s, last_error=%s",
+            max_retries, payment_id, last_exc,
         )
-    except asyncio.TimeoutError:
-        logger.error("Oxapay status query timeout: payment_id=%s", payment_id)
-        raise RuntimeError("支付状态查询超时，请稍后重试")
-    except httpx.HTTPStatusError as exc:
-        if exc.response.status_code == 404:
-            raise ValueError("支付订单不存在")
-        logger.error("Oxapay status query failed: payment_id=%s, status=%s", payment_id, exc.response.status_code)
-        raise RuntimeError("支付状态查询失败，请稍后重试")
-    except RuntimeError:
-        raise
-    except Exception as exc:
-        logger.error("Oxapay status query error: payment_id=%s, error=%s", payment_id, exc)
-        raise RuntimeError("支付状态查询失败，请稍后重试")
+        raise RuntimeError("支付网关暂时不可用，已重试多次仍失败，请稍后再试")
 
     try:
         payload = WebhookPayload.model_validate(provider_response)
