@@ -17,7 +17,6 @@ import {
   ChevronDown,
   LogOut,
   Rocket,
-  Send,
   Zap,
   type LucideIcon,
   Settings,
@@ -244,30 +243,6 @@ export function Sidebar() {
               </div>
             );
           })}
-        </div>
-
-        {/* External Help - Pins to bottom of scrollable area */}
-        <div className="pt-3 mt-4 border-t border-white/[0.04]">
-          <a
-            href="https://t.me/axiom888"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex items-center h-11 px-3.5 rounded-xl transition-all relative font-semibold text-zinc-500 hover:bg-[#2AABEE]/10 hover:text-[#2AABEE] hover:-translate-y-[1px]"
-          >
-            <Send size={20} className="shrink-0 transition-colors" />
-            <AnimatePresence>
-              {expanded && (
-                <motion.div
-                  initial={{ opacity: 0, width: 0 }}
-                  animate={{ opacity: 1, width: "auto" }}
-                  exit={{ opacity: 0, width: 0 }}
-                  className="ml-3.5 flex-1 overflow-hidden"
-                >
-                  <span className="text-sm font-bold tracking-wide whitespace-nowrap">Telegram 客服</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </a>
         </div>
       </div>
 

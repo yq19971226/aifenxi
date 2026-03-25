@@ -12,6 +12,7 @@ import { DataSourceBanner } from "@/components/cards/DataSourceBanner";
 import { OfflineBanner } from "@/components/ui/OfflineBanner";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { Disclaimer } from "@/components/layout/Disclaimer";
+import { TelegramSupport } from "@/components/layout/TelegramSupport";
 
 import type { ReactNode } from "react";
 
@@ -70,6 +71,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
           </div>
         </div>
       </div>
+
+      {/* Floating Telegram Support */}
+      <TelegramSupport />
     </AuthGuard>
   );
 }
