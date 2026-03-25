@@ -168,6 +168,7 @@ class EventPredictor:
                 "running": status == "running",
                 "symbol": self.symbol,
                 "status": status,
+                "current_round": self._current_round,
             })
             await r.setex(_REDIS_STATUS_KEY, 120, data)  # 2 分钟 TTL
         except Exception as exc:
@@ -185,8 +186,9 @@ class EventPredictor:
     async def _prediction_loop(self) -> None:
         """每轮预测循环。"""
         # 等待聚合器有数据（至少 30 秒）
-        logger.info("Waiting for aggregator warm-up (30s)...")
+        logger.warning("[PREDICTOR] prediction_loop started, warm-up 30s...")
         await asyncio.sleep(30)
+        logger.warning("[PREDICTOR] warm-up done, entering round loop")
 
         while self._running:
             try:
@@ -194,7 +196,11 @@ class EventPredictor:
             except asyncio.CancelledError:
                 break
             except Exception as exc:
-                logger.error("prediction_round_error", extra={"error": str(exc)})
+                import traceback
+                logger.error(
+                    "prediction_round_error",
+                    extra={"error": str(exc), "traceback": traceback.format_exc()},
+                )
                 await asyncio.sleep(30)
 
     async def _run_one_round(self) -> None:
@@ -203,9 +209,9 @@ class EventPredictor:
         round_start = datetime.now(timezone.utc)
         expire_time = round_start + timedelta(seconds=_ROUND_DURATION)
 
-        logger.info(
-            "Round %d started, will decide at +%ds",
-            self._current_round, _DECISION_DELAY,
+        logger.warning(
+            "[PREDICTOR] Round %d started (will decide at +%ds, expire at +%ds)",
+            self._current_round, _DECISION_DELAY, _ROUND_DURATION,
         )
 
         # 等待数据采集
@@ -217,7 +223,7 @@ class EventPredictor:
         # 获取当前指标快照
         metrics = self._aggregator.metrics
         if not metrics or not metrics.get("current_price"):
-            logger.warning("Round %d: no metrics available, skipping", self._current_round)
+            logger.warning("[PREDICTOR] Round %d: no metrics available, skipping", self._current_round)
             ok = await self._record_prediction(
                 round_num=self._current_round,
                 direction=None,
@@ -244,8 +250,8 @@ class EventPredictor:
 
         if result.direction is None:
             # 信号不足，跳过
-            logger.info(
-                "Round %d: signal insufficient, skipping (primary=%.1f, secondary=%.1f)",
+            logger.warning(
+                "[PREDICTOR] Round %d: signal insufficient, skipping (primary=%.1f, secondary=%.1f)",
                 self._current_round, result.primary_score, result.secondary_score,
             )
             ok = await self._record_prediction(
@@ -262,8 +268,8 @@ class EventPredictor:
             if ok:
                 await self._record_skipped_stat()
         else:
-            logger.info(
-                "Round %d: predicted %s (strength=%.2f, primary=%.1f, secondary=%.1f)",
+            logger.warning(
+                "[PREDICTOR] Round %d: predicted %s (strength=%.2f, primary=%.1f, secondary=%.1f)",
                 self._current_round, result.direction, result.strength,
                 result.primary_score, result.secondary_score,
             )
