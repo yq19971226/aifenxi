@@ -153,6 +153,46 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     except Exception as exc:
         import logging
         logging.getLogger(__name__).warning("params_changelog 建表失败: %s", exc)
+    # 确保 payment_audit_log 表存在（P1：支付审计日志完整链路）
+    try:
+        async with AsyncSessionLocal() as session:
+            _spk = serial_pk()
+            _v50 = varchar(50)
+            _v100 = varchar(100)
+            _ts = timestamptz_default()
+            await session.execute(text(f"""
+                CREATE TABLE IF NOT EXISTS payment_audit_log (
+                    id {_spk},
+                    payment_id {_v100} NOT NULL,
+                    user_id {_v100},
+                    event_type {_v50} NOT NULL,
+                    provider_status {_v50},
+                    local_status {_v50},
+                    status_reason {_v100},
+                    pay_amount TEXT,
+                    pay_currency {_v50},
+                    pay_address TEXT,
+                    provider_payload_json TEXT,
+                    source {_v50} DEFAULT 'webhook',
+                    created_at {_ts}
+                )
+            """))
+            await session.execute(text("""
+                CREATE INDEX IF NOT EXISTS idx_payment_audit_log_pid
+                ON payment_audit_log (payment_id)
+            """))
+            await session.execute(text("""
+                CREATE INDEX IF NOT EXISTS idx_payment_audit_log_uid
+                ON payment_audit_log (user_id)
+            """))
+            await session.execute(text("""
+                CREATE INDEX IF NOT EXISTS idx_payment_audit_log_at
+                ON payment_audit_log (created_at DESC)
+            """))
+            await session.commit()
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning("payment_audit_log 建表失败: %s", exc)
     # 初始化数据源管理器和健康监控
     try:
         from app.services.datasource_manager import get_datasource_manager

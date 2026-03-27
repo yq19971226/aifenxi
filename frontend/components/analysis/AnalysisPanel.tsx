@@ -12,6 +12,7 @@ import { ModeSelector, MODE_OPTIONS } from "@/components/analysis/ModeSelector";
 import { SymbolInput } from "@/components/analysis/SymbolInput";
 import { QuotaDisplay } from "@/components/analysis/QuotaDisplay";
 import { MarketRegimeBadge } from "@/components/analysis/MarketRegimeBadge";
+import { UpgradeModal, type UpgradeReason } from "@/components/analysis/UpgradeModal";
 import { useAuth } from "@/lib/auth-context";
 import { effectiveLevel } from "@/lib/utils/membershipLevel";
 import {
@@ -50,6 +51,9 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
   const [error, setError] = useState<string | null>(null);
   const [upgradeHint, setUpgradeHint] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<number | undefined>(undefined);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [upgradeReason, setUpgradeReason] = useState<UpgradeReason>("exhausted");
+  const [upgradeTierLabel, setUpgradeTierLabel] = useState<string | undefined>(undefined);
 
   const abortRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -203,7 +207,9 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
   const handleModeSelect = useCallback((m: AnalysisMode) => {
     if (isModeLocked(m)) {
       const opt = MODE_OPTIONS.find((o) => o.value === m);
-      setUpgradeHint(t("analysisPanel.modeLocked", { tier: opt?.tierLabel ?? "Premium" }));
+      setUpgradeTierLabel(opt?.tierLabel ?? "Premium");
+      setUpgradeReason("locked");
+      setUpgradeModalOpen(true);
       return;
     }
     setUpgradeHint(null);
@@ -212,6 +218,15 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
     setError(null);
     setProgressSteps([]);
   }, [isModeLocked]);
+
+  const handleStartOrUpgrade = useCallback(() => {
+    if (isQuotaExhausted) {
+      setUpgradeReason("exhausted");
+      setUpgradeModalOpen(true);
+      return;
+    }
+    handleStart(false);
+  }, [isQuotaExhausted, handleStart]);
 
   return (
     <motion.div
@@ -249,8 +264,8 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
         onSymbolChange={setSymbol}
         quickSymbols={quickSymbols}
         running={running}
-        canStart={canStart}
-        onStart={() => handleStart(false)}
+        canStart={canStart || isQuotaExhausted}
+        onStart={handleStartOrUpgrade}
       />
 
       {/* Quota & upgrade hints */}
@@ -319,6 +334,14 @@ export function AnalysisPanel({ symbol: externalSymbol }: AnalysisPanelProps) {
           />
         </motion.div>
       )}
+
+      {/* Upgrade modal */}
+      <UpgradeModal
+        open={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+        reason={upgradeReason}
+        tierLabel={upgradeTierLabel}
+      />
     </motion.div>
   );
 }

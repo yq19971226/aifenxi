@@ -65,3 +65,33 @@ export async function syncAdminOrderStatus(
 
   return handleApiResponse(res, "同步订单状态失败");
 }
+
+// ── Audit log ────────────────────────────────────────────────
+
+export interface AuditLogEntry {
+  id: number;
+  event_type: string;
+  provider_status: string | null;
+  local_status: string | null;
+  status_reason: string | null;
+  pay_amount: string | null;
+  pay_currency: string | null;
+  pay_address: string | null;
+  source: string | null;
+  created_at: string | null;
+}
+
+export interface AuditLogResponse {
+  payment_id: string;
+  total: number;
+  logs: AuditLogEntry[];
+}
+
+export async function getPaymentAuditLog(
+  paymentId: string
+): Promise<AuditLogResponse> {
+  const res = await authFetch(
+    `${API_BASE}/api/admin/orders/${paymentId}/audit-log`
+  );
+  return handleApiResponse(res, "查询审计日志失败");
+}

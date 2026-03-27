@@ -36,35 +36,44 @@ export function QuotaDisplay({ quota, isLocked, isExhausted, upgradeHint }: Quot
       )}
 
       {quota && !isLocked && !isExhausted && (
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-            <span className="text-xs text-zinc-500">{t("remaining")}</span>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+              <span className="text-xs text-zinc-500">{t("remaining")}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {(() => {
+                // effectiveTotal: bonus 充值后 remaining 可能 > limit（limit=0 时尤其如此）
+                const effectiveTotal = Math.max(quota.limit, quota.remaining);
+                const barCount = Math.min(5, effectiveTotal);
+                return (
+                  <div className="flex gap-1">
+                    {barCount > 0 && Array.from({ length: barCount }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={`h-1.5 w-6 rounded-full ${
+                          i < quota.remaining
+                            ? quota.remaining <= 2 ? "bg-amber-500" : "bg-indigo-500"
+                            : "bg-white/[0.05]"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                );
+              })()}
+              <span className={`text-xs font-mono ml-2 ${quota.remaining <= 2 ? "text-amber-400" : "text-zinc-400"}`}>
+                {quota.remaining}{quota.limit > 0 ? ` / ${quota.limit}` : ""}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            {(() => {
-              // effectiveTotal: bonus 充值后 remaining 可能 > limit（limit=0 时尤其如此）
-              const effectiveTotal = Math.max(quota.limit, quota.remaining);
-              const barCount = Math.min(5, effectiveTotal);
-              return (
-                <div className="flex gap-1">
-                  {barCount > 0 && Array.from({ length: barCount }).map((_, i) => (
-                    <div
-                      key={i}
-                      className={`h-1.5 w-6 rounded-full ${
-                        i < quota.remaining
-                          ? "bg-indigo-500"
-                          : "bg-white/[0.05]"
-                      }`}
-                    />
-                  ))}
-                </div>
-              );
-            })()}
-            <span className="text-xs text-zinc-400 font-mono ml-2">
-              {quota.remaining}{quota.limit > 0 ? ` / ${quota.limit}` : ""}
-            </span>
-          </div>
+
+          {/* Low quota warning */}
+          {quota.remaining > 0 && quota.remaining <= 2 && (
+            <p className="text-[11px] text-amber-400/80 font-medium">
+              ⚡ {t("lowWarning")}
+            </p>
+          )}
         </div>
       )}
     </div>

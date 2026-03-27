@@ -419,6 +419,55 @@ async def ensure_payment_audit_columns(session: AsyncSession) -> None:
     )
     await session.commit()
 
+
+async def _write_audit_log(
+    session: AsyncSession,
+    *,
+    payment_id: str,
+    user_id: str | None,
+    event_type: str,
+    provider_status: str | None = None,
+    local_status: str | None = None,
+    status_reason: str | None = None,
+    audit_values: dict[str, Any] | None = None,
+    source: str = "webhook",
+) -> None:
+    """向 payment_audit_log 写入一条不可变审计记录。
+
+    调用方无需担心失败 — 日志写入不影响业务事务。
+    """
+    try:
+        vals = audit_values or {}
+        await session.execute(
+            text("""
+                INSERT INTO payment_audit_log
+                    (payment_id, user_id, event_type,
+                     provider_status, local_status, status_reason,
+                     pay_amount, pay_currency, pay_address,
+                     provider_payload_json, source)
+                VALUES
+                    (:payment_id, :user_id, :event_type,
+                     :provider_status, :local_status, :status_reason,
+                     :pay_amount, :pay_currency, :pay_address,
+                     :provider_payload_json, :source)
+            """),
+            {
+                "payment_id": payment_id,
+                "user_id": user_id,
+                "event_type": event_type,
+                "provider_status": provider_status or vals.get("provider_status"),
+                "local_status": local_status,
+                "status_reason": status_reason or vals.get("status_reason"),
+                "pay_amount": vals.get("pay_amount"),
+                "pay_currency": vals.get("pay_currency"),
+                "pay_address": vals.get("pay_address"),
+                "provider_payload_json": vals.get("provider_payload_json"),
+                "source": source,
+            },
+        )
+    except Exception as exc:
+        logger.warning("审计日志写入失败 (非致命): payment_id=%s, error=%s", payment_id, exc)
+
 def _payment_info_from_row(row: dict) -> PaymentInfo:
     return PaymentInfo(
         id=str(row["id"]),
@@ -666,6 +715,24 @@ async def handle_webhook(
         raise
 
     local_status = _map_local_payment_status(provider_status)
+
+    # ── 审计日志：记录每次 Webhook/Sync 事件到 payment_audit_log ──
+    #    位于 provider_snapshot 写入之后、业务分支之前，
+    #    确保所有事件（含幂等跳过）都被完整记录。
+    event_type = (
+        "idempotent_skip" if existing["status"] == "completed"
+        else f"status_{local_status}"
+    )
+    await _write_audit_log(
+        session,
+        payment_id=payment_id,
+        user_id=str(existing["user_id"]) if existing.get("user_id") else None,
+        event_type=event_type,
+        provider_status=provider_status,
+        local_status=local_status,
+        audit_values=audit_values,
+        source=source,
+    )
 
     # 幂等性：已完成的支付仍记录审计快照，但不重复执行业务副作用
     if existing["status"] == "completed":

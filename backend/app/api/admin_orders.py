@@ -73,3 +73,49 @@ async def sync_order_route(
     except Exception as exc:
         logger.error("sync_order_route error: payment_id=%s, error=%s", payment_id, exc)
         raise HTTPException(status_code=500, detail="同步订单状态失败，请稍后重试")
+
+
+@router.get("/orders/{payment_id}/audit-log")
+async def get_payment_audit_log(
+    payment_id: str,
+    user: UserInfo = Depends(require_operator_or_admin),
+    session: AsyncSession = Depends(get_db),
+) -> dict:
+    """查询某笔支付的完整审计日志链路。"""
+    try:
+        from sqlalchemy import text
+        result = await session.execute(
+            text("""
+                SELECT id, payment_id, user_id, event_type,
+                       provider_status, local_status, status_reason,
+                       pay_amount, pay_currency, pay_address,
+                       provider_payload_json, source, created_at
+                FROM payment_audit_log
+                WHERE payment_id = :payment_id
+                ORDER BY created_at ASC
+            """),
+            {"payment_id": payment_id},
+        )
+        rows = result.mappings().all()
+        return {
+            "payment_id": payment_id,
+            "total": len(rows),
+            "logs": [
+                {
+                    "id": row["id"],
+                    "event_type": row["event_type"],
+                    "provider_status": row["provider_status"],
+                    "local_status": row["local_status"],
+                    "status_reason": row["status_reason"],
+                    "pay_amount": row["pay_amount"],
+                    "pay_currency": row["pay_currency"],
+                    "pay_address": row["pay_address"],
+                    "source": row["source"],
+                    "created_at": str(row["created_at"]) if row["created_at"] else None,
+                }
+                for row in rows
+            ],
+        }
+    except Exception as exc:
+        logger.error("get_payment_audit_log error: payment_id=%s, error=%s", payment_id, exc)
+        raise HTTPException(status_code=500, detail="查询审计日志失败")

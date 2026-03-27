@@ -182,7 +182,15 @@
       "createdAt": "创建时间",
       "action": "操作",
       "planPro": "专业",
-      "planFlagship": "旗舰"
+      "planFlagship": "旗舰",
+      "auditLog": "审计链路",
+      "auditLogLoading": "加载中...",
+      "auditLogEmpty": "暂无审计记录",
+      "auditLogEvent": "事件",
+      "auditLogProvider": "Provider",
+      "auditLogLocal": "本地状态",
+      "auditLogSource": "来源",
+      "auditLogTime": "时间"
     }
   },
   "announcements": {

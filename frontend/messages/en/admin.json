@@ -185,7 +185,15 @@
       "createdAt": "Created At",
       "action": "Action",
       "planPro": "Pro",
-      "planFlagship": "Flagship"
+      "planFlagship": "Flagship",
+      "auditLog": "Audit Trail",
+      "auditLogLoading": "Loading...",
+      "auditLogEmpty": "No audit records",
+      "auditLogEvent": "Event",
+      "auditLogProvider": "Provider",
+      "auditLogLocal": "Local Status",
+      "auditLogSource": "Source",
+      "auditLogTime": "Time"
     }
   },
   "announcements": {

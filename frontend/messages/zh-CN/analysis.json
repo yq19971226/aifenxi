@@ -110,7 +110,17 @@
   },
   "quotaDisplay": {
     "exhausted": "分析次数已用完，升级会员解锁更多次数。",
-    "remaining": "今日分析配额"
+    "remaining": "今日分析配额",
+    "lowWarning": "额度即将用完，升级获取更多分析次数"
+  },
+  "upgradeModal": {
+    "exhaustedTitle": "分析额度已用完",
+    "exhaustedDesc": "今日免费分析次数已全部使用。升级会员可获得更多每日配额，或购买积分包按量补充。",
+    "lockedTitle": "需要{tier}会员",
+    "lockedDesc": "该分析模式需要更高等级会员才能使用。升级后即可解锁全部功能。",
+    "upgradeMembership": "升级会员",
+    "buyCredits": "购买积分包",
+    "dismiss": "稍后再说"
   },
   "symbolInput": {
     "label": "交易对 Symbol",

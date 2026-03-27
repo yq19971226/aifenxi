@@ -110,7 +110,17 @@
   },
   "quotaDisplay": {
     "exhausted": "Analysis quota exhausted. Upgrade to unlock more.",
-    "remaining": "Today's analysis quota"
+    "remaining": "Today's analysis quota",
+    "lowWarning": "Quota running low. Upgrade for more analysis credits."
+  },
+  "upgradeModal": {
+    "exhaustedTitle": "Quota Exhausted",
+    "exhaustedDesc": "Your free analysis credits for today have been used up. Upgrade your membership for more daily quota, or purchase a credit pack.",
+    "lockedTitle": "{tier} Membership Required",
+    "lockedDesc": "This analysis mode requires a higher membership tier. Upgrade to unlock all features.",
+    "upgradeMembership": "Upgrade Membership",
+    "buyCredits": "Buy Credit Pack",
+    "dismiss": "Maybe later"
   },
   "symbolInput": {
     "label": "Trading Pair Symbol",

@@ -182,7 +182,15 @@
       "createdAt": "建立時間",
       "action": "操作",
       "planPro": "專業",
-      "planFlagship": "旗艦"
+      "planFlagship": "旗艦",
+      "auditLog": "審計鏈路",
+      "auditLogLoading": "載入中...",
+      "auditLogEmpty": "暫無審計記錄",
+      "auditLogEvent": "事件",
+      "auditLogProvider": "Provider",
+      "auditLogLocal": "本地狀態",
+      "auditLogSource": "來源",
+      "auditLogTime": "時間"
     }
   },
   "announcements": {
